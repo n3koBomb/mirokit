@@ -60,10 +60,12 @@
    ============================================================================ */
 
 :root {
+	--bld: #01337b;
 	--bl: #1565ff;
 	--bl2: #3a7bff;
 	--bll: #8ec5ff;
 	--rd: #ff3d3d;
+	--rdl: #d63c3a;
 	--yl: #ffd54f;
 	--dk: #0d1b4b;
 	--bg: #f0f6ff;
@@ -239,14 +241,25 @@ iconify-icon {
 	display: block;
 }
 
-/* --- Desktop-Navigation: erst ab 1081px sichtbar (siehe Burger unten) --- */
+/* ============================================================================
+   DESKTOP-NAVIGATION — MEHRSTUFIGE MIROKIT-DROPDOWNS
+   ============================================================================ */
 
 .desktop-nav {
+	--desktop-nav-button: #60a5cb;
+	--desktop-nav-button-hover: #559bc2;
+	--desktop-sub-button: #72afd0;
+	--desktop-nested-button: #83b9d6;
+	--desktop-nav-text: rgba(255, 255, 255, 0.94);
+
 	display: none;
 	align-items: center;
 	gap: 10px;
+
 	list-style: none;
 }
+
+/* Desktop-Navigation wird weiterhin erst ab 1081px angezeigt. */
 
 @media (min-width: 1081px) {
 	.desktop-nav {
@@ -254,83 +267,413 @@ iconify-icon {
 	}
 }
 
-.desktop-nav a,
-.submenu-toggle {
-	font-weight: 800;
-	font-size: 13px;
-	text-decoration: none;
-	cursor: pointer;
-	transition: transform 0.18s, filter 0.18s, box-shadow 0.18s;
-	white-space: nowrap;
-	color: #fff;
-	background-color: #60a5cb;
-	font-family: "Montserrat", sans-serif;
-	box-shadow: 0 14px 28px rgba(13, 27, 75, 0.13);
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	min-height: 2.5em;
-	padding: 0 1.15em;
-	border-radius: 16px;
+.desktop-nav,
+.desktop-nav ul {
+	list-style: none;
 }
 
-.desktop-nav a:hover,
-.submenu-toggle:hover {
-	transform: translateX(-3px) translateY(-1px);
-	filter: saturate(1.12);
-	box-shadow: 0 20px 36px rgba(13, 27, 75, 0.18);
-}
+/* Jeder Hauptpunkt ist der Positionsanker seines Dropdowns. */
 
-.nav-item {
+.desktop-nav>.nav-item {
 	position: relative;
 }
 
-.submenu-toggle {
-	display: flex;
+/* --------------------------------------------------------------------------
+   HAUPTNAVIGATIONS-BUTTONS
+   -------------------------------------------------------------------------- */
+
+.desktop-nav>.nav-item>a,
+.desktop-nav>.nav-item>.submenu-toggle {
+	min-height: 2.5em;
+
+	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 10px;
+
+	padding: 0 1.15em;
+
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 16px;
+
+	background: var(--desktop-nav-button);
+	color: var(--desktop-nav-text);
+
+	font-family: "Montserrat", sans-serif;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1;
+
+	text-decoration: none;
+	white-space: nowrap;
+
+	cursor: pointer;
+
+	box-shadow: 0 14px 28px rgba(13, 27, 75, 0.13);
+
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		filter 0.18s ease,
+		box-shadow 0.18s ease;
 }
 
-.submenu {
+/* --------------------------------------------------------------------------
+   ERSTE DROPDOWN-EBENE
+   -------------------------------------------------------------------------- */
+
+.desktop-nav>.nav-item>.submenu {
+	position: absolute;
+	z-index: 100;
+
+	top: calc(100% + 8px);
+	right: 0;
+
+	min-width: 240px;
+	max-width: min(320px, calc(100vw - 32px));
+
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
-	position: absolute;
-	top: calc(100% + 14px);
-	right: -16px;
-	min-width: 230px;
-	list-style: none;
+	gap: 6px;
+
 	padding: 10px;
-	background: rgba(255, 255, 255, 0.98);
+
 	border: 1px solid rgba(21, 101, 255, 0.12);
 	border-radius: 18px;
+
+	background: rgba(255, 255, 255, 0.98);
+
 	box-shadow: 0 18px 46px rgba(13, 27, 75, 0.16);
+
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+
 	opacity: 0;
+	visibility: hidden;
 	pointer-events: none;
+
 	transform: translateY(-6px);
-	transition: 0.2s;
-	z-index: 100;
+
+	transition:
+		opacity 0.18s ease,
+		transform 0.18s ease,
+		visibility 0s linear 0.18s;
 }
 
-.nav-item:focus-within .submenu {
+/*
+   Wichtig: Der direkte Kindselektor ">" verhindert, dass beim Öffnen eines
+   Hauptmenüs automatisch alle verschachtelten Untermenüs sichtbar werden.
+*/
+
+.desktop-nav>.nav-item:hover>.submenu,
+.desktop-nav>.nav-item:focus-within>.submenu,
+.desktop-nav>.nav-item.is-open>.submenu,
+.desktop-nav>.nav-item>.submenu-toggle[aria-expanded="true"]+.submenu {
 	opacity: 1;
+	visibility: visible;
 	pointer-events: auto;
+
 	transform: translateY(0);
+
+	transition:
+		opacity 0.18s ease,
+		transform 0.18s ease,
+		visibility 0s linear 0s;
 }
 
-.submenu a {
-	display: block;
+/*
+   Unsichtbare Hover-Brücke zwischen Hauptbutton und Dropdown.
+   Dadurch schließt sich das Menü nicht, während der Mauszeiger den kleinen
+   Abstand überquert.
+*/
+
+.desktop-nav>.nav-item>.submenu::before {
+	content: "";
+
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: -10px;
+
+	height: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS UND LINKS INNERHALB DES DROPDOWNS
+   -------------------------------------------------------------------------- */
+
+.submenu>li {
+	position: relative;
+	min-width: 0;
+}
+
+.submenu>li>a,
+.submenu>li>.submenu-toggle--nested {
+	width: 100%;
+	min-height: 42px;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+
 	padding: 10px 12px;
-	border-radius: 12px;
-	color: var(--paper);
+
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 13px;
+
+	background: var(--desktop-sub-button);
+	color: var(--desktop-nav-text);
+
+	font-family: "Montserrat", sans-serif;
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.25;
+
+	text-align: left;
 	text-decoration: none;
-	font-weight: 700;
-	font-size: 13px;
+	white-space: normal;
+	overflow-wrap: anywhere;
+
+	cursor: pointer;
+
+	box-shadow: 0 8px 18px rgba(13, 27, 75, 0.1);
+
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		box-shadow 0.18s ease;
 }
 
-.submenu a:hover {
-	color: var(--bl2);
-	background: rgba(21, 101, 255, 0.08);
+/* --------------------------------------------------------------------------
+   ZWEITE DROPDOWN-EBENE
+   -------------------------------------------------------------------------- */
+
+.submenu--nested {
+	position: absolute;
+	z-index: 110;
+
+	top: -10px;
+	left: calc(100% + 10px);
+	right: auto;
+
+	min-width: 230px;
+	max-width: min(310px, calc(100vw - 32px));
+
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	padding: 10px;
+
+	border: 1px solid rgba(21, 101, 255, 0.12);
+	border-radius: 18px;
+
+	background: rgba(255, 255, 255, 0.98);
+
+	box-shadow: 0 18px 46px rgba(13, 27, 75, 0.16);
+
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+
+	transform: translateX(-6px);
+
+	transition:
+		opacity 0.18s ease,
+		transform 0.18s ease,
+		visibility 0s linear 0.18s;
+}
+
+/* Nur das konkrete verschachtelte Menü wird geöffnet. */
+
+.submenu-item:hover>.submenu--nested,
+.submenu-item:focus-within>.submenu--nested,
+.submenu-item.is-open>.submenu--nested,
+.submenu-item>.submenu-toggle--nested[aria-expanded="true"]+.submenu--nested {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+
+	transform: translateX(0);
+
+	transition:
+		opacity 0.18s ease,
+		transform 0.18s ease,
+		visibility 0s linear 0s;
+}
+
+/* Hover-Brücke zwischen erster und zweiter Ebene. */
+
+.submenu--nested::before {
+	content: "";
+
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: -12px;
+
+	width: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   OPTIONAL: VERSCHACHTELTES MENÜ NACH LINKS ÖFFNEN
+   -------------------------------------------------------------------------- */
+
+/*
+   Verwende diese Klasse bei Menüs nahe dem rechten Bildschirmrand:
+
+   <li class="submenu-item submenu-item--open-left">
+*/
+
+.submenu-item--open-left>.submenu--nested {
+	left: auto;
+	right: calc(100% + 10px);
+
+	transform: translateX(6px);
+}
+
+.submenu-item--open-left:hover>.submenu--nested,
+.submenu-item--open-left:focus-within>.submenu--nested,
+.submenu-item--open-left.is-open>.submenu--nested,
+.submenu-item--open-left>.submenu-toggle--nested[aria-expanded="true"]+.submenu--nested {
+	transform: translateX(0);
+}
+
+.submenu-item--open-left>.submenu--nested::before {
+	left: auto;
+	right: -12px;
+}
+
+/* Zweite Ebene erhält einen etwas helleren Blauton. */
+
+.submenu--nested>li>a,
+.submenu--nested>li>.submenu-toggle--nested {
+	background: var(--desktop-nested-button);
+}
+
+/* --------------------------------------------------------------------------
+   PFEILE
+   -------------------------------------------------------------------------- */
+
+.desktop-nav .submenu-arrow,
+.desktop-nav .submenu-toggle>span:last-child {
+	flex: 0 0 auto;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	transition: transform 0.18s ease;
+}
+
+/* Hauptmenü-Pfeil dreht sich nach oben. */
+
+.desktop-nav>.nav-item>.submenu-toggle[aria-expanded="true"]>span:last-child {
+	transform: rotate(180deg);
+}
+
+/* Pfeil eines verschachtelten Menüs dreht sich nach unten. */
+
+.desktop-nav .submenu-toggle--nested[aria-expanded="true"]>.submenu-arrow {
+	transform: rotate(90deg);
+}
+
+/* --------------------------------------------------------------------------
+   HOVER-ZUSTÄNDE
+   -------------------------------------------------------------------------- */
+
+/*
+   Hover-Effekte nur auf Geräten mit echtem Mauszeiger.
+   Touch-Geräte erhalten dadurch keine festhängenden Hover-Zustände.
+*/
+
+@media (hover: hover) and (pointer: fine) {
+
+	.desktop-nav>.nav-item>a:hover,
+	.desktop-nav>.nav-item>.submenu-toggle:hover {
+		background: var(--desktop-nav-button-hover);
+
+		transform: translateY(-1px);
+
+		filter: saturate(1.08);
+
+		box-shadow: 0 20px 36px rgba(13, 27, 75, 0.18);
+	}
+
+	.submenu>li>a:hover,
+	.submenu>li>.submenu-toggle--nested:hover {
+		background: #65a5c8;
+		color: #fff;
+
+		transform: translateX(2px);
+
+		box-shadow: 0 10px 20px rgba(13, 27, 75, 0.13);
+	}
+
+	.submenu--nested>li>a:hover,
+	.submenu--nested>li>.submenu-toggle--nested:hover {
+		background: #74aece;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   ACTIVE- UND FOKUS-ZUSTÄNDE
+   -------------------------------------------------------------------------- */
+
+.desktop-nav>.nav-item>a:active,
+.desktop-nav>.nav-item>.submenu-toggle:active,
+.submenu>li>a:active,
+.submenu>li>.submenu-toggle--nested:active {
+	transform: translateY(0);
+
+	box-shadow: 0 5px 12px rgba(13, 27, 75, 0.12);
+}
+
+.desktop-nav a:focus-visible,
+.desktop-nav button:focus-visible {
+	outline: 3px solid rgba(21, 101, 255, 0.42);
+	outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   KOMPAKTE DESKTOP-BREITEN
+   -------------------------------------------------------------------------- */
+
+/*
+   Zwischen 1081px und 1240px ist wenig Platz für fünf Hauptbuttons,
+   Logo und Sprachwahl. Die Navigation wird hier etwas kompakter.
+*/
+
+@media (min-width: 1081px) and (max-width: 1240px) {
+	.desktop-nav {
+		gap: 6px;
+	}
+
+	.desktop-nav>.nav-item>a,
+	.desktop-nav>.nav-item>.submenu-toggle {
+		gap: 7px;
+
+		padding-inline: 0.85em;
+
+		font-size: 12px;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   REDUZIERTE BEWEGUNG
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+	.desktop-nav a,
+	.desktop-nav button,
+	.desktop-nav .submenu {
+		transition: none;
+	}
 }
 
 .right-tools {
@@ -492,47 +835,288 @@ iconify-icon {
 	padding: 4px;
 }
 
-.mobile-links a,
-.mobile-sub-toggle {
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	text-decoration: none;
-	color: var(--dk);
-	font-weight: 900;
-	padding: 13px 14px;
-	border-radius: 16px;
-	background: rgba(21, 101, 255, 0.05);
-	cursor: pointer;
+/* --- Mobile navigation: MiroKit Buttons und verschachtelte Accordions --- */
+
+.mobile-links {
+	gap: 8px;
 }
 
-.mobile-links a:hover,
-.mobile-sub-toggle:hover {
-	background: rgba(21, 101, 255, 0.11);
+.mobile-links>li {
+	min-width: 0;
 }
+
+/* Hauptpunkte: gleiche Gestaltung wie die Desktop-Navigation */
+.mobile-links>li>.mobile-sub-toggle,
+.mobile-links>li>a:not(.mobile-cta) {
+	width: 100%;
+	min-height: 46px;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+
+	padding: 12px 14px;
+
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 16px;
+
+	background: #60a5cb;
+	color: rgba(255, 255, 255, 0.94);
+
+	font-family: "Montserrat", sans-serif;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.25;
+
+	text-align: left;
+	text-decoration: none;
+	white-space: normal;
+
+	cursor: pointer;
+
+	box-shadow: 0 12px 24px rgba(13, 27, 75, 0.14);
+
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		box-shadow 0.18s ease,
+		filter 0.18s ease;
+}
+
+.mobile-links>li>.mobile-sub-toggle>span:first-child,
+.mobile-links>li>a:not(.mobile-cta) {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+/* Pfeile */
+
+.mobile-sub-arrow,
+.mobile-sub-toggle>span:last-child {
+	flex: 0 0 auto;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 1.5rem;
+	height: 1.5rem;
+
+	color: rgba(255, 255, 255, 0.86);
+
+	transition: transform 0.22s ease;
+}
+
+.mobile-sub-toggle[aria-expanded="true"] .mobile-sub-arrow,
+.mobile-sub-toggle[aria-expanded="true"]>span:last-child,
+.mobile-sub-toggle.is-open .mobile-sub-arrow,
+.mobile-sub-toggle.is-open>span:last-child {
+	transform: rotate(180deg);
+}
+
+/* Accordion-System */
 
 .mobile-sub {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows 0.22s;
+
+	visibility: hidden;
+
+	transition:
+		grid-template-rows 0.22s ease,
+		visibility 0s linear 0.22s;
 }
 
 .mobile-sub.open {
 	grid-template-rows: 1fr;
+
+	visibility: visible;
+
+	transition:
+		grid-template-rows 0.22s ease,
+		visibility 0s linear 0s;
 }
 
-.mobile-sub ul {
+.mobile-sub>ul {
+	min-height: 0;
 	overflow: hidden;
+
+	display: grid;
+	gap: 6px;
+
 	list-style: none;
-	padding-left: 12px;
+
+	padding: 6px 0 2px 12px;
 }
+
+/* Links der ersten Unterebene */
 
 .mobile-sub a {
+	width: 100%;
+	min-height: 42px;
+
+	display: flex;
+	align-items: center;
+
+	padding: 10px 12px;
+	margin: 0;
+
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 14px;
+
+	background: #72afd0;
+	color: rgba(255, 255, 255, 0.94);
+
+	font-family: "Montserrat", sans-serif;
+	font-size: 12.5px;
 	font-weight: 800;
-	background: #fff;
-	border: 1px solid rgba(21, 101, 255, 0.08);
-	margin-top: 6px;
+	line-height: 1.3;
+
+	text-decoration: none;
+	white-space: normal;
+	overflow-wrap: anywhere;
+
+	box-shadow: 0 8px 18px rgba(13, 27, 75, 0.1);
+
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		box-shadow 0.18s ease;
+}
+
+/* Button innerhalb eines Untermenüs */
+
+.mobile-sub-toggle--nested {
+	width: 100%;
+	min-height: 42px;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+
+	padding: 10px 12px;
+	margin: 0;
+
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 14px;
+
+	background: #72afd0;
+	color: rgba(255, 255, 255, 0.94);
+
+	font-family: "Montserrat", sans-serif;
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.3;
+
+	text-align: left;
+	cursor: pointer;
+
+	box-shadow: 0 8px 18px rgba(13, 27, 75, 0.1);
+
+	transition:
+		transform 0.18s ease,
+		background-color 0.18s ease,
+		box-shadow 0.18s ease;
+}
+
+/* Zweite Unterebene */
+
+.mobile-sub--nested>ul {
+	margin-left: 8px;
+	padding: 6px 0 2px 12px;
+
+	border-left: 2px solid rgba(96, 165, 203, 0.3);
+}
+
+.mobile-sub--nested a {
+	min-height: 40px;
+
+	background: #83b9d6;
+
+	font-size: 12px;
+
+	box-shadow: 0 6px 14px rgba(13, 27, 75, 0.08);
+}
+
+/* Hover nur auf Geräten mit echtem Mauszeiger */
+
+@media (hover: hover) {
+
+	.mobile-links>li>.mobile-sub-toggle:hover,
+	.mobile-links>li>a:not(.mobile-cta):hover {
+		background: #559bc2;
+
+		transform: translateY(-1px);
+		filter: saturate(1.06);
+
+		box-shadow: 0 16px 28px rgba(13, 27, 75, 0.17);
+	}
+
+	.mobile-sub a:hover,
+	.mobile-sub-toggle--nested:hover {
+		background: #65a5c8;
+		color: #fff;
+
+		transform: translateY(-1px);
+
+		box-shadow: 0 10px 20px rgba(13, 27, 75, 0.13);
+	}
+
+	.mobile-sub--nested a:hover {
+		background: #74aece;
+	}
+}
+
+/* Gedrückter Zustand */
+
+.mobile-links>li>.mobile-sub-toggle:active,
+.mobile-links>li>a:not(.mobile-cta):active,
+.mobile-sub a:active,
+.mobile-sub-toggle--nested:active {
+	transform: translateY(0);
+
+	box-shadow: 0 5px 12px rgba(13, 27, 75, 0.12);
+}
+
+/* Tastatur-Fokus */
+
+.mobile-links .mobile-sub-toggle:focus-visible,
+.mobile-links a:focus-visible {
+	outline: 3px solid rgba(21, 101, 255, 0.38);
+	outline-offset: 3px;
+}
+
+/* Kleine Smartphones */
+
+@media (max-width: 380px) {
+
+	.mobile-links>li>.mobile-sub-toggle,
+	.mobile-links>li>a:not(.mobile-cta) {
+		padding-inline: 12px;
+		font-size: 12.5px;
+	}
+
+	.mobile-sub a,
+	.mobile-sub-toggle--nested {
+		font-size: 12px;
+	}
+}
+
+/* Reduzierte Bewegung */
+
+@media (prefers-reduced-motion: reduce) {
+
+	.mobile-links>li>.mobile-sub-toggle,
+	.mobile-links>li>a:not(.mobile-cta),
+	.mobile-sub,
+	.mobile-sub a,
+	.mobile-sub-toggle--nested,
+	.mobile-sub-arrow,
+	.mobile-sub-toggle>span:last-child {
+		transition: none;
+	}
 }
 
 .mobile-cta {
@@ -1078,6 +1662,11 @@ body:not(.is-home) .panel:not(#hero) {
 	line-height: 1.65;
 }
 
+.tx-red {
+	color: var(--rdl);
+	text-transform: none;
+}
+
 /* Farb-Utilities, aktuell nur von den (auskommentierten) JS-Übersetzungstexten
    referenziert — bewusst schlank gehalten, falls sie wieder aktiviert werden. */
 .c-bl {
@@ -1260,7 +1849,7 @@ body:not(.is-home) .panel:not(#hero) {
 	display: block;
 	width: 100%;
 	height: 100%;
-	object-fit: contain;
+	object-fit: cover;
 	object-position: center;
 	opacity: 0.92;
 	/* filter: saturate(1.2); */
@@ -1291,31 +1880,23 @@ body:not(.is-home) .panel:not(#hero) {
 	display: flex;
 	justify-content: space-between;
 	height: 100%;
-/*	padding: clamp(1.25rem, 5vw, 2rem);*/
+	/*	padding: clamp(1.25rem, 5vw, 2rem);*/
 }
 
 #hero .left-content {
 	flex-basis: -webkit-fill-available;
 	display: inline-flex;
-	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	gap: 1rem;
-}
-
-#hero .content-logo {
 	width: 100%;
 	height: 100%;
 }
 
-#hero .content-logo img {
-	inset: 0;
-	display: block;
+#hero .right-content {
 	width: 100%;
 	height: 100%;
-	object-fit: contain;
-	object-position: center;
-	
+	flex-basis: -webkit-fill-available;
+	display: inline-flex;
+	align-items: center;
 }
 
 #hero .topline {
@@ -1677,7 +2258,7 @@ body:not(.is-home) .panel:not(#hero) {
 
 #hero .partner-head {
 	display: grid;
-	grid-template-columns: auto minmax(0,1fr);
+	grid-template-columns: auto minmax(0, 1fr);
 	align-items: center;
 	gap: 0.35rem 0.75rem;
 }
@@ -1711,7 +2292,7 @@ body:not(.is-home) .panel:not(#hero) {
 
 #hero .partner-block {
 	display: grid;
-	grid-template-columns: 1fr minmax(0,1fr);
+	grid-template-columns: 1fr minmax(0, 1fr);
 	align-items: center;
 	justify-items: auto;
 	gap: 0.5rem;
@@ -2076,7 +2657,7 @@ body:not(.is-home) .panel:not(#hero) {
    ============================================================================ */
 
 #aboutUs {
-	background: linear-gradient(135deg, var(--bl), #3a7bff);
+	background: linear-gradient(150deg, #deeaff 0%, #f5f8ff 50%, #e0ecff 100%);
 	color: #fff;
 	text-align: center;
 	overflow: hidden;
@@ -2121,7 +2702,7 @@ body:not(.is-home) .panel:not(#hero) {
 }
 
 #aboutUs .title {
-	color: #fff;
+	color: var(--bl);
 	font-size: clamp(24px, 4vw, 38px);
 }
 
@@ -3107,12 +3688,12 @@ body:not(.is-home) .panel:not(#hero) {
 /* Platzhalter für ein quadratisches Bild (aktuell das MIRoKIT-Logo, wird
    aber gegen ein anderes Bild ausgetauscht) — einfach `src` ersetzen. */
 #contact .contact-logo {
-	width: clamp(84px, 20vw, 128px);
+	width: clamp(282px, 20vw, 342px);
 	aspect-ratio: 1 / 1;
 	border-radius: 22px;
 	overflow: hidden;
-	background: var(--bg);
-	box-shadow: var(--soft-shadow);
+	/* 	background: var(--bg); */
+	/* 	box-shadow: var(--soft-shadow); */
 	flex: 0 0 auto;
 }
 
@@ -3122,6 +3703,7 @@ body:not(.is-home) .panel:not(#hero) {
 	height: 100%;
 	object-fit: cover;
 	object-position: center;
+	mix-blend-mode: multiply;
 }
 
 #contact .contact-side-heading {
@@ -3241,6 +3823,7 @@ body:not(.is-home) .panel:not(#hero) {
 
 #contact .contact-head .title {
 	font-size: clamp(24px, 4vw, 36px);
+	color: var(--bld)
 }
 
 #contact .contact-tagline {
@@ -3270,7 +3853,7 @@ body:not(.is-home) .panel:not(#hero) {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: clamp(16px, 2vw, 19px);
-	color: var(--dk);
+	color: var(--bld);
 }
 
 #contact .form-grid {
@@ -3461,7 +4044,7 @@ body:not(.is-home) .panel:not(#hero) {
 
 @media (min-width: 721px) and (min-height: 480px) and (max-height: 760px) {
 	#contact .contact-logo {
-		width: clamp(56px, 12vw, 76px);
+		width: clamp(236px, 12vw, 282px);
 	}
 
 	#contact .contact-social {
@@ -3645,12 +4228,12 @@ body:not(.is-home) .panel:not(#hero) {
 	font-weight: 900;
 	font-size: clamp(0.95rem, 2vw, 1.05rem);
 	line-height: 1.3;
-	color: var(--dk);
+	color: var(--bld);
 }
 
 #news .news-full-excerpt {
 	font-size: 0.85rem;
-	color: #666;
+	color: #54545d;
 	line-height: 1.55;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
