@@ -135,115 +135,208 @@
 				data-key="brand">МИРоКИТ</span> -->
             <img class="logo-placeholder" src="./public/assets/images/miroKit_logo_full-1.png" alt="МИРоКИТ logo placeholder" />
          </a>
-         <nav aria-label="Main navigation">
+        <nav aria-label="Hauptnavigation">
             <ul class="desktop-nav">
-               <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Über uns öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-about">
-                     <span aria-hidden="true"><i class="fa-solid fa-circle-info"></i></span>
-                     <span data-key="nav1">Über MIRoKIT</span>
-                     <span aria-hidden="true">▾</span>
-                  </button>
-
-                  <ul class="submenu" id="submenu-about">
-                     <li class="submenu-item"><a href="#aboutUs" data-nav-link data-key="menu_aboutUs">Was ist MIRoKIT?</a></li>
-                     <!-- <li><a href="#ourValues" data-nav-link data-key="menu_ourValues">Unsere Werte</a></li> -->
-                     <li class="submenu-item"><a href="#team" data-nav-link data-key="menu_team">Team</a></li>
-                     <li class="submenu-item"><a href="#world" data-nav-link data-key="menu_world">MIRoKIT weltweit</a></li>
-                     <li class="submenu-item"><a href="#partners" data-nav-link data-key="menu_partners">Partner</a></li>
-                  </ul>
-               </li>
-
-               <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label=" öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-howItWorks">
-                     <span aria-hidden="true"><i class="fa-solid fa-puzzle-piece"></i></span>
-                     <span data-key="nav2"></span>
-                     <span aria-hidden="true">▾</span>
-                  </button>
-
-                  <ul class="submenu" id="submenu-howItWorks">
-                     <li class="submenu-item"><a href="#gamePrinciple" data-nav-link data-key="menu_gamePrinciple">Spiel Prinzip</a></li>
-                     <li class="submenu-item"><a href="#programs" data-nav-link data-key="menu_programs">Programme</a></li>
-                     <li class="submenu-item"><a href="#ageGroups" data-nav-link data-key="menu_ageGroups">Jahres Grupen</a></li>
-                     <!-- Redirect to Vstupitj v ligu -->
-                     <li class="submenu-item"><a href="#participation" data-nav-link data-key="menu_participation">Participate</a></li>
-                  </ul>
-               </li>
-
-               <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Projekte öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-projects">
-                     <span aria-hidden="true"><i class="fa-solid fa-gamepad"></i></span>
-                     <span data-key="nav3"></span>
-                     <span aria-hidden="true">▾</span>
-                  </button>
-
-                  <ul class="submenu" id="submenu-projects">
-                     <li class="submenu-item"><a href="#onlineProjects" data-nav-link data-key="menu_onlineProjects">Online Projekte</a></li>
-                     <li class="submenu-item"><a href="#projects" data-nav-link data-key="menu_currentProjects">Jetzige Projekte</a></li>
-                     <li class="submenu-item has-children">
-                        <div class="submenu-entry">
-                           <a href="#pastProjects" data-nav-link data-key="menu_pastProjects">Past Projects</a>
-                           <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Past Projects öffnen" aria-expanded="false" aria-controls="submenu-pastProjects">
-                              <span aria-hidden="true">></span>
-                           </button>
-                        </div>
-                        <ul class="submenu submenu--nested" id="submenu-pastProjects">
-                           <li class="submenu-item"><a href="#" data-nav-link>Tunis</a></li>
-                           <li class="submenu-item"><a href="#" data-nav-link></a></li>
-                        </ul>
-                     </li>
-                  </ul>
-               </li>
-
-               <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Media öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-media">
-                     <span aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span>
-                     <span data-key="nav4">Media</span>
-                     <span aria-hidden="true">▾</span>
-                  </button>
-
-                  <ul class="submenu" id="submenu-media">
-                     <li class="submenu-item"><a href="#news" data-nav-link data-key="menu_news">News</a></li>
-                     <li class="submenu-item has-children">
-                        <div class="submenu-entry">
-                           <a href="#gallery" data-nav-link data-key="menu_gallery">Galerie</a>
-                           <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Galerie öffnen" aria-expanded="false" aria-controls="submenu-gallery">
-                              <span aria-hidden="true">></span>
-                           </button>
-                        </div>
-                        <ul class="submenu submenu--nested" id="submenu-gallery">
-                           <li class="submenu-item"><a href="#videos" data-nav-link data-key="menu_videos">Videos</a></li>
-                           <li class="submenu-item"><a href="#photos" data-nav-link data-key="menu_photos">Fotos</a></li>
-                        </ul>
-                     </li>
-                     <li class="submenu-item"><a href="#interviews" data-nav-link data-key="menu_interviews">Interviews</a></li>
-                  </ul>
-               </li>
-
-               <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Kontakt öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact">
-                     <span aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
-                     <span data-key="nav5">Kontakt</span>
-                     <span aria-hidden="true">▾</span>
-                  </button>
-
-                  <ul class="submenu" id="submenu-contact">
-                     <li class="submenu-item has-children">
-                        <div class="submenu-entry">
-                           <a href="#contact" data-nav-link data-key="menu_contact">Kontakt</a>
-                           <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Kontakt öffnen" aria-expanded="false" aria-controls="submenu-contact">
-                              <span aria-hidden="true">></span>
-                           </button>
-                        </div>
-                        <ul class="submenu submenu--nested" id="submenu-contact">
-                           <li class="submenu-item"><a href="#contact?p=1" data-nav-link data-key="menu_contactFormMain">Hauptform Liste</a></li>
-                           <li class="submenu-item"><a href="#contact?p=2" data-nav-link data-key="menu_contactFormExtra">Extraform Liste</a></li>
-                        </ul>
-                     </li>
-                     <li class="submenu-item"><a href="#contactPersons" data-nav-link data-key="menu_contactPersons">Ansprechpartner</a></li>
-                  </ul>
-               </li>
+                <!-- ÜBER MIROKIT -->
+                <li class="nav-item">
+                    <button class="submenu-toggle" type="button" aria-label="Menü Über MIRoKIT öffnen" aria-haspopup="true"
+                        aria-expanded="false" aria-controls="submenu-about">
+                        <span aria-hidden="true">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </span>
+                        <span data-key="nav1">Über MIRoKIT</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="submenu" id="submenu-about">
+                        <li class="submenu-item">
+                            <a href="#aboutUs" data-nav-link data-key="menu_aboutUs">
+                                Was ist MIRoKIT?
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#team" data-nav-link data-key="menu_team">
+                                Team
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#world" data-nav-link data-key="menu_world">
+                                MIRoKIT weltweit
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#partners" data-nav-link data-key="menu_partners">
+                                Partner
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- SO FUNKTIONIERT ES -->
+                <li class="nav-item">
+                    <button class="submenu-toggle" type="button" aria-label="Menü So funktioniert es öffnen"
+                        aria-haspopup="true" aria-expanded="false" aria-controls="submenu-how-it-works">
+                        <span aria-hidden="true">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </span>
+                        <span data-key="nav2">So funktioniert’s</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="submenu" id="submenu-how-it-works">
+                        <li class="submenu-item">
+                            <a href="#gamePrinciple" data-nav-link data-key="menu_gamePrinciple">
+                                Spielprinzip
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#programs" data-nav-link data-key="menu_programs">
+                                Programme
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#ageGroups" data-nav-link data-key="menu_ageGroups">
+                                Altersgruppen
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#participation" data-nav-link data-key="menu_participation">
+                                Teilnahme
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- PROJEKTE -->
+                <li class="nav-item">
+                    <button class="submenu-toggle" type="button" aria-label="Menü Projekte öffnen" aria-haspopup="true"
+                        aria-expanded="false" aria-controls="submenu-projects">
+                        <span aria-hidden="true">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </span>
+                        <span data-key="nav3">Projekte</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="submenu" id="submenu-projects">
+                        <li class="submenu-item">
+                            <a href="#onlineProjects" data-nav-link data-key="menu_onlineProjects">
+                                Online-Projekte
+                            </a>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#projects" data-nav-link data-key="menu_currentProjects">
+                                Aktuelle Projekte
+                            </a>
+                        </li>
+                        <li class="submenu-item has-children">
+                            <div class="submenu-entry">
+                                <a href="#pastProjects" data-nav-link data-key="menu_pastProjects">
+                                    Vergangene Projekte
+                                </a>
+                                <button class="submenu-toggle submenu-toggle--nested" type="button"
+                                    aria-label="Untermenü Vergangene Projekte öffnen" aria-haspopup="true" aria-expanded="false"
+                                    aria-controls="submenu-projects-past">
+                                    <span aria-hidden="true">›</span>
+                                </button>
+                            </div>
+                            <ul class="submenu submenu--nested" id="submenu-projects-past">
+                                <li class="submenu-item">
+                                    <a href="#project-tunis" data-nav-link>
+                                        Tunis
+                                    </a>
+                                </li>
+                                <!-- Später weitere Projekte ergänzen -->
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <!-- MEDIEN -->
+                <li class="nav-item">
+                    <button class="submenu-toggle" type="button" aria-label="Menü Medien öffnen" aria-haspopup="true"
+                        aria-expanded="false" aria-controls="submenu-media">
+                        <span aria-hidden="true">
+                            <i class="fa-solid fa-newspaper"></i>
+                        </span>
+                        <span data-key="nav4">Medien</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="submenu" id="submenu-media">
+                        <li class="submenu-item">
+                            <a href="#news" data-nav-link data-key="menu_news">
+                                News
+                            </a>
+                        </li>
+                        <li class="submenu-item has-children">
+                            <div class="submenu-entry">
+                                <a href="#gallery" data-nav-link data-key="menu_gallery">
+                                    Galerie
+                                </a>
+                                <button class="submenu-toggle submenu-toggle--nested" type="button"
+                                    aria-label="Untermenü Galerie öffnen" aria-haspopup="true" aria-expanded="false"
+                                    aria-controls="submenu-media-gallery">
+                                    <span aria-hidden="true">›</span>
+                                </button>
+                            </div>
+                            <ul class="submenu submenu--nested" id="submenu-media-gallery">
+                                <li class="submenu-item">
+                                    <a href="#videos" data-nav-link data-key="menu_videos">
+                                        Videos
+                                    </a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="#photos" data-nav-link data-key="menu_photos">
+                                        Fotos
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#interviews" data-nav-link data-key="menu_interviews">
+                                Interviews
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- KONTAKT -->
+                <li class="nav-item">
+                    <button class="submenu-toggle" type="button" aria-label="Menü Kontakt öffnen" aria-haspopup="true"
+                        aria-expanded="false" aria-controls="submenu-contact">
+                        <span aria-hidden="true">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <span data-key="nav5">Kontakt</span>
+                        <span aria-hidden="true">▾</span>
+                    </button>
+                    <ul class="submenu" id="submenu-contact">
+                        <li class="submenu-item has-children">
+                            <div class="submenu-entry">
+                                <a href="#contact" data-nav-link data-key="menu_contact">
+                                    Kontakt
+                                </a>
+                                <button class="submenu-toggle submenu-toggle--nested" type="button"
+                                    aria-label="Untermenü Kontaktformulare öffnen" aria-haspopup="true" aria-expanded="false"
+                                    aria-controls="submenu-contact-forms">
+                                    <span aria-hidden="true">›</span>
+                                </button>
+                            </div>
+                            <ul class="submenu submenu--nested" id="submenu-contact-forms">
+                                <li class="submenu-item">
+                                    <a href="#contact" data-nav-link data-contact-form="main" data-key="menu_contactFormMain">
+                                        Hauptformular
+                                    </a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="#contact" data-nav-link data-contact-form="extra" data-key="menu_contactFormExtra">
+                                        Zusatzformular
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="submenu-item">
+                            <a href="#contactPersons" data-nav-link data-key="menu_contactPersons">
+                                Ansprechpartner
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
-         </nav>
+        </nav>
          <div class="right-tools">
             <div class="lang-switch desktop-lang" aria-label="Language">
                <label class="sr-only" for="desktopLangSelect">Language</label>
@@ -262,97 +355,226 @@
       </header>
       <div class="progress" id="progress"></div>
       <div class="mobile-backdrop" id="mobileBackdrop"></div>
-      <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
-         <div class="mobile-head">
-            <a class="brand" href="#hero" data-nav-link><span class="brand-mark">🌍</span><span data-key="brand">МИРоКИТ</span></a>
-            <button class="close-menu" type="button" aria-label="Menu schließen">×</button>
-         </div>
-         <div class="lang-switch" aria-label="Language mobile">
-            <button class="lang-btn on" data-lang="ru">RU</button>
-            <button class="lang-btn" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="de">DE</button>
-         </div>
-         <ul class="mobile-links">
-            <li class="mobile-nav-item">
-               <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-about"><span data-key="nav1"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-               <div class="mobile-sub" id="mobile-sub-about" aria-hidden="true">
-                  <ul>
-                     <li class="mobile-nav-item"><a href="#aboutUs" data-nav-link data-key="menu_aboutUs"></a></li>
-                     <!-- <li><a href="#ourValues" data-nav-link data-key="menu_ourValues"></a></li> -->
-                     <li class="mobile-nav-item"><a href="#team" data-nav-link data-key="menu_team"></a></li>
-                     <li class="mobile-nav-item"><a href="#world" data-nav-link data-key="menu_world"></a></li>
-                     <li class="mobile-nav-item"><a href="#partners" data-nav-link data-key="menu_partners"></a></li>
-                  </ul>
-               </div>
-            </li>
-            <li class="mobile-nav-item">
-               <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-howItWorks"><span data-key="nav2"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-               <div class="mobile-sub" id="mobile-sub-howItWorks" aria-hidden="true">
-                  <ul>
-                     <li class="mobile-nav-item"><a href="#gamePrinciple" data-nav-link data-key="menu_gamePrinciple"></a></li>
-                     <li class="mobile-nav-item"><a href="#programs" data-nav-link data-key="menu_programs"></a></li>
-                     <li class="mobile-nav-item"><a href="#ageGroups" data-nav-link data-key="menu_ageGroups"></a></li>
-                     <li class="mobile-nav-item"><a href="#participation" data-nav-link data-key="menu_participation"></a></li>
-                  </ul>
-               </div>
-            </li>
-            <li class="mobile-nav-item">
-               <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-projects"><span data-key="nav3"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-               <div class="mobile-sub" id="mobile-sub-projects" aria-hidden="true">
-                  <ul>
-                     <li class="mobile-nav-item"><a href="#onlineProjects" data-nav-link data-key="menu_onlineProjects"></a></li>
-                     <li class="mobile-nav-item"><a href="#projects" data-nav-link data-key="menu_currentProjects"></a></li>
-                     <li class="mobile-nav-item mobile-nav-item--nested">
-                        <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-pastProjects"><span data-key="menu_pastProjects"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-                        <div class="mobile-sub mobile-sub--nested" id="mobile-sub-pastProjects" aria-hidden="true">
-                           <ul>
-                              <li class="mobile-nav-item"><a href="#" data-nav-link>Tunis</a></li>
-                              <li class="mobile-nav-item"><a href="#" data-nav-link></a></li>
-                           </ul>
-                        </div>
-                     </li>
-                  </ul>
-               </div>
-            </li>
-            <li class="mobile-nav-item">
-               <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-media"><span data-key="nav4"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-               <div class="mobile-sub" id="mobile-sub-media" aria-hidden="true">
-                  <ul>
-                     <li class="mobile-nav-item"><a href="#news" data-nav-link data-key="menu_news"></a></li>
-                     <li class="mobile-nav-item mobile-nav-item--nested">
-                        <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-pastProjects"><span data-key="menu_pastProjects"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-                        <div class="mobile-sub mobile-sub--nested" id="mobile-sub-pastProjects" aria-hidden="true">
-                           <ul>
-                              <li class="mobile-nav-item"><a href="#videos" data-nav-link data-key="menu_videos">Videos</a></li>
-                              <li class="mobile-nav-item"><a href="#photos" data-nav-link data-key="menu_photos">Photos</a></li>
-                           </ul>
-                        </div>
-                     </li>
-                     <li class="mobile-nav-item"><a href="#interviews" data-nav-link data-key="menu_interviews"></a></li>
-                  </ul>
-               </div>
-            </li>
-            <li class="mobile-nav-item">
-               <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-contact"><span data-key="nav5"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-               <div class="mobile-sub" id="mobile-sub-contact" aria-hidden="true">
-                  <ul>
-                     <li class="mobile-nav-item mobile-nav-item--nested">
-                        <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-contact"><span data-key="menu_contact"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-                        <div class="mobile-sub mobile-sub--nested" id="mobile-sub-contact" aria-hidden="true">
-                           <ul>
-                              <li class="mobile-nav-item"><a href="#contact?p=1" data-nav-link data-key="menu_contactFormMain">Hauptform Liste</a></li>
-                              <li class="mobile-nav-item"><a href="#contact?p=2" data-nav-link data-key="menu_contactFormExtra">Extraform Liste</a></li>
-                           </ul>
-                        </div>
-                     </li>
-                     <li class="mobile-nav-item"><a href="#contactPersons" data-nav-link data-key="menu_contactPersons"></a></li>
-                  </ul>
-               </div>
-            </li>
-            <li class="mobile-nav-item"><a class="mobile-cta" href="#join" data-nav-link data-key="mobile_fastChip"></a></li>
-         </ul>
-         <p class="mobile-note" data-key="mobile_note"></p>
-      </aside>
+        <aside class="mobile-menu" id="mobileMenu" aria-label="Mobile Navigation" aria-hidden="true">
+            <div class="mobile-head">
+                <a class="brand" href="#hero" data-nav-link>
+                    <span class="brand-mark" aria-hidden="true">🌍</span>
+                    <span data-key="brand">МИРоКИТ</span>
+                </a>
+                <button class="close-menu" type="button" aria-label="Mobile Navigation schließen">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="lang-switch" aria-label="Sprache auswählen">
+                <button class="lang-btn on" type="button" data-lang="ru">RU</button>
+                <button class="lang-btn" type="button" data-lang="en">EN</button>
+                <button class="lang-btn" type="button" data-lang="de">DE</button>
+            </div>
+            <ul class="mobile-links">
+                <!-- ÜBER MIROKIT -->
+                <li class="mobile-nav-item">
+                    <button class="mobile-sub-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="mobile-sub-about">
+                        <span data-key="nav1">Über MIRoKIT</span>
+                        <span class="mobile-sub-arrow" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mobile-sub" id="mobile-sub-about" aria-hidden="true">
+                        <ul>
+                            <li class="mobile-nav-item">
+                                <a href="#aboutUs" data-nav-link data-key="menu_aboutUs">
+                                    Was ist MIRoKIT?
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#team" data-nav-link data-key="menu_team">
+                                    Team
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#world" data-nav-link data-key="menu_world">
+                                    MIRoKIT weltweit
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#partners" data-nav-link data-key="menu_partners">
+                                    Partner
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- SO FUNKTIONIERT ES -->
+                <li class="mobile-nav-item">
+                    <button class="mobile-sub-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="mobile-sub-how-it-works">
+                        <span data-key="nav2">So funktioniert’s</span>
+                        <span class="mobile-sub-arrow" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mobile-sub" id="mobile-sub-how-it-works" aria-hidden="true">
+                        <ul>
+                            <li class="mobile-nav-item">
+                                <a href="#gamePrinciple" data-nav-link data-key="menu_gamePrinciple">
+                                    Spielprinzip
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#programs" data-nav-link data-key="menu_programs">
+                                    Programme
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#ageGroups" data-nav-link data-key="menu_ageGroups">
+                                    Altersgruppen
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#participation" data-nav-link data-key="menu_participation">
+                                    Teilnahme
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- PROJEKTE -->
+                <li class="mobile-nav-item">
+                    <button class="mobile-sub-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="mobile-sub-projects">
+                        <span data-key="nav3">Projekte</span>
+                        <span class="mobile-sub-arrow" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mobile-sub" id="mobile-sub-projects" aria-hidden="true">
+                        <ul>
+                            <li class="mobile-nav-item">
+                                <a href="#onlineProjects" data-nav-link data-key="menu_onlineProjects">
+                                    Online-Projekte
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#projects" data-nav-link data-key="menu_currentProjects">
+                                    Aktuelle Projekte
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item mobile-nav-item--nested">
+                                <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-haspopup="true"
+                                    aria-expanded="false" aria-controls="mobile-sub-projects-past">
+                                    <span data-key="menu_pastProjects">
+                                        Vergangene Projekte
+                                    </span>
+                                    <span class="mobile-sub-arrow" aria-hidden="true">
+                                        ▾
+                                    </span>
+                                </button>
+                                <div class="mobile-sub mobile-sub--nested" id="mobile-sub-projects-past" aria-hidden="true">
+                                    <ul>
+                                        <li class="mobile-nav-item">
+                                            <a href="#pastProjects" data-nav-link data-project="tunis">
+                                                Tunis
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- MEDIEN -->
+                <li class="mobile-nav-item">
+                    <button class="mobile-sub-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="mobile-sub-media">
+                        <span data-key="nav4">Medien</span>
+                        <span class="mobile-sub-arrow" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mobile-sub" id="mobile-sub-media" aria-hidden="true">
+                        <ul>
+                            <li class="mobile-nav-item">
+                                <a href="#news" data-nav-link data-key="menu_news">
+                                    News
+                                </a>
+                            </li>
+                            <li class="mobile-nav-item mobile-nav-item--nested">
+                                <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-haspopup="true"
+                                    aria-expanded="false" aria-controls="mobile-sub-media-gallery">
+                                    <span data-key="menu_gallery">Galerie</span>
+                                    <span class="mobile-sub-arrow" aria-hidden="true">
+                                        ▾
+                                    </span>
+                                </button>
+                                <div class="mobile-sub mobile-sub--nested" id="mobile-sub-media-gallery" aria-hidden="true">
+                                    <ul>
+                                        <li class="mobile-nav-item">
+                                            <a href="#videos" data-nav-link data-key="menu_videos">
+                                                Videos
+                                            </a>
+                                        </li>
+                                        <li class="mobile-nav-item">
+                                            <a href="#photos" data-nav-link data-key="menu_photos">
+                                                Fotos
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#interviews" data-nav-link data-key="menu_interviews">
+                                    Interviews
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- KONTAKT -->
+                <li class="mobile-nav-item">
+                    <button class="mobile-sub-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="mobile-sub-contact">
+                        <span data-key="nav5">Kontakt</span>
+                        <span class="mobile-sub-arrow" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="mobile-sub" id="mobile-sub-contact" aria-hidden="true">
+                        <ul>
+                            <li class="mobile-nav-item mobile-nav-item--nested">
+                                <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-haspopup="true"
+                                    aria-expanded="false" aria-controls="mobile-sub-contact-forms">
+                                    <span data-key="menu_contact">Kontaktformulare</span>
+                                    <span class="mobile-sub-arrow" aria-hidden="true">
+                                        ▾
+                                    </span>
+                                </button>
+                                <div class="mobile-sub mobile-sub--nested" id="mobile-sub-contact-forms" aria-hidden="true">
+                                    <ul>
+                                        <li class="mobile-nav-item">
+                                            <a href="#contact" data-nav-link data-contact-form="main"
+                                                data-key="menu_contactFormMain">
+                                                Hauptformular
+                                            </a>
+                                        </li>
+                                        <li class="mobile-nav-item">
+                                            <a href="#contact" data-nav-link data-contact-form="extra"
+                                                data-key="menu_contactFormExtra">
+                                                Zusatzformular
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="mobile-nav-item">
+                                <a href="#contactPersons" data-nav-link data-key="menu_contactPersons">
+                                    Ansprechpartner
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- CTA -->
+                <li class="mobile-nav-item">
+                    <a class="mobile-cta" href="#join" data-nav-link data-key="mobile_fastChip">
+                        Mitmachen
+                    </a>
+                </li>
+            </ul>
+            <p class="mobile-note" data-key="mobile_note">
+                Das Menü schließt nach der Auswahl automatisch.
+            </p>
+        </aside>
       <main class="h-scroll" id="scroller" tabindex="0" aria-label="Horizontal scrolling sections">
          <section id="hero" class="panel home-panel">
             <aside class="hero">
