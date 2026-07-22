@@ -1,4 +1,21 @@
+.agents
 .claude
+.codex
+.github/
 .vscode
+claude-philosophy
 index_*.html
 source/style/style_*.css
+
+# Monorepo (packages/, apps/)
+node_modules
+dist
+.vite
+*.tsbuildinfo
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
