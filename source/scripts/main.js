@@ -48,7 +48,6 @@ const T = {
             menu_press: "Для прессы",
             mobile_fastChip: "Присоединяйся!",
             mobile_note: "Меню закрывается после клика по ссылке или по пустой области снаружи.",
-            scroll_hint: "Shift + колесо или трекпад: горизонтально →",
             val_tag: "Наши ценности",
             val_title: 'На чём строится <span class="tx-red">МИРоКИТ</span>',
             val_sub: "Три кита нашего клуба — основа каждого мероприятия",
@@ -59,7 +58,7 @@ const T = {
             v3t: "Уважение",
             v3d: "Учимся понимать и ценить культуру друг друга. Уважение — фундамент настоящей дружбы.",
             about_sup: "Клуб Интернациональный Диалог",
-            about_h2: '<span class="tx-red">«МИРоКИТ»</span> Культурный Игровой Триатлон',
+            about_h2: '<span class="tx-red">«МИРоКИТ»</span><br><span class="tx-red">К</span>ультурно <span class="tx-red">И</span>гровой <span class="tx-red">Т</span>риатлон',
             about_p: "МИРоКИТ — это <strong>культурно-игровой триатлон</strong> для детей и молодёжи. Это пространство <strong>детской дипломатии, творчества и диалога</strong>, где каждый участник становится частью большого мира взаимопонимания.",
             about_cta: "Присоединиться сейчас →",
             pill1: "Международный",
@@ -110,7 +109,7 @@ const T = {
             join_p: "Присоединяйся к международному сообществу! Тысячи участников уже открывают мир через игру, творчество и дружбу.",
             join_cta1: "Записаться сейчас",
             join_cta2: "Для организаций",
-            footer_copy: `© Лига «МИРоКИТ». Все права защищены. ${new Date().getFullYear()} | При полном или частичном цитировании, заимствовании, использовании ссылка обязательна.`,
+            footer_copy: `© Лига «МИРоКИТ». Все права защищены. 2025 - ${new Date().getFullYear()} | При полном или частичном цитировании, заимствовании, использовании ссылка обязательна.`,
             footer_top: "Наверх",
             modal_title: "Заявка",
             modal_note: "Демо-форма: проверяет поля локально и открывает почтовую программу.",
@@ -168,7 +167,6 @@ const T = {
             menu_press: "Press",
             mobile_fastChip: "Join Us!",
             mobile_note: "The menu closes after link click or outside click. Civilized behavior, finally.",
-            scroll_hint: "Shift + mouse wheel or trackpad: horizontal →",
             val_tag: "Our Values",
             val_title: "What MIRoKIT stands for",
             val_sub: "Three pillars of our club — the foundation of every event",
@@ -230,7 +228,7 @@ const T = {
             join_p: "Join our international community! Thousands of participants are already discovering the world through play, creativity and friendship.",
             join_cta1: "Sign up now",
             join_cta2: "For organisations",
-            footer_copy: `© MИРоКИТ League. All rights reserved. ${new Date().getFullYear()} | Full or partial quotation, reproduction, or use of these materials is permitted only with mandatory attribution to the source.`,
+            footer_copy: `© MИРоКИТ League. All rights reserved. 2025 - ${new Date().getFullYear()} | Full or partial quotation, reproduction, or use of these materials is permitted only with mandatory attribution to the source.`,
             footer_top: "Top",
             modal_title: "Sign-up request",
             modal_note: "Demo form: validates locally and opens your mail app.",
@@ -288,7 +286,6 @@ const T = {
             menu_press: "Presse",
             mobile_fastChip: "Begleiten Sie uns!",
             mobile_note: "Das Menü schließt nach Link-Klick oder Außenklick. So wie es sich gehört.",
-            scroll_hint: "Shift + Mausrad oder Trackpad: horizontal →",
             val_tag: "Unsere Werte",
             val_title: "Wofür MIRoKIT steht",
             val_sub: "Drei Säulen unseres Clubs — Basis jeder Veranstaltung",
@@ -350,7 +347,7 @@ const T = {
             join_p: "Tritt unserer internationalen Gemeinschaft bei! Tausende Teilnehmer entdecken bereits die Welt durch Spiel, Kreativität und Freundschaft.",
             join_cta1: "Jetzt anmelden",
             join_cta2: "Für Organisationen",
-            footer_copy: `© Liga „MИРоКИТ“. Alle Rechte vorbehalten. ${new Date().getFullYear()} | Bei vollständiger oder teilweiser Zitierung, Übernahme oder Nutzung der Inhalte ist eine Quellenangabe zwingend erforderlich.`,
+            footer_copy: `© Liga „MИРоКИТ“. Alle Rechte vorbehalten. 2025 - ${new Date().getFullYear()} | Bei vollständiger oder teilweiser Zitierung, Übernahme oder Nutzung der Inhalte ist eine Quellenangabe zwingend erforderlich.`,
             footer_top: "Nach oben",
             modal_title: "Anmeldung",
             modal_note: "Demo-Formular: prüft Eingaben lokal und öffnet danach dein Mailprogramm.",
@@ -361,9 +358,7 @@ const T = {
             toast_sent: "Fertig: E-Mail-Entwurf wird geöffnet.",
          },
       };
-      const scroller = document.getElementById("scroller"),
-         progress = document.getElementById("progress"),
-         burger = document.querySelector(".burger"),
+      const burger = document.querySelector(".burger"),
          mobileMenu = document.getElementById("mobileMenu"),
          backdrop = document.getElementById("mobileBackdrop"),
          closeBtn = document.querySelector(".close-menu"),
@@ -374,25 +369,14 @@ const T = {
       function syncFooterTaskbar() {
          if (!panels.length) return;
 
-         let active;
-         if (horizontalMQ.matches) {
-            active = panels.reduce((best, panel) => {
-               const currentDistance = Math.abs(panel.offsetLeft - scroller.scrollLeft);
-               const bestDistance = Math.abs(best.offsetLeft - scroller.scrollLeft);
-               return currentDistance < bestDistance ? panel : best;
-            }, panels[0]);
-         } else {
-            active = panels.reduce((best, panel) => {
-               const currentDistance = Math.abs(panel.getBoundingClientRect().top);
-               const bestDistance = Math.abs(best.getBoundingClientRect().top);
-               return currentDistance < bestDistance ? panel : best;
-            }, panels[0]);
-         }
+         const active = panels.reduce((best, panel) => {
+            const currentDistance = Math.abs(panel.getBoundingClientRect().top);
+            const bestDistance = Math.abs(best.getBoundingClientRect().top);
+            return currentDistance < bestDistance ? panel : best;
+         }, panels[0]);
 
          document.body.classList.toggle("is-home", active?.id === "hero");
       }
-      let horizontalMQ = window.matchMedia("(min-width: 721px) and (min-height: 480px)");
-      const contactPanel = document.getElementById("contact");
       const contactViews = [...document.querySelectorAll("[data-contact-view]")];
 
       function setContactView(viewKey = "main-contact") {
@@ -409,12 +393,10 @@ const T = {
             else link.removeAttribute("aria-current");
          });
 
-         if (contactPanel) contactPanel.scrollTop = 0;
       }
 
       setContactView();
 
-      const galleryPanel = document.getElementById("gallery");
       const galleryViews = [...document.querySelectorAll("[data-gallery-view]")];
 
       function setGalleryView(viewKey = "gallery-main") {
@@ -431,26 +413,56 @@ const T = {
             else link.removeAttribute("aria-current");
          });
 
-         if (galleryPanel) galleryPanel.scrollTop = 0;
       }
 
       setGalleryView();
+
+      const projectsPanel = document.getElementById("projects");
+      const projectsViews = [...document.querySelectorAll("[data-projects-view]")];
+      const projectsLogo = projectsPanel?.querySelector(".section-logo img");
+      const projectsLogoByView = {
+         current_projects: "public/assets/logos/sections/current_projects_page.png",
+         pas_projects: "public/assets/logos/sections/past_projects_page.png",
+      };
+
+      function setProjectsView(viewKey = "current_projects") {
+         const selectedKey = projectsViews.some((view) => view.dataset.projectsView === viewKey) ? viewKey : "current_projects";
+
+         projectsViews.forEach((view) => {
+            view.hidden = view.dataset.projectsView !== selectedKey;
+            if (!view.hidden) view.querySelectorAll(".fu").forEach((element) => element.classList.add("vis"));
+         });
+         document.querySelectorAll("[data-projects-link]").forEach((link) => {
+            const isCurrent = link.dataset.linkKey === selectedKey;
+            link.classList.toggle("is-current", isCurrent);
+            link.classList.toggle("is-active", isCurrent);
+            if (link.getAttribute("role") === "tab") {
+               link.setAttribute("aria-selected", String(isCurrent));
+               link.removeAttribute("aria-current");
+            } else if (isCurrent) link.setAttribute("aria-current", "page");
+            else link.removeAttribute("aria-current");
+         });
+
+         if (projectsLogo) {
+            projectsLogo.src = projectsLogoByView[selectedKey] || projectsLogoByView.current_projects;
+            projectsLogo.alt = selectedKey === "pas_projects" ? "Logo vergangene Projekte MIRoKIT" : "Logo aktuelle Projekte MIRoKIT";
+         }
+      }
+
+      setProjectsView();
+
+      document.querySelectorAll("button[data-projects-link]").forEach((button) =>
+         button.addEventListener("click", () => setProjectsView(button.dataset.linkKey || "current_projects")),
+      );
 
       function goToHash(hash) {
          const target = document.querySelector(hash);
          if (!target) return;
 
-         if (horizontalMQ.matches) {
-            scroller.scrollTo({
-               left: target.offsetLeft,
-               behavior: "smooth",
-            });
-         } else {
-            target.scrollIntoView({
-               behavior: "smooth",
-               block: "start",
-            });
-         }
+         target.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+         });
 
          history.replaceState(null, "", hash);
       }
@@ -461,131 +473,18 @@ const T = {
                e.preventDefault();
                if (href === "#contact" && a.dataset.linkKey) setContactView(a.dataset.linkKey);
                if (href === "#gallery") setGalleryView(a.dataset.linkKey || "gallery-main");
+               if (href === "#projects") setProjectsView(a.dataset.linkKey || "current_projects");
                goToHash(href);
                closeMenu();
             }
          }),
       );
 
-      let wheelGestureNavigated = false;
-      let wheelGestureTimer;
-
-      function normalizedWheelDelta(e, value) {
-         if (e.deltaMode === WheelEvent.DOM_DELTA_LINE) return value * 18;
-         if (e.deltaMode === WheelEvent.DOM_DELTA_PAGE) return value * window.innerHeight;
-         return value;
-      }
-
-      function activeHorizontalPanel() {
-         return panels.reduce((best, panel) => {
-            const currentDistance = Math.abs(panel.getBoundingClientRect().left);
-            const bestDistance = Math.abs(best.getBoundingClientRect().left);
-            return currentDistance < bestDistance ? panel : best;
-         }, panels[0]);
-      }
-
-      function moveToAdjacentPanel(panel, direction) {
-         const currentIndex = panels.indexOf(panel);
-         const nextPanel = panels[currentIndex + direction];
-         if (!nextPanel) return false;
-
-         const nextMaxScroll = Math.max(0, nextPanel.scrollHeight - nextPanel.clientHeight);
-         nextPanel.scrollTop = direction > 0 ? 0 : nextMaxScroll;
-         scroller.scrollTo({ left: nextPanel.offsetLeft, behavior: "smooth" });
-         return true;
-      }
-
-      window.addEventListener(
-         "wheel",
-         (e) => {
-            if (!horizontalMQ.matches || !panels.length) return;
-
-            const target = e.target instanceof Element ? e.target : null;
-            const ignored = target?.closest("input, textarea, select, button, .modal, .mobile-menu");
-
-            if (ignored) return;
-
-            const canScrollHorizontally = scroller.scrollWidth > scroller.clientWidth;
-            if (!canScrollHorizontally) return;
-
-            const deltaX = normalizedWheelDelta(e, e.deltaX);
-            const deltaY = normalizedWheelDelta(e, e.deltaY);
-            const isHorizontalGesture = Math.abs(deltaX) > Math.abs(deltaY);
-            const delta = isHorizontalGesture ? deltaX : deltaY;
-
-            if (!delta) return;
-
-            const direction = delta > 0 ? 1 : -1;
-            const activePanel = activeHorizontalPanel();
-
-            clearTimeout(wheelGestureTimer);
-            wheelGestureTimer = window.setTimeout(() => {
-               wheelGestureNavigated = false;
-            }, 140);
-
-            if (!isHorizontalGesture) {
-               const maxScrollTop = Math.max(0, activePanel.scrollHeight - activePanel.clientHeight);
-               const atStart = activePanel.scrollTop <= 1;
-               const atEnd = activePanel.scrollTop >= maxScrollTop - 1;
-               const canScrollVertically = (direction < 0 && !atStart) || (direction > 0 && !atEnd);
-
-               if (canScrollVertically) {
-                  e.preventDefault();
-                  activePanel.scrollBy({ top: deltaY, behavior: "auto" });
-                  return;
-               }
-            }
-
-            e.preventDefault();
-
-            if (wheelGestureNavigated) return;
-            wheelGestureNavigated = moveToAdjacentPanel(activePanel, direction);
-         },
-         { passive: false },
-      );
-      scroller.addEventListener("scroll", () => {
-         const max = scroller.scrollWidth - scroller.clientWidth;
-
-         if (progress) {
-            progress.style.width = (max ? (scroller.scrollLeft / max) * 100 : 0) + "%";
-         }
-
-         const active = panels.reduce((best, panel) => {
-            const currentDistance = Math.abs(panel.offsetLeft - scroller.scrollLeft);
-            const bestDistance = Math.abs(best.offsetLeft - scroller.scrollLeft);
-            return currentDistance < bestDistance ? panel : best;
-         }, panels[0]);
-
-         if (active && location.hash !== `#${active.id}`) {
-            history.replaceState(null, "", `#${active.id}`);
-         }
-
-         document.body.classList.toggle("is-home", active?.id === "hero");
-      });
       window.addEventListener("scroll", syncFooterTaskbar, { passive: true });
-      horizontalMQ.addEventListener?.("change", syncFooterTaskbar);
       requestAnimationFrame(syncFooterTaskbar);
 
       window.addEventListener("keydown", (e) => {
          if (document.querySelector(".gallery-media-modal.show, .news-modal.show")) return;
-
-         if (e.key === "ArrowRight") {
-            e.preventDefault();
-
-            scroller.scrollBy({
-               left: scroller.clientWidth,
-               behavior: "smooth",
-            });
-         }
-
-         if (e.key === "ArrowLeft") {
-            e.preventDefault();
-
-            scroller.scrollBy({
-               left: -scroller.clientWidth,
-               behavior: "smooth",
-            });
-         }
 
          if (e.key === "Escape") {
             closeMenu();
@@ -635,7 +534,7 @@ const T = {
             es.forEach((e) => {
                if (e.isIntersecting) e.target.classList.add("vis");
             }),
-         { root: scroller, threshold: 0.16 },
+         { threshold: 0.16 },
       );
       document.querySelectorAll(".fu").forEach((el) => obs.observe(el));
       function openModal() {

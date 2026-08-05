@@ -13,15 +13,16 @@ async function initWorldCanvas() {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const WORLD_URL =
-    "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
+  const WORLD_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
 
   const points = [
-    { label: "Дюссельдорф",country: "Германия",lon: 6.77,lat: 51.23,status: "done", hq: true, hqLabel: "Главный офис" },
+    { label: "Дюссельдорф", country: "Германия", lon: 6.77, lat: 51.23, hq: true, hqLabel: "Главный офис" ,
+      // flag: ["#0f0f0f", "#bf0000", "#dfdf00"] 
+    },
     { label: "Москва", country: "Россия", lon: 37.62, lat: 55.75, status: "done" },
     { label: "Санкт-Петербург", country: "Россия", lon: 30.31, lat: 59.94, status: "done" },
     { label: "Тунис", country: "Тунис", lon: 10.18, lat: 36.8, status: "done" },
-    { label: "Берлин", country: "Германия", lon: 13.4, lat: 52.52, status: "planned" },
+    { label: "Берлин", country: "Германия", lon: 13.4, lat: 52.52, status: "planned"},
     { label: "Варшава", country: "Польша", lon: 21.01, lat: 52.23, status: "planned" },
     { label: "Прага", country: "Чехия", lon: 14.44, lat: 50.08, status: "planned" },
     { label: "Алматы", country: "Казахстан", lon: 76.95, lat: 43.24, status: "planned" },
@@ -66,18 +67,12 @@ async function initWorldCanvas() {
 
     const land = topojson.feature(world, world.objects.land);
     const countries = topojson.feature(world, world.objects.countries);
-    const countryBorders = topojson.mesh(
-      world,
-      world.objects.countries,
-      (a, b) => a !== b,
-    );
+    const countryBorders = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
     const graticule = d3Geo.geoGraticule10();
     const sphere = { type: "Sphere" };
 
     // Germany, numeric ISO 3166-1 code 276, receives a subtle HQ highlight.
-    const hqCountry = countries.features.find(
-      (feature) => String(feature.id) === "276",
-    );
+    const hqCountry = countries.features.find((feature) => String(feature.id) === "276");
 
     function roundedRect(x, y, width, height, radius) {
       const r = Math.min(radius, width / 2, height / 2);
@@ -94,13 +89,7 @@ async function initWorldCanvas() {
       ctx.closePath();
     }
 
-    function drawRoundedLabel(
-      text,
-      centerX,
-      dotTopY,
-      logicalWidth,
-      options = {},
-    ) {
+    function drawRoundedLabel(text, centerX, dotTopY, logicalWidth, options = {}) {
       const compact = Boolean(options.compact);
       const progress = Math.min(1, Math.max(0, options.progress ?? 1));
       const paddingX = compact ? 8 : 10;
@@ -116,14 +105,8 @@ async function initWorldCanvas() {
 
       const labelWidth = Math.ceil(ctx.measureText(text).width + paddingX * 2);
       const centeredX = centerX - labelWidth / 2;
-      const safeX = Math.min(
-        Math.max(centeredX, 8),
-        Math.max(8, logicalWidth - labelWidth - 8),
-      );
-      const safeY = Math.max(
-        dotTopY - labelHeight - (compact ? 10 : 12),
-        8,
-      );
+      const safeX = Math.min(Math.max(centeredX, 8), Math.max(8, logicalWidth - labelWidth - 8));
+      const safeY = Math.max(dotTopY - labelHeight - (compact ? 10 : 12), 8);
 
       // Subtle "from the void" effect: opacity + a tiny lift and scale.
       const eased = 1 - Math.pow(1 - progress, 3);
@@ -142,13 +125,7 @@ async function initWorldCanvas() {
       ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
       ctx.strokeStyle = "rgba(1, 51, 123, 0.17)";
       ctx.lineWidth = 1;
-      roundedRect(
-        -labelWidth / 2,
-        -labelHeight / 2,
-        labelWidth,
-        labelHeight,
-        labelHeight / 2,
-      );
+      roundedRect(-labelWidth / 2, -labelHeight / 2, labelWidth, labelHeight, labelHeight / 2);
       ctx.fill();
       ctx.shadowColor = "transparent";
       ctx.stroke();
@@ -159,9 +136,7 @@ async function initWorldCanvas() {
     }
 
     function getHoverLabel(point) {
-      return point.hq
-        ? `${point.label} · ${point.hqLabel}`
-        : point.label + (point.country ? ` · ${point.country}` : "");
+      return point.hq ? `${point.label} · ${point.hqLabel}` : point.label + (point.country ? ` · ${point.country}` : "");
     }
 
     function smoothStep(value) {
@@ -198,10 +173,7 @@ async function initWorldCanvas() {
         return;
       }
 
-      const progress = Math.min(
-        1,
-        Math.max(0, (timestamp - zoomOutStartedAt) / ZOOM_OUT_DURATION),
-      );
+      const progress = Math.min(1, Math.max(0, (timestamp - zoomOutStartedAt) / ZOOM_OUT_DURATION));
       const eased = smoothStep(progress);
       zoomScale = 1 + (zoomOutStartScale - 1) * (1 - eased);
 
@@ -211,39 +183,31 @@ async function initWorldCanvas() {
     }
 
     function toZoomedPosition(position) {
-      return [
-        zoomFocus.x + (position[0] - zoomFocus.x) * zoomScale,
-        zoomFocus.y + (position[1] - zoomFocus.y) * zoomScale,
-      ];
+      return [zoomFocus.x + (position[0] - zoomFocus.x) * zoomScale, zoomFocus.y + (position[1] - zoomFocus.y) * zoomScale];
     }
 
     function makeGreatCircleRoute(from, to, steps = 48) {
-      const interpolate = d3Geo.geoInterpolate(
-        [from.lon, from.lat],
-        [to.lon, to.lat],
-      );
+      const interpolate = d3Geo.geoInterpolate([from.lon, from.lat], [to.lon, to.lat]);
 
       return {
         type: "LineString",
-        coordinates: Array.from({ length: steps + 1 }, (_, index) =>
-          interpolate(index / steps),
-        ),
+        coordinates: Array.from({ length: steps + 1 }, (_, index) => interpolate(index / steps)),
       };
     }
 
     function drawHeadquartersFlag(position, point, compact) {
-      const poleX = position[0] + 10;
-      const poleTop = position[1] - 47;
-      const flagWidth = compact ? 30 : 38;
-      const flagHeight = compact ? 18 : 24;
+      const poleX = position[0] - 19;
+      const poleTop = position[1] - 20;
+      const flagWidth = compact ? 12 : 16;
+      const flagHeight = compact ? 9 : 12;
 
       ctx.save();
       ctx.strokeStyle = "#01337b";
       ctx.lineWidth = 2.5;
       ctx.lineCap = "round";
       ctx.beginPath();
-      ctx.moveTo(poleX, position[1] - 1);
-      ctx.lineTo(poleX, poleTop);
+      ctx.moveTo(poleX + 19, poleTop - 1);
+      ctx.lineTo(poleX + 19, poleTop + 20);
       ctx.stroke();
 
       ctx.shadowColor = "rgba(1, 51, 123, 0.20)";
@@ -251,19 +215,13 @@ async function initWorldCanvas() {
       ctx.shadowOffsetY = 3;
       point.flag.forEach((color, index) => {
         ctx.fillStyle = color;
-        ctx.fillRect(
-          poleX + 2,
-          poleTop + index * (flagHeight / 3),
-          flagWidth,
-          flagHeight / 3 + 0.5,
-        );
+        ctx.fillRect(poleX + 2, poleTop + index * (flagHeight / 3), flagWidth, flagHeight / 3 + 0.5);
       });
       ctx.shadowColor = "transparent";
       ctx.strokeStyle = "rgba(1, 51, 123, 0.18)";
       ctx.lineWidth = 1;
       ctx.strokeRect(poleX + 2, poleTop, flagWidth, flagHeight);
       ctx.restore();
-
     }
 
     function drawMap(timestamp = performance.now()) {
@@ -277,17 +235,11 @@ async function initWorldCanvas() {
       const padding = compact ? 12 : 18;
       const frameDelta = Math.min(64, Math.max(0, timestamp - lastFrameAt));
       lastFrameAt = timestamp;
-      const pulse = reducedMotionQuery.matches
-        ? 0.35
-        : (Math.sin((timestamp - startedAt) / 650) + 1) / 2;
+      const pulse = reducedMotionQuery.matches ? 0.35 : (Math.sin((timestamp - startedAt) / 650) + 1) / 2;
 
       updateZoom(timestamp, frameDelta, width, height);
 
-      if (
-        currentWidth !== width ||
-        currentHeight !== height ||
-        currentRatio !== ratio
-      ) {
+      if (currentWidth !== width || currentHeight !== height || currentRatio !== ratio) {
         currentWidth = width;
         currentHeight = height;
         currentRatio = ratio;
@@ -302,15 +254,13 @@ async function initWorldCanvas() {
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
 
-      const projection = d3Geo
-        .geoNaturalEarth1()
-        .fitExtent(
-          [
-            [padding, padding],
-            [width - padding, height - padding],
-          ],
-          sphere,
-        );
+      const projection = d3Geo.geoNaturalEarth1().fitExtent(
+        [
+          [padding, padding],
+          [width - padding, height - padding],
+        ],
+        sphere,
+      );
       const path = d3Geo.geoPath(projection, ctx);
 
       const background = ctx.createLinearGradient(0, 0, width, height);
@@ -384,14 +334,10 @@ async function initWorldCanvas() {
           ctx.save();
           ctx.beginPath();
           path(route);
-          ctx.strokeStyle = planned
-            ? "rgba(232, 23, 43, 0.46)"
-            : "rgba(21, 101, 255, 0.40)";
+          ctx.strokeStyle = planned ? "rgba(232, 23, 43, 0.46)" : "rgba(21, 101, 255, 0.40)";
           ctx.lineWidth = planned ? 1.35 : 1.8;
           ctx.setLineDash(planned ? [5, 6] : []);
-          ctx.shadowColor = planned
-            ? "rgba(232, 23, 43, 0.12)"
-            : "rgba(21, 101, 255, 0.15)";
+          ctx.shadowColor = planned ? "rgba(232, 23, 43, 0.12)" : "rgba(21, 101, 255, 0.15)";
           ctx.shadowBlur = 5;
           ctx.stroke();
           ctx.restore();
@@ -405,9 +351,8 @@ async function initWorldCanvas() {
 
         const planned = point.status === "planned";
         const color = planned ? "#e8172b" : "#1565ff";
-        const halo = planned
-          ? "rgba(232, 23, 43, 0.18)"
-          : "rgba(21, 101, 255, 0.18)";
+        const mainColor = "#e8af00";
+        const halo = planned ? "rgba(232, 23, 43, 0.18)" : "rgba(21, 101, 255, 0.18)";
         const radius = point.hq ? 7 : compact ? 4.4 : 5.3;
 
         const zoomedPosition = toZoomedPosition(position);
@@ -418,27 +363,19 @@ async function initWorldCanvas() {
         });
 
         ctx.beginPath();
-        ctx.arc(
-          position[0],
-          position[1],
-          radius + 7 + pulse * 4,
-          0,
-          Math.PI * 2,
-        );
+        ctx.arc(position[0], position[1], radius + 7 + pulse * 4, 0, Math.PI * 2);
         ctx.fillStyle = halo;
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(position[0], position[1], radius, 0, Math.PI * 2);
-        ctx.fillStyle = color;
+        ctx.fillStyle = point.hq ? mainColor : color;
         ctx.fill();
         ctx.lineWidth = point.hq ? 3 : 2.4;
         ctx.strokeStyle = "#ffffff";
         ctx.stroke();
 
-        // if (point.hq) {
-        //   drawHeadquartersFlag(position, point, compact);
-        // }
+        if (point?.hq && point.flag) { drawHeadquartersFlag(position, point, compact); } else return;
       });
 
       ctx.restore();
@@ -468,13 +405,7 @@ async function initWorldCanvas() {
         const projected = projectedPoints.find((entry) => entry.point === point);
         if (!projected) return;
 
-        drawRoundedLabel(
-          getHoverLabel(point),
-          projected.position[0],
-          projected.position[1] - projected.radius,
-          width,
-          { compact, progress: next },
-        );
+        drawRoundedLabel(getHoverLabel(point), projected.position[0], projected.position[1] - projected.radius, width, { compact, progress: next });
       });
 
       if (!reducedMotionQuery.matches || labelsAnimating) {
@@ -500,10 +431,7 @@ async function initWorldCanvas() {
         const dx = x - entry.position[0];
         const dy = y - entry.position[1];
         const distance = Math.hypot(dx, dy);
-        const hitRadius = Math.max(
-          LABEL_HIT_RADIUS,
-          entry.radius + (entry.point.hq ? 11 : 9),
-        );
+        const hitRadius = Math.max(LABEL_HIT_RADIUS, entry.radius + (entry.point.hq ? 11 : 9));
 
         if (distance <= hitRadius && distance < closestDistance) {
           match = entry.point;
@@ -564,8 +492,7 @@ async function initWorldCanvas() {
       });
     }
 
-    const resizeObserver =
-      "ResizeObserver" in window ? new ResizeObserver(scheduleResize) : null;
+    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(scheduleResize) : null;
 
     if (resizeObserver) {
       resizeObserver.observe(shell);
