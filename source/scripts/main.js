@@ -1,371 +1,125 @@
 /* eslint-disable no-undef */
-const T = {
-         ru: {
-            brand: "МИРоКИТ",
-            hero_badge: "Международный клуб для детей и молодёжи",
-            hero_h1: '<span class="c-bl">Игра.</span> <span class="c-rd">Творчество.</span><br>Диалог. Общение!',
-            hero_sub: "МИРоКИТ — культурно-игровой триатлон для детей и молодёжи. Пространство детской дипломатии, творчества и взаимопонимания.",
-            tag1: "Международный",
-            tag2: "лет",
-            tag3: "Творчество",
-            tag4: "Диалог",
-            cta1: "Присоединяйся!",
-            cta2: "Узнать больше",
-            fb1: "Международный",
-            fb2: "8–18 лет",
-            hero_card_sub: "Культурно-игровой триатлон",
-            nav1: "О МИРоКИТ",
-            nav2: "Как это работает",
-            nav3: "Проекты",
-            nav4: "Медиа",
-            nav5: "Контакты",
-            menu_aboutUs: 'Что такое "МИРоКИТ"?',
-            menu_ourValues: "Наши ценности",
-            menu_team: "Команда",
-            menu_mirokitLocations: "МИРоКИТ в мире",
-            menu_partners: "Партнёры",
-            menu_gamePrinciple: "Принцип игры",
-            menu_programs: "Программы",
-            menu_ageGroups: "Возрастные группы",
-            menu_participation: "Участие",
-            menu_onlineProjects: "Онлайн-проекты",
-            menu_currentProjects: "Текущие проекты",
-            menu_pastProjects: "Завершённые проекты",
-            menu_locations: "Места проведения",
-            menu_projectGallery: "Галерея проектов",
-            menu_news: "Новости",
-            menu_gallery: "Галерея",
-            menu_videos: "Видео",
-            menu_interviews: "Интервью",
-            menu_downloads: "Материалы для скачивания",
-            menu_contactForm: "Контактная форма",
-            menu_contact: "Формы",
-            menu_contactFormMain: "Написать нам",
-            menu_contactFormExtra: "Вступить в Лигу",
-            menu_contactPersons: "Контактные лица",
-            menu_partnerContacts: "Контакты партнёров",
-            menu_cooperation: "Сотрудничество",
-            menu_press: "Для прессы",
-            mobile_fastChip: "Присоединяйся!",
-            mobile_note: "Меню закрывается после клика по ссылке или по пустой области снаружи.",
-            val_tag: "Наши ценности",
-            val_title: 'На чём строится <span class="tx-red">МИРоКИТ</span>',
-            val_sub: "Три кита нашего клуба — основа каждого мероприятия",
-            v1t: "Диалог",
-            v1d: "Объединяем детей разных культур и традиций. Учимся слышать и понимать друг друга через игру и общение.",
-            v2t: "Творчество",
-            v2d: "Раскрываем таланты и вдохновляем на новые идеи. Театр, музыка, искусство — инструменты самовыражения.",
-            v3t: "Уважение",
-            v3d: "Учимся понимать и ценить культуру друг друга. Уважение — фундамент настоящей дружбы.",
-            about_sup: "Клуб Интернациональный Диалог",
-            about_h2: '<span class="tx-red">«МИРоКИТ»</span><br><span class="tx-red">К</span>ультурно <span class="tx-red">И</span>гровой <span class="tx-red">Т</span>риатлон',
-            about_p: "МИРоКИТ — это <strong>культурно-игровой триатлон</strong> для детей и молодёжи. Это пространство <strong>детской дипломатии, творчества и диалога</strong>, где каждый участник становится частью большого мира взаимопонимания.",
-            about_cta: "Присоединиться сейчас →",
-            pill1: "Международный",
-            pill2: "Школы",
-            pill3: "Фестивали",
-            pill4: "Лагеря",
-            pill5: "Культурные центры",
-            prog_tag: "Как проходит МИРоКИТ",
-            prog_title: "Программы и активности",
-            prog_sub: "Команды проходят туры, где важны знания, творчество, смекалка и командный дух!",
-            p1t: "Викторины и эссе",
-            p1d: "Вопросы о культуре, истории и традициях разных народов мира",
-            p2t: "Интеллектуальные игры",
-            p2d: "Шахматы, шашки и логические турниры для развития стратегии",
-            p3t: "Творчество",
-            p3d: "Театр, танцы, вокал, художественные выступления",
-            p4t: "Командные задания",
-            p4d: "Логика, сотрудничество и взаимопомощь — побеждаем вместе!",
-            p5t: "Культурный код",
-            p5d: "Обычаи, кухня, искусство и языки разных народов",
-            loc_tag: "Где мы работаем",
-            loc_title: "МИРоКИТ — везде!",
-            loc_sub: "Клуб работает на международном и локальном уровне",
-            l1n: "В школах",
-            l1d: "Программы интегрированы в школьную жизнь.",
-            l2n: "Центры культуры",
-            l2d: "Дома культуры — площадка для больших событий.",
-            l3n: "В лагерях",
-            l3d: "Летние и зимние лагеря — интенсивный формат дружбы.",
-            l4n: "На фестивалях",
-            l4d: "Международные фестивали — МИРоКИТ встречает весь мир.",
-            ben_title: "МИРоКИТ помогает детям:",
-            ben_sub: "Расти, дружить и открывать мир 🌍",
-            b1n: "Раскрывать способности",
-            b1d: "Каждый ребёнок талантлив. Наши программы помогают найти и развить уникальные сильные стороны.",
-            b2n: "Работать в команде",
-            b2d: "Командная работа — ключевой навык XXI века. Учимся побеждать вместе.",
-            b3n: "Развивать коммуникацию",
-            b3d: "Умение говорить и слушать — основа успеха. Развиваем диалог в игровой форме.",
-            b4n: "Уважать другие культуры",
-            b4d: "Понимание различий делает нас богаче. Дети открывают мир через культуру.",
-            b5n: "Находить друзей",
-            b5d: "Дружба без границ — дружба по всему миру. Наши участники остаются друзьями навсегда.",
-            b6n: "Верить в себя",
-            b6d: "Уверенность начинается с маленьких побед. МИРоКИТ вдохновляет на большие мечты.",
-            join_hw: "Присоединяйся!",
-            join_h2: "Открой мир <span>вместе с нами</span>",
-            join_p: "Присоединяйся к международному сообществу! Тысячи участников уже открывают мир через игру, творчество и дружбу.",
-            join_cta1: "Записаться сейчас",
-            join_cta2: "Для организаций",
-            footer_copy: `© Лига «МИРоКИТ». Все права защищены. 2025 - ${new Date().getFullYear()} | При полном или частичном цитировании, заимствовании, использовании ссылка обязательна.`,
-            footer_top: "Наверх",
-            modal_title: "Заявка",
-            modal_note: "Демо-форма: проверяет поля локально и открывает почтовую программу.",
-            form_name: "Имя",
-            form_email: "E-mail",
-            form_message: "Сообщение",
-            form_submit: "Отправить заявку",
-            toast_sent: "Готово: открываю письмо для отправки.",
-         },
-         en: {
-            brand: "MIRoKIT",
-            hero_badge: "International club for children & youth",
-            hero_h1: '<span class="c-bl">Play.</span> <span class="c-rd">Creativity.</span><br>Dialogue. Connection!',
-            hero_sub: "MIRoKIT — a cultural-game triathlon for children & youth. A space for youth diplomacy, creativity and mutual understanding.",
-            tag1: "International",
-            tag2: "years",
-            tag3: "Creativity",
-            tag4: "Dialogue",
-            cta1: "Join now!",
-            cta2: "Learn more",
-            fb1: "International",
-            fb2: "Ages 8–18",
-            hero_card_sub: "Cultural-Game Triathlon",
-            nav1: "About MIRoKIT",
-            nav2: "How It Works",
-            nav3: "Projects",
-            nav4: "Latest",
-            nav5: "Contact",
-            menu_aboutUs: "What is MIRoKIT?",
-            menu_ourValues: "Our Values",
-            menu_team: "Team",
-            menu_mirokitLocations: "MIRoKIT Worldwide",
-            menu_partners: "Partners",
-            menu_gamePrinciple: "How the Game Works",
-            menu_programs: "Programs",
-            menu_ageGroups: "Age Groups",
-            menu_participation: "How to Participate",
-            menu_onlineProjects: "Online Projects",
-            menu_currentProjects: "Current Projects",
-            menu_pastProjects: "Past Projects",
-            menu_locations: "Project Locations",
-            menu_projectGallery: "Project Gallery",
-            menu_news: "News",
-            menu_gallery: "Gallery",
-            menu_videos: "Videos",
-            menu_interviews: "Interviews",
-            menu_downloads: "Downloads",
-            menu_contactForm: "Contact Form",
-            menu_contact: "Forms",
-            menu_contactFormMain: "Contact us",
-            menu_contactFormExtra: "Join the League",
-            menu_contactPersons: "Contact Persons",
-            menu_partnerContacts: "Partner Contacts",
-            menu_cooperation: "Cooperation",
-            menu_press: "Press",
-            mobile_fastChip: "Join Us!",
-            mobile_note: "The menu closes after link click or outside click. Civilized behavior, finally.",
-            val_tag: "Our Values",
-            val_title: "What MIRoKIT stands for",
-            val_sub: "Three pillars of our club — the foundation of every event",
-            v1t: "Dialogue",
-            v1d: "We unite children from different cultures and traditions, learning to listen and understand each other through play.",
-            v2t: "Creativity",
-            v2d: "We unlock talents and inspire new ideas. Theatre, music, art — tools for self-expression.",
-            v3t: "Respect",
-            v3d: "We learn to understand and appreciate each other's cultures. Respect is the foundation of true friendship.",
-            about_sup: "International Dialogue Club",
-            about_h2: 'MIRoKIT — a <span class="tx-red">cultural game triathlon</span>',
-            about_p: "MIRoKIT is a <strong>cultural-game triathlon</strong> for children and youth — a space for <strong>youth diplomacy, creativity and dialogue</strong>, where every participant becomes part of a world of understanding and cooperation.",
-            about_cta: "Join us now →",
-            pill1: "International",
-            pill2: "Schools",
-            pill3: "Festivals",
-            pill4: "Camps",
-            pill5: "Cultural Centres",
-            prog_tag: "How MIRoKIT works",
-            prog_title: "Programs & Activities",
-            prog_sub: "Teams compete in exciting rounds where knowledge, creativity and teamwork are key!",
-            p1t: "Quizzes & Essays",
-            p1d: "Questions about culture, history and traditions from around the world",
-            p2t: "Intellectual Games",
-            p2d: "Chess, checkers and logic tournaments to develop strategic thinking",
-            p3t: "Creativity",
-            p3d: "Theatre, dance, singing, and artistic performances",
-            p4t: "Team Challenges",
-            p4d: "Logic, cooperation and mutual support — we win together!",
-            p5t: "Cultural Code",
-            p5d: "Customs, cuisine, art and languages of different peoples",
-            loc_tag: "Where we work",
-            loc_title: "MIRoKIT — everywhere!",
-            loc_sub: "The club operates at international and local levels",
-            l1n: "In schools",
-            l1d: "Programs integrated into school life. Creativity and dialogue right in the classroom.",
-            l2n: "Cultural centres",
-            l2d: "Community centres are the stage for major international events.",
-            l3n: "In camps",
-            l3d: "Summer and winter camps — intensive format for making new friends.",
-            l4n: "At festivals",
-            l4d: "International festivals — MIRoKIT meets the whole world.",
-            ben_title: "MIRoKIT helps children:",
-            ben_sub: "Grow, make friends and explore the world 🌍",
-            b1n: "Discover talents",
-            b1d: "Every child is gifted. Our programs help find and develop unique strengths.",
-            b2n: "Work as a team",
-            b2d: "Teamwork is the key skill of the 21st century. We learn to win and lose together.",
-            b3n: "Develop communication",
-            b3d: "The ability to speak and listen is the foundation of success. We develop dialogue through play.",
-            b4n: "Respect other cultures",
-            b4d: "Understanding differences enriches us. Children discover the world through culture.",
-            b5n: "Make friends",
-            b5d: "Friendship without borders — friendships around the world. Our participants stay friends forever.",
-            b6n: "Believe in themselves",
-            b6d: "Confidence starts with small victories. MIRoKIT inspires big dreams.",
-            join_hw: "Join us!",
-            join_h2: "Discover the world <span>together with us</span>",
-            join_p: "Join our international community! Thousands of participants are already discovering the world through play, creativity and friendship.",
-            join_cta1: "Sign up now",
-            join_cta2: "For organisations",
-            footer_copy: `© MИРоКИТ League. All rights reserved. 2025 - ${new Date().getFullYear()} | Full or partial quotation, reproduction, or use of these materials is permitted only with mandatory attribution to the source.`,
-            footer_top: "Top",
-            modal_title: "Sign-up request",
-            modal_note: "Demo form: validates locally and opens your mail app.",
-            form_name: "Name",
-            form_email: "Email",
-            form_message: "Message",
-            form_submit: "Send request",
-            toast_sent: "Ready: opening the email draft.",
-         },
-         de: {
-            brand: "MIRoKIT",
-            hero_badge: "Internationaler Club für Kinder & Jugend",
-            hero_h1: '<span class="c-bl">Spiel.</span> <span class="c-rd">Kreativität.</span><br>Dialog. Verbindung!',
-            hero_sub: "MIRoKIT — ein kulturell-spielerischer Triathlon für Kinder & Jugendliche. Ein Raum für Jugenddiplomatie, Kreativität und gegenseitiges Verstehen.",
-            tag1: "International",
-            tag2: "Jahre",
-            tag3: "Kreativität",
-            tag4: "Dialog",
-            cta1: "Mitmachen!",
-            cta2: "Mehr erfahren",
-            fb1: "International",
-            fb2: "8–18 Jahre",
-            hero_card_sub: "Kulturell-spielerischer Triathlon",
-            nav1: "Über MIRoKIT",
-            nav2: "So funktioniert’s",
-            nav3: "Projekte",
-            nav4: "Aktuelles",
-            nav5: "Kontakt",
-            menu_aboutUs: "Was ist MIRoKIT?",
-            menu_ourValues: "Unsere Werte",
-            menu_team: "Team",
-            menu_mirokitLocations: "MIRoKIT weltweit",
-            menu_partners: "Partner",
-            menu_gamePrinciple: "Spielprinzip",
-            menu_programs: "Programme",
-            menu_ageGroups: "Altersgruppen",
-            menu_participation: "Teilnahme",
-            menu_onlineProjects: "Online-Projekte",
-            menu_currentProjects: "Aktuelle Projekte",
-            menu_pastProjects: "Vergangene Projekte",
-            menu_locations: "Standorte",
-            menu_projectGallery: "Projektgalerie",
-            menu_news: "News",
-            menu_gallery: "Galerie",
-            menu_videos: "Videos",
-            menu_interviews: "Interviews",
-            menu_downloads: "Downloads",
-            menu_contactForm: "Kontaktformular",
-            menu_contact: "Formulare",
-            menu_contactFormMain: "Kontakt aufnehmen",
-            menu_contactFormExtra: "Der Liga beitreten",
-            menu_contactPersons: "Ansprechpartner",
-            menu_partnerContacts: "Partnerkontakte",
-            menu_cooperation: "Kooperation",
-            menu_press: "Presse",
-            mobile_fastChip: "Begleiten Sie uns!",
-            mobile_note: "Das Menü schließt nach Link-Klick oder Außenklick. So wie es sich gehört.",
-            val_tag: "Unsere Werte",
-            val_title: "Wofür MIRoKIT steht",
-            val_sub: "Drei Säulen unseres Clubs — Basis jeder Veranstaltung",
-            v1t: "Dialog",
-            v1d: "Wir verbinden Kinder verschiedener Kulturen und Traditionen und lernen, einander zuzuhören und zu verstehen.",
-            v2t: "Kreativität",
-            v2d: "Wir entfalten Talente und inspirieren zu neuen Ideen. Theater, Musik, Kunst — Mittel zur Selbstentfaltung.",
-            v3t: "Respekt",
-            v3d: "Wir lernen, die Kulturen anderer zu verstehen und zu schätzen. Respekt ist die Grundlage echter Freundschaft.",
-            about_sup: "Internationaler Dialogclub",
-            about_h2: 'MIRoKIT — ein <span class="tx-red">kultureller Spiel-Triathlon</span>',
-            about_p: "MIRoKIT ist ein <strong>kulturell-spielerischer Triathlon</strong> für Kinder und Jugendliche — ein Raum für <strong>Jugenddiplomatie, Kreativität und Dialog</strong>, wo jeder Teilnehmer Teil einer Welt des Verständnisses wird.",
-            about_cta: "Jetzt mitmachen →",
-            pill1: "International",
-            pill2: "Schulen",
-            pill3: "Festivals",
-            pill4: "Lager",
-            pill5: "Kulturzentren",
-            prog_tag: "So läuft MIRoKIT ab",
-            prog_title: "Programme & Aktivitäten",
-            prog_sub: "Teams bestreiten spannende Runden, in denen Wissen, Kreativität und Teamgeist gefragt sind!",
-            p1t: "Quiz & Essays",
-            p1d: "Fragen über Kulturen, Geschichte und Traditionen aus aller Welt",
-            p2t: "Intellektuelle Spiele",
-            p2d: "Schach, Dame und Logikturniere zur Förderung strategischen Denkens",
-            p3t: "Kreativität",
-            p3d: "Theater, Tanz, Gesang und künstlerische Aufführungen",
-            p4t: "Teamaufgaben",
-            p4d: "Logik, Zusammenarbeit und gegenseitige Hilfe — wir gewinnen gemeinsam!",
-            p5t: "Kultureller Code",
-            p5d: "Bräuche, Küche, Kunst und Sprachen verschiedener Völker",
-            loc_tag: "Wo wir tätig sind",
-            loc_title: "MIRoKIT — überall!",
-            loc_sub: "Der Club ist auf internationaler und lokaler Ebene tätig",
-            l1n: "In Schulen",
-            l1d: "Programme ins Schulleben integriert. Kreativität und Dialog direkt im Klassenzimmer.",
-            l2n: "Kulturzentren",
-            l2d: "Kulturhäuser als Bühne für große internationale Veranstaltungen.",
-            l3n: "In Lagern",
-            l3d: "Sommer- und Winterlager — intensives Format für neue Freundschaften.",
-            l4n: "Auf Festivals",
-            l4d: "Internationale Festivals — MIRoKIT trifft die ganze Welt.",
-            ben_title: "MIRoKIT hilft Kindern:",
-            ben_sub: "Wachsen, Freundschaften schließen und die Welt entdecken 🌍",
-            b1n: "Talente entfalten",
-            b1d: "Jedes Kind ist begabt. Unsere Programme helfen, einzigartige Stärken zu finden und zu entwickeln.",
-            b2n: "Im Team arbeiten",
-            b2d: "Teamarbeit ist die Schlüsselkompetenz des 21. Jahrhunderts. Gemeinsam gewinnen und verlieren.",
-            b3n: "Kommunikation entwickeln",
-            b3d: "Reden und Zuhören als Grundlage des Erfolgs. Wir entwickeln Dialog spielerisch.",
-            b4n: "Andere Kulturen respektieren",
-            b4d: "Unterschiede zu verstehen bereichert uns. Kinder entdecken die Welt durch Kultur.",
-            b5n: "Freunde finden",
-            b5d: "Freundschaft ohne Grenzen — Freundschaften rund um die Welt. Für immer.",
-            b6n: "An sich glauben",
-            b6d: "Selbstvertrauen beginnt mit kleinen Siegen. MIRoKIT inspiriert zu großen Träumen.",
-            join_hw: "Mitmachen!",
-            join_h2: "Entdecke die Welt <span>mit uns gemeinsam</span>",
-            join_p: "Tritt unserer internationalen Gemeinschaft bei! Tausende Teilnehmer entdecken bereits die Welt durch Spiel, Kreativität und Freundschaft.",
-            join_cta1: "Jetzt anmelden",
-            join_cta2: "Für Organisationen",
-            footer_copy: `© Liga „MИРоКИТ“. Alle Rechte vorbehalten. 2025 - ${new Date().getFullYear()} | Bei vollständiger oder teilweiser Zitierung, Übernahme oder Nutzung der Inhalte ist eine Quellenangabe zwingend erforderlich.`,
-            footer_top: "Nach oben",
-            modal_title: "Anmeldung",
-            modal_note: "Demo-Formular: prüft Eingaben lokal und öffnet danach dein Mailprogramm.",
-            form_name: "Name",
-            form_email: "E-Mail",
-            form_message: "Nachricht",
-            form_submit: "Anfrage senden",
-            toast_sent: "Fertig: E-Mail-Entwurf wird geöffnet.",
-         },
-      };
-      const burger = document.querySelector(".burger"),
-         mobileMenu = document.getElementById("mobileMenu"),
-         backdrop = document.getElementById("mobileBackdrop"),
-         closeBtn = document.querySelector(".close-menu"),
-         modal = document.getElementById("signupModal"),
-         toast = document.getElementById("toast");
-      let currentLang = localStorage.getItem("mirokitLang") || "ru";
+/* The translation object and language switch live in language.js. */
+      const scroller = document.querySelector(".site-main.scroller"),progress = document.getElementById("progress"),burger = document.querySelector(".burger"),mobileMenu = document.getElementById("mobileMenu"),backdrop = document.getElementById("mobileBackdrop"),closeBtn = document.querySelector(".close-menu"),modal = document.getElementById("signupModal"),toast = document.getElementById("toast");
+      let currentTheme = "light";
+      try {
+         currentTheme = localStorage.getItem("mirokitTheme") === "dark" ? "dark" : "light";
+      } catch {
+         // Theme still works for the current page when storage is blocked.
+      }
       const panels = [...document.querySelectorAll(".panel")];
+      const scrollTopControl = document.getElementById("scrollTopControl");
+      const revealElements = [...document.querySelectorAll(".fu")];
+      const themeToggles = [...document.querySelectorAll("[data-theme-toggle]")];
+      const newsRotator = document.querySelector("[data-news-rotator]");
+      const newsSlides = newsRotator ? [...newsRotator.querySelectorAll("[data-news-slide]")] : [];
+      const newsDots = [...document.querySelectorAll("[data-news-rotate-target]")];
+      const newsCurrent = document.querySelector("[data-news-current]");
+      let newsSlideIndex = 0;
+      let newsRotationTimer = 0;
+      let revealFrame = 0;
+      let revealObserver = null;
+
+      function syncThemeControls() {
+         const isDark = currentTheme === "dark";
+         document.body.classList.toggle("theme-dark", isDark);
+         document.documentElement.dataset.theme = currentTheme;
+         const labelKey = isDark ? "theme_light" : "theme_dark";
+         const label = T[currentLang]?.[labelKey] || (isDark ? "Light theme" : "Dark theme");
+         themeToggles.forEach((toggle) => {
+            toggle.setAttribute("aria-pressed", String(isDark));
+            toggle.setAttribute("aria-label", label);
+            toggle.setAttribute("title", label);
+            const text = toggle.querySelector(".theme-toggle-label");
+            if (text) text.textContent = label;
+            const icon = toggle.querySelector("i");
+            if (icon) {
+               icon.classList.toggle("fa-moon", !isDark);
+               icon.classList.toggle("fa-sun", isDark);
+            }
+         });
+      }
+
+      function setTheme(theme) {
+         currentTheme = theme === "dark" ? "dark" : "light";
+         try {
+            localStorage.setItem("mirokitTheme", currentTheme);
+         } catch {
+            // Theme still applies for the current page when storage is blocked.
+         }
+         syncThemeControls();
+      }
+
+      function stopNewsRotation() {
+         window.clearTimeout(newsRotationTimer);
+         newsRotationTimer = 0;
+      }
+
+      function scheduleNewsRotation() {
+         stopNewsRotation();
+         if (newsSlides.length < 2 || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+         newsRotationTimer = window.setTimeout(() => showNewsSlide(newsSlideIndex + 1), 6500);
+      }
+
+      function showNewsSlide(index) {
+         if (!newsSlides.length) return;
+         newsSlideIndex = (index + newsSlides.length) % newsSlides.length;
+         newsSlides.forEach((slide, slideIndex) => {
+            const isActive = slideIndex === newsSlideIndex;
+            slide.hidden = !isActive;
+            slide.classList.toggle("is-active", isActive);
+         });
+         newsDots.forEach((dot) => {
+            const isActive = Number(dot.dataset.newsRotateTarget) === newsSlideIndex;
+            dot.classList.toggle("is-active", isActive);
+            dot.setAttribute("aria-current", String(isActive));
+         });
+         if (newsCurrent) newsCurrent.textContent = String(newsSlideIndex + 1).padStart(2, "0");
+         scheduleNewsRotation();
+      }
+
+      themeToggles.forEach((toggle) => toggle.addEventListener("click", () => setTheme(currentTheme === "dark" ? "light" : "dark")));
+      newsDots.forEach((dot) => dot.addEventListener("click", () => showNewsSlide(Number(dot.dataset.newsRotateTarget))));
+      newsRotator?.addEventListener("mouseenter", stopNewsRotation);
+      newsRotator?.addEventListener("mouseleave", scheduleNewsRotation);
+      newsRotator?.addEventListener("focusin", stopNewsRotation);
+      newsRotator?.addEventListener("focusout", (event) => {
+         if (!newsRotator.contains(event.relatedTarget)) scheduleNewsRotation();
+      });
+      syncThemeControls();
+      showNewsSlide(0);
+
+      function revealVisibleElements() {
+         revealFrame = 0;
+         const revealLine = window.innerHeight * 0.82;
+         revealElements.forEach((element) => {
+            if (element.classList.contains("vis")) return;
+            const bounds = element.getBoundingClientRect();
+            if (bounds.top <= revealLine && bounds.bottom > 0) element.classList.add("vis");
+         });
+      }
+
+      function scheduleReveal() {
+         if (!revealFrame) revealFrame = requestAnimationFrame(revealVisibleElements);
+      }
+
+      function syncReadingProgress() {
+         const scrollableHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+         const progress = scrollableHeight ? Math.min(Math.max(window.scrollY / scrollableHeight, 0), 1) : 0;
+         const percent = Math.round(progress * 100);
+         document.documentElement.style.setProperty("--scroll-progress-value", percent);
+         document.documentElement.style.setProperty("--scroll-progress", `${percent}%`);
+         document.documentElement.style.setProperty("--scroll-progress-offset", 100 - percent);
+         document.documentElement.style.setProperty("--scroll-progress-angle", `${percent * 3.6}deg`);
+         document.documentElement.style.setProperty("--scroll-glow-opacity", String(0.18 + progress * 0.38));
+         if (scrollTopControl) {
+            const percentNode = scrollTopControl.querySelector(".scroll-top-percent");
+            if (percentNode) percentNode.textContent = `${percent}%`;
+            scrollTopControl.classList.toggle("is-visible", window.scrollY > Math.min(180, window.innerHeight * 0.18) || percent > 1);
+            scrollTopControl.classList.toggle("is-complete", percent >= 99);
+         }
+      }
+
       function syncFooterTaskbar() {
          if (!panels.length) return;
 
@@ -376,7 +130,121 @@ const T = {
          }, panels[0]);
 
          document.body.classList.toggle("is-home", active?.id === "hero");
+         syncReadingProgress();
       }
+
+      function initIntroLoader() {
+         const introLoader = document.getElementById("introLoader");
+         const introLogo = introLoader?.querySelector(".intro-loader-logo");
+         const headerLogo = document.querySelector(".topbar .logo-placeholder");
+         const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+         if (!introLoader || !introLogo || !headerLogo || reducedMotion) {
+            document.body.classList.remove("intro-loading");
+            introLoader?.remove();
+            return;
+         }
+
+         let started = false;
+
+         async function inlineIntroSvg() {
+            const svgSource = introLogo.dataset.svgSrc;
+            if (!svgSource) return false;
+
+            try {
+               const response = await fetch(svgSource, { cache: "force-cache" });
+               if (!response.ok) throw new Error(`SVG request failed: ${response.status}`);
+
+               const svgDocument = new DOMParser().parseFromString(await response.text(), "image/svg+xml");
+               const svg = svgDocument.documentElement;
+               if (svg.nodeName.toLowerCase() !== "svg" || svg.querySelector("parsererror")) throw new Error("Invalid intro SVG");
+
+               svg.removeAttribute("width");
+               svg.removeAttribute("height");
+               svg.setAttribute("viewBox", "0 0 344 338");
+               svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+               svg.setAttribute("aria-hidden", "true");
+               svg.classList.add("intro-logo-svg");
+
+               const pieces = [...svg.querySelectorAll("path")];
+               pieces.forEach((path, index) => {
+                  const piece = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  piece.classList.add("intro-logo-piece");
+                  piece.style.setProperty("--piece-angle", `${index % 2 ? 5 : -5}deg`);
+                  piece.style.setProperty("--piece-mid-angle", `${index % 2 ? -1.75 : 1.75}deg`);
+                  piece.style.setProperty("--piece-delay", `${(0.52 + index * 0.1).toFixed(2)}s`);
+                  path.replaceWith(piece);
+                  piece.append(path);
+               });
+
+               introLogo.replaceChildren(document.importNode(svg, true));
+               introLogo.classList.add("is-svg-ready");
+               return true;
+            } catch (error) {
+               console.warn("MIRoKIT intro SVG could not be inlined.", error);
+               const fallback = document.createElement("img");
+               fallback.src = introLogo.dataset.svg-src;
+               fallback.alt = "SVG-LOGOofMIRoKIT";
+               fallback.setAttribute("aria-hidden", "true");
+               fallback.className = "intro-logo-fallback";
+               introLogo.replaceChildren(fallback);
+               return false;
+            }
+         }
+
+         const finishIntro = () => {
+            if (introLoader.dataset.finished) return;
+            introLoader.dataset.finished = "true";
+            document.body.classList.remove("intro-loading");
+            introLoader.classList.add("is-finished");
+            window.setTimeout(() => introLoader.remove(), 750);
+         };
+
+         const moveLogoToHeader = () => {
+            if (!started || introLoader.dataset.moving) return;
+            introLoader.dataset.moving = "true";
+            introLoader.classList.add("is-moving");
+
+            const introRect = introLogo.getBoundingClientRect();
+            const headerRect = headerLogo.getBoundingClientRect();
+            const targetSize = Math.max(24, Math.min(headerRect.height * 0.5, introRect.width));
+            const targetLeft = headerRect.left + headerRect.width * 0.075;
+            const targetTop = headerRect.top + headerRect.height * 0.245;
+            const translateX = targetLeft + targetSize / 2 - (introRect.left + introRect.width / 2);
+            const translateY = targetTop + targetSize / 2 - (introRect.top + introRect.height / 2);
+            const scale = targetSize / introRect.width;
+
+            if (typeof introLogo.animate !== "function") {
+               finishIntro();
+               return;
+            }
+
+            const movement = introLogo.animate(
+               [
+                  { transform: "translate3d(0, 0, 0) rotate(0deg) scale(1)" },
+                  { transform: `translate3d(${translateX}px, ${translateY}px, 0) rotate(0deg) scale(${scale})` },
+               ],
+               {
+                  duration: 1450,
+                  easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                  fill: "forwards",
+               },
+            );
+            movement.onfinish = finishIntro;
+            window.setTimeout(finishIntro, 1750);
+         };
+
+         const startIntro = () => {
+            if (started) return;
+            started = true;
+            introLoader.classList.add("is-started");
+            window.setTimeout(moveLogoToHeader, 3650);
+         };
+
+         inlineIntroSvg().then(startIntro).catch(startIntro);
+      }
+
+      initIntroLoader();
       const contactViews = [...document.querySelectorAll("[data-contact-view]")];
 
       function setContactView(viewKey = "main-contact") {
@@ -384,8 +252,14 @@ const T = {
 
          contactViews.forEach((view) => {
             view.hidden = view.dataset.contactView !== selectedKey;
-            if (!view.hidden) view.querySelectorAll(".fu").forEach((element) => element.classList.add("vis"));
          });
+         const activeContactView = contactViews.find((view) => view.dataset.contactView === selectedKey);
+         const contactQuicklinks = activeContactView?.querySelector(".contact-quicklinks");
+         if (contactQuicklinks && revealObserver) {
+            revealObserver.unobserve(contactQuicklinks);
+            revealObserver.observe(contactQuicklinks);
+         }
+         scheduleReveal();
          document.querySelectorAll('[href="#contact"][data-link-key]').forEach((link) => {
             const isCurrent = link.dataset.linkKey === selectedKey;
             link.classList.toggle("is-current", isCurrent);
@@ -404,8 +278,8 @@ const T = {
 
          galleryViews.forEach((view) => {
             view.hidden = view.dataset.galleryView !== selectedKey;
-            if (!view.hidden) view.querySelectorAll(".fu").forEach((element) => element.classList.add("vis"));
          });
+         scheduleReveal();
          document.querySelectorAll("[data-gallery-link]").forEach((link) => {
             const isCurrent = link.dataset.linkKey === selectedKey;
             link.classList.toggle("is-current", isCurrent);
@@ -430,8 +304,8 @@ const T = {
 
          projectsViews.forEach((view) => {
             view.hidden = view.dataset.projectsView !== selectedKey;
-            if (!view.hidden) view.querySelectorAll(".fu").forEach((element) => element.classList.add("vis"));
          });
+         scheduleReveal();
          document.querySelectorAll("[data-projects-link]").forEach((link) => {
             const isCurrent = link.dataset.linkKey === selectedKey;
             link.classList.toggle("is-current", isCurrent);
@@ -455,8 +329,17 @@ const T = {
          button.addEventListener("click", () => setProjectsView(button.dataset.linkKey || "current_projects")),
       );
 
+      function getHashTarget(hash) {
+         if (!hash || !hash.startsWith("#")) return null;
+         try {
+            return document.querySelector(hash);
+         } catch {
+            return null;
+         }
+      }
+
       function goToHash(hash) {
-         const target = document.querySelector(hash);
+         const target = getHashTarget(hash);
          if (!target) return;
 
          target.scrollIntoView({
@@ -475,12 +358,32 @@ const T = {
                if (href === "#gallery") setGalleryView(a.dataset.linkKey || "gallery-main");
                if (href === "#projects") setProjectsView(a.dataset.linkKey || "current_projects");
                goToHash(href);
+               closeDesktopMenus();
                closeMenu();
             }
          }),
       );
 
+      if (scrollTopControl) {
+         const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+         let launchTimer = 0;
+
+         scrollTopControl.addEventListener("click", () => {
+            window.clearTimeout(launchTimer);
+            scrollTopControl.classList.remove("is-launching");
+            void scrollTopControl.offsetWidth;
+            scrollTopControl.classList.add("is-launching");
+
+            const behavior = reducedMotion?.matches ? "auto" : "smooth";
+            document.getElementById("hero")?.scrollIntoView({ behavior, block: "start" });
+            if (location.hash !== "#hero") history.replaceState(null, "", "#hero");
+
+            launchTimer = window.setTimeout(() => scrollTopControl.classList.remove("is-launching"), 780);
+         });
+      }
+
       window.addEventListener("scroll", syncFooterTaskbar, { passive: true });
+      window.addEventListener("resize", syncReadingProgress, { passive: true });
       requestAnimationFrame(syncFooterTaskbar);
 
       window.addEventListener("keydown", (e) => {
@@ -504,39 +407,65 @@ const T = {
          burger.setAttribute("aria-expanded", "false");
          mobileMenu.setAttribute("aria-hidden", "true");
          document.body.classList.remove("menu-open");
+         document.querySelectorAll(".mobile-sub-toggle").forEach((button) => {
+            button.setAttribute("aria-expanded", "false");
+            button.classList.remove("is-open");
+         });
+         document.querySelectorAll(".mobile-sub").forEach((submenu) => submenu.classList.remove("open"));
       }
       burger.addEventListener("click", () => (burger.getAttribute("aria-expanded") === "true" ? closeMenu() : openMenu()));
       backdrop.addEventListener("click", closeMenu);
       closeBtn.addEventListener("click", closeMenu);
-      document.querySelectorAll(".mobile-sub-toggle").forEach((btn) => btn.addEventListener("click", () => btn.nextElementSibling.classList.toggle("open")));
-      function setLang(lang) {
-         const t = T[lang];
-         if (!t) return;
-         currentLang = lang;
-         localStorage.setItem("mirokitLang", lang);
-         document.documentElement.lang = lang;
-         document.querySelectorAll("[data-key]").forEach((el) => {
-            const k = el.dataset.key;
-            if (t[k] !== undefined) el.innerHTML = t[k];
-         });
-         document.querySelectorAll(".lang-btn").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
-         document.querySelectorAll("[data-lang-select]").forEach((select) => {
-            select.value = lang;
-         });
+      document.querySelectorAll(".mobile-sub-toggle").forEach((btn) =>
+         btn.addEventListener("click", () => {
+            const submenu = btn.nextElementSibling;
+            const isOpen = submenu?.classList.toggle("open") ?? false;
+            btn.classList.toggle("is-open", isOpen);
+            btn.setAttribute("aria-expanded", String(isOpen));
+            submenu?.setAttribute("aria-hidden", String(!isOpen));
+         }),
+      );
+
+      const desktopNav = document.querySelector(".desktop-nav");
+
+      function closeDesktopMenus() {
+         desktopNav?.querySelectorAll(".nav-item.is-open, .submenu-item.is-open").forEach((item) => item.classList.remove("is-open"));
+         desktopNav?.querySelectorAll(".submenu-toggle[aria-expanded=\"true\"]").forEach((button) => button.setAttribute("aria-expanded", "false"));
       }
-      document.querySelectorAll(".lang-btn").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
-      document.querySelectorAll("[data-lang-select]").forEach((select) => {
-         select.addEventListener("change", () => setLang(select.value));
+
+      desktopNav?.querySelectorAll(".submenu-toggle").forEach((button) => {
+         button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const item = button.closest(".nav-item, .submenu-item");
+            const isOpen = item?.classList.toggle("is-open") ?? false;
+            button.setAttribute("aria-expanded", String(isOpen));
+            if (isOpen) {
+               desktopNav.querySelectorAll(".nav-item.is-open, .submenu-item.is-open").forEach((other) => {
+                  if (other !== item && !item?.contains(other) && !other.contains(item)) other.classList.remove("is-open");
+               });
+            }
+         });
+         button.addEventListener("focus", () => {
+            const item = button.closest(".nav-item, .submenu-item");
+            item?.classList.add("is-open");
+            button.setAttribute("aria-expanded", "true");
+         });
       });
-      setLang(currentLang);
-      const obs = new IntersectionObserver(
+
+      desktopNav?.addEventListener("pointerleave", closeDesktopMenus);
+      document.addEventListener("pointerdown", (event) => {
+         if (desktopNav && !desktopNav.contains(event.target)) closeDesktopMenus();
+      });
+      revealObserver = new IntersectionObserver(
          (es) =>
             es.forEach((e) => {
                if (e.isIntersecting) e.target.classList.add("vis");
             }),
-         { threshold: 0.16 },
+         { rootMargin: "0px 0px -8% 0px", threshold: 0.01 },
       );
-      document.querySelectorAll(".fu").forEach((el) => obs.observe(el));
+      revealElements.forEach((el) => revealObserver.observe(el));
+      window.addEventListener("scroll", scheduleReveal, { passive: true });
+      scheduleReveal();
       function openModal() {
          modal.classList.add("show");
          modal.setAttribute("aria-hidden", "false");
@@ -561,8 +490,8 @@ const T = {
       document.getElementById("signupForm").addEventListener("submit", (e) => {
          e.preventDefault();
          const fd = new FormData(e.currentTarget);
-         const subject = encodeURIComponent("MIRoKIT Anmeldung");
-         const body = encodeURIComponent(`Name: ${fd.get("name")}\nE-Mail: ${fd.get("email")}\n\nNachricht:\n${fd.get("message")}`);
+         const subject = encodeURIComponent(T[currentLang].mail_subject);
+         const body = encodeURIComponent(`${T[currentLang].mail_name}: ${fd.get("name")}\n${T[currentLang].mail_email}: ${fd.get("email")}\n\n${T[currentLang].mail_message}:\n${fd.get("message")}`);
          showToast(T[currentLang].toast_sent);
          closeModal();
          location.href = `mailto:info@mirokit.org?subject=${subject}&body=${body}`;
@@ -615,7 +544,7 @@ const T = {
          const poster = trigger.querySelector("img")?.currentSrc || trigger.closest(".video-card")?.querySelector("img")?.currentSrc || "";
          const source = trigger.dataset.videoSrc;
          galleryVideo.poster = poster;
-         galleryVideoTitle.textContent = trigger.dataset.videoTitle || "Просмотр видео";
+         galleryVideoTitle.textContent = trigger.dataset.videoTitle || T[currentLang].gallery_video_modal;
          galleryVideoNote.hidden = Boolean(source);
          galleryVideo.removeAttribute("src");
          if (source) galleryVideo.src = source;
@@ -680,7 +609,6 @@ const T = {
             }
          }
       });
-      document.querySelectorAll(".hashtag-carousel").forEach(initHashtagCarousel);
 
       // --- #news: Kategorie-Filter ---
       const newsFilterBtns = document.querySelectorAll(".news-filter-btn");
@@ -803,173 +731,14 @@ const T = {
          }
       });
 
-      function initHashtagCarousel(carousel) {
-         if (carousel.dataset.carouselInitialized === "true") return;
+      scroller.addEventListener("scroll", () => {
+         const max = scroller.scrollHeight - scroller.clientHeight;
 
-         carousel.dataset.carouselInitialized = "true";
-
-         const viewport = carousel.querySelector(".hashtag-carousel__viewport");
-
-         const track = carousel.querySelector(".hashtag-carousel__track");
-
-         const originalGroup = track?.querySelector(".hashtag-carousel__group");
-
-         if (!viewport || !track || !originalGroup) return;
-
-         /*
-          * Geschwindigkeit in Pixeln pro Sekunde.
-          * Kann optional über data-speed="50" am Carousel geändert werden.
-          */
-         const speed = Number(carousel.dataset.speed) || 40;
-
-         const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-         let groupWidth = 0;
-         let position = 0;
-         let previousTime = 0;
-         let animationFrame = null;
-         let resizeFrame = null;
-
-         let isHovered = false;
-         let hasFocus = false;
-
-         originalGroup.dataset.originalGroup = "true";
-
-         function createClone() {
-            const clone = originalGroup.cloneNode(true);
-
-            clone.dataset.carouselClone = "true";
-            clone.setAttribute("aria-hidden", "true");
-
-            clone.querySelectorAll("a, button, input, select, textarea").forEach((element) => {
-               element.setAttribute("tabindex", "-1");
-            });
-
-            return clone;
+         if (progress) {
+            progress.style.width = (max ? (scroller.scrollTop / max) * 100 : 0) + "%";
          }
-
-         function removeClones() {
-            track.querySelectorAll('[data-carousel-clone="true"]').forEach((clone) => clone.remove());
-         }
-
-         function addRequiredClones() {
-            /*
-             * Es werden genug Gruppen erzeugt, damit hinter der sichtbaren
-             * Fläche immer mindestens zwei weitere Gruppen liegen.
-             */
-            const requiredWidth = viewport.clientWidth + groupWidth * 2;
-
-            while (track.scrollWidth < requiredWidth) {
-               track.appendChild(createClone());
-            }
-         }
-
-         function measureAndBuild() {
-            cancelAnimationFrame(animationFrame);
-
-            removeClones();
-
-            position = 0;
-
-            track.style.transform = "translate3d(0px, 0px, 0px)";
-
-            groupWidth = originalGroup.getBoundingClientRect().width;
-
-            if (groupWidth <= 0) return;
-
-            addRequiredClones();
-
-            previousTime = performance.now();
-
-            if (!reducedMotionQuery.matches) {
-               animationFrame = requestAnimationFrame(animate);
-            }
-         }
-
-         function isPaused() {
-            return hasFocus || document.hidden || reducedMotionQuery.matches;
-         }
-
-         function animate(currentTime) {
-            /*
-             * Delta begrenzen, damit nach einem inaktiven Browser-Tab
-             * kein großer Positionssprung entsteht.
-             */
-            const deltaTime = Math.min((currentTime - previousTime) / 1000, 0.05);
-
-            previousTime = currentTime;
-
-            if (!isPaused() && groupWidth > 0) {
-               position -= speed * deltaTime;
-
-               /*
-                * Sobald die erste Gruppe vollständig verschwunden ist,
-                * springen wir exakt um ihre Breite zurück.
-                *
-                * Da direkt dahinter eine identische Gruppe liegt,
-                * ist dieser Reset visuell nicht erkennbar.
-                */
-               while (position <= -groupWidth) {
-                  position += groupWidth;
-               }
-
-               track.style.transform = `translate3d(${position}px, 0px, 0px)`;
-            }
-
-            animationFrame = requestAnimationFrame(animate);
-         }
-
-         carousel.addEventListener("pointerenter", () => {
-            isHovered = true;
-         });
-
-         carousel.addEventListener("pointerleave", () => {
-            isHovered = false;
-            previousTime = performance.now();
-         });
-
-         carousel.addEventListener("focusin", () => {
-            hasFocus = true;
-         });
-
-         carousel.addEventListener("focusout", () => {
-            requestAnimationFrame(() => {
-               hasFocus = carousel.contains(document.activeElement);
-               previousTime = performance.now();
-            });
-         });
-
-         document.addEventListener("visibilitychange", () => {
-            previousTime = performance.now();
-         });
-
-         const resizeObserver = new ResizeObserver(() => {
-            cancelAnimationFrame(resizeFrame);
-
-            resizeFrame = requestAnimationFrame(() => {
-               measureAndBuild();
-            });
-         });
-
-         resizeObserver.observe(viewport);
-         resizeObserver.observe(originalGroup);
-
-         reducedMotionQuery.addEventListener("change", measureAndBuild);
-
-         /*
-          * Erst starten, nachdem Fonts und Layout berechnet wurden.
-          * Sonst kann die gemessene Breite durch später geladene Fonts
-          * nachträglich falsch werden.
-          */
-         if (document.fonts?.ready) {
-            document.fonts.ready.then(measureAndBuild);
-         } else {
-            window.addEventListener("load", measureAndBuild, {
-               once: true,
-            });
-         }
-      }
+      });
 
       window.addEventListener("load", () => {
-         if (location.hash && document.querySelector(location.hash)) setTimeout(() => goToHash(location.hash), 80);
+         if (getHashTarget(location.hash)) setTimeout(() => goToHash(location.hash), 80);
       });

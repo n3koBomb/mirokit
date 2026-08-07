@@ -4,7 +4,7 @@
       <!-- Basic Meta -->
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Мирокит — Игра, Творчество, Диалог, Общение</title>
+      <title data-key="page_title">Мирокит — Игра, Творчество, Диалог, Общение</title>
       <meta name="description" content="Мирокит — культурно-игровой триатлон для детей и молодёжи. Пространство творчества, диалога, уважения и международного общения." />
       <meta name="keywords" content="Мирокит, МироКит, культурный проект, дети, молодёжь, творчество, диалог, международный клуб, викторины, интеллектуальные игры, командные задания, культура, фестиваль" />
       <meta name="author" content="Мирокит" />
@@ -57,6 +57,7 @@
       <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
       <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
       <link rel="preload" as="style" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+      <link rel="preload" as="image" href="./public/assets/brand/miroKit_logo_full-1%20(1).svg" />
 
       <!-- FONT STYLES -->
       <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Rubik:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -126,16 +127,28 @@
       </style>
    </head>
 
-   <body>
+   <body class="intro-loading">
+      <div class="intro-loader" id="introLoader" role="status" aria-live="polite" aria-label="MIRoKIT wird geladen">
+         <div class="intro-loader-backdrop" aria-hidden="true"></div>
+         <div class="intro-loader-stage" aria-hidden="true">
+            <div class="intro-loader-orbit intro-loader-orbit--one"></div>
+            <div class="intro-loader-orbit intro-loader-orbit--two"></div>
+            <div class="intro-loader-logo-wrap">
+               <div class="intro-loader-logo" data-svg-src="./public/assets/brand/miroKit_logo_full-1%20(1).svg" aria-hidden="true"></div>
+               <span class="intro-loader-scanline"></span>
+            </div>
+            <span class="intro-loader-caption" data-key="loader_caption">PLAY · CREATE · CONNECT</span>
+         </div>
+      </div>
       <header class="topbar">
          <a class="brand" href="#hero" data-nav-link>
             <!-- <span class="brand-mark">🌍</span><span data-key="brand">МИРоКИТ</span> -->
             <img class="logo-placeholder" src="./public/assets/brand/miroKit_logo_full-1.png" alt="МИРоКИТ logo placeholder" />
          </a>
-         <nav aria-label="Hauptnavigation">
+         <nav aria-label="Hauptnavigation" data-i18n-attrs="aria-label:nav_label">
             <ul class="desktop-nav">
                <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Über uns öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-about">
+                  <button class="submenu-toggle" type="button" aria-label="Über uns öffnen" data-i18n-attrs="aria-label:nav_about_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-about">
                      <span aria-hidden="true"><i class="fa-solid fa-circle-info"></i></span>
                      <span data-key="nav1">Über MIRoKIT</span>
                      <span aria-hidden="true">▾</span>
@@ -148,7 +161,7 @@
                   </ul>
                </li>
                <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label=" öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-howItWorks">
+                  <button class="submenu-toggle" type="button" aria-label=" öffnen" data-i18n-attrs="aria-label:nav_how_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-howItWorks">
                      <span aria-hidden="true"><i class="fa-solid fa-puzzle-piece"></i></span>
                      <span data-key="nav2"></span>
                      <span aria-hidden="true">▾</span>
@@ -162,7 +175,7 @@
                   </ul>
                </li>
                <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Projekte öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-projects">
+                  <button class="submenu-toggle" type="button" aria-label="Projekte öffnen" data-i18n-attrs="aria-label:nav_projects_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-projects">
                      <span aria-hidden="true"><i class="fa-solid fa-gamepad"></i></span>
                      <span data-key="nav3"></span>
                      <span aria-hidden="true">▾</span>
@@ -174,7 +187,7 @@
                   </ul>
                </li>
                <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Media öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-media">
+                  <button class="submenu-toggle" type="button" aria-label="Media öffnen" data-i18n-attrs="aria-label:nav_media_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-media">
                      <span aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span>
                      <span data-key="nav4">Media</span>
                      <span aria-hidden="true">▾</span>
@@ -182,7 +195,7 @@
                   <ul class="submenu" id="submenu-media">
                      <li class="submenu-item"><a href="#news" data-nav-link data-key="menu_news">News</a></li>
                      <li class="submenu-item has-children">
-                        <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Galerie öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-gallery">
+                        <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Galerie öffnen" data-i18n-attrs="aria-label:gallery_submenu_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-gallery">
                            <span data-key="menu_gallery"></span>
                            <span aria-hidden="true">></span>
                         </button>
@@ -195,18 +208,18 @@
                   </ul>
                </li>
                <li class="nav-item">
-                  <button class="submenu-toggle" type="button" aria-label="Kontakt öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact">
+                  <button class="submenu-toggle" type="button" aria-label="Kontakt öffnen" data-i18n-attrs="aria-label:nav_contact_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact">
                      <span aria-hidden="true"><i class="fa-solid fa-envelope"></i></span>
                      <span data-key="nav5">Kontakt</span>
                      <span aria-hidden="true">▾</span>
                   </button>
                   <ul class="submenu" id="submenu-contact">
                      <li class="submenu-item has-children">
-                        <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Kontakt öffnen" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact">
+                        <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Kontakt öffnen" data-i18n-attrs="aria-label:contact_submenu_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact-forms">
                            <span data-key="menu_contact"></span>
                            <span aria-hidden="true">▾</span>
                         </button>
-                        <ul class="submenu submenu--nested" id="submenu-contact">
+                        <ul class="submenu submenu--nested" id="submenu-contact-forms">
                            <li class="submenu-item"><a href="#contact" data-nav-link data-link-key="main-contact" data-key="menu_contactFormMain">Kontaktformular</a></li>
                            <li class="submenu-item"><a href="#contact" data-nav-link data-link-key="extra-contact" data-key="menu_contactFormExtra">In die Liga eintreten</a></li>
                         </ul>
@@ -217,9 +230,13 @@
             </ul>
          </nav>
          <div class="right-tools">
-            <div class="lang-switch desktop-lang" aria-label="Language">
-               <label class="sr-only" for="desktopLangSelect">Language</label>
-               <select class="lang-select" id="desktopLangSelect" data-lang-select aria-label="Language selector">
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Dunkles Design aktivieren" aria-pressed="false" title="Dunkles Design aktivieren">
+               <i class="fa-solid fa-moon" aria-hidden="true"></i>
+               <span class="theme-toggle-label" data-key="theme_dark">Dark</span>
+            </button>
+            <div class="lang-switch desktop-lang" aria-label="Language" data-i18n-attrs="aria-label:language_label">
+               <label class="sr-only" for="desktopLangSelect" data-key="language_label">Language</label>
+               <select class="lang-select" id="desktopLangSelect" data-lang-select aria-label="Language selector" data-i18n-attrs="aria-label:language_selector">
                   <option value="ru">RU</option>
                   <option value="en">EN</option>
                   <option value="de">DE</option>
@@ -232,13 +249,18 @@
             </button>
          </div>
       </header>
+      <div class="progress" id="progress"></div>
       <div class="mobile-backdrop" id="mobileBackdrop"></div>
-      <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+         <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
          <div class="mobile-head">
             <a class="brand" href="#hero" data-nav-link><span class="brand-mark">🌍</span><span data-key="brand">МИРоКИТ</span></a>
-            <button class="close-menu" type="button" aria-label="Menu schließen">×</button>
+            <button class="close-menu" type="button" aria-label="Menu schließen" data-i18n-attrs="aria-label:close_menu">×</button>
          </div>
-         <div class="lang-switch" aria-label="Language mobile">
+         <div class="lang-switch" aria-label="Language mobile" data-i18n-attrs="aria-label:mobile_language_label">
+            <button class="theme-toggle mobile-theme-toggle" type="button" data-theme-toggle aria-label="Dunkles Design aktivieren" aria-pressed="false" title="Dunkles Design aktivieren">
+               <i class="fa-solid fa-moon" aria-hidden="true"></i>
+               <span class="theme-toggle-label" data-key="theme_dark">Dark</span>
+            </button>
             <button class="lang-btn on" data-lang="ru">RU</button>
             <button class="lang-btn" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -299,8 +321,8 @@
                <div class="mobile-sub" id="mobile-sub-contact" aria-hidden="true">
                   <ul>
                      <li class="mobile-nav-item mobile-nav-item--nested">
-                        <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-contact"><span data-key="menu_contact"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
-                        <div class="mobile-sub mobile-sub--nested" id="mobile-sub-contact" aria-hidden="true">
+                        <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-contact-forms"><span data-key="menu_contact"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
+                        <div class="mobile-sub mobile-sub--nested" id="mobile-sub-contact-forms" aria-hidden="true">
                            <ul>
                               <li class="mobile-nav-item"><a href="#contact" data-nav-link data-link-key="main-contact" data-key="menu_contactFormMain">Kontaktformular</a></li>
                               <li class="mobile-nav-item"><a href="#contact" data-nav-link data-link-key="extra-contact" data-key="menu_contactFormExtra">In die Liga eintreten</a></li>
@@ -315,147 +337,146 @@
          </ul>
          <p class="mobile-note" data-key="mobile_note"></p>
       </aside>
-      <main class="site-main" id="site-main" aria-label="Vertically scrolling sections">
+      <main class="site-main scroller" id="site-main" aria-label="Vertically scrolling sections">
          <section id="hero" class="panel home-panel">
             <aside class="hero" aria-label="МИРоКИТ — культурно-игровой триатлон">
+               <div class="hero-grid-lines" aria-hidden="true"></div>
+               <div class="hero-orbit hero-orbit--one" aria-hidden="true"></div>
+               <div class="hero-orbit hero-orbit--two" aria-hidden="true"></div>
+               <div class="hero-orbit hero-orbit--three" aria-hidden="true"></div>
+               <span class="hero-spark hero-spark--one" aria-hidden="true"></span>
+               <span class="hero-spark hero-spark--two" aria-hidden="true"></span>
+
                <div class="hero-content">
-                  <div class="left-content">
-                     <div class="hero-bg">
-                        <!-- Above the fold: do not lazy-load the main hero artwork. -->
-                        <img src="./public/assets/backgrounds/content-bg-home-left.png" alt="Логотип и девиз культурно-игрового триатлона МИРоКИТ" loading="eager" decoding="async" />
+                  <div class="hero-copy">
+                     <div class="hero-kicker">
+                        <span class="hero-signal" aria-hidden="true"><i></i><i></i><i></i></span>
+                        <span data-key="hero_badge">Международный клуб для детей и молодёжи</span>
+                        <span class="hero-kicker-index">01 / 04</span>
+                     </div>
+
+                     <div class="hero-title-wrap">
+                        <span class="hero-overline" data-key="hero_overline">MIROKIT / 2026</span>
+                        <h1 class="hero-title" data-key="hero_h1"><span class="c-bl">Игра.</span> <span class="c-rd">Творчество.</span><br />Диалог. Общение!</h1>
+                     </div>
+
+                     <p class="hero-sub" data-key="hero_sub">МИРоКИТ — культурно-игровой триатлон для детей и молодёжи. Пространство детской дипломатии, творчества и взаимопонимания.</p>
+
+                     <div class="hero-actions">
+                        <a class="btn-primary hero-action-primary" href="#join" data-nav-link data-key="cta1">Присоединяйся! <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="btn-secondary hero-action-secondary" href="#aboutUs" data-nav-link data-key="cta2">Узнать больше <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a>
+                     </div>
+
+                     <div class="hero-tags" aria-label="Ключевые направления">
+                        <span class="hero-tag"><strong>01</strong><span data-key="tag1">Международный</span></span>
+                        <span class="hero-tag"><strong>7–25</strong><span data-key="tag2">лет</span></span>
+                        <span class="hero-tag"><strong>02</strong><span data-key="tag3">Творчество</span></span>
+                        <span class="hero-tag"><strong>03</strong><span data-key="tag4">Диалог</span></span>
                      </div>
                   </div>
 
-                  <div class="right-content">
-                     <div class="hero-bg">
+                  <div class="hero-visual" aria-label="Визуальная карта МИРоКИТ">
+                     <div class="hero-visual-label"><span data-key="hero_live">LIVE / WORLDWIDE</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></div>
+                     <div class="hero-image-frame">
+                        <!-- Above the fold: do not lazy-load the main hero artwork. -->
                         <img src="./public/assets/backgrounds/content-bg-home-right-4.png" alt="Участники международного проекта МИРоКИТ" loading="eager" fetchpriority="high" decoding="async" />
                      </div>
+                     <div class="hero-float-card">
+                        <span class="hero-float-card-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
+                        <span><small data-key="hero_card_sub">Культурно-игровой триатлон</small><strong data-key="hero_card_tag">PLAY / CREATE / CONNECT</strong></span>
+                     </div>
+                     <div class="hero-coordinates" aria-hidden="true">51° 13' N<br />6° 46' E</div>
                   </div>
+               </div>
+
+               <div class="hero-bottomline">
+                  <span data-key="intro_open" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> OPEN TO EVERY CULTURE</span>
+                  <span data-key="intro_scroll" data-i18n-mode="text">SCROLL TO EXPLORE <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></span>
                </div>
             </aside>
 
-            <aside class="content-row" aria-label="Новости и партнёры МИРоКИТ">
-               <article class="card news" aria-labelledby="home-news-title">
-                  <div class="section-title-row">
-                     <h2 class="section-title" id="home-news-title">
-                        <span class="icon-box" aria-hidden="true">
-                           <i class="fa-solid fa-newspaper"></i>
-                        </span>
-                        <span>Новости проекта</span>
-                     </h2>
+            <aside class="content-row landing-deck" aria-label="Новости и партнёры МИРоКИТ">
+               <article class="card news news-module" aria-labelledby="home-news-title">
+                  <header class="module-head">
+                     <div>
+                        <span class="module-kicker" data-key="live_feed" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> LIVE FEED / 03</span>
+                        <h2 class="section-title" id="home-news-title"><span class="icon-box" aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span><span data-key="news_title">Новости проекта</span></h2>
+                     </div>
+                     <a class="module-link" data-nav-link href="#news" data-key="all_news" data-i18n-mode="text">Все новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                  </header>
 
-                     <a class="mini-link" data-nav-link href="#news">
-                        Все новости
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                     </a>
+                  <div class="news-rotator" data-news-rotator aria-live="polite">
+                     <article class="news-slide is-active" data-news-slide="0">
+                        <a class="news-slide-media" href="#news" data-nav-link aria-label="Открыть новость о конкурсе рисунков">
+                           <img src="./public/assets/images/news/online-course_painting_01-08-26.png" alt="Афиша международного онлайн-конкурса рисунков МИРоКИТ" loading="eager" decoding="async" />
+                           <span class="category cat-blue" data-key="news_category_events">События</span>
+                        </a>
+                        <div class="news-slide-content">
+                           <div class="news-card-meta"><span>01 / NEWS</span><time datetime="2026-08-01">01.08.26</time></div>
+                           <h3 class="news-title" data-key="news_slide_1_title">Международный онлайн-конкурс рисунков «МИРоКИТ»</h3>
+                           <p class="news-slide-summary" data-key="news_slide_1_desc">Креатив объединяет мир: участники из разных стран встречаются через рисунок, игру и воображение.</p>
+                           <a class="news-read-link" href="#news" data-nav-link data-key="news_read" data-i18n-mode="text">Читать историю <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                     </article>
+
+                     <article class="news-slide" data-news-slide="1" hidden>
+                        <a class="news-slide-media" href="#news" data-nav-link aria-label="Открыть новость об игре в Дюссельдорфе">
+                           <img src="./public/assets/images/news/turnir_dus_10-07-26.png" alt="Игра МИРоКИТ в Дюссельдорфе" loading="lazy" decoding="async" />
+                           <span class="category cat-blue" data-key="news_category_events">События</span>
+                        </a>
+                        <div class="news-slide-content">
+                           <div class="news-card-meta"><span>02 / NEWS</span><time datetime="2026-07-10">10.07.26</time></div>
+                           <h3 class="news-title" data-key="news_slide_2_title">В Дюссельдорфе состоялась игра «МИРоКИТ»</h3>
+                           <p class="news-slide-summary" data-key="news_slide_2_desc">Команды встретились за игровым столом и снова доказали: общение — это лучший маршрут к дружбе.</p>
+                           <a class="news-read-link" href="#news" data-nav-link data-key="news_read" data-i18n-mode="text">Читать историю <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                     </article>
+
+                     <article class="news-slide" data-news-slide="2" hidden>
+                        <a class="news-slide-media" href="#news" data-nav-link aria-label="Открыть фоторепортаж">
+                           <img src="./public/assets/gallery/example.png" alt="Фоторепортаж о дружбе и творчестве участников МИРоКИТ" loading="lazy" decoding="async" />
+                           <span class="category cat-green" data-key="news_category_photo">Фоторепортаж</span>
+                        </a>
+                        <div class="news-slide-content">
+                           <div class="news-card-meta"><span>03 / NEWS</span><time datetime="2025-05-25">25.05.25</time></div>
+                           <h3 class="news-title" data-key="news_slide_3_title">Дружба народов в игре, творчестве и общении</h3>
+                           <p class="news-slide-summary" data-key="news_slide_3_desc">Живые встречи, общие идеи и моменты, в которых разные культуры становятся одной командой.</p>
+                           <a class="news-read-link" href="#news" data-nav-link data-key="news_read" data-i18n-mode="text">Читать историю <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+                     </article>
                   </div>
 
-                  <div class="news-grid">
-                     <article class="news-card">
-                        <div class="news-img-wrap">
-                           <img src="./public/assets/images/news/online-course_painting_01-08-26.png" alt="Афиша международного онлайн-конкурса рисунков МИРоКИТ" loading="lazy" decoding="async" />
-                           <span class="category cat-blue">События</span>
-                        </div>
-
-                        <div class="news-body">
-                           <h3 class="news-title">Международный онлайн-конкурс рисунков «МИРоКИТ»</h3>
-                           <div class="news-meta">
-                              <time class="date" datetime="2026-08-01">
-                                 <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                 1 августа 2026
-                              </time>
-                              <a class="quader-link" href="#news" data-nav-link aria-label="Открыть новость о конкурсе рисунков">
-                                 Читать дальше
-                                 <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                              </a>
-                           </div>
-                        </div>
-                     </article>
-
-                     <article class="news-card">
-                        <div class="news-img-wrap">
-                           <img src="./public/assets/images/news/turnir_dus_10-07-26.png" alt="Игра МИРоКИТ в Дюссельдорфе" loading="lazy" decoding="async" />
-                           <span class="category cat-blue">События</span>
-                        </div>
-
-                        <div class="news-body">
-                           <h3 class="news-title">В Дюссельдорфе состоялась игра «МИРоКИТ»</h3>
-                           <div class="news-meta">
-                              <time class="date" datetime="2026-07-10">
-                                 <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                 10 июля 2026
-                              </time>
-                              <a class="quader-link" href="#news" data-nav-link aria-label="Открыть новость об игре в Дюссельдорфе">
-                                 Читать дальше
-                                 <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                              </a>
-                           </div>
-                        </div>
-                     </article>
-
-                     <article class="news-card">
-                        <div class="news-img-wrap">
-                           <img src="./public/assets/gallery/example.png" alt="Фоторепортаж о дружбе и творчестве участников МИРоКИТ" loading="lazy" decoding="async" />
-                           <span class="category cat-green">Фоторепортаж</span>
-                        </div>
-
-                        <div class="news-body">
-                           <h3 class="news-title">Дружба народов в игре, творчестве и общении</h3>
-                           <div class="news-meta">
-                              <time class="date" datetime="2025-05-25">
-                                 <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                 25 мая 2025
-                              </time>
-                              <a class="quader-link" href="#news" data-nav-link aria-label="Открыть фоторепортаж">
-                                 Читать дальше
-                                 <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                              </a>
-                           </div>
-                        </div>
-                     </article>
+                  <div class="news-rotator-controls" aria-label="Выбор новости" data-i18n-attrs="aria-label:choose_news">
+                     <div class="news-rotator-dots">
+                        <button class="news-rotator-dot is-active" type="button" data-news-rotate-target="0" aria-label="Показать новость 1" data-i18n-attrs="aria-label:show_news_1" aria-current="true"></button>
+                        <button class="news-rotator-dot" type="button" data-news-rotate-target="1" aria-label="Показать новость 2" data-i18n-attrs="aria-label:show_news_2" aria-current="false"></button>
+                        <button class="news-rotator-dot" type="button" data-news-rotate-target="2" aria-label="Показать новость 3" data-i18n-attrs="aria-label:show_news_3" aria-current="false"></button>
+                     </div>
+                     <span class="news-rotator-status"><span data-news-current>01</span> / 03</span>
                   </div>
                </article>
 
-               <article class="card partner" aria-labelledby="home-partners-title">
-                  <header class="partner-head">
-                     <h2 class="section-title" id="home-partners-title">
-                        <span class="icon-box" aria-hidden="true">
-                           <i class="fa-solid fa-people-group"></i>
-                        </span>
-                        <span>Наши партнёры</span>
-                     </h2>
-
-                     <a class="mini-link" data-nav-link href="#partners">
-                        Все партнёры
-                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                     </a>
+               <article class="card partner partner-module" aria-labelledby="home-partners-title">
+                  <header class="module-head">
+                     <div>
+                        <span class="module-kicker module-kicker--gold" data-key="network" data-i18n-mode="text"><i class="fa-solid fa-circle-nodes" aria-hidden="true"></i> NETWORK / 08</span>
+                        <h2 class="section-title" id="home-partners-title"><span class="icon-box" aria-hidden="true"><i class="fa-solid fa-people-group"></i></span><span data-key="partners_title">Наши партнёры</span></h2>
+                     </div>
+                     <a class="module-link" data-nav-link href="#partners" data-key="all_partners" data-i18n-mode="text">Все партнёры <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                   </header>
 
-                  <div class="partner-group" aria-label="Краткая подборка партнёров">
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative Erleben">
-                        <img src="./public/assets/images/partners/initiatie-erleben.png" alt="Initiative Erleben" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Vdochnovenije">
-                        <img src="./public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Iskra PNDJ">
-                        <img src="./public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="NKO без границ">
-                        <img src="./public/assets/images/partners/nko-no-border.png" alt="НКО без границ" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Bricks Charity">
-                        <img src="./public/assets/images/partners/bricks.png" alt="Bricks Charity" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Integral e.V.">
-                        <img src="./public/assets/images/partners/integral-eV.png" alt="Integral e.V." loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="Социальная площадка Клумба">
-                        <img src="./public/assets/images/partners/klumba.png" alt="Социальная площадка Клумба" loading="lazy" decoding="async" />
-                     </a>
-                     <a class="partner-block" href="#partners" data-nav-link aria-label="BV NeMO">
-                        <img src="./public/assets/images/partners/bv-nemo-512.png" alt="BV NeMO" loading="lazy" decoding="async" />
-                     </a>
+                  <div class="partner-showcase">
+                     <div class="partner-showcase-meta"><span data-key="partner_meta_count">08 организаций в одной истории</span><span data-key="partner_meta_title">Партнёры МИРоКИТ</span></div>
+                     <div class="partner-group" aria-label="Краткая подборка партнёров" data-i18n-attrs="aria-label:partner_group">
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative Erleben"><span class="partner-index">01</span><img src="./public/assets/images/partners/initiatie-erleben.png" alt="Initiative Erleben" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Vdochnovenije"><span class="partner-index">02</span><img src="./public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Iskra PNDJ"><span class="partner-index">03</span><img src="./public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="NKO без границ"><span class="partner-index">04</span><img src="./public/assets/images/partners/nko-no-border.png" alt="НКО без границ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Bricks Charity"><span class="partner-index">05</span><img src="./public/assets/images/partners/bricks.png" alt="Bricks Charity" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Integral e.V."><span class="partner-index">06</span><img src="./public/assets/images/partners/integral-eV.png" alt="Integral e.V." loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Социальная площадка Клумба"><span class="partner-index">07</span><img src="./public/assets/images/partners/klumba.png" alt="Социальная площадка Клумба" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="BV NeMO"><span class="partner-index">08</span><img src="./public/assets/images/partners/bv-nemo-512.png" alt="BV NeMO" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                     </div>
                   </div>
                </article>
             </aside>
@@ -464,55 +485,55 @@
             <div class="panel-inner aboutUs-layout">
                <div class="section-header">
                   <div class="section-logo">
-                     <img loading="lazy" src="public/assets/logos/sections/about_us_page_rgba.png" alt="Logo Über uns MIRoKIT" />
+                        <img loading="lazy" src="public/assets/logos/sections/about_us_page_rgba.png" alt="Logo Über uns MIRoKIT" data-i18n-attrs="alt:logo_about_alt" />
                   </div>
                   <div class="section-head">
-                     <span class="eyebrow">О нас</span>
+                     <span class="eyebrow" data-key="about_eyebrow">О нас</span>
                      <h2 class="title" data-key="about_h2">МИРоКИТ — культурный игровой триатлон</h2>
-                     <p class="subtitle"></p>
+                     <p class="subtitle" data-key="about_subtitle"></p>
                   </div>
                </div>
 
-               <div class="about-story fu d1">
+               <div class="about-story fu d4">
                   <div class="about-story-copy">
-                     <span class="about-kicker"><i class="fa-solid fa-people-line" aria-hidden="true"></i> Международная командная игра</span>
-                     <p>Проект <strong>«МИРоКИТ»</strong> представляет собой <strong>культурный игровой триатлон</strong>, который объединяет подростков и молодёжь из разных стран через три универсальных языка взаимодействия: <strong>коммуникацию, игру и творчество</strong>.</p>
-                     <p>
+                     <span class="about-kicker" data-key="about_kicker" data-i18n-mode="text"><i class="fa-solid fa-people-line" aria-hidden="true"></i> Международная командная игра</span>
+                     <p data-key="about_story">Проект <strong>«МИРоКИТ»</strong> представляет собой <strong>культурный игровой триатлон</strong>, который объединяет подростков и молодёжь из разных стран через три универсальных языка взаимодействия: <strong>коммуникацию, игру и творчество</strong>.</p>
+                     <p data-key="about_story_2">
                         «МИРо<strong>КИТ</strong>» (Коммуникация – Игра – Творчество) — это инновационный формат, ориентированный на подростков в возрасте от 7 до 25 лет и их наставников (25+), работающих в сфере образования, культуры и молодёжных инициатив. Участники организуются в
                         интернациональные команды, соревнующиеся в трёх ключевых направлениях:
                      </p>
                   </div>
-                  <aside class="about-audience" aria-label="Участники МИРоКИТ">
-                     <div><strong>7-25</strong><span>лет: дети, подростки и молодёжь</span></div>
-                     <div><strong>25+</strong><span>наставники, педагоги и организаторы</span></div>
+                  <aside class="about-audience" aria-label="Участники МИРоКИТ" data-i18n-attrs="aria-label:audience">
+                     <div><strong>7-25</strong><span data-key="audience_children">лет: дети, подростки и молодёжь</span></div>
+                     <div><strong>25+</strong><span data-key="audience_mentors">наставники, педагоги и организаторы</span></div>
                      <!-- <div><strong>3</strong><span>направления культурного триатлона</span></div> -->
                   </aside>
                </div>
 
-               <div class="about-path fu d2" aria-label="Три направления МИРоКИТ">
+               <div class="about-path fu d2" aria-label="Три направления МИРоКИТ" data-i18n-attrs="aria-label:directions">
                   <article class="path-step path-step-1">
                      <span class="path-icon"
                         >I
                         <!-- <span class="path-letter">К</span> -->
                      </span>
-                     <h3 class="path-title">Межкультурный диалог и детская дипломатия</h3>
-                     <p class="path-desc">Дебаты, эссе, и творческие мини-проекты о взаимопонимании, мире и дружбе между народами.</p>
+                     <h3 class="path-title" data-key="path_1_title">Межкультурный диалог и детская дипломатия</h3>
+                     <p class="path-desc" data-key="path_1_desc">Дебаты, эссе, и творческие мини-проекты о взаимопонимании, мире и дружбе между народами.</p>
                   </article>
                   <article class="path-step path-step-2">
                      <span class="path-icon"
                         >II
                         <!-- <span class="path-letter">И</span> -->
                      </span>
-                     <h3 class="path-title">Настольные интеллектуальные игры</h3>
-                     <p class="path-desc">Шахматы, шашки, нарды как универсальные и мирные инструменты стратегического мышление и взаимодействия.</p>
+                     <h3 class="path-title" data-key="path_2_title">Настольные интеллектуальные игры</h3>
+                     <p class="path-desc" data-key="path_2_desc">Шахматы, шашки, нарды как универсальные и мирные инструменты стратегического мышление и взаимодействия.</p>
                   </article>
                   <article class="path-step path-step-3">
                      <span class="path-icon"
                         >III
                         <!-- <span class="path-letter">Т</span> -->
                      </span>
-                     <h3 class="path-title">Народное творчество и искусство</h3>
-                     <p class="path-desc">Сказки, легенды, народные истории, фольклор, ремёсла и визуальные формы, отражающие культурную идентичность и способствующие обращению к колективной памяти, традициям и культурному коду народа.</p>
+                     <h3 class="path-title" data-key="path_3_title">Народное творчество и искусство</h3>
+                     <p class="path-desc" data-key="path_3_desc">Сказки, легенды, народные истории, фольклор, ремёсла и визуальные формы, отражающие культурную идентичность и способствующие обращению к колективной памяти, традициям и культурному коду народа.</p>
                   </article>
                </div>
                <div class="about-method fu d3">
@@ -520,42 +541,43 @@
                      <img loading="lazy" src="public/assets/documents/posters/methodologischer-leitfaden_ru.png" alt="Методическое пособие Международной лиги МИРоКИТ" />
                   </div>
                   <div class="method-copy">
-                     <span class="about-kicker"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Методическое сопровождение</span>
+                     <span class="about-kicker" data-key="method_kicker" data-i18n-mode="text"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Методическое сопровождение</span>
                      <!-- <h3>Организатор не остаётся один на один с форматом</h3> -->
-                     <p>После вступления в Международную Лигу «МИРоКИТ» Вы получите методическое пособие, рекомендации для организаторов и консультационную поддержку нашей команды.</p>
+                     <p data-key="method_desc">После вступления в Международную Лигу «МИРоКИТ» Вы получите методическое пособие, рекомендации для организаторов и консультационную поддержку нашей команды.</p>
                   </div>
                </div>
 
                <div class="about-contests fu d4">
                   <div class="about-contests-head">
-                     <h3 class="about-contests-title"><i class="fa-solid fa-earth-europe" aria-hidden="true"></i> Онлайн-конкурсы круглый год</h3>
-                     <p class="about-contests-sub">
+                     <h3 class="about-contests-title" data-key="contests_title" data-i18n-mode="text"><i class="fa-solid fa-earth-europe" aria-hidden="true"></i> Онлайн-конкурсы круглый год</h3>
+                     <p class="about-contests-sub" data-key="contests_desc">
                         В рамках проекта наряду с очными турнирами регулярно проводятся онлайн-конкурсы, объединяющие участников из разных стран. Дистанционный формат позволяет принимать участие независимо от места проживания, расширяет международное сотрудничество и способствует культурному обмену.
                         В течение года проводится:
                      </p>
                   </div>
                   <ul class="contest-chips">
-                     <li class="contest-chip"><i class="fa-solid fa-palette" aria-hidden="true"></i> Конкурс рисунков</li>
-                     <li class="contest-chip"><i class="fa-solid fa-camera" aria-hidden="true"></i> Конкурс художественная фотография</li>
-                     <li class="contest-chip"><i class="fa-solid fa-video" aria-hidden="true"></i> Конкурс видеоролики</li>
-                     <li class="contest-chip"><i class="fa-solid fa-microphone" aria-hidden="true"></i> Конкурс художественное чтение</li>
-                     <li class="contest-chip"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> Конкурс эссе и литературное творчество</li>
-                     <li class="contest-chip"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> Конкурс авторские стихотворения</li>
-                     <li class="contest-chip"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Конкурс рассказы и сказки</li>
-                     <li class="contest-chip"><i class="fa-solid fa-hands-holding" aria-hidden="true"></i> Конкурс декоративно-прикладное творчество</li>
-                     <li class="contest-chip"><i class="fa-solid fa-music" aria-hidden="true"></i> Конкурс музыкальное и вокальное искусство <br />(в видеоформате)</li>
-                     <li class="contest-chip"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Конкурс театральные мини-постановки</li>
+                     <li class="contest-chip" data-key="contest_drawings" data-i18n-mode="text"><i class="fa-solid fa-palette" aria-hidden="true"></i> Конкурс рисунков</li>
+                     <li class="contest-chip" data-key="contest_photo" data-i18n-mode="text"><i class="fa-solid fa-camera" aria-hidden="true"></i> Конкурс художественная фотография</li>
+                     <li class="contest-chip" data-key="contest_video" data-i18n-mode="text"><i class="fa-solid fa-video" aria-hidden="true"></i> Конкурс видеоролики</li>
+                     <li class="contest-chip" data-key="contest_reading" data-i18n-mode="text"><i class="fa-solid fa-microphone" aria-hidden="true"></i> Конкурс художественное чтение</li>
+                     <li class="contest-chip" data-key="contest_essay" data-i18n-mode="text"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> Конкурс эссе и литературное творчество</li>
+                     <li class="contest-chip" data-key="contest_poetry" data-i18n-mode="text"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> Конкурс авторские стихотворения</li>
+                     <li class="contest-chip" data-key="contest_stories" data-i18n-mode="text"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Конкурс рассказы и сказки</li>
+                     <li class="contest-chip" data-key="contest_crafts" data-i18n-mode="text"><i class="fa-solid fa-hands-holding" aria-hidden="true"></i> Конкурс декоративно-прикладное творчество</li>
+                     <li class="contest-chip" data-key="contest_music" data-i18n-mode="text"><i class="fa-solid fa-music" aria-hidden="true"></i> Конкурс музыкальное и вокальное искусство <br />(в видеоформате)</li>
+                     <li class="contest-chip" data-key="contest_theatre" data-i18n-mode="text"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Конкурс театральные мини-постановки</li>
                   </ul>
                </div>
 
                <div class="about-league fu d5">
                   <div>
                      <p>
-                        Присоединяйтесь к Международной Лиге «МИРоКИТ» и станьте официальным организатором игры <br />
+                        <span data-key="league_invite">Присоединяйтесь к Международной Лиге «МИРоКИТ» и станьте официальным организатором игры <br />
                         в своей стране!
+                        </span>
                      </p>
                   </div>
-                  <a class="btn-primary about-league-btn" href="#contact" data-nav-link data-link-key="extra-contact"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Вступить в Лигу</a>
+                  <a class="btn-primary about-league-btn" href="#contact" data-nav-link data-link-key="extra-contact" data-key="league_join" data-i18n-mode="text"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Вступить в Лигу</a>
                </div>
             </div>
          </section>
@@ -566,15 +588,15 @@
                      <img loading="lazy" src="public/assets/logos/sections/team_page_rgba.png" alt="Team Logo MIRoKIT" />
                   </div>
                   <div class="section-head">
-                     <span class="eyebrow">Команда</span>
-                     <h2 class="title">Наша команда</h2>
-                     <p class="subtitle">Мы создаём пространство, где дети учатся понимать и уважать друг друга.</p>
+                     <span class="eyebrow" data-key="team_eyebrow">Команда</span>
+                     <h2 class="title" data-key="team_title">Наша команда</h2>
+                     <p class="subtitle" data-key="team_subtitle">Мы создаём пространство, где дети учатся понимать и уважать друг друга.</p>
                   </div>
                </div>
 
                <div class="team-showcase">
                   <div class="main-text">
-                     <p>
+                     <p data-key="team_intro">
                         Каждый ребёнок рождается открытым Миру. Но чтобы научиться понимать других людей, уважать чужую культуру, работать в команде и находить общий язык, недостаточно только получать знания. Для этого нужен живой опыт общения, совместного творчества и игры. Именно поэтому появился
                         проект «МИРоКИТ».
                      </p>
@@ -587,20 +609,20 @@
                            <strong></strong>
                         </figcaption>
                      </figure>
-                     <p class="team-closing">
+                     <p class="team-closing" data-key="team_closing">
                         <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Мы верим, что Мир начинается с ребёнка. И если сегодня дети научатся уважать, понимать и поддерживать друг друга, завтра они смогут сделать Мир добрее, открытее и безопаснее. Именно ради этого мы создаём и
                         развиваем «МИРоКИТ».
                      </p>
                   </div>
                   <div class="team-story">
-                     <p class="team-lead">Мы — команда авторов Международной Лиги «МИРоКИТ». Нас объединило желание создать образовательную технологию, которая поможет детям из разных стран знакомиться, дружить, учиться сотрудничать и открывать Мир через культуру и творчество.</p>
+                     <p class="team-lead" data-key="team_lead">Мы — команда авторов Международной Лиги «МИРоКИТ». Нас объединило желание создать образовательную технологию, которая поможет детям из разных стран знакомиться, дружить, учиться сотрудничать и открывать Мир через культуру и творчество.</p>
                      <div class="team-copy">
-                        <p>
+                        <p data-key="team_story_1">
                            Так родилась авторская методика культурно-игрового триатлона «МИРоКИТ» — современная образовательная технология, которая объединяет диалог, игру и творчество, создавая безопасное и вдохновляющее пространство, где дети могут чувствовать себя значимыми, свободно выражать
                            идеи, учиться сотрудничеству и видеть ценность культурного многообразия.
                         </p>
-                        <p>Мы не создаём разовые мероприятия. Мы строим пространство, в котором дети из разных стран становятся друзьями, педагоги обмениваются опытом, а творчество становится языком взаимопонимания.</p>
-                        <p>
+                        <p data-key="team_story_2">Мы не создаём разовые мероприятия. Мы строим пространство, в котором дети из разных стран становятся друзьями, педагоги обмениваются опытом, а творчество становится языком взаимопонимания.</p>
+                        <p data-key="team_story_3">
                            Сегодня Международная Лига «МИРоКИТ» объединяет участников из разных стран, проводит турниры, конкурсы и образовательные программы, а наша команда продолжает развивать методику, расширять международное сотрудничество и создавать новые возможности для международного
                            общения.
                         </p>
@@ -613,110 +635,110 @@
             <div class="panel-inner world-layout">
                <div class="section-header">
                   <div class="section-logo">
-                     <img loading="lazy" src="public/assets/logos/sections/world.png" alt="Logo Welt MIRoKIT" />
+                     <img loading="lazy" src="#" alt="Logo Welt MIRoKIT" />
                   </div>
                   <div class="section-head">
-                     <div class="eyebrow">География</div>
-                     <h2 class="title">МИРоКИТ в мире</h2>
-                     <p class="subtitle">Отдельная секция под страны, флаги, статусы, координаторов и локальные события.</p>
+                     <div class="eyebrow" data-key="world_eyebrow">География</div>
+                     <h2 class="title" data-key="world_title">МИРоКИТ в мире</h2>
+                     <p class="subtitle" data-key="world_subtitle">Отдельная секция под страны, флаги, статусы, координаторов и локальные события.</p>
                   </div>
                </div>
                <div class="world-stage">
                   <article class="glass-board world-map-card fu d1" aria-labelledby="worldMapTitle">
                      <div class="board-head world-board-head">
                         <div>
-                           <div class="board-title" id="worldMapTitle"><i class="ti ti-world"></i>Карта международных площадок МИРоКИТ</div>
-                           <p class="world-lead">Синие точки показывают города, где уже были мероприятия МИРоКИТ. Красные точки отмечают направления, где готовятся новые встречи, онлайн-мосты и партнёрские площадки.</p>
+                           <div class="board-title" id="worldMapTitle" data-key="world_board_title" data-i18n-mode="text"><i class="ti ti-world"></i>Карта международных площадок МИРоКИТ</div>
+                           <p class="world-lead" data-key="world_lead">Синие точки показывают города, где уже были мероприятия МИРоКИТ. Красные точки отмечают направления, где готовятся новые встречи, онлайн-мосты и партнёрские площадки.</p>
                         </div>
-                        <a class="board-action" href="#partners" data-nav-link>Стать партнёром →</a>
+                        <a class="board-action" href="#partners" data-nav-link data-key="become_partner">Стать партнёром →</a>
                      </div>
                      <div class="world-map-shell">
                         <figure class="world-map-figure" aria-hidden="true">
-                           <canvas id="worldCanvas" role="img" class="world-canvas" aria-label="Карта международных площадок МИРоКИТ"></canvas>
-                           <figcaption class="world-map-caption">Наведите курсор на карту, чтобы увидеть информацию о конкретном городе</figcaption>
+                           <canvas id="worldCanvas" role="img" class="world-canvas" aria-label="Карта международных площадок МИРоКИТ" data-i18n-attrs="aria-label:world_map_label"></canvas>
+                           <figcaption class="world-map-caption" data-key="world_map_caption">Наведите курсор на карту, чтобы увидеть информацию о конкретном городе</figcaption>
                         </figure>
                         <div class="world-map-overlay" aria-hidden="true">
                            <span class="world-compass"><i class="fa-solid fa-compass"></i></span>
                         </div>
-                        <div class="world-map-fallback sr-only">Главный офис: Дюссельдорф, Германия. Уже проведены события: Дюссельдорф, Москва, Санкт-Петербург, Тунис. Планируются новые площадки: Берлин, Варшава, Прага, Алматы и Стамбул.</div>
+                        <div class="world-map-fallback sr-only" data-key="world_map_fallback">Главный офис: Дюссельдорф, Германия. Уже проведены события: Дюссельдорф, Москва, Санкт-Петербург, Тунис. Планируются новые площадки: Берлин, Варшава, Прага, Алматы и Стамбул.</div>
                      </div>
-                     <div class="world-legend" aria-label="Легенда карты">
-                        <span><i class="legend-flag">⚑</i>главный штаб</span>
-                        <span><i class="legend-dot legend-dot--planned"></i>планируется</span>
-                        <span><i class="legend-dot legend-dot--done"></i>уже были события</span>
+                     <div class="world-legend" aria-label="Легенда карты" data-i18n-attrs="aria-label:map_legend">
+                        <span data-key="hq" data-i18n-mode="text"><i class="legend-flag">⚑</i>главный штаб</span>
+                        <span data-key="planned" data-i18n-mode="text"><i class="legend-dot legend-dot--planned"></i>планируется</span>
+                        <span data-key="events_done" data-i18n-mode="text"><i class="legend-dot legend-dot--done"></i>уже были события</span>
                      </div>
                   </article>
 
-                  <aside class="world-side-panel fu d2" aria-label="Статус стран проекта">
+                  <aside class="world-side-panel fu d2" aria-label="Статус стран проекта" data-i18n-attrs="aria-label:country_status">
                      <div class="world-side-card world-hq-card">
-                        <span class="world-card-kicker">Главный штаб</span>
-                        <h3>Координационый центр. Дюссельдорф.</h3>
-                        <p>Здесь собираются заявки, партнёрские контакты, методические материалы и календарь международных активностей.</p>
+                        <span class="world-card-kicker" data-key="hq">Главный штаб</span>
+                        <h3 data-key="hq_title">Координационый центр. Дюссельдорф.</h3>
+                        <p data-key="hq_desc">Здесь собираются заявки, партнёрские контакты, методические материалы и календарь международных активностей.</p>
                      </div>
                      <div class="world-status-grid">
                         <article class="world-status-card">
                            <strong>4</strong>
-                           <span>города с проведёнными событиями</span>
+                           <span data-key="cities_done">города с проведёнными событиями</span>
                         </article>
                         <article class="world-status-card world-status-card--red">
                            <strong>5</strong>
-                           <span>направлений в планировании</span>
+                           <span data-key="directions_planned">направлений в планировании</span>
                         </article>
                      </div>
                      <div class="world-country-list">
                         <div class="world-country-item is-done">
                            <span>🇩🇪</span>
-                           <div><strong>Германия</strong><small>Дюссельдорф, Берлин, партнёрские площадки</small></div>
+                           <div><strong data-key="country_germany">Германия</strong><small data-key="country_germany_desc">Дюссельдорф, Берлин, партнёрские площадки</small></div>
                         </div>
                         <div class="world-country-item is-done">
                            <span>🇷🇺</span>
-                           <div><strong>Россия</strong><small>игровые события, культурные задания, наставники</small></div>
+                           <div><strong data-key="country_russia">Россия</strong><small data-key="country_russia_desc">игровые события, культурные задания, наставники</small></div>
                         </div>
                         <div class="world-country-item is-planned">
                            <span>🇵🇱</span>
-                           <div><strong>Польша</strong><small>планируется онлайн-мост и команда координаторов</small></div>
+                           <div><strong data-key="country_poland">Польша</strong><small data-key="country_poland_desc">планируется онлайн-мост и команда координаторов</small></div>
                         </div>
                         <div class="world-country-item is-planned">
                            <span>🇰🇿</span>
-                           <div><strong>Казахстан</strong><small>подготовка молодёжной онлайн-площадки</small></div>
+                           <div><strong data-key="country_kazakhstan">Казахстан</strong><small data-key="country_kazakhstan_desc">подготовка молодёжной онлайн-площадки</small></div>
                         </div>
                      </div>
                   </aside>
                </div>
 
-               <div class="world-content-grid" aria-label="Как развивается география МИРоКИТ">
+               <div class="world-content-grid" aria-label="Как развивается география МИРоКИТ" data-i18n-attrs="aria-label:geography_growth">
                   <article class="world-info-card fu d1">
                      <span class="world-info-icon"><i class="ti ti-video"></i></span>
-                     <h3>Онлайн-мосты между городами</h3>
-                     <p>Команды могут встречаться без долгих поездок: викторины, творческие задания, мини-презентации культур и общие финалы проходят в одном цифровом пространстве.</p>
+                     <h3 data-key="bridges_title">Онлайн-мосты между городами</h3>
+                     <p data-key="bridges_desc">Команды могут встречаться без долгих поездок: викторины, творческие задания, мини-презентации культур и общие финалы проходят в одном цифровом пространстве.</p>
                   </article>
                   <article class="world-info-card fu d2">
                      <span class="world-info-icon"><i class="ti ti-users-group"></i></span>
-                     <h3>Локальные координаторы</h3>
-                     <p>Каждая новая точка на карте получает понятный сценарий: как собрать участников, как провести игру, как оформить материалы и как связаться с международной командой.</p>
+                     <h3 data-key="coordinators_title">Локальные координаторы</h3>
+                     <p data-key="coordinators_desc">Каждая новая точка на карте получает понятный сценарий: как собрать участников, как провести игру, как оформить материалы и как связаться с международной командой.</p>
                   </article>
                   <article class="world-info-card fu d3">
                      <span class="world-info-icon"><i class="ti ti-certificate"></i></span>
-                     <h3>Единый стандарт событий</h3>
-                     <p>Мероприятия сохраняют общую структуру МИРоКИТ: культура, игра, уважительный диалог, командное творчество и честная обратная связь после события.</p>
+                     <h3 data-key="standard_title">Единый стандарт событий</h3>
+                     <p data-key="standard_desc">Мероприятия сохраняют общую структуру МИРоКИТ: культура, игра, уважительный диалог, командное творчество и честная обратная связь после события.</p>
                   </article>
                </div>
 
-               <div class="world-timeline fu d3" aria-label="План развития международной сети">
+               <div class="world-timeline fu d3" aria-label="План развития международной сети" data-i18n-attrs="aria-label:network_plan">
                   <div class="world-timeline-step is-done">
                      <span>01</span>
-                     <strong>Проведённые встречи</strong>
-                     <p>Собираем опыт, фото, отзывы участников и лучшие задания.</p>
+                     <strong data-key="timeline_done">Проведённые встречи</strong>
+                     <p data-key="timeline_done_desc">Собираем опыт, фото, отзывы участников и лучшие задания.</p>
                   </div>
                   <div class="world-timeline-step is-active">
                      <span>02</span>
-                     <strong>Партнёрская подготовка</strong>
-                     <p>Проверяем площадки, согласуем формат и готовим команды.</p>
+                     <strong data-key="timeline_prepare">Партнёрская подготовка</strong>
+                     <p data-key="timeline_prepare_desc">Проверяем площадки, согласуем формат и готовим команды.</p>
                   </div>
                   <div class="world-timeline-step is-planned">
                      <span>03</span>
-                     <strong>Новые международные точки</strong>
-                     <p>Запускаем события там, где есть координаторы и устойчивый интерес.</p>
+                     <strong data-key="timeline_future">Новые международные точки</strong>
+                     <p data-key="timeline_future_desc">Запускаем события там, где есть координаторы и устойчивый интерес.</p>
                   </div>
                </div>
             </div>
@@ -728,17 +750,17 @@
                      <img loading="lazy" src="public/assets/logos/sections/partners_page_rgba.png" alt="Logo Partner MIRoKIT" />
                   </div>
                   <div class="section-head">
-                     <div class="eyebrow">Партнёры</div>
-                     <h2 class="title">Партнёры МИРоКИТ</h2>
-                     <p class="subtitle">Наши партнёры помогают создавать международные события, поддерживать семьи, открывать детям новые культурные маршруты и превращать игру в настоящее пространство доверия.</p>
+                     <div class="eyebrow" data-key="partners_eyebrow">Партнёры</div>
+                     <h2 class="title" data-key="partners_title">Партнёры МИРоКИТ</h2>
+                     <p class="subtitle" data-key="partners_subtitle">Наши партнёры помогают создавать международные события, поддерживать семьи, открывать детям новые культурные маршруты и превращать игру в настоящее пространство доверия.</p>
                   </div>
                </div>
 
                <div class="partners-content">
-                  <section class="partner-panel partner-hero-card fu d1" aria-label="Партнёрство с МИРоКИТ">
-                     <span class="partner-kicker"><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i> Открытое приглашение</span>
+                  <section class="partner-panel partner-hero-card fu d1" aria-label="Партнёрство с МИРоКИТ" data-i18n-attrs="aria-label:partnership_label">
+                     <span class="partner-kicker" data-key="open_invitation" data-i18n-mode="text"><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i> Открытое приглашение</span>
                      <!-- <h3>Собираем партнёрскую карту для событий, образования и гуманитарных инициатив</h3> -->
-                     <p>
+                     <p data-key="partnership_desc">
                         Мы открыты для новых партнёрств и приглашаем к сотрудничеству образовательные организации, университеты, школы, учреждения дополнительного образования, общественные объединения, учреждения культуры, библиотеки, молодёжные центры, благотворительные фонды и организации,
                         заинтересованные в развитии международных гуманитарных инициатив.
                      </p>
@@ -757,30 +779,30 @@
                         международные встречи и поддерживать детские инициативы.</p>
                   </div> -->
                      <div class="partner-actions">
-                        <a class="btn-primary" href="mailto:info@mirokit.org?subject=Partnership"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Стать партнёром</a>
-                        <a class="btn-secondary" href="#contact" data-nav-link data-link-key="main-contact">Связаться</a>
+                        <a class="btn-primary" href="mailto:info@mirokit.org?subject=Partnership" data-key="become_partner" data-i18n-mode="text"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Стать партнёром</a>
+                        <a class="btn-secondary" href="#contact" data-nav-link data-link-key="main-contact" data-key="partner_contact">Связаться</a>
                      </div>
                   </section>
 
-                  <section class="partner-logo-stage fu d2" aria-label="Логотипы партнёров МИРоКИТ">
+                  <section class="partner-logo-stage fu d2" aria-label="Логотипы партнёров МИРоКИТ" data-i18n-attrs="aria-label:partner_logo_label">
                      <div class="partner-stage-head">
-                        <span><i class="fa-solid fa-star" aria-hidden="true"></i> Карта партнёров</span>
+                        <span data-key="partner_map" data-i18n-mode="text"><i class="fa-solid fa-star" aria-hidden="true"></i> Карта партнёров</span>
                      </div>
                      <div class="partner-logo-groups">
                         <article class="partner-logo-group">
-                           <h3>Общественные организации</h3>
+                           <h3 data-key="partner_public">Общественные организации</h3>
                            <div class="partner-logo-wall">
                               <figure class="partner-logo-tile">
                                  <img loading="lazy" src="public/assets/images/partners/initiatie-erleben.png" alt="Initiative Erleben" />
-                                 <figcaption>Initiative Erleben</figcaption>
+                                 <figcaption data-key="partner_initiative">Initiative Erleben</figcaption>
                               </figure>
                               <figure class="partner-logo-tile">
                                  <img loading="lazy" src="public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" />
-                                 <figcaption>Vdochnovenije</figcaption>
+                                 <figcaption data-key="partner_vdochnovenije">Vdochnovenije</figcaption>
                               </figure>
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/integral-eV.png" alt="Integral e.V." />
-                                 <figcaption>Integral e.V.</figcaption>
+                                 <figcaption data-key="partner_integral">Integral e.V.</figcaption>
                               </figure>
                               <!-- <figure class="partner-logo-tile partner-logo-tile--wide">
                               <img loading="lazy" src="public/assets/images/partners/bv-nemo-512.png" alt="BV NeMO" />
@@ -789,19 +811,19 @@
                            </div>
                         </article>
                         <article class="partner-logo-group">
-                           <h3>Социальные и благотворительные инициативы</h3>
+                           <h3 data-key="partner_social">Социальные и благотворительные инициативы</h3>
                            <div class="partner-logo-wall">
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/bricks.png" alt="Bricks Charity" />
-                                 <figcaption>Bricks Charity</figcaption>
+                                 <figcaption data-key="partner_bricks">Bricks Charity</figcaption>
                               </figure>
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/klumba.png" alt="Social Marketplace Klumba" />
-                                 <figcaption>Klumba</figcaption>
+                                 <figcaption data-key="partner_klumba">Klumba</figcaption>
                               </figure>
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/nko-no-border.png" alt="NKO no Border" />
-                                 <figcaption>NKO no Border</figcaption>
+                                 <figcaption data-key="partner_nko">NKO no Border</figcaption>
                               </figure>
                               <!-- <figure class="partner-logo-tile">
                               <img loading="lazy"
@@ -812,11 +834,11 @@
                            </div>
                         </article>
                         <article class="partner-logo-group">
-                           <h3>Образование, культура и городские сети</h3>
+                           <h3 data-key="partner_education">Образование, культура и городские сети</h3>
                            <div class="partner-logo-wall">
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" />
-                                 <figcaption>Iskra PNDJ</figcaption>
+                                 <figcaption data-key="partner_iskra">Iskra PNDJ</figcaption>
                               </figure>
                               <!-- <figure class="partner-logo-tile">
                                  <img loading="lazy" src="public/assets/images/partners/kommunales-integrationszentrum-duesseldorf-512.png" alt="Kommunales Integrationszentrum Düsseldorf" />
@@ -928,68 +950,68 @@
                      </div>
                      <div>
                         <dt>24/7</dt>
-                        <dd data-key="op2d">доступ к материалам</dd>
+                        <dd data-key="op_access">доступ к материалам</dd>
                      </div>
                   </dl>
                </div>
 
                <div class="online-projects-grid">
                   <article class="online-project-card online-project-card--featured fu d1">
-                     <a class="online-project-thumb" href="#news" data-nav-link aria-label="Открыть проект Международный онлайн-конкурс рисунков">
+                     <a class="online-project-thumb" href="#news" data-nav-link aria-label="Открыть проект Международный онлайн-конкурс рисунков" data-i18n-attrs="aria-label:online_project_1_label">
                         <img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Работы международного онлайн-конкурса рисунков" />
-                        <span class="online-project-status is-live"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span>
+                        <span class="online-project-status is-live" data-key="project_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span>
                         <span class="online-project-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                      </a>
                      <div class="online-project-content">
-                        <div class="online-project-meta"><span>Творчество</span><span>8–18 лет</span><span>Онлайн</span></div>
-                        <h3>Международный конкурс рисунков «Мир глазами детей»</h3>
-                        <p>Участники создают работы о дружбе народов, традициях и общем будущем. На странице проекта будут опубликованы условия, галерея, календарь и результаты.</p>
+                        <div class="online-project-meta"><span data-key="online_creativity">Творчество</span><span data-key="online_ages">8–18 лет</span><span data-key="online_tag">Онлайн</span></div>
+                        <h3 data-key="online_1_title">Международный конкурс рисунков «Мир глазами детей»</h3>
+                        <p data-key="online_1_desc">Участники создают работы о дружбе народов, традициях и общем будущем. На странице проекта будут опубликованы условия, галерея, календарь и результаты.</p>
                         <div class="online-project-actions">
-                           <a class="btn-primary" href="#news" data-nav-link>Открыть проект <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                           <a class="online-project-text-link" href="#gallery" data-nav-link>Смотреть галерею</a>
+                           <a class="btn-primary" href="#news" data-nav-link data-key="open_project" data-i18n-mode="text">Открыть проект <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                           <a class="online-project-text-link" href="#gallery" data-nav-link data-key="watch_gallery">Смотреть галерею</a>
                         </div>
                      </div>
                   </article>
 
                   <article class="online-project-card fu d2">
-                     <a class="online-project-thumb" href="#programs" data-nav-link aria-label="Открыть проект Онлайн-квиз Культурный код">
+                     <a class="online-project-thumb" href="#programs" data-nav-link aria-label="Открыть проект Онлайн-квиз Культурный код" data-i18n-attrs="aria-label:online_project_2_label">
                         <img loading="lazy" src="public/assets/gallery/example.png" alt="Международная встреча участников MIRoKIT" />
-                        <span class="online-project-status is-soon"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span>
+                        <span class="online-project-status is-soon" data-key="project_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span>
                         <span class="online-project-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                      </a>
                      <div class="online-project-content">
-                        <div class="online-project-meta"><span>Викторина</span><span>Команды</span></div>
-                        <h3>Онлайн-квиз «Культурный код»</h3>
-                        <p>Игровая серия о языках, музыке, кухне и традициях мира с прямыми эфирами и командным финалом.</p>
-                        <a class="online-project-card-link" href="#programs" data-nav-link>Подробнее о формате <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        <div class="online-project-meta"><span data-key="quiz">Викторина</span><span data-key="teams">Команды</span></div>
+                        <h3 data-key="online_2_title">Онлайн-квиз «Культурный код»</h3>
+                        <p data-key="online_2_desc">Игровая серия о языках, музыке, кухне и традициях мира с прямыми эфирами и командным финалом.</p>
+                        <a class="online-project-card-link" href="#programs" data-nav-link data-key="format_details" data-i18n-mode="text">Подробнее о формате <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                      </div>
                   </article>
 
                   <article class="online-project-card fu d3">
-                     <a class="online-project-thumb" href="#gallery" data-nav-link aria-label="Открыть архив проекта Лаборатория дружбы">
+                     <a class="online-project-thumb" href="#gallery" data-nav-link aria-label="Открыть архив проекта Лаборатория дружбы" data-i18n-attrs="aria-label:online_project_3_label">
                         <img loading="lazy" src="public/assets/gallery/example.png" alt="Команда участников проекта MIRoKIT" />
-                        <span class="online-project-status is-archive"><i class="fa-solid fa-check" aria-hidden="true"></i> Завершён</span>
+                        <span class="online-project-status is-archive" data-key="project_done" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Завершён</span>
                         <span class="online-project-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                      </a>
                      <div class="online-project-content">
-                        <div class="online-project-meta"><span>Диалог</span><span>Медиа</span></div>
-                        <h3>Лаборатория дружбы</h3>
-                        <p>Участники записывали интервью, создавали мини-фильмы и собирали цифровую карту историй своих городов.</p>
-                        <a class="online-project-card-link" href="#gallery" data-nav-link>Посмотреть результаты <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        <div class="online-project-meta"><span data-key="dialogue">Диалог</span><span data-key="media">Медиа</span></div>
+                        <h3 data-key="online_3_title">Лаборатория дружбы</h3>
+                        <p data-key="online_3_desc">Участники записывали интервью, создавали мини-фильмы и собирали цифровую карту историй своих городов.</p>
+                        <a class="online-project-card-link" href="#gallery" data-nav-link data-key="view_results">Посмотреть результаты <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                      </div>
                   </article>
 
                   <article class="online-project-card fu d4">
-                     <a class="online-project-thumb online-project-thumb--poster" href="#contact" data-nav-link data-link-key="main-contact" aria-label="Запросить методические материалы">
+                     <a class="online-project-thumb online-project-thumb--poster" href="#contact" data-nav-link data-link-key="main-contact" aria-label="Запросить методические материалы" data-i18n-attrs="aria-label:request_materials">
                         <img loading="lazy" src="public/assets/gallery/example.png" alt="Обложка методического пособия MIRoKIT" />
-                        <span class="online-project-status is-resource"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Материалы</span>
+                        <span class="online-project-status is-resource" data-key="project_kit" data-i18n-mode="text"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Материалы</span>
                         <span class="online-project-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                      </a>
                      <div class="online-project-content">
-                        <div class="online-project-meta"><span>Для организаторов</span><span>Вебинар</span></div>
-                        <h3>Онлайн-школа координаторов</h3>
-                        <p>Практические встречи, готовые сценарии, рабочие материалы и поддержка для запуска проекта в своём городе.</p>
-                        <a class="online-project-card-link" href="#contact" data-nav-link data-link-key="main-contact">Запросить материалы <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        <div class="online-project-meta"><span data-key="for_organisers">Для организаторов</span><span data-key="webinar">Вебинар</span></div>
+                        <h3 data-key="online_4_title">Онлайн-школа координаторов</h3>
+                        <p data-key="online_4_desc">Практические встречи, готовые сценарии, рабочие материалы и поддержка для запуска проекта в своём городе.</p>
+                        <a class="online-project-card-link" href="#contact" data-nav-link data-link-key="main-contact" data-key="request_materials" data-i18n-mode="text">Запросить материалы <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                      </div>
                   </article>
                </div>
@@ -997,9 +1019,9 @@
                <div class="online-projects-footer">
                   <div>
                      <span class="online-projects-footer-icon"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span>
-                     <p><strong>Есть идея для онлайн-проекта?</strong><br />Расскажите нам о ней — мы поможем найти партнёров и формат для международного запуска.</p>
+                     <p data-key="online_idea">Есть идея для онлайн-проекта?<br />Расскажите нам о ней — мы поможем найти партнёров и формат для международного запуска.</p>
                   </div>
-                  <a class="btn-secondary" href="#contact" data-nav-link data-link-key="main-contact">Предложить проект</a>
+                  <a class="btn-secondary" href="#contact" data-nav-link data-link-key="main-contact" data-key="suggest_project">Предложить проект</a>
                </div>
             </div>
          </section>
@@ -1010,19 +1032,19 @@
                      <img loading="lazy" src="public/assets/logos/sections/current_projects_page_rgba.png" alt="Logo Projekte MIRoKIT" />
                   </div>
                   <div class="section-head">
-                     <div class="eyebrow">Проектная лаборатория</div>
-                     <h2 class="title">Живые проекты MIRoKIT: от идеи до международной сцены</h2>
-                     <p class="subtitle">Одна секция собирает текущие инициативы, архив завершённых форматов, маршруты участия, материалы для партнёров и понятные следующие шаги.</p>
+                     <div class="eyebrow" data-key="projects_eyebrow">Проектная лаборатория</div>
+                     <h2 class="title" data-key="projects_title">Живые проекты MIRoKIT: от идеи до международной сцены</h2>
+                     <p class="subtitle" data-key="projects_subtitle">Одна секция собирает текущие инициативы, архив завершённых форматов, маршруты участия, материалы для партнёров и понятные следующие шаги.</p>
                   </div>
                </div>
-               <div class="projects-switch fu d1" role="tablist" aria-label="Проекты MIRoKIT">
+               <div class="projects-switch fu d1" role="tablist" aria-label="Проекты MIRoKIT" data-i18n-attrs="aria-label:projects_label">
                   <button type="button" class="projects-switch-btn is-active" role="tab" aria-selected="true" aria-controls="projects-current-view" data-projects-link data-link-key="current_projects">
                      <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                     <span>Current Projects</span>
+                     <span data-key="current_projects">Current Projects</span>
                   </button>
                   <button type="button" class="projects-switch-btn" role="tab" aria-selected="false" aria-controls="projects-past-view" data-projects-link data-link-key="pas_projects">
                      <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-                     <span>Past Projects</span>
+                     <span data-key="past_projects">Past Projects</span>
                   </button>
                </div>
 
@@ -1030,40 +1052,40 @@
                   <div class="projects-hero-grid">
                      <article class="projects-feature fu d1">
                         <div class="projects-feature-copy">
-                           <span class="projects-kicker"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Сейчас в работе</span>
-                           <h3>Культурный триатлон 2026: команды, раунды, сцена и общий международный финал</h3>
-                           <p>
+                           <span class="projects-kicker" data-key="current_status" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Сейчас в работе</span>
+                           <h3 data-key="projects_feature_title">Культурный триатлон 2026: команды, раунды, сцена и общий международный финал</h3>
+                           <p data-key="projects_feature_desc">
                               Проект собирает школы, семейные команды, культурные центры и партнёров в единую игровую систему. Участники проходят интеллектуальные задания, творческие челленджи, диалоговые миссии и медиа-этапы, а организаторы получают готовую структуру для запуска локального события.
                            </p>
                            <div class="projects-feature-actions">
-                              <a class="btn-primary" href="#programs" data-nav-link>Открыть программу <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                              <a class="btn-secondary" href="#contact" data-nav-link data-link-key="extra-contact">Подключить команду</a>
+                              <a class="btn-primary" href="#programs" data-nav-link data-key="open_program" data-i18n-mode="text">Открыть программу <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                              <a class="btn-secondary" href="#contact" data-nav-link data-link-key="extra-contact" data-key="connect_team">Подключить команду</a>
                            </div>
                         </div>
-                        <div class="projects-command-center" aria-label="Статус текущего проекта">
+                        <div class="projects-command-center" aria-label="Статус текущего проекта" data-i18n-attrs="aria-label:current_project_status">
                            <div class="project-radar"><span></span><span></span><span></span></div>
                            <dl class="projects-live-stats">
                               <div>
                                  <dt>4</dt>
-                                 <dd>формата участия</dd>
+                                 <dd data-key="participation_formats">формата участия</dd>
                               </div>
                               <div>
                                  <dt>12</dt>
-                                 <dd>партнёрских задач</dd>
+                                 <dd data-key="partner_tasks">партнёрских задач</dd>
                               </div>
                               <div>
                                  <dt>8-18</dt>
-                                 <dd>возраст участников</dd>
+                                 <dd data-key="participant_ages">возраст участников</dd>
                               </div>
                            </dl>
                         </div>
                      </article>
                      <aside class="projects-context fu d2">
-                        <span class="projects-context-label">Почему это работает</span>
+                        <span class="projects-context-label" data-key="why_works">Почему это работает</span>
                         <ul>
-                           <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Каждый проект состоит из понятных модулей: игра, творчество, диалог, медиа и рефлексия.</span></li>
-                           <li><i class="fa-solid fa-route" aria-hidden="true"></i><span>Команда может стартовать онлайн, локально в школе или через партнёрскую площадку.</span></li>
-                           <li><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i><span>Партнёры видят роли, сроки, материалы и результат, а не просто афишу события.</span></li>
+                           <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span data-key="project_modular">Каждый проект состоит из понятных модулей: игра, творчество, диалог, медиа и рефлексия.</span></li>
+                           <li><i class="fa-solid fa-route" aria-hidden="true"></i><span data-key="project_start">Команда может стартовать онлайн, локально в школе или через партнёрскую площадку.</span></li>
+                           <li><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i><span data-key="project_roles">Партнёры видят роли, сроки, материалы и результат, а не просто афишу события.</span></li>
                         </ul>
                      </aside>
                   </div>
@@ -1072,73 +1094,73 @@
                      <article class="project-card project-card--wide fu d1">
                         <a class="project-shot project-shot--photo" href="#news" data-nav-link aria-label="Открыть международный конкурс рисунков">
                            <img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Анонс онлайн курса по рисованию" />
-                           <span class="project-status is-live"><i class="fa-solid fa-circle" aria-hidden="true"></i> Live</span>
+                           <span class="project-status is-live" data-key="project_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Live</span>
                         </a>
                         <div class="project-body">
-                           <span class="project-chip">Творческий трек</span>
-                           <h3>Международная мастерская рисунка</h3>
-                           <p>Онлайн-курс и конкурс для детей, где личная история превращается в визуальный рассказ о культуре, семье, городе и дружбе.</p>
-                           <div class="project-meta"><span>Онлайн</span><span>Галерея работ</span><span>Наставники</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link>Подробнее</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos">Работы</a></div>
+                           <span class="project-chip" data-key="creative_track">Творческий трек</span>
+                           <h3 data-key="project_card_1_title">Международная мастерская рисунка</h3>
+                           <p data-key="project_card_1_desc">Онлайн-курс и конкурс для детей, где личная история превращается в визуальный рассказ о культуре, семье, городе и дружбе.</p>
+                           <div class="project-meta"><span data-key="online_tag">Онлайн</span><span data-key="work_gallery">Галерея работ</span><span data-key="mentors">Наставники</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="details">Подробнее</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="works">Работы</a></div>
                         </div>
                      </article>
                      <article class="project-card fu d2">
                         <div class="project-shot project-shot--icon">
                            <i class="fa-solid fa-chess-board" aria-hidden="true"></i>
-                           <span class="project-status is-soon"><i class="fa-regular fa-clock" aria-hidden="true"></i> Next</span>
+                           <span class="project-status is-soon" data-key="project_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Next</span>
                         </div>
                         <div class="project-body">
-                           <span class="project-chip">Игровой формат</span>
-                           <h3>Культурный код: командный квиз</h3>
-                           <p>Серия раундов о традициях, языках, музыке, кухне и символах разных стран. Формат готовится для школ и клубов.</p>
-                           <div class="project-meta"><span>Команды</span><span>Баллы</span><span>Финал</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#programs" data-nav-link>Форматы</a><a class="mini-btn mini-ghost" href="#contact" data-nav-link data-link-key="main-contact">Запросить</a></div>
+                           <span class="project-chip" data-key="game_format">Игровой формат</span>
+                           <h3 data-key="project_card_2_title">Культурный код: командный квиз</h3>
+                           <p data-key="project_card_2_desc">Серия раундов о традициях, языках, музыке, кухне и символах разных стран. Формат готовится для школ и клубов.</p>
+                           <div class="project-meta"><span data-key="online_teams">Команды</span><span data-key="points">Баллы</span><span data-key="final">Финал</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#programs" data-nav-link data-key="formats">Форматы</a><a class="mini-btn mini-ghost" href="#contact" data-nav-link data-link-key="main-contact" data-key="request">Запросить</a></div>
                         </div>
                      </article>
                      <article class="project-card fu d3">
                         <div class="project-shot project-shot--icon project-shot--red">
                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                           <span class="project-status is-build"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Build</span>
+                           <span class="project-status is-build" data-key="project_build" data-i18n-mode="text"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Build</span>
                         </div>
                         <div class="project-body">
-                           <span class="project-chip">Международная сеть</span>
-                           <h3>Карта MIRoKIT Worldwide</h3>
-                           <p>Живая карта стран, городов, локальных координаторов, партнёров и статусов будущих событий.</p>
-                           <div class="project-meta"><span>Города</span><span>Партнёры</span><span>Контакты</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#world" data-nav-link>Смотреть карту</a><a class="mini-btn mini-ghost" href="#partners" data-nav-link>Партнёры</a></div>
+                           <span class="project-chip" data-key="international_network">Международная сеть</span>
+                           <h3 data-key="project_card_3_title">Карта MIRoKIT Worldwide</h3>
+                           <p data-key="project_card_3_desc">Живая карта стран, городов, локальных координаторов, партнёров и статусов будущих событий.</p>
+                           <div class="project-meta"><span data-key="cities">Города</span><span data-key="partners_short">Партнёры</span><span data-key="contacts_short">Контакты</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#world" data-nav-link data-key="view_map">Смотреть карту</a><a class="mini-btn mini-ghost" href="#partners" data-nav-link data-key="partners_short">Партнёры</a></div>
                         </div>
                      </article>
                      <article class="project-card fu d4">
                         <div class="project-shot project-shot--icon project-shot--green">
                            <i class="fa-solid fa-book-open-reader" aria-hidden="true"></i>
-                           <span class="project-status is-resource"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Kit</span>
+                           <span class="project-status is-resource" data-key="project_kit" data-i18n-mode="text"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Kit</span>
                         </div>
                         <div class="project-body">
-                           <span class="project-chip">Для организаторов</span>
-                           <h3>Методический пакет проекта</h3>
-                           <p>Регламенты, чек-листы, письма партнёрам, структура туров и шаблоны для запуска локального этапа.</p>
-                           <div class="project-meta"><span>PDF</span><span>Сценарии</span><span>Шаблоны</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#contact" data-nav-link data-link-key="main-contact">Получить</a><a class="mini-btn mini-ghost" href="#onlineProjects" data-nav-link>Онлайн</a></div>
+                           <span class="project-chip" data-key="for_organisers">Для организаторов</span>
+                           <h3 data-key="project_card_4_title">Методический пакет проекта</h3>
+                           <p data-key="project_card_4_desc">Регламенты, чек-листы, письма партнёрам, структура туров и шаблоны для запуска локального этапа.</p>
+                           <div class="project-meta"><span>PDF</span><span data-key="scripts">Сценарии</span><span data-key="templates">Шаблоны</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="get">Получить</a><a class="mini-btn mini-ghost" href="#onlineProjects" data-nav-link data-key="online_tag">Онлайн</a></div>
                         </div>
                      </article>
                   </div>
 
-                  <div class="projects-flow fu d2" aria-label="Путь текущего проекта">
+                  <div class="projects-flow fu d2" aria-label="Путь текущего проекта" data-i18n-attrs="aria-label:current_project_path">
                      <div>
-                        <span>01</span><strong>Идея</strong>
-                        <p>Формулируем тему, аудиторию, партнёров и результат.</p>
+                        <span>01</span><strong data-key="idea">Идея</strong>
+                        <p data-key="idea_desc">Формулируем тему, аудиторию, партнёров и результат.</p>
                      </div>
                      <div>
-                        <span>02</span><strong>Сбор команд</strong>
-                        <p>Подключаем школы, клубы, семьи и культурные площадки.</p>
+                        <span>02</span><strong data-key="teams">Сбор команд</strong>
+                        <p data-key="teams_desc">Подключаем школы, клубы, семьи и культурные площадки.</p>
                      </div>
                      <div>
-                        <span>03</span><strong>Игра</strong>
-                        <p>Проводим раунды, творческие задания и командные миссии.</p>
+                        <span>03</span><strong data-key="play">Игра</strong>
+                        <p data-key="play_desc">Проводим раунды, творческие задания и командные миссии.</p>
                      </div>
                      <div>
-                        <span>04</span><strong>Финал</strong>
-                        <p>Публикуем итоги, медиа, дипломы и партнёрский отчёт.</p>
+                        <span>04</span><strong data-key="final">Финал</strong>
+                        <p data-key="final_desc">Публикуем итоги, медиа, дипломы и партнёрский отчёт.</p>
                      </div>
                   </div>
                </div>
@@ -1146,69 +1168,69 @@
                <div class="projects-view" id="projects-past-view" role="tabpanel" data-projects-view="pas_projects" hidden>
                   <div class="projects-archive-head fu d1">
                      <div>
-                        <span class="projects-kicker"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> Архив проектов</span>
-                        <h3>Завершённые форматы не исчезают: они становятся библиотекой сценариев, медиа и опыта</h3>
+                           <span class="projects-kicker" data-key="project_archive" data-i18n-mode="text"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> Архив проектов</span>
+                           <h3 data-key="project_archive_title">Завершённые форматы не исчезают: они становятся библиотекой сценариев, медиа и опыта</h3>
                      </div>
-                     <a class="btn-secondary" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main">Открыть галерею</a>
+                           <a class="btn-secondary" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="project_open_gallery">Открыть галерею</a>
                   </div>
 
                   <div class="projects-archive-grid">
                      <article class="project-card project-card--archive fu d1">
                         <a class="project-shot project-shot--photo" href="#news" data-nav-link aria-label="Открыть архив турнира в Дюссельдорфе">
                            <img loading="lazy" src="public/assets/images/news/turnir_dus_10-07-26.png" alt="Архив турнира MIRoKIT в Дюссельдорфе" />
-                           <span class="project-status is-done"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
+                           <span class="project-status is-done" data-key="project_done" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
                         </a>
                         <div class="project-body">
-                           <span class="project-chip">Дюссельдорф</span>
-                           <h3>Локальный турнир дружбы</h3>
-                           <p>Командная встреча с игровыми станциями, культурными вопросами, творческими заданиями и финальным награждением.</p>
-                           <div class="project-meta"><span>Событие</span><span>Фото</span><span>Отчёт</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link>Итоги</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos">Фото</a></div>
+                           <span class="project-chip" data-key="dusseldorf">Дюссельдорф</span>
+                           <h3 data-key="archive_card_1_title">Локальный турнир дружбы</h3>
+                           <p data-key="archive_card_1_desc">Командная встреча с игровыми станциями, культурными вопросами, творческими заданиями и финальным награждением.</p>
+                           <div class="project-meta"><span data-key="event">Событие</span><span data-key="photos_count">Фото</span><span data-key="report">Отчёт</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="results">Итоги</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="photos_count">Фото</a></div>
                         </div>
                      </article>
                      <article class="project-card project-card--archive fu d2">
                         <div class="project-shot project-shot--icon project-shot--violet">
                            <i class="fa-solid fa-people-group" aria-hidden="true"></i>
-                           <span class="project-status is-done"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
+                           <span class="project-status is-done" data-key="project_done" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
                         </div>
                         <div class="project-body">
-                           <span class="project-chip">Тунис</span>
-                           <h3>Диалоговая встреча Tunis</h3>
-                           <p>Пилотный международный блок про взаимное представление культур, семейные истории и командное общение.</p>
-                           <div class="project-meta"><span>Диалог</span><span>Пилот</span><span>Партнёры</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#world" data-nav-link>На карте</a><a class="mini-btn mini-ghost" href="#partners" data-nav-link>Связи</a></div>
+                           <span class="project-chip" data-key="country_tunisia">Тунис</span>
+                           <h3 data-key="archive_card_2_title">Диалоговая встреча Tunis</h3>
+                           <p data-key="archive_card_2_desc">Пилотный международный блок про взаимное представление культур, семейные истории и командное общение.</p>
+                           <div class="project-meta"><span data-key="dialogue">Диалог</span><span data-key="pilot">Пилот</span><span data-key="partners_short">Партнёры</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#world" data-nav-link data-key="view_map">На карте</a><a class="mini-btn mini-ghost" href="#partners" data-nav-link data-key="connections">Связи</a></div>
                         </div>
                      </article>
                      <article class="project-card project-card--archive fu d3">
                         <div class="project-shot project-shot--icon project-shot--amber">
                            <i class="fa-solid fa-masks-theater" aria-hidden="true"></i>
-                           <span class="project-status is-done"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
+                           <span class="project-status is-done" data-key="project_done" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</span>
                         </div>
                         <div class="project-body">
-                           <span class="project-chip">Сценический формат</span>
-                           <h3>Творческая лаборатория дружбы</h3>
-                           <p>Мини-выступления, роли, музыка и короткие презентации стран как подготовка к большому фестивальному дню.</p>
-                           <div class="project-meta"><span>Сцена</span><span>Музыка</span><span>Команды</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#gallery" data-nav-link data-gallery-link data-link-key="video">Видео</a><a class="mini-btn mini-ghost" href="#programs" data-nav-link>Повторить</a></div>
+                           <span class="project-chip" data-key="stage_format">Сценический формат</span>
+                           <h3 data-key="archive_card_3_title">Творческая лаборатория дружбы</h3>
+                           <p data-key="archive_card_3_desc">Мини-выступления, роли, музыка и короткие презентации стран как подготовка к большому фестивальному дню.</p>
+                           <div class="project-meta"><span data-key="stage">Сцена</span><span data-key="music">Музыка</span><span data-key="online_teams">Команды</span></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#gallery" data-nav-link data-gallery-link data-link-key="video" data-key="videos_count">Видео</a><a class="mini-btn mini-ghost" href="#programs" data-nav-link data-key="repeat">Повторить</a></div>
                         </div>
                      </article>
                   </div>
 
                   <div class="projects-timeline fu d4">
                      <div class="timeline-row">
-                        <span>Запуск</span>
-                        <strong>Идея превращается в сценарий</strong>
-                        <p>Собираются темы, партнёры, роли, площадки и правила для участников.</p>
+                        <span data-key="timeline_launch">Запуск</span>
+                        <strong data-key="launch_title">Идея превращается в сценарий</strong>
+                        <p data-key="launch_desc">Собираются темы, партнёры, роли, площадки и правила для участников.</p>
                      </div>
                      <div class="timeline-row">
-                        <span>Проведение</span>
-                        <strong>Команды проходят общую игру</strong>
-                        <p>Каждый этап фиксирует не только баллы, но и истории, фотографии, видео и обратную связь.</p>
+                        <span data-key="timeline_run">Проведение</span>
+                        <strong data-key="run_title">Команды проходят общую игру</strong>
+                        <p data-key="run_desc">Каждый этап фиксирует не только баллы, но и истории, фотографии, видео и обратную связь.</p>
                      </div>
                      <div class="timeline-row">
-                        <span>Архив</span>
-                        <strong>Материалы остаются живыми</strong>
-                        <p>Проект можно повторить, адаптировать для другой страны или показать новым партнёрам.</p>
+                        <span data-key="timeline_archive">Архив</span>
+                        <strong data-key="archive_title">Материалы остаются живыми</strong>
+                        <p data-key="archive_desc">Проект можно повторить, адаптировать для другой страны или показать новым партнёрам.</p>
                      </div>
                   </div>
                </div>
@@ -1221,18 +1243,18 @@
                      <img loading="lazy" src="public/assets/logos/sections/news_page_rgba.png" alt="Logo News MIRoKIT" />
                   </div>
                   <div class="section-head">
-                     <span class="eyebrow">Новости проекта</span>
-                     <h2 class="title">Что нового в МИРоКИТ</h2>
-                     <p class="subtitle">События, интервью и репортажи из жизни клуба. Выберите категорию или откройте карточку, чтобы прочитать целиком.</p>
+                     <span class="eyebrow" data-key="news_title">Новости проекта</span>
+                     <h2 class="title" data-key="news_page_title">Что нового в МИРоКИТ</h2>
+                     <p class="subtitle" data-key="news_page_subtitle">События, интервью и репортажи из жизни клуба. Выберите категорию или откройте карточку, чтобы прочитать целиком.</p>
                   </div>
                </div>
 
-               <div class="news-filters fu d1" role="group" aria-label="Фильтр новостей по категориям">
-                  <button type="button" class="news-filter-btn is-active" aria-pressed="true" data-filter="all">Все</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="event">События</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="interview">Интервью</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="photo">Фоторепортаж</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="announce">Анонсы</button>
+               <div class="news-filters fu d1" role="group" aria-label="Фильтр новостей по категориям" data-i18n-attrs="aria-label:news_filter_label">
+                  <button type="button" class="news-filter-btn is-active" aria-pressed="true" data-filter="all" data-key="news_all">Все</button>
+                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="event" data-key="news_category_events">События</button>
+                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="interview" data-key="news_category_interview">Интервью</button>
+                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="photo" data-key="news_category_photo">Фоторепортаж</button>
+                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="announce" data-key="news_category_announce">Анонсы</button>
                </div>
 
                <div class="news-grid-full fu d2" id="newsGridFull">
@@ -1240,13 +1262,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: ">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/images/news/online-course_painting_01-08-26.png" alt="" />
-                           <span class="category cat-blue">События</span>
+                           <span class="category cat-blue" data-key="news_category_events">События</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> </span>
-                           <span class="news-full-title">Онлайн-конкурс рисунков <br />Международной Лиги «МИРоКИТ»</span>
-                           <span class="news-full-excerpt">С 1 августа 2026 года Международная Лига «МИРоКИТ» объявляет о старте Международного онлайн-конкурса рисунков!</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_1_title">Онлайн-конкурс рисунков <br />Международной Лиги «МИРоКИТ»</span>
+                           <span class="news-full-excerpt" data-key="news_full_1_excerpt">С 1 августа 2026 года Международная Лига «МИРоКИТ» объявляет о старте Международного онлайн-конкурса рисунков!</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1267,13 +1289,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: Как МИРоКИТ меняет жизнь детей — интервью с координатором">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/images/news/turnir_dus_10-07-26.png" alt="" />
-                           <span class="category cat-blue">События</span>
+                           <span class="category cat-blue" data-key="news_category_events">События</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 10 Juli 2026</span>
-                           <span class="news-full-title">В Дюссельдорфе состоялась игра «МИРоКИТ».</span>
-                           <span class="news-full-excerpt">10 июля 2026 года в Дюссельдорфе (Германия) прошла игра и шахматный турнир Международного культурно-игрового триатлона «МИРоКИТ». Мероприятие собрало юных любителей шахмат, их родителей и гостей.</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_2_title">В Дюссельдорфе состоялась игра «МИРоКИТ».</span>
+                           <span class="news-full-excerpt" data-key="news_full_2_excerpt">10 июля 2026 года в Дюссельдорфе (Германия) прошла игра и шахматный турнир Международного культурно-игрового триатлона «МИРоКИТ». Мероприятие собрало юных любителей шахмат, их родителей и гостей.</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1295,13 +1317,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: Фоторепортаж с летнего лагеря в Германии">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/gallery/example.png" alt="" />
-                           <span class="category cat-green">Фоторепортаж</span>
+                           <span class="category cat-green" data-key="news_category_photo">Фоторепортаж</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 18 мая 2025</span>
-                           <span class="news-full-title">Фоторепортаж с летнего лагеря в Германии</span>
-                           <span class="news-full-excerpt">Десять дней у озера: командные игры, вечерние костры и первый совместный спектакль лагерной смены.</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_3_title">Фоторепортаж с летнего лагеря в Германии</span>
+                           <span class="news-full-excerpt" data-key="news_full_3_excerpt">Десять дней у озера: командные игры, вечерние костры и первый совместный спектакль лагерной смены.</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1314,13 +1336,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: Анонс — зимний кубок МИРоКИТ пройдёт в январе">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/gallery/example.png" alt="" />
-                           <span class="category cat-violet">Анонс</span>
+                           <span class="category cat-violet" data-key="news_category_announce">Анонс</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 10 мая 2025</span>
-                           <span class="news-full-title">Анонс: зимний кубок МИРоКИТ пройдёт в январе</span>
-                           <span class="news-full-excerpt">Регистрация команд уже открыта — расскажем, что нового в правилах и почему в этот раз будет сложнее.</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_4_title">Анонс: зимний кубок МИРоКИТ пройдёт в январе</span>
+                           <span class="news-full-excerpt" data-key="news_full_4_excerpt">Регистрация команд уже открыта — расскажем, что нового в правилах и почему в этот раз будет сложнее.</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1333,13 +1355,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: Участники поделились впечатлениями после проекта в Тунисе">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/gallery/example.png" alt="" />
-                           <span class="category cat-red">Интервью</span>
+                           <span class="category cat-red" data-key="news_category_interview">Интервью</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 3 мая 2025</span>
-                           <span class="news-full-title">Участники поделились впечатлениями после проекта в Тунисе</span>
-                           <span class="news-full-excerpt">«Я думал, что еду просто в лагерь, а нашёл друзей на всю жизнь» — говорят подростки из первой тунисской смены.</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_5_title">Участники поделились впечатлениями после проекта в Тунисе</span>
+                           <span class="news-full-excerpt" data-key="news_full_5_excerpt">«Я думал, что еду просто в лагерь, а нашёл друзей на всю жизнь» — говорят подростки из первой тунисской смены.</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1352,13 +1374,13 @@
                      <button type="button" class="news-card-full" aria-label="Открыть новость: Дружба народов — как прошёл культурный обмен в России">
                         <span class="news-full-img-wrap">
                            <img loading="lazy" src="./public/assets/gallery/example.png" alt="" />
-                           <span class="category cat-blue">События</span>
+                           <span class="category cat-blue" data-key="news_category_events">События</span>
                         </span>
                         <span class="news-full-body">
                            <span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> 20 апреля 2025</span>
-                           <span class="news-full-title">Дружба народов: как прошёл культурный обмен в России </span>
-                           <span class="news-full-excerpt">Неделя встреч, мастер-классов и совместных проектов между российской и немецкой площадками.</span>
-                           <span class="news-full-readmore">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                           <span class="news-full-title" data-key="news_full_6_title">Дружба народов: как прошёл культурный обмен в России </span>
+                           <span class="news-full-excerpt" data-key="news_full_6_excerpt">Неделя встреч, мастер-классов и совместных проектов между российской и немецкой площадками.</span>
+                           <span class="news-full-readmore" data-key="news_full" data-i18n-mode="text">Читать полностью <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
                         </span>
                      </button>
                      <template>
@@ -1368,7 +1390,7 @@
                   </div>
                </div>
 
-               <p class="news-empty" id="newsEmpty" hidden>В этой категории пока нет новостей — загляните позже.</p>
+               <p class="news-empty" id="newsEmpty" hidden data-key="news_empty">В этой категории пока нет новостей — загляните позже.</p>
             </div>
          </section>
          <section id="gallery" class="panel compact-panel">
@@ -1377,41 +1399,40 @@
                   <div class="section-header">
                      <div class="section-logo"><img loading="lazy" src="public/assets/logos/sections/gallery_page_rgba.png" alt="Logo Galerie MIRoKIT" /></div>
                      <div class="section-head">
-                        <div class="eyebrow">Галерея и медиа</div>
-                        <h2 class="title">Истории, которые хочется пересматривать</h2>
-                        <p class="subtitle">Фотографии, видео и живые моменты Международной лиги «МИРоКИТ» — собраны в одном медиа-пространстве.</p>
+                        <div class="eyebrow" data-key="gallery_eyebrow">Галерея и медиа</div>
+                        <h2 class="title" data-key="gallery_title">Истории, которые хочется пересматривать</h2>
+                        <p class="subtitle" data-key="gallery_subtitle">Фотографии, видео и живые моменты Международной лиги «МИРоКИТ» — собраны в одном медиа-пространстве.</p>
                      </div>
                   </div>
-                  <div class="gallery-hero">
-                     <div>
-                        <span class="gallery-eyeline"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> Медиаархив 2025–2026</span>
-                        <h3>Каждый кадр — новая встреча, идея или дружба</h3>
-                        <p>Выберите формат и загляните за кулисы турниров, творческих лабораторий, международных встреч и больших премьер.</p>
-                        <div class="gallery-hero-stats">
-                           <span><strong>180+</strong> фотографий</span><span><strong>24</strong> видеосюжета</span><span><strong>8</strong> стран в кадре</span>
-                        </div>
+                  <div class="gallery-toolbox fu d1">
+                     <div class="gallery-toolbox-copy">
+                        <span class="gallery-eyeline" data-key="media_navigator" data-i18n-mode="text"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Навигатор медиа</span>
+                        <h3 data-key="choose_media">Выберите, что хотите посмотреть</h3>
+                        <p data-key="media_desc">Фотографии и видео разделены по задачам: быстро открыть архив, найти историю или предложить новый материал.</p>
                      </div>
-                     <div class="gallery-hero-orbit" aria-hidden="true">
-                        <span>🎨</span><span>🌍</span><span>🎬</span><b><i class="fa-solid fa-heart"></i></b>
+                     <div class="gallery-stat-list" aria-label="Состав медиаархива" data-i18n-attrs="aria-label:media_archive">
+                        <span><strong>180+</strong><small data-key="photos_count">фото</small></span>
+                        <span><strong>24</strong><small data-key="videos_count">видео</small></span>
+                        <span><strong>8</strong><small data-key="countries_count">стран</small></span>
                      </div>
                   </div>
                   <div class="gallery-portal-grid">
                      <a class="gallery-portal gallery-portal--photos fu d2" href="#gallery" data-nav-link data-gallery-link data-link-key="photos">
                         <img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Дети рисуют на международном конкурсе" />
                         <span
-                           ><i class="fa-solid fa-camera" aria-hidden="true"></i><small>Фотоистории</small><strong>Смотреть фотографии</strong><em>События, лица, эмоции и творческие работы</em><b>Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
+                           ><i class="fa-solid fa-camera" aria-hidden="true"></i><small data-key="photo_stories">Фотоистории</small><strong data-key="watch_photos">Смотреть фотографии</strong><em data-key="photo_portal_desc">События, лица, эмоции и творческие работы</em><b data-key="gallery_open" data-i18n-mode="text">Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
                         ></span>
                      </a>
                      <a class="gallery-portal gallery-portal--video fu d3" href="#gallery" data-nav-link data-gallery-link data-link-key="video">
                         <img loading="lazy" src="public/assets/gallery/team-run.png" alt="Участники проекта MIRoKIT" />
                         <span
-                           ><i class="fa-solid fa-play" aria-hidden="true"></i><small>Видеотека</small><strong>Смотреть видео</strong><em>Репортажи, интервью и истории участников</em><b>Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
+                           ><i class="fa-solid fa-play" aria-hidden="true"></i><small data-key="video_library">Видеотека</small><strong data-key="watch_videos">Смотреть видео</strong><em data-key="video_portal_desc">Репортажи, интервью и истории участников</em><b data-key="gallery_open" data-i18n-mode="text">Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
                         ></span>
                      </a>
                   </div>
-                  <div class="gallery-strip fu d4">
-                     <span><i class="fa-solid fa-globe" aria-hidden="true"></i> Германия</span><span><i class="fa-solid fa-globe" aria-hidden="true"></i> Россия</span><span><i class="fa-solid fa-globe" aria-hidden="true"></i> Тунис</span
-                     ><a href="#contact" data-nav-link data-link-key="main-contact">Предложить материал <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                  <div class="gallery-notice fu d4">
+                     <div><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span data-key="gallery_notice">Архив растёт после каждого события. Сейчас в нём уже есть истории из Германии, России и Туниса.</span></div>
+                     <a href="#contact" data-nav-link data-link-key="main-contact" data-key="suggest_material" data-i18n-mode="text">Предложить материал <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                   </div>
                </div>
 
@@ -1419,36 +1440,36 @@
                   <div class="section-header">
                      <div class="section-logo"><img loading="lazy" src="public/assets/logos/sections/photo_page_rgba.png" alt="Logo Fotoarchiv MIRoKIT" /></div>
                      <div class="section-head">
-                        <div class="eyebrow">Фотоархив</div>
-                        <h2 class="title">Моменты, из которых складывается МИРоКИТ</h2>
-                        <p class="subtitle">Выставки, турниры, творческие лаборатории и маленькие кадры большой международной истории.</p>
+                        <div class="eyebrow" data-key="photo_eyebrow">Фотоархив</div>
+                        <h2 class="title" data-key="photo_title">Моменты, из которых складывается МИРоКИТ</h2>
+                        <p class="subtitle" data-key="photo_subtitle">Выставки, турниры, творческие лаборатории и маленькие кадры большой международной истории.</p>
                      </div>
                   </div>
                   <div class="gallery-detail-toolbar">
-                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-images" aria-hidden="true"></i> 180+ фотографий</span>
+                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="back_gallery" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-images" aria-hidden="true"></i> 180+ <span data-key="photos_count">фотографий</span></span>
                   </div>
                   <div class="photo-story-grid">
-                     <button class="photo-story photo-story--feature fu d1" type="button" data-gallery-image data-gallery-title="Цвета дружбы без границ" aria-label="Фото открыть: Цвета дружбы без границ">
-                        <img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Участники конкурса рисуют вместе" /><span><small>01 / Конкурс рисунков</small><strong>Цвета дружбы без границ</strong></span>
+                     <button class="photo-story photo-story--feature fu d1" type="button" data-gallery-image data-gallery-title="Цвета дружбы без границ" aria-label="Фото открыть: Цвета дружбы без границ" data-i18n-attrs="data-gallery-title:photo_story_1,aria-label:photo_open_1">
+                        <img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Участники конкурса рисуют вместе" data-i18n-attrs="alt:photo_alt_1" /><span><small>01 / <span data-key="contest_drawings">Конкурс рисунков</span></small><strong data-key="photo_story_1">Цвета дружбы без границ</strong></span>
                      </button>
-                     <button class="photo-story fu d2" type="button" data-gallery-image data-gallery-title="Команды из разных стран" aria-label="Фото открыть: Команды из разных стран">
-                        <img loading="lazy" src="public/assets/gallery/events_example.webp" alt="Международная встреча участников" /><span><small>02 / Встреча</small><strong>Команды из разных стран</strong></span>
+                     <button class="photo-story fu d2" type="button" data-gallery-image data-gallery-title="Команды из разных стран" aria-label="Фото открыть: Команды из разных стран" data-i18n-attrs="data-gallery-title:photo_story_2,aria-label:photo_open_2">
+                        <img loading="lazy" src="public/assets/gallery/events_example.webp" alt="Международная встреча участников" data-i18n-attrs="alt:photo_alt_2" /><span><small>02 / Встреча</small><strong data-key="photo_story_2">Команды из разных стран</strong></span>
                      </button>
-                     <button class="photo-story fu d3" type="button" data-gallery-image data-gallery-title="Движение вместе" aria-label="Фото открыть: Движение вместе">
-                        <img loading="lazy" src="public/assets/gallery/team-run.png" alt="Команда MIRoKIT" /><span><small>03 / Команда</small><strong>Движение вместе</strong></span>
+                     <button class="photo-story fu d3" type="button" data-gallery-image data-gallery-title="Движение вместе" aria-label="Фото открыть: Движение вместе" data-i18n-attrs="data-gallery-title:photo_story_3,aria-label:photo_open_3">
+                        <img loading="lazy" src="public/assets/gallery/team-run.png" alt="Команда MIRoKIT" data-i18n-attrs="alt:photo_alt_3" /><span><small>03 / Команда</small><strong data-key="photo_story_3">Движение вместе</strong></span>
                      </button>
                      <article class="photo-story photo-story--quote fu d4">
                         <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
-                        <p>«В одном кадре могут встретиться люди, которые ещё вчера не знали языка друг друга».</p>
-                        <small>МИРоКИТ — международный диалог</small>
+                        <p data-key="gallery_quote">«В одном кадре могут встретиться люди, которые ещё вчера не знали языка друг друга».</p>
+                        <small data-key="gallery_quote_by">МИРоКИТ — международный диалог</small>
                      </article>
-                     <button class="photo-story fu d5" type="button" data-gallery-image data-gallery-title="Игра, в которой все свои" aria-label="Фото открыть: Игра, в которой все свои">
-                        <img loading="lazy" src="public/assets/gallery/example.png" alt="Событие MIRoKIT" /><span><small>04 / Событие</small><strong>Игра, в которой все свои</strong></span>
+                     <button class="photo-story fu d5" type="button" data-gallery-image data-gallery-title="Игра, в которой все свои" aria-label="Фото открыть: Игра, в которой все свои" data-i18n-attrs="data-gallery-title:photo_story_4,aria-label:photo_open_4">
+                        <img loading="lazy" src="public/assets/gallery/example.png" alt="Событие MIRoKIT" data-i18n-attrs="alt:photo_alt_4" /><span><small>04 / Событие</small><strong data-key="photo_story_4">Игра, в которой все свои</strong></span>
                      </button>
                   </div>
                   <div class="gallery-detail-footer fu d5">
-                     <p><strong>Новые фото появляются после каждого события.</strong><br />Следите за анонсами, чтобы увидеть свою историю в следующем альбоме.</p>
-                     <a class="btn-secondary" href="#news" data-nav-link>Открыть новости</a>
+                     <p data-key="new_photos"><strong>Новые фото появляются после каждого события.</strong><br />Следите за анонсами, чтобы увидеть свою историю в следующем альбоме.</p>
+                     <a class="btn-secondary" href="#news" data-nav-link data-key="all_news">Открыть новости</a>
                   </div>
                </div>
 
@@ -1456,170 +1477,44 @@
                   <div class="section-header">
                      <div class="section-logo"><img loading="lazy" src="public/assets/logos/sections/video_page_rgba.png" alt="Logo Videothek MIRoKIT" /></div>
                      <div class="section-head">
-                        <div class="eyebrow">Видеотека</div>
-                        <h2 class="title">Смотрите, слушайте, проживайте вместе с нами</h2>
-                        <p class="subtitle">Видеодневники, репортажи, разговоры с участниками и самые яркие эпизоды проектов.</p>
+                        <div class="eyebrow" data-key="video_eyebrow">Видеотека</div>
+                        <h2 class="title" data-key="video_title">Смотрите, слушайте, проживайте вместе с нами</h2>
+                        <p class="subtitle" data-key="video_subtitle">Видеодневники, репортажи, разговоры с участниками и самые яркие эпизоды проектов.</p>
                      </div>
                   </div>
                   <div class="gallery-detail-toolbar">
-                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-circle-play" aria-hidden="true"></i> 24 видеосюжета</span>
+                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="back_gallery" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-circle-play" aria-hidden="true"></i> 24 <span data-key="videos_count">видеосюжета</span></span>
                   </div>
                   <article class="video-spotlight fu d1">
-                     <button class="video-spotlight-open" type="button" data-gallery-video data-video-src="" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog" aria-label="Видео im Vollbild öffnen: Один день, который объединил целый мир">
+                     <button class="video-spotlight-open" type="button" data-gallery-video data-video-src="./public/assets/media/videos/events/tunis_1.mp4" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog" aria-label="Видео im Vollbild öffnen: Один день, который объединил целый мир" data-i18n-attrs="data-video-title:video_feature_title,aria-label:video_open_label">
                         <img loading="lazy" src="public/assets/gallery/team-run.png" alt="Участники проекта MIRoKIT" /><span class="video-play-button"><i class="fa-solid fa-play" aria-hidden="true"></i></span><small>03:42</small>
                      </button>
                      <section>
-                        <span>Премьера / МИРоКИТ в движении</span>
-                        <h3>Один день, который объединил целый мир</h3>
-                        <p>Как рождается командная игра, какие истории звучат в перерывах и почему участники не хотят расходиться после финала.</p>
-                        <button class="btn-primary" type="button" data-gallery-video data-video-src="" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog"><i class="fa-solid fa-play" aria-hidden="true"></i> Смотреть трейлер</button>
+                        <span data-key="video_premiere">Премьера / МИРоКИТ в движении</span>
+                        <h3 data-key="video_feature_title">Один день, который объединил целый мир</h3>
+                        <p data-key="video_feature_desc">Как рождается командная игра, какие истории звучат в перерывах и почему участники не хотят расходиться после финала.</p>
+                        <button class="btn-primary" type="button" data-gallery-video data-video-src="" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog" data-key="watch_trailer" data-i18n-mode="text" data-i18n-attrs="data-video-title:video_feature_title"><i class="fa-solid fa-play" aria-hidden="true"></i> Смотреть трейлер</button>
                      </section>
                   </article>
                   <div class="video-list">
                      <article class="video-card fu d2">
                         <span><img loading="lazy" src="public/assets/images/news/turnir_dus_10-07-26.png" alt="Турнир MIRoKIT" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
-                        <div><small>Репортаж · 05:16</small><strong>Турнир: азарт, стратегия и дружба</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Турнир: азарт, стратегия и дружба" aria-haspopup="dialog">Открыть в полном экране</button></div>
+                        <div><small data-key="video_report">Репортаж · 05:16</small><strong data-key="video_list_1_title">Турнир: азарт, стратегия и дружба</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Турнир: азарт, стратегия и дружба" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_1_title">Открыть в полном экране</button></div>
                      </article>
                      <article class="video-card fu d3">
                         <span><img loading="lazy" src="public/assets/gallery/events_example.webp" alt="Международная встреча" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
                         <div>
-                           <small>Интервью · 07:24</small><strong>Что дети рассказывают друг другу без переводчика</strong
-                           ><button type="button" data-gallery-video data-video-src="" data-video-title="Что дети рассказывают друг другу без переводчика" aria-haspopup="dialog">Открыть в полном экране</button>
+                           <small data-key="video_interview">Интервью · 07:24</small><strong data-key="video_list_2_title">Что дети рассказывают друг другу без переводчика</strong
+                           ><button type="button" data-gallery-video data-video-src="" data-video-title="Что дети рассказывают друг другу без переводчика" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_2_title">Открыть в полном экране</button>
                         </div>
                      </article>
                      <article class="video-card fu d4">
                         <span><img loading="lazy" src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Конкурс рисунков" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
                         <div>
-                           <small>За кадром · 02:58</small><strong>Как создавалась международная онлайн-выставка</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Как создавалась международная онлайн-выставка" aria-haspopup="dialog">Открыть в полном экране</button>
+                           <small data-key="video_behind">За кадром · 02:58</small><strong data-key="video_list_3_title">Как создавалась международная онлайн-выставка</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Как создавалась международная онлайн-выставка" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_3_title">Открыть в полном экране</button>
                         </div>
                      </article>
                   </div>
-               </div>
-            </div>
-         </section>
-         <section id="locations" class="panel compact-panel">
-            <div class="panel-inner locations-layout">
-               <div class="section-header">
-                  <div class="section-logo">
-                     <img loading="lazy" src="" alt="Logo Standorte MIRoKIT" />
-                  </div>
-                  <div class="section-head">
-                     <div class="eyebrow" data-key="loc_tag">Где мы работаем</div>
-                     <h2 class="title" data-key="loc_title">МИРоКИТ — везде!</h2>
-                     <p class="subtitle" data-key="loc_sub">Клуб работает на международном и локальном уровне</p>
-                  </div>
-               </div>
-               <div class="location-grid">
-                  <article class="location-card lc1 fu d1">
-                     <div class="location-top">🏫</div>
-                     <div class="location-body">
-                        <h3 class="location-title" data-key="l1n">В школах</h3>
-                        <p class="location-copy" data-key="l1d">Программы интегрированы в школьную жизнь. Творчество и диалог прямо в классе.</p>
-                     </div>
-                  </article>
-                  <article class="location-card lc2 fu d2">
-                     <div class="location-top">🏛️</div>
-                     <div class="location-body">
-                        <h3 class="location-title" data-key="l2n">Центры культуры</h3>
-                        <p class="location-copy" data-key="l2d">Дома культуры — площадка для больших международных событий.</p>
-                     </div>
-                  </article>
-                  <article class="location-card lc3 fu d3">
-                     <div class="location-top">⛺</div>
-                     <div class="location-body">
-                        <h3 class="location-title" data-key="l3n">В лагерях</h3>
-                        <p class="location-copy" data-key="l3d">Летние и зимние лагеря — интенсивный формат новых дружеских связей.</p>
-                     </div>
-                  </article>
-                  <article class="location-card lc4 fu d4">
-                     <div class="location-top">🎪</div>
-                     <div class="location-body">
-                        <h3 class="location-title" data-key="l4n">На фестивалях</h3>
-                        <p class="location-copy" data-key="l4d">Международные фестивали и мероприятия — МИРоКИТ встречает весь мир.</p>
-                     </div>
-                  </article>
-               </div>
-            </div>
-         </section>
-         <section id="benefits" class="panel compact-panel">
-            <div class="panel-inner benefits-layout">
-               <div class="section-header">
-                  <div class="section-logo">
-                     <img loading="lazy" src="" alt="Logo Vorteile MIRoKIT" />
-                  </div>
-                  <div class="section-head">
-                     <h2 class="benefit-title" data-key="ben_title">МИРоКИТ помогает детям:</h2>
-                     <div class="benefit-sub" data-key="ben_sub">Расти, дружить и открывать мир 🌍</div>
-                  </div>
-               </div>
-               <div class="benefit-grid">
-                  <article class="benefit-card fu d1">
-                     <span class="benefit-icon">🌟</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b1n">Раскрывать способности</h3>
-                        <p class="benefit-desc" data-key="b1d">Каждый ребёнок талантлив. Наши программы помогают найти и развить уникальные сильные стороны.</p>
-                     </div>
-                  </article>
-                  <article class="benefit-card fu d2">
-                     <span class="benefit-icon">🤝</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b2n">Работать в команде</h3>
-                        <p class="benefit-desc" data-key="b2d">Командная работа — ключевой навык XXI века. Учимся побеждать и проигрывать вместе.</p>
-                     </div>
-                  </article>
-                  <article class="benefit-card fu d3">
-                     <span class="benefit-icon">💬</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b3n">Развивать коммуникацию</h3>
-                        <p class="benefit-desc" data-key="b3d">Умение говорить и слушать — основа успеха. Развиваем диалог в игровой форме.</p>
-                     </div>
-                  </article>
-                  <article class="benefit-card fu d1">
-                     <span class="benefit-icon">🌍</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b4n">Уважать другие культуры</h3>
-                        <p class="benefit-desc" data-key="b4d">Понимание различий делает нас богаче. Дети открывают мир через культуру и традиции.</p>
-                     </div>
-                  </article>
-                  <article class="benefit-card fu d2">
-                     <span class="benefit-icon">❤️</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b5n">Находить друзей</h3>
-                        <p class="benefit-desc" data-key="b5d">Дружба без границ — дружба по всему миру. Наши участники остаются друзьями навсегда.</p>
-                     </div>
-                  </article>
-                  <article class="benefit-card fu d3">
-                     <span class="benefit-icon">🚀</span>
-                     <div>
-                        <h3 class="benefit-name" data-key="b6n">Верить в себя</h3>
-                        <p class="benefit-desc" data-key="b6d">Уверенность начинается с маленьких побед. МИРоКИТ вдохновляет на большие мечты.</p>
-                     </div>
-                  </article>
-               </div>
-            </div>
-         </section>
-         <section id="join" class="panel compact-panel">
-            <div class="panel-inner join-layout">
-               <div class="section-header">
-                  <div class="section-logo">
-                     <img loading="lazy" src="" alt="Logo Mitmachen MIRoKIT" />
-                  </div>
-                  <div class="section-head">
-                     <div class="join-hand" data-key="join_hw">Присоединяйся!</div>
-                     <h2 class="join-title" data-key="join_h2">Открой мир <span>вместе с нами</span></h2>
-                     <p class="join-copy" data-key="join_p">Присоединяйся к международному сообществу! Тысячи участников уже открывают мир через игру, творчество и дружбу.</p>
-                  </div>
-               </div>
-               <div class="btn-row" style="justify-content: center">
-                  <button class="btn-primary" type="button" data-open-modal data-key="join_cta1">Записаться сейчас</button>
-                  <a class="btn-secondary" href="mailto:info@mirokit.org?subject=MIRoKIT%20Organisation" data-key="join_cta2">Для организаций</a>
-               </div>
-               <div class="social-row">
-                  <a class="social" target="_blank" rel="noopener" href="https://t.me/">📱 Telegram</a>
-                  <a class="social" target="_blank" rel="noopener" href="https://vk.com/">🔵 ВКонтакте</a>
-                  <!-- <a class="social" target="_blank" rel="noopener" href="https://instagram.com/">📷 Instagram</a> -->
-                  <a class="social" target="_blank" rel="noopener" href="https://youtube.com/">▶️ YouTube</a>
-                  <!-- <a class="social" target="_blank" rel="noopener" href="https://discord.com/">🎮 Discord</a> -->
                </div>
             </div>
          </section>
@@ -1631,33 +1526,33 @@
                         <img loading="lazy" src="" alt="Kontakt Logo MIRoKIT" />
                      </div>
                      <div class="section-head">
-                        <div class="eyebrow">Мы всегда на связи!</div>
-                        <h2 class="title">Контакты</h2>
+                     <div class="eyebrow" data-key="contact_eyebrow">Мы всегда на связи!</div>
+                     <h2 class="title" data-key="contact_title">Контакты</h2>
                         <!--<p class="subtitle">Если у вас есть вопросы, предложения или вы хотите стать частью Международной лиги «МИРоКИТ» — свяжитесь с нами удобным для вас способом.</p>-->
                      </div>
                   </div>
 
                   <div class="contact-columns">
                      <aside class="contact-side fu d1">
-                        <h3 class="contact-side-heading">Наши контакты</h3>
+                        <h3 class="contact-side-heading" data-key="our_contacts">Наши контакты</h3>
                         <ul class="contact-list">
                            <li class="contact-item">
                               <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
                               <span class="contact-text">
-                                 <strong>E-mail</strong>
+                                 <strong data-key="email_label">E-mail</strong>
                                  <a href="mailto:info@mirokit.com">info@mirokit.com</a>
                               </span>
                            </li>
                            <li class="contact-item">
                               <span class="contact-icon"><i class="fa-brands fa-telegram"></i></span>
                               <span class="contact-text">
-                                 <strong>Telegram</strong>
+                                 <strong data-key="telegram_label">Telegram</strong>
                                  <a href="https://t.me/ligamirokit">@ligamirokit</a>
                               </span>
                            </li>
                         </ul>
                         <div class="contact-social">
-                           <span class="contact-social-label">Мы в социальных сетях</span>
+                           <span class="contact-social-label" data-key="social_label">Мы в социальных сетях</span>
                            <div class="contact-social-icons">
                               <a class="social-mini" href="https://youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
                               <a class="social-mini" href="https://vk.com/" target="_blank" rel="noopener" aria-label="VKontakte"><i class="fa-brands fa-vk"></i></a>
@@ -1667,82 +1562,82 @@
 
                      <div class="contact-main">
                         <form class="contact-form fu d3" id="contactForm">
-                           <h3 class="contact-form-heading">Напишите нам</h3>
+                           <h3 class="contact-form-heading" data-key="write_us">Напишите нам</h3>
 
                            <div class="form-grid">
                               <div class="field">
-                                 <label for="cf-name">ФИО <span class="req">*</span></label>
-                                 <input type="text" id="cf-name" name="name" placeholder="Введите ваше имя" required />
+                                 <label for="cf-name"><span data-key="full_name">ФИО</span> <span class="req">*</span></label>
+                                 <input type="text" id="cf-name" name="name" placeholder="Введите ваше имя" data-i18n-attrs="placeholder:input_name" required />
                               </div>
                               <div class="field">
-                                 <label for="cf-email">E-mail <span class="req">*</span></label>
-                                 <input type="email" id="cf-email" name="email" placeholder="Введите ваш e-mail" required />
+                                 <label for="cf-email"><span data-key="form_email">E-mail</span> <span class="req">*</span></label>
+                                 <input type="email" id="cf-email" name="email" placeholder="Введите ваш e-mail" data-i18n-attrs="placeholder:input_email" required />
                               </div>
                               <div class="field">
-                                 <label for="cf-country">Страна <span class="req">*</span></label>
+                                 <label for="cf-country"><span data-key="country">Страна</span> <span class="req">*</span></label>
                                  <div class="select-wrap">
                                     <select id="cf-country" name="country" required>
-                                       <option value="" disabled selected>Выберите страну</option>
-                                       <option value="de">Германия</option>
-                                       <option value="ru">Россия</option>
-                                       <option value="tn">Тунис</option>
-                                       <option value="other">Другая страна</option>
+                                       <option value="" disabled selected data-key="choose_country">Выберите страну</option>
+                                       <option value="de" data-key="country_germany">Германия</option>
+                                       <option value="ru" data-key="country_russia">Россия</option>
+                                       <option value="tn" data-key="country_tunisia">Тунис</option>
+                                       <option value="other" data-key="other">Другая страна</option>
                                     </select>
                                     <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                                  </div>
                               </div>
                               <div class="field">
-                                 <label for="cf-org">Город <span class="req">*</span></label>
-                                 <input type="text" id="cf-city" name="city" placeholder="Введите название города" />
+                                 <label for="cf-org"><span data-key="city">Город</span> <span class="req">*</span></label>
+                                 <input type="text" id="cf-city" name="city" placeholder="Введите название города" data-i18n-attrs="placeholder:input_city" />
                               </div>
                               <div class="field">
-                                 <label for="cf-org">Название организаций <span class="req">*</span></label>
-                                 <input type="text" id="cf-org" name="organization" placeholder="Введите название организаций" />
+                                 <label for="cf-org"><span data-key="organization">Название организации</span> <span class="req">*</span></label>
+                                 <input type="text" id="cf-org" name="organization" placeholder="Введите название организации" data-i18n-attrs="placeholder:input_organization" />
                               </div>
                               <div class="field">
-                                 <label for="cf-phone">Телефон / WhatsApp / Telegram</label>
-                                 <input type="text" id="cf-phone" name="phone" placeholder="Введите номер телефона или ник" />
+                                 <label for="cf-phone" data-key="phone">Телефон / WhatsApp / Telegram</label>
+                                 <input type="text" id="cf-phone" name="phone" placeholder="Введите номер телефона или ник" data-i18n-attrs="placeholder:input_phone" />
                               </div>
                               <div class="field">
-                                 <label for="cf-topic">Тема обращения <span class="req">*</span></label>
+                                 <label for="cf-topic"><span data-key="topic">Тема обращения</span> <span class="req">*</span></label>
                                  <div class="select-wrap">
                                     <select id="cf-topic" name="topic" required>
-                                       <option value="" disabled selected>Выберите тему обращения</option>
-                                       <option value="join">Вступить в Лигу</option>
-                                       <option value="event">Провести мероприятие</option>
-                                       <option value="partner">Стать партнёром</option>
-                                       <option value="other">Другое</option>
+                                       <option value="" disabled selected data-key="choose_topic">Выберите тему обращения</option>
+                                       <option value="join" data-key="join_league">Вступить в Лигу</option>
+                                       <option value="event" data-key="hold_event">Провести мероприятие</option>
+                                       <option value="partner" data-key="become_partner">Стать партнёром</option>
+                                       <option value="other" data-key="other">Другое</option>
                                     </select>
                                     <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                                  </div>
                               </div>
                               <div class="field field-full">
-                                 <label for="cf-message">Сообщение <span class="req">*</span></label>
-                                 <textarea id="cf-message" name="message" placeholder="Введите ваше сообщение" required></textarea>
+                                 <label for="cf-message"><span data-key="message">Сообщение</span> <span class="req">*</span></label>
+                                 <textarea id="cf-message" name="message" placeholder="Введите ваше сообщение" data-i18n-attrs="placeholder:input_message" required></textarea>
                               </div>
                            </div>
 
                            <div class="form-consents">
                               <label class="consent-check">
                                  <input type="checkbox" name="consent_required" required />
-                                 <span>Соглашаюсь на обработку данных согласно <a href="./page/privacyPolicy/">Политике конфиденциальности</a>
+                                 <span data-key="consent_required">Соглашаюсь на обработку данных согласно <a href="./page/privacyPolicy/">Политике конфиденциальности</a>
                                      <!-- и принимаю <a href="#">Правила участия</a> <span class="req">*</span> -->
                               </span>
                               </label>
                               <label class="consent-check">
                                  <input type="checkbox" name="consent_optional" />
-                                 <span>Согласие на получение новостей о проектах.</span>
+                                 <span data-key="consent_news">Согласие на получение новостей о проектах.</span>
                               </label>
                            </div>
 
                            <div class="form-footer">
                               <div class="form-security">
                                  <span class="form-security-icon"><i class="fa-solid fa-shield-halved"></i></span>
-                                 <p class="form-note">Ваши данные защищены и не передаются третьим лицам. Мы используем их только для связи с вами и в рамках проекта.</p>
+                                 <p class="form-note" data-key="security_note">Ваши данные защищены и не передаются третьим лицам. Мы используем их только для связи с вами и в рамках проекта.</p>
                               </div>
                               <div class="form-actions">
-                                 <button type="reset" class="btn-secondary btn-reset"><i class="fa-solid fa-rotate-left"></i> Очистить форму</button>
-                                 <button type="submit" class="btn-primary btn-send"><i class="fa-solid fa-paper-plane"></i> Отправить сообщение</button>
+                                 <button type="reset" class="btn-secondary btn-reset" data-key="clear_form" data-i18n-mode="text"><i class="fa-solid fa-rotate-left"></i> Очистить форму</button>
+                                 <button type="submit" class="btn-primary btn-send" data-key="send_message" data-i18n-mode="text"><i class="fa-solid fa-paper-plane"></i> Отправить сообщение</button>
                               </div>
                            </div>
                         </form>
@@ -1752,19 +1647,19 @@
                   <div class="contact-quicklinks fu d4">
                      <a class="quicklink-card" href="#contact" data-nav-link data-link-key="extra-contact">
                         <span class="quicklink-icon"><i class="fa-solid fa-user-plus"></i></span>
-                        <span class="quicklink-text"><strong>Вступить в Лигу</strong><small>Подать заявку на участие</small></span>
+                        <span class="quicklink-text"><strong data-key="quick_join">Вступить в Лигу</strong><small data-key="quick_join_desc">Подать заявку на участие</small></span>
                      </a>
-                     <a class="quicklink-card" href="#">
+                     <a class="quicklink-card" href="#contact" data-nav-link data-link-key="main-contact">
                         <span class="quicklink-icon"><i class="fa-solid fa-file-lines"></i></span>
-                        <span class="quicklink-text"><strong>Методическое пособие</strong><small>Получить материалы и рекомендации</small></span>
+                        <span class="quicklink-text"><strong data-key="quick_method">Методическое пособие</strong><small data-key="quick_method_desc">Получить материалы и рекомендации</small></span>
                      </a>
-                     <a class="quicklink-card" href="#">
+                     <a class="quicklink-card" href="#projects" data-nav-link data-projects-link data-link-key="current_projects">
                         <span class="quicklink-icon"><i class="fa-solid fa-trophy"></i></span>
-                        <span class="quicklink-text"><strong>Турниры</strong><small>Регистрация участников</small></span>
+                        <span class="quicklink-text"><strong data-key="quick_tournaments">Турниры</strong><small data-key="quick_tournaments_desc">Регистрация участников</small></span>
                      </a>
-                     <a class="quicklink-card" href="#">
+                     <a class="quicklink-card" href="#onlineProjects" data-nav-link>
                         <span class="quicklink-icon"><i class="fa-solid fa-star"></i></span>
-                        <span class="quicklink-text"><strong>Онлайн-конкурсы</strong><small>Подать работу на конкурс</small></span>
+                        <span class="quicklink-text"><strong data-key="quick_online">Онлайн-конкурсы</strong><small data-key="quick_online_desc">Подать работу на конкурс</small></span>
                      </a>
                   </div>
                </div>
@@ -1775,138 +1670,138 @@
                         <img loading="lazy" src="public/assets/logos/sections/contact_liga-admission_form.png" alt="Logo Eintritt in die MIRoKIT Liga" />
                      </div>
                      <div class="section-head">
-                        <div class="eyebrow">Международное сообщество</div>
-                        <h2 class="title">Заявка на вступление в международную Лигу <span class="tx-red">«МИРоКИТ»</span></h2>
-                        <p class="subtitle">Заполните заявку организации — после рассмотрения мы свяжемся с вами.</p>
+                        <div class="eyebrow" data-key="league_eyebrow">Международное сообщество</div>
+                        <h2 class="title" data-key="league_title">Заявка на вступление в международную Лигу <span class="tx-red">«МИРоКИТ»</span></h2>
+                        <p class="subtitle" data-key="league_subtitle">Заполните заявку организации — после рассмотрения мы свяжемся с вами.</p>
                      </div>
                   </div>
 
                   <form class="contact-form league-form fu d2" id="leagueForm">
                      <fieldset class="league-form-section">
-                        <legend><span>1</span> Сведения об организации</legend>
+                        <legend><span>1</span> <span data-key="organization_details">Сведения об организации</span></legend>
                         <div class="form-grid">
                            <div class="field field-full">
-                              <label for="lf-name-full">Полное наименование организации <span class="req">*</span></label>
+                              <label for="lf-name-full"><span data-key="full_org_name">Полное наименование организации</span> <span class="req">*</span></label>
                               <input id="lf-name-full" name="organization_full" type="text" required />
                            </div>
                            <div class="field field-full">
-                              <label for="lf-name-short">Сокращённое наименование <span class="req">*</span></label>
+                              <label for="lf-name-short"><span data-key="short_org_name">Сокращённое наименование</span> <span class="req">*</span></label>
                               <input id="lf-name-short" name="organization_short" type="text" required />
                            </div>
                            <div class="field field-full">
-                              <label for="lf-name-short">Улица, номер дома <span class="req">*</span></label>
-                              <input id="lf-name-short" name="organization_short" type="text" required />
+                              <label for="lf-address"><span data-key="street">Улица, номер дома</span> <span class="req">*</span></label>
+                              <input id="lf-address" name="address" type="text" autocomplete="street-address" required />
                            </div>
                            <div class="field">
-                              <label for="lf-country">Страна <span class="req">*</span></label>
+                              <label for="lf-country"><span data-key="country">Страна</span> <span class="req">*</span></label>
                               <div class="select-wrap">
                                  <select id="lf-country" name="country" required>
-                                    <option value="" selected disabled>Выберите страну</option>
-                                    <option value="de">Германия</option>
-                                    <option value="ru">Россия</option>
-                                    <option value="tn">Тунис</option>
-                                    <option value="other">Другая страна</option>
+                                    <option value="" selected disabled data-key="choose_country">Выберите страну</option>
+                                    <option value="de" data-key="country_germany">Германия</option>
+                                    <option value="ru" data-key="country_russia">Россия</option>
+                                    <option value="tn" data-key="country_tunisia">Тунис</option>
+                                    <option value="other" data-key="other">Другая страна</option>
                                  </select>
                                  <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                               </div>
                            </div>
-                           <div class="field"><label for="lf-region">Регион / область</label><input id="lf-region" name="region" type="text" /></div>
+                           <div class="field"><label for="lf-region" data-key="region">Регион / область</label><input id="lf-region" name="region" type="text" /></div>
                            <div class="field">
-                              <label for="lf-city">Город <span class="req">*</span></label
+                              <label for="lf-city"><span data-key="city">Город</span> <span class="req">*</span></label
                               ><input id="lf-city" name="city" type="text" required />
                            </div>
                            <div class="field">
-                              <label for="lf-postcode">Индекс <span class="req">*</span></label
+                              <label for="lf-postcode"><span data-key="postcode">Индекс</span> <span class="req">*</span></label
                               ><input id="lf-postcode" name="postcode" type="text" required />
                            </div>
                         </div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>2</span> Контактное лицо</legend>
+                        <legend><span>2</span> <span data-key="contact_person">Контактное лицо</span></legend>
                         <div class="form-grid">
                            <div class="field">
-                              <label for="lf-contact-name">ФИО<span class="req">*</span></label
+                              <label for="lf-contact-name"><span data-key="full_name">ФИО</span><span class="req">*</span></label
                               ><input id="lf-contact-name" name="contact_name" type="text" required />
                            </div>
-                           <div class="field"><label for="lf-role">Должность</label><input id="lf-role" name="role" type="text" /></div>
+                           <div class="field"><label for="lf-role" data-key="position">Должность</label><input id="lf-role" name="role" type="text" /></div>
                            <div class="field">
-                              <label for="lf-email">E-mail <span class="req">*</span></label
+                              <label for="lf-email"><span data-key="form_email">E-mail</span> <span class="req">*</span></label
                               ><input id="lf-email" name="email" type="email" required />
                            </div>
                            <div class="field">
-                              <label for="lf-phone">Телефон <span class="req">*</span></label
+                              <label for="lf-phone"><span data-key="phone">Телефон</span> <span class="req">*</span></label
                               ><input id="lf-phone" name="phone" type="tel" required />
                            </div>
-                           <div class="field field-full"><label for="lf-sozialMedia">Социальные медиа</label><input id="lf-sozialMedia" name="sozialMedia" type="text" /></div>
+                           <div class="field field-full"><label for="lf-sozialMedia" data-key="social_media">Социальные медиа</label><input id="lf-sozialMedia" name="sozialMedia" type="text" /></div>
                         </div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>3</span> Информация об организации</legend>
+                        <legend><span>3</span> <span data-key="organization_info">Информация об организации</span></legend>
                         <div class="league-choice-grid">
                            <div>
-                              <p class="league-question">Основные направления деятельности <span class="req">*</span></p>
+                              <p class="league-question"><span data-key="activity_question">Основные направления деятельности</span> <span class="req">*</span></p>
                               <div class="league-options league-options--columns">
-                                 <label><input type="checkbox" name="activities" value="education" /> образование</label>
-                                 <label><input type="checkbox" name="activities" value="culture" /> культура</label>
-                                 <label><input type="checkbox" name="activities" value="youth" /> молодёжная политика</label>
-                                 <label><input type="checkbox" name="activities" value="sport" /> спорт</label>
-                                 <label><input type="checkbox" name="activities" value="games" /> настольные игры</label>
-                                 <label><input type="checkbox" name="activities" value="further-education" /> дополнительное образование</label>
-                                 <label><input type="checkbox" name="activities" value="international" /> международное сотрудничество</label>
-                                 <label><input type="checkbox" name="activities" value="volunteering" /> волонтёрство</label>
-                                 <label><input type="checkbox" name="activities" value="other" /> другое</label>
+                                 <label><input type="checkbox" name="activities" value="education" /><span data-key="education">образование</span></label>
+                                 <label><input type="checkbox" name="activities" value="culture" /><span data-key="culture">культура</span></label>
+                                 <label><input type="checkbox" name="activities" value="youth" /><span data-key="youth_policy">молодёжная политика</span></label>
+                                 <label><input type="checkbox" name="activities" value="sport" /><span data-key="sport">спорт</span></label>
+                                 <label><input type="checkbox" name="activities" value="games" /><span data-key="board_games">настольные игры</span></label>
+                                 <label><input type="checkbox" name="activities" value="further-education" /><span data-key="further_education">дополнительное образование</span></label>
+                                 <label><input type="checkbox" name="activities" value="international" /><span data-key="international_cooperation">международное сотрудничество</span></label>
+                                 <label><input type="checkbox" name="activities" value="volunteering" /><span data-key="volunteering">волонтёрство</span></label>
+                                 <label><input type="checkbox" name="activities" value="other" /><span data-key="other">другое</span></label>
                               </div>
                            </div>
                            <div>
-                              <p class="league-question">Количество участников организации <span class="req">*</span></p>
+                              <p class="league-question"><span data-key="members_question">Количество участников организации</span> <span class="req">*</span></p>
                               <div class="league-options">
-                                 <label><input type="radio" name="member_count" value="20" required /> до 20</label>
+                                 <label><input type="radio" name="member_count" value="20" required /><span data-key="up_to_20">до 20</span></label>
                                  <label><input type="radio" name="member_count" value="50" /> 20–50</label>
                                  <label><input type="radio" name="member_count" value="100" /> 50–100</label>
-                                 <label><input type="radio" name="member_count" value="100+" /> более 100</label>
+                                 <label><input type="radio" name="member_count" value="100+" /><span data-key="more_100">более 100</span></label>
                               </div>
                            </div>
                         </div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>4</span> Цели вступления в Лигу <span class="req">*</span></legend>
+                        <legend><span>4</span> <span data-key="league_goals">Цели вступления в Лигу</span> <span class="req">*</span></legend>
                         <div class="league-options league-options--columns">
-                           <label><input type="checkbox" name="goals" value="triathlon" /> проводить культурно-игровой триатлон «МИРоКИТ»</label>
-                           <label><input type="checkbox" name="goals" value="international-tournaments" /> участвовать в международных турнирах</label>
-                           <label><input type="checkbox" name="goals" value="online" /> участвовать в онлайн-конкурсах</label>
-                           <label><input type="checkbox" name="goals" value="national" /> организовать национальные этапы</label>
-                           <label><input type="checkbox" name="goals" value="cooperation" /> развивать международное сотрудничество</label>
-                           <label><input type="checkbox" name="goals" value="regional" /> стать региональным координатором</label>
+                           <label><input type="checkbox" name="goals" value="triathlon" /><span data-key="goal_triathlon">проводить культурно-игровой триатлон «МИРоКИТ»</span></label>
+                           <label><input type="checkbox" name="goals" value="international-tournaments" /><span data-key="goal_tournaments">участвовать в международных турнирах</span></label>
+                           <label><input type="checkbox" name="goals" value="online" /><span data-key="goal_online">участвовать в онлайн-конкурсах</span></label>
+                           <label><input type="checkbox" name="goals" value="national" /><span data-key="goal_national">организовать национальные этапы</span></label>
+                           <label><input type="checkbox" name="goals" value="cooperation" /><span data-key="goal_cooperation">развивать международное сотрудничество</span></label>
+                           <label><input type="checkbox" name="goals" value="regional" /><span data-key="goal_regional">стать региональным координатором</span></label>
                         </div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>5</span> Краткая информация об организации <span class="req">*</span></legend>
-                        <div class="field"><label class="sr-only" for="lf-about">Краткая информация об организации</label><textarea id="lf-about" name="about" required></textarea></div>
+                        <legend><span>5</span> <span data-key="org_summary">Краткая информация об организации</span> <span class="req">*</span></legend>
+                        <div class="field"><label class="sr-only" for="lf-about" data-key="org_summary">Краткая информация об организации</label><textarea id="lf-about" name="about" required></textarea></div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>6</span> Интернет-ресурсы</legend>
-                        <div class="field"><label for="lf-website">Сайт</label><input id="lf-website" name="website" type="url" placeholder="https://" /></div>
+                        <legend><span>6</span> <span data-key="resources">Интернет-ресурсы</span></legend>
+                        <div class="field"><label for="lf-website" data-key="site">Сайт</label><input id="lf-website" name="website" type="url" placeholder="https://" /></div>
                      </fieldset>
 
                      <fieldset class="league-form-section">
-                        <legend><span>7</span> Подтверждения <span class="req">*</span></legend>
+                        <legend><span>7</span> <span data-key="confirmations">Подтверждения</span> <span class="req">*</span></legend>
                         <div class="league-options league-confirmations">
-                           <label><input type="checkbox" name="confirm_accuracy" required /> Подтверждаем достоверность предоставленной информации.</label>
-                           <label><input type="checkbox" name="confirm_goals" required /> Ознакомлены с целями и принципами Международной лиги «МИРоКИТ».</label>
-                           <label><input type="checkbox" name="confirm_privacy" required /> Согласны на обработку персональных данных согласно <a href="./page/privacyPolicy/">Политике конфиденциальности</a>.</label>
+                           <label><input type="checkbox" name="confirm_accuracy" required /><span data-key="confirm_accuracy">Подтверждаем достоверность предоставленной информации.</span></label>
+                           <label><input type="checkbox" name="confirm_goals" required /><span data-key="confirm_goals">Ознакомлены с целями и принципами Международной лиги «МИРоКИТ».</span></label>
+                           <label><input type="checkbox" name="confirm_privacy" required /><span data-key="confirm_privacy">Согласны на обработку персональных данных согласно <a href="./page/privacyPolicy/">Политике конфиденциальности</a>.</span></label>
                         </div>
                      </fieldset>
 
                      <div class="form-footer league-form-footer">
-                        <p class="form-note"><span class="req">*</span> Поля, обязательные для заполнения.</p>
+                        <p class="form-note"><span class="req">*</span> <span data-key="required_note">Поля, обязательные для заполнения.</span></p>
                         <div class="form-actions">
-                           <button type="reset" class="btn-secondary btn-reset"><i class="fa-solid fa-rotate-left"></i> Очистить форму</button>
-                           <button type="submit" class="btn-primary btn-send"><i class="fa-solid fa-paper-plane"></i> Подать заявку</button>
+                           <button type="reset" class="btn-secondary btn-reset" data-key="clear_form" data-i18n-mode="text"><i class="fa-solid fa-rotate-left"></i> Очистить форму</button>
+                           <button type="submit" class="btn-primary btn-send" data-key="submit_application" data-i18n-mode="text"><i class="fa-solid fa-paper-plane"></i> Подать заявку</button>
                         </div>
                      </div>
                   </form>
@@ -1914,13 +1809,13 @@
             </div>
          </section>
       </main>
-      <footer id="fixedFooter" class="fixed-footer" aria-label="Footer taskbar">
-         <div class="fixed-footer-brand" data-key="brand">МИРоКИТ</div>
-         <div class="fixed-footer-copy" data-key="footer_copy">© 2025 Клуб Интернациональный Диалог. Все права защищены.</div>
+      <footer id="fixedFooter" class="fixed-footer" aria-label="Footer taskbar" data-i18n-attrs="aria-label:footer_taskbar">
+         <div class="fixed-footer-brand"><span data-key="brand">МИРоКИТ</span><small data-key="hero_card_tag">PLAY · CREATE · CONNECT</small></div>
+         <div class="fixed-footer-copy"><span data-key="footer_copy">© 2025 Клуб Интернациональный Диалог. Все права защищены.</span><span class="fixed-footer-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> <span data-key="archive_label">архив 2026</span></span></div>
          <div class="fixed-footer-actions">
-            <a class="fixed-footer-top" href="#hero" data-nav-link data-key="footer_top">Наверх</a>
-            <a href="#join" data-nav-link data-key="nav4">Контакты</a>
-            <div class="socials" aria-label="Social links">
+            <a href="#join" data-nav-link data-key="nav5">Контакты</a>
+            <a href="#gallery" data-nav-link data-key="menu_gallery">Медиа</a>
+            <div class="socials" aria-label="Social links" data-i18n-attrs="aria-label:social_links">
                <a class="social tg" href="#" aria-label="Telegram"
                   ><span><i class="fa-brands fa-telegram"></i></span
                ></a>
@@ -1933,6 +1828,33 @@
             </div>
          </div>
       </footer>
+      <button class="scroll-top-control" id="scrollTopControl" type="button"
+         aria-label="Вернуться в начало страницы" title="Вернуться в начало страницы" data-i18n-attrs="aria-label:scroll_label,title:scroll_label">
+         <span class="sr-only scroll-top-accessible-label" data-key="scroll_label">Вернуться в начало страницы</span>
+         <svg viewBox="0 0 100 100" role="img" aria-hidden="true" focusable="false">
+            <defs>
+               <linearGradient id="mirokitScrollGradient" x1="12" y1="12" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#1565ff" />
+                  <stop offset=".55" stop-color="#ff3d3d" />
+                  <stop offset="1" stop-color="#ffd54f" />
+               </linearGradient>
+            </defs>
+            <circle class="scroll-top-track" cx="50" cy="50" r="43" pathLength="100" />
+            <circle class="scroll-top-progress" cx="50" cy="50" r="43" pathLength="100" />
+            <g class="scroll-top-orbit-spin">
+               <circle class="scroll-top-orbit" cx="50" cy="50" r="35.5" />
+            </g>
+            <g class="scroll-top-plane-orbit">
+               <path class="scroll-top-plane" d="M50 4.7 57.2 16l-7.2-2.8-7.2 2.8Z" />
+            </g>
+            <g class="scroll-top-globe">
+               <circle class="scroll-top-globe-ring" cx="50" cy="48" r="18.5" />
+               <path class="scroll-top-globe-line" d="M31.7 48h36.6M50 29.5c5.1 5.2 7.8 11.3 7.8 18.5S55.1 61.3 50 66.5M50 29.5c-5.1 5.2-7.8 11.3-7.8 18.5S44.9 61.3 50 66.5M35.7 37.2c4.1 2 8.9 3 14.3 3s10.2-1 14.3-3M35.7 58.8c4.1-2 8.9-3 14.3-3s10.2 1 14.3 3" />
+            </g>
+            <path class="scroll-top-arrow" d="M43.2 50.5 50 43.7l6.8 6.8M50 44v12.8" />
+         </svg>
+         <span class="scroll-top-percent" aria-hidden="true">0%</span>
+      </button>
       <div class="modal" id="signupModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
          <div class="modal-card">
             <div class="modal-head">
@@ -1940,7 +1862,7 @@
                   <h2 class="modal-title" id="modalTitle" data-key="modal_title">Anmeldung</h2>
                   <p class="form-note" data-key="modal_note">Demo-Formular: prüft Eingaben lokal und öffnet danach dein Mailprogramm.</p>
                </div>
-               <button class="modal-close" type="button" aria-label="Schließen">×</button>
+               <button class="modal-close" type="button" aria-label="Schließen" data-i18n-attrs="aria-label:close">×</button>
             </div>
             <form id="signupForm" class="form-grid">
                <div class="field"><label for="name" data-key="form_name">Name</label><input id="name" name="name" autocomplete="name" required minlength="2" /></div>
@@ -1952,7 +1874,7 @@
       </div>
       <div class="modal news-modal" id="newsModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="newsModalTitle">
          <div class="modal-card news-modal-card">
-            <button class="modal-close news-modal-close" type="button" aria-label="Закрыть">×</button>
+            <button class="modal-close news-modal-close" type="button" aria-label="Закрыть" data-i18n-attrs="aria-label:close">×</button>
             <div class="news-modal-image">
                <img loading="lazy" src="" alt="" />
                <span class="category news-modal-category"></span>
@@ -1963,37 +1885,38 @@
                <div class="news-modal-body-text"></div>
             </div>
             <div class="news-modal-nav">
-               <button type="button" class="news-modal-prev" aria-label="Предыдущая новость"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Назад</button>
+               <button type="button" class="news-modal-prev" aria-label="Предыдущая новость" data-i18n-attrs="aria-label:news_prev" data-key="previous" data-i18n-mode="text"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Назад</button>
                <span class="news-modal-counter" aria-live="polite"></span>
-               <button type="button" class="news-modal-next" aria-label="Следующая новость">Далее <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+               <button type="button" class="news-modal-next" aria-label="Следующая новость" data-i18n-attrs="aria-label:news_next" data-key="next" data-i18n-mode="text">Далее <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
          </div>
       </div>
       <div class="gallery-media-modal" id="galleryImageModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="galleryImageModalTitle">
          <div class="gallery-media-modal-card gallery-image-modal-card">
             <div class="gallery-media-modal-head">
-               <p id="galleryImageModalTitle">Просмотр фотографии</p>
-               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр фотографии"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+               <p id="galleryImageModalTitle" data-key="gallery_photo_modal">Просмотр фотографии</p>
+               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр фотографии" data-i18n-attrs="aria-label:close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             </div>
             <div class="gallery-image-stage"><img loading="lazy" src="" alt="" /></div>
             <div class="gallery-media-modal-footer">
-               <button class="gallery-modal-prev" type="button" aria-label="Предыдущая фотография"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад</button>
+               <button class="gallery-modal-prev" type="button" aria-label="Предыдущая фотография" data-i18n-attrs="aria-label:gallery_prev" data-key="previous" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад</button>
                <p class="gallery-image-caption" aria-live="polite"></p>
-               <button class="gallery-modal-next" type="button" aria-label="Следующая фотография">Далее <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+               <button class="gallery-modal-next" type="button" aria-label="Следующая фотография" data-i18n-attrs="aria-label:gallery_next" data-key="next" data-i18n-mode="text">Далее <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
             </div>
          </div>
       </div>
       <div class="gallery-media-modal" id="galleryVideoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="galleryVideoModalTitle">
          <div class="gallery-media-modal-card gallery-video-modal-card">
             <div class="gallery-media-modal-head">
-               <p id="galleryVideoModalTitle">Просмотр видео</p>
-               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр видео"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+               <p id="galleryVideoModalTitle" data-key="gallery_video_modal">Просмотр видео</p>
+               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр видео" data-i18n-attrs="aria-label:close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             </div>
             <video class="gallery-modal-video" controls controlslist="nodownload" preload="metadata" aria-describedby="galleryVideoModalNote"></video>
-            <p class="gallery-video-modal-note" id="galleryVideoModalNote">Для этого ролика пока не добавлен видеофайл. После добавления адреса в <code>data-video-src</code> здесь будут доступны воспроизведение, громкость, субтитры и полноэкранный режим.</p>
+            <p class="gallery-video-modal-note" id="galleryVideoModalNote" data-key="gallery_video_note">Для этого ролика пока не добавлен видеофайл. После добавления адреса в <code>data-video-src</code> здесь будут доступны воспроизведение, громкость, субтитры и полноэкранный режим.</p>
          </div>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <script src="source/scripts/language.js"></script>
       <script src="source/scripts/main.js"></script>
       <script src="source/scripts/mirokit-world-map.js" defer></script>
    </body>
