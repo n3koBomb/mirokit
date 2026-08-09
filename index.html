@@ -134,7 +134,7 @@
             <div class="intro-loader-orbit intro-loader-orbit--one"></div>
             <div class="intro-loader-orbit intro-loader-orbit--two"></div>
             <div class="intro-loader-logo-wrap">
-               <div class="intro-loader-logo" data-svg-src="./public/assets/brand/miroKit_logo_full-1%20(1).svg" aria-hidden="true"></div>
+               <div class="intro-loader-logo" data-svg-src="./public/assets/brand/miroKit_introLoading_logo.svg" aria-hidden="true"></div>
                <span class="intro-loader-scanline"></span>
             </div>
             <span class="intro-loader-caption" data-key="loader_caption">PLAY · CREATE · CONNECT</span>
@@ -468,7 +468,7 @@
                   <div class="partner-showcase">
                      <div class="partner-showcase-meta"><span data-key="partner_meta_count">08 организаций в одной истории</span><span data-key="partner_meta_title">Партнёры МИРоКИТ</span></div>
                      <div class="partner-group" aria-label="Краткая подборка партнёров" data-i18n-attrs="aria-label:partner_group">
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative Erleben"><span class="partner-index">01</span><img src="./public/assets/images/partners/initiatie-erleben.png" alt="Initiative Erleben" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative Erleben"><span class="partner-index">01</span><img src="./public/assets/images/partners/initiative-erleben.png" alt="Initiative Erleben" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                         <a class="partner-block" href="#partners" data-nav-link aria-label="Vdochnovenije"><span class="partner-index">02</span><img src="./public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                         <a class="partner-block" href="#partners" data-nav-link aria-label="Iskra PNDJ"><span class="partner-index">03</span><img src="./public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                         <a class="partner-block" href="#partners" data-nav-link aria-label="NKO без границ"><span class="partner-index">04</span><img src="./public/assets/images/partners/nko-no-border.png" alt="НКО без границ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
@@ -634,113 +634,116 @@
          <section id="world" class="panel compact-panel">
             <div class="panel-inner world-layout">
                <div class="section-header">
-                  <div class="section-logo">
-                     <img loading="lazy" src="#" alt="Logo Welt MIRoKIT" />
+                  <div class="section-logo world-section-logo">
+                     <img loading="lazy" src="/public/assets/logo/sections/world_page_rgba.png" alt="World MIRoKIT logo" data-i18n-attrs="alt:world_logo_alt" />
                   </div>
                   <div class="section-head">
-                     <div class="eyebrow" data-key="world_eyebrow">География</div>
-                     <h2 class="title" data-key="world_title">МИРоКИТ в мире</h2>
-                     <p class="subtitle" data-key="world_subtitle">Отдельная секция под страны, флаги, статусы, координаторов и локальные события.</p>
+                     <div class="eyebrow" data-key="world_eyebrow">Международная Лига</div>
+                     <h2 class="title" data-key="world_title">«МИРоКИТ» в Мире.</h2>
+                     <p class="subtitle" data-key="world_subtitle">Культура, творчество и дружба без границ.</p>
                   </div>
                </div>
-               <div class="world-stage">
-                  <article class="glass-board world-map-card fu d1" aria-labelledby="worldMapTitle">
-                     <div class="board-head world-board-head">
-                        <div>
-                           <div class="board-title" id="worldMapTitle" data-key="world_board_title" data-i18n-mode="text"><i class="ti ti-world"></i>Карта международных площадок МИРоКИТ</div>
-                           <p class="world-lead" data-key="world_lead">Синие точки показывают города, где уже были мероприятия МИРоКИТ. Красные точки отмечают направления, где готовятся новые встречи, онлайн-мосты и партнёрские площадки.</p>
-                        </div>
-                        <a class="board-action" href="#partners" data-nav-link data-key="become_partner">Стать партнёром →</a>
+               <div class="world-story-grid">
+                  <article class="world-manifesto fu d1">
+                     <div class="world-manifesto-topline">
+                        <span class="world-index">01</span>
+                        <span class="world-manifesto-label" data-key="world_manifesto_label">Открытое международное пространство</span>
                      </div>
-                     <div class="world-map-shell">
-                        <figure class="world-map-figure" aria-hidden="true">
-                           <canvas id="worldCanvas" role="img" class="world-canvas" aria-label="Карта международных площадок МИРоКИТ" data-i18n-attrs="aria-label:world_map_label"></canvas>
-                           <figcaption class="world-map-caption" data-key="world_map_caption">Наведите курсор на карту, чтобы увидеть информацию о конкретном городе</figcaption>
-                        </figure>
-                        <div class="world-map-overlay" aria-hidden="true">
-                           <span class="world-compass"><i class="fa-solid fa-compass"></i></span>
-                        </div>
-                        <div class="world-map-fallback sr-only" data-key="world_map_fallback">Главный офис: Дюссельдорф, Германия. Уже проведены события: Дюссельдорф, Москва, Санкт-Петербург, Тунис. Планируются новые площадки: Берлин, Варшава, Прага, Алматы и Стамбул.</div>
-                     </div>
-                     <div class="world-legend" aria-label="Легенда карты" data-i18n-attrs="aria-label:map_legend">
-                        <span data-key="hq" data-i18n-mode="text"><i class="legend-flag">⚑</i>главный штаб</span>
-                        <span data-key="planned" data-i18n-mode="text"><i class="legend-dot legend-dot--planned"></i>планируется</span>
-                        <span data-key="events_done" data-i18n-mode="text"><i class="legend-dot legend-dot--done"></i>уже были события</span>
+                     <div class="world-copy">
+                        <p data-key="world_text_1">Совместный проект — это шаг к взаимопониманию между странами, культурами и людьми. Именно поэтому была создана Международная Лига «МИРоКИТ» — международное сообщество, объединяющее детей, молодёжь, педагогов, родителей разных стран.</p>
+                        <p data-key="world_text_2">Лига открывает новые возможности для общения. Участники знакомятся с культурой и традициями разных народов, приобретают новых друзей, обмениваются опытом и учатся работать в команде.</p>
+                        <p data-key="world_text_3">География Международной Лиги «МИРоКИТ» продолжает расширяться. Всё больше детей, молодёжи, педагогов и организаций из разных стран присоединяются к нашим инициативам, внося в них свои традиции, опыт и культурное многообразие. Нас объединяет стремление создавать условия для развития талантов и укрепления международного сотрудничества.</p>
+                        <p class="world-closing" data-key="world_text_4">МИРоКИТ — это пространство, где знания объединяют, творчество вдохновляет, а международное сотрудничество становится основой дружбы, взаимопонимания и общего будущего.</p>
                      </div>
                   </article>
 
-                  <aside class="world-side-panel fu d2" aria-label="Статус стран проекта" data-i18n-attrs="aria-label:country_status">
-                     <div class="world-side-card world-hq-card">
-                        <span class="world-card-kicker" data-key="hq">Главный штаб</span>
-                        <h3 data-key="hq_title">Координационый центр. Дюссельдорф.</h3>
-                        <p data-key="hq_desc">Здесь собираются заявки, партнёрские контакты, методические материалы и календарь международных активностей.</p>
+                  <aside class="world-visual fu d2" aria-label="Мир МИРоКИТ" data-i18n-attrs="aria-label:world_visual_label">
+                     <div class="world-visual-glow world-visual-glow--blue"></div>
+                     <div class="world-visual-glow world-visual-glow--red"></div>
+                     <div class="world-orbit-stage" aria-hidden="true">
+                        <span class="world-orbit-ring world-orbit-ring--outer"></span>
+                        <span class="world-orbit-ring world-orbit-ring--inner"></span>
+                        <span class="world-orbit-dot world-orbit-dot--one"></span>
+                        <span class="world-orbit-dot world-orbit-dot--two"></span>
+                        <span class="world-orbit-dot world-orbit-dot--three"></span>
+                        <span class="world-orbit-core">MIR<br />oKIT</span>
                      </div>
-                     <div class="world-status-grid">
-                        <article class="world-status-card">
-                           <strong>4</strong>
-                           <span data-key="cities_done">города с проведёнными событиями</span>
-                        </article>
-                        <article class="world-status-card world-status-card--red">
-                           <strong>5</strong>
-                           <span data-key="directions_planned">направлений в планировании</span>
-                        </article>
+                     <div class="world-visual-copy">
+                        <span class="world-visual-kicker" data-key="world_visual_kicker">WORLD / TOGETHER</span>
+                        <h3 data-key="world_visual_title">Разные страны. Общее будущее.</h3>
+                        <p data-key="world_visual_desc">Каждая культура приносит в Лигу свою историю, свой голос и новые идеи.</p>
                      </div>
-                     <div class="world-country-list">
-                        <div class="world-country-item is-done">
-                           <span>🇩🇪</span>
-                           <div><strong data-key="country_germany">Германия</strong><small data-key="country_germany_desc">Дюссельдорф, Берлин, партнёрские площадки</small></div>
-                        </div>
-                        <div class="world-country-item is-done">
-                           <span>🇷🇺</span>
-                           <div><strong data-key="country_russia">Россия</strong><small data-key="country_russia_desc">игровые события, культурные задания, наставники</small></div>
-                        </div>
-                        <div class="world-country-item is-planned">
-                           <span>🇵🇱</span>
-                           <div><strong data-key="country_poland">Польша</strong><small data-key="country_poland_desc">планируется онлайн-мост и команда координаторов</small></div>
-                        </div>
-                        <div class="world-country-item is-planned">
-                           <span>🇰🇿</span>
-                           <div><strong data-key="country_kazakhstan">Казахстан</strong><small data-key="country_kazakhstan_desc">подготовка молодёжной онлайн-площадки</small></div>
-                        </div>
+                     <div class="world-word-cloud" aria-label="Ключевые идеи МИРоКИТ" data-i18n-attrs="aria-label:world_values_label">
+                        <span data-key="world_value_1">Знания</span>
+                        <span data-key="world_value_2">Творчество</span>
+                        <span data-key="world_value_3">Диалог</span>
+                        <span data-key="world_value_4">Дружба</span>
                      </div>
                   </aside>
                </div>
 
-               <div class="world-content-grid" aria-label="Как развивается география МИРоКИТ" data-i18n-attrs="aria-label:geography_growth">
-                  <article class="world-info-card fu d1">
-                     <span class="world-info-icon"><i class="ti ti-video"></i></span>
-                     <h3 data-key="bridges_title">Онлайн-мосты между городами</h3>
-                     <p data-key="bridges_desc">Команды могут встречаться без долгих поездок: викторины, творческие задания, мини-презентации культур и общие финалы проходят в одном цифровом пространстве.</p>
+               <div class="world-pillars" aria-label="Что объединяет Лига МИРоКИТ" data-i18n-attrs="aria-label:world_pillars_label">
+                  <article class="world-pillar world-pillar--blue fu d1">
+                     <span class="world-pillar-number">01</span>
+                     <h3 data-key="world_pillar_1_title">Общение</h3>
+                     <p data-key="world_pillar_1_desc">Новые встречи становятся началом взаимопонимания.</p>
                   </article>
-                  <article class="world-info-card fu d2">
-                     <span class="world-info-icon"><i class="ti ti-users-group"></i></span>
-                     <h3 data-key="coordinators_title">Локальные координаторы</h3>
-                     <p data-key="coordinators_desc">Каждая новая точка на карте получает понятный сценарий: как собрать участников, как провести игру, как оформить материалы и как связаться с международной командой.</p>
+                  <article class="world-pillar world-pillar--red fu d2">
+                     <span class="world-pillar-number">02</span>
+                     <h3 data-key="world_pillar_2_title">Многообразие</h3>
+                     <p data-key="world_pillar_2_desc">Традиции и опыт разных стран усиливают общий проект.</p>
                   </article>
-                  <article class="world-info-card fu d3">
-                     <span class="world-info-icon"><i class="ti ti-certificate"></i></span>
-                     <h3 data-key="standard_title">Единый стандарт событий</h3>
-                     <p data-key="standard_desc">Мероприятия сохраняют общую структуру МИРоКИТ: культура, игра, уважительный диалог, командное творчество и честная обратная связь после события.</p>
+                  <article class="world-pillar world-pillar--gold fu d3">
+                     <span class="world-pillar-number">03</span>
+                     <h3 data-key="world_pillar_3_title">Сотрудничество</h3>
+                     <p data-key="world_pillar_3_desc">Вместе мы создаём условия для талантов и дружбы.</p>
                   </article>
                </div>
 
-               <div class="world-timeline fu d3" aria-label="План развития международной сети" data-i18n-attrs="aria-label:network_plan">
-                  <div class="world-timeline-step is-done">
-                     <span>01</span>
-                     <strong data-key="timeline_done">Проведённые встречи</strong>
-                     <p data-key="timeline_done_desc">Собираем опыт, фото, отзывы участников и лучшие задания.</p>
+               <section class="world-map-section fu d3" aria-labelledby="worldMapTitle">
+                  <div class="world-map-visual-grid">
+                     <figure class="world-image-card">
+                        <img loading="lazy" src="/public/assets/gallery/world.png" alt="Карта мира МИРоКИТ" data-i18n-attrs="alt:world_image_alt" />
+                        <figcaption>
+                           <span class="world-image-kicker" data-key="world_image_kicker">WORLD / ONE PLANET</span>
+                           <strong data-key="world_image_caption">Одна планета — множество голосов.</strong>
+                        </figcaption>
+                     </figure>
+
+                     <article class="world-map-card">
+                        <div class="world-map-head">
+                           <div>
+                              <span class="world-map-kicker" data-key="world_map_kicker">LIVE NETWORK / 2026</span>
+                              <h3 id="worldMapTitle" data-key="world_map_title">Карта международных площадок МИРоКИТ</h3>
+                              <p data-key="world_map_desc">Синие точки показывают места уже проведённых событий, красные — направления для новых встреч и партнёрских площадок.</p>
+                           </div>
+                           <span class="world-map-live"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i><span data-key="world_map_live">LIVE</span></span>
+                        </div>
+                        <div class="world-map-shell">
+                           <canvas id="worldCanvas" role="img" class="world-canvas" aria-label="Карта международных площадок МИРоКИТ" data-i18n-attrs="aria-label:world_map_label"></canvas>
+                           <span class="world-map-compass" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+                           <p class="world-map-fallback" data-key="world_map_fallback">Карта временно недоступна.</p>
+                        </div>
+                        <div class="world-map-legend" aria-label="Легенда карты" data-i18n-attrs="aria-label:map_legend">
+                           <span><i class="world-legend-dot world-legend-dot--hq"></i><span data-key="hq">главный штаб</span></span>
+                           <span><i class="world-legend-dot world-legend-dot--done"></i><span data-key="events_done">уже были события</span></span>
+                           <span><i class="world-legend-dot world-legend-dot--planned"></i><span data-key="planned">планируется</span></span>
+                        </div>
+                     </article>
                   </div>
-                  <div class="world-timeline-step is-active">
-                     <span>02</span>
-                     <strong data-key="timeline_prepare">Партнёрская подготовка</strong>
-                     <p data-key="timeline_prepare_desc">Проверяем площадки, согласуем формат и готовим команды.</p>
-                  </div>
-                  <div class="world-timeline-step is-planned">
-                     <span>03</span>
-                     <strong data-key="timeline_future">Новые международные точки</strong>
-                     <p data-key="timeline_future_desc">Запускаем события там, где есть координаторы и устойчивый интерес.</p>
-                  </div>
-               </div>
+
+                  <section class="world-network-card" aria-labelledby="worldCountryFeedTitle">
+                     <div class="world-network-head">
+                        <div>
+                           <span class="world-map-kicker" data-key="world_country_feed_kicker">COUNTRY SIGNALS</span>
+                           <h3 id="worldCountryFeedTitle" data-key="world_country_feed_title">Страны и города Лиги</h3>
+                           <p data-key="world_country_feed_desc">Этот список собирается автоматически из массива точек карты: страны, флаги, города и текущий статус всегда синхронизированы.</p>
+                        </div>
+                        <span class="world-network-count" id="worldCountryCount" aria-live="polite">0</span>
+                     </div>
+                     <div id="worldCountryFeed" class="world-country-feed" aria-live="polite" aria-label="Страны и города проекта" data-i18n-attrs="aria-label:world_country_feed_label"></div>
+                  </section>
+               </section>
             </div>
          </section>
          <section id="partners" class="panel compact-panel">
@@ -793,12 +796,12 @@
                            <h3 data-key="partner_public">Общественные организации</h3>
                            <div class="partner-logo-wall">
                               <figure class="partner-logo-tile">
-                                 <img loading="lazy" src="public/assets/images/partners/initiatie-erleben.png" alt="Initiative Erleben" />
-                                 <figcaption data-key="partner_initiative">Initiative Erleben</figcaption>
+                                 <img loading="lazy" src="public/assets/images/partners/initiative-erleben.png" alt="Initiative erLeben" />
+                                 <figcaption data-key="partner_initiative">Initiative erLeben</figcaption>
                               </figure>
                               <figure class="partner-logo-tile">
                                  <img loading="lazy" src="public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" />
-                                 <figcaption data-key="partner_vdochnovenije">Vdochnovenije</figcaption>
+                                 <figcaption data-key="partner_vdochnovenije">Center for the Realization of Creative Initiatives 'Inspiration'</figcaption>
                               </figure>
                               <figure class="partner-logo-tile partner-logo-tile--wide">
                                  <img loading="lazy" src="public/assets/images/partners/integral-eV.png" alt="Integral e.V." />
@@ -879,6 +882,54 @@
                </div>
             </div>
          </section>
+         <section id="gamePrinciple" class="panel compact-panel">
+            <div class="panel-inner game-principle-layout">
+               <div class="section-header">
+                  <div class="section-logo">
+                     <img loading="lazy" src="/public/assets/logos/sections/game_principle_page_rgba.png" alt="" aria-hidden="true" />
+                  </div>
+                  <div class="section-head">
+                     <div class="eyebrow" data-key="gamePrinciple_eyebrow"></div>
+                     <h2 class="title" data-key="gamePrinciple_title"></h2>
+                     <p class="subtitle" data-key="gamePrinciple_subtitle"></p>
+                  </div>
+               </div>
+
+               <div class="game-principle-stage">
+                  <div class="game-principle-story">
+                     <div class="game-principle-lead fu d1">
+                        <span class="game-principle-lead-mark" aria-hidden="true"><i class="fa-solid fa-hand-point-up"></i></span>
+                        <p data-key="gamePrinciple_lead"></p>
+                     </div>
+
+                     <div class="game-principle-route" role="list">
+                        <article class="game-principle-route-card game-principle-route-card--blue fu d2" role="listitem">
+                           <span class="game-principle-route-index" aria-hidden="true">01</span>
+                           <h3 data-key="gamePrinciple_stage_1"></h3>
+                        </article>
+                        <article class="game-principle-route-card game-principle-route-card--red fu d3" role="listitem">
+                           <span class="game-principle-route-index" aria-hidden="true">02</span>
+                           <h3 data-key="gamePrinciple_stage_2"></h3>
+                        </article>
+                        <article class="game-principle-route-card game-principle-route-card--green fu d4" role="listitem">
+                           <span class="game-principle-route-index" aria-hidden="true">03</span>
+                           <h3 data-key="gamePrinciple_stage_3"></h3>
+                        </article>
+                     </div>
+
+                     <p class="game-principle-together fu d5" data-key="gamePrinciple_together"></p>
+                     <p class="game-principle-body fu d6" data-key="gamePrinciple_body"></p>
+                     <p class="game-principle-finale fu d7" data-key="gamePrinciple_finale"></p>
+                  </div>
+
+                  <figure class="game-principle-visual fu d2">
+                     <div class="game-principle-visual-frame">
+                        <img loading="lazy" decoding="async" src="/public/assets/gallery/gamePrinciple.png" alt="" data-i18n-attrs="alt:gamePrinciple_image_alt" />
+                     </div>
+                  </figure>
+               </div>
+            </div>
+         </section>
          <section id="programs" class="panel compact-panel">
             <div class="panel-inner programs-layout">
                <div class="section-header">
@@ -917,6 +968,43 @@
                      <h3 class="small-heading" data-key="p5t">Культурный код</h3>
                      <p class="small-copy" data-key="p5d">Обычаи, кухня, искусство и языки разных народов</p>
                   </article>
+               </div>
+            </div>
+         </section>
+         <section id="ageGroups" class="panel compact-panel">
+            <div class="panel-inner ageGroups-layout">
+               <div class="section-header">
+                  <div class="section-logo ageGroups-logo">
+                     <img loading="lazy" src="/public/assets/logos/sections/age_groups_page.png" alt="" aria-hidden="true" />
+                  </div>
+                  <div class="section-head">
+                     <div class="eyebrow" data-key="ageGroups_eyebrow"></div>
+                     <h2 class="title" data-key="ageGroups_title"></h2>
+                     <p class="subtitle" data-key="ageGroups_subtitle"></p>
+                  </div>
+               </div>
+               <div class="age-groups-stage">
+                  <figure class="age-groups-visual fu d1">
+                     <div class="age-groups-visual-frame">
+                        <img loading="lazy" decoding="async" src="/public/assets/gallery/ageGroups.png" alt="" data-i18n-attrs="alt:ageGroups_image_alt" />
+                     </div>
+                  </figure>
+                  <div class="age-groups-copy">
+                     <article class="age-groups-card age-groups-card--participants fu d2">
+                        <span class="age-groups-card-index" aria-hidden="true">01</span>
+                        <div>
+                           <h3 data-key="ageGroups_participants_title"></h3>
+                           <p data-key="ageGroups_participants_text"></p>
+                        </div>
+                     </article>
+                     <article class="age-groups-card age-groups-card--mentors fu d3">
+                        <span class="age-groups-card-index" aria-hidden="true">02</span>
+                        <div>
+                           <h3 data-key="ageGroups_mentors_title"></h3>
+                           <p data-key="ageGroups_mentors_text"></p>
+                        </div>
+                     </article>
+                  </div>
                </div>
             </div>
          </section>
@@ -1534,28 +1622,50 @@
 
                   <div class="contact-columns">
                      <aside class="contact-side fu d1">
+                        <span class="contact-side-kicker"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> MIRoKIT / CONNECT</span>
                         <h3 class="contact-side-heading" data-key="our_contacts">Наши контакты</h3>
                         <ul class="contact-list">
                            <li class="contact-item">
                               <span class="contact-icon"><i class="fa-solid fa-envelope"></i></span>
-                              <span class="contact-text">
-                                 <strong data-key="email_label">E-mail</strong>
-                                 <a href="mailto:info@mirokit.com">info@mirokit.com</a>
-                              </span>
+                              <button type="button" class="contact-text" onclick="location.href='mailto:mirokit2025@gmail.com'">
+                                 <strong>E-mail</strong>
+                                 <span>mirokit2025@gmail.com</span>
+                              </button>
                            </li>
                            <li class="contact-item">
                               <span class="contact-icon"><i class="fa-brands fa-telegram"></i></span>
-                              <span class="contact-text">
+                              <button class="contact-text">
                                  <strong data-key="telegram_label">Telegram</strong>
                                  <a href="https://t.me/ligamirokit">@ligamirokit</a>
-                              </span>
+                              </button>
                            </li>
                         </ul>
                         <div class="contact-social">
-                           <span class="contact-social-label" data-key="social_label">Мы в социальных сетях</span>
+                           <div class="contact-social-heading">
+                              <span class="contact-social-label" data-key="social_label">Мы в социальных сетях</span>
+                              <span class="contact-social-count" aria-hidden="true">04 / CHANNELS</span>
+                           </div>
                            <div class="contact-social-icons">
-                              <a class="social-mini" href="https://youtube.com/" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                              <a class="social-mini" href="https://vk.com/" target="_blank" rel="noopener" aria-label="VKontakte"><i class="fa-brands fa-vk"></i></a>
+                              <a class="social-mini social-mini--youtube" href="https://youtube.com/" target="_blank" rel="noopener" aria-label="YouTube">
+                                 <span class="social-mini-icon"><i class="fa-brands fa-youtube" aria-hidden="true"></i></span>
+                                 <span class="social-mini-name">YouTube</span>
+                                 <i class="fa-solid fa-arrow-up-right-from-square social-mini-arrow" aria-hidden="true"></i>
+                              </a>
+                              <a class="social-mini social-mini--rutube" href="https://rutube.ru/" target="_blank" rel="noopener" aria-label="Rutube">
+                                 <span class="social-mini-icon"><iconify-icon icon="simple-icons:rutube" aria-hidden="true"></iconify-icon></span>
+                                 <span class="social-mini-name">Rutube</span>
+                                 <i class="fa-solid fa-arrow-up-right-from-square social-mini-arrow" aria-hidden="true"></i>
+                              </a>
+                              <a class="social-mini social-mini--telegram" href="https://t.me/ligamirokit" target="_blank" rel="noopener" aria-label="Telegram">
+                                 <span class="social-mini-icon"><i class="fa-brands fa-telegram" aria-hidden="true"></i></span>
+                                 <span class="social-mini-name">Telegram</span>
+                                 <i class="fa-solid fa-arrow-up-right-from-square social-mini-arrow" aria-hidden="true"></i>
+                              </a>
+                              <a class="social-mini social-mini--vk" href="https://vk.com/" target="_blank" rel="noopener" aria-label="VK">
+                                 <span class="social-mini-icon"><i class="fa-brands fa-vk" aria-hidden="true"></i></span>
+                                 <span class="social-mini-name">VK</span>
+                                 <i class="fa-solid fa-arrow-up-right-from-square social-mini-arrow" aria-hidden="true"></i>
+                              </a>
                            </div>
                         </div>
                      </aside>

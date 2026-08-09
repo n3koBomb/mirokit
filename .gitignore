@@ -7,6 +7,7 @@ claude-philosophy
 index_*.html
 source/style/style_*.css
 build/
+*.mp4
 
 # Monorepo (packages/, apps/)
 node_modules

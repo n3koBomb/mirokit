@@ -70,6 +70,22 @@ const T = {
       pill3: "Фестивали",
       pill4: "Лагеря",
       pill5: "Культурные центры",
+      gamePrinciple_eyebrow: "Культурно-игровой триатлон «МИРоКИТ»",
+      gamePrinciple_title: "Принцип игры.",
+      gamePrinciple_subtitle: "Пройти эту дистанцию можно только вместе.",
+      gamePrinciple_image_alt: "Принцип игры «МИРоКИТ»: диалог, творчество и команда",
+      gamePrinciple_lead: `Не все триатлоны проходят на стадионе. В триатлоне «МИРоКИТ» участники
+объединяются в команды и преодолевают дистанцию в трёх направлениях:`,
+      gamePrinciple_stage_1: "Диалог и дипломатия",
+      gamePrinciple_stage_2: "Интеллектуальные игры",
+      gamePrinciple_stage_3: "Творчество и искусство",
+      gamePrinciple_together: "Пройти эту дистанцию можно только вместе.",
+      gamePrinciple_body: `В «МИРоКИТ» нет случайных заданий. Игра проходит в формате культурно-
+игрового триатлона, где каждый этап раскрывает новую сторону участника.`,
+      gamePrinciple_finale: `Сначала — диалог и логика, потом творчество и воображение, а финалом
+становится единство команды и умение принять совместное решение.
+Победа здесь рождается не только из знаний, а из умения думать, создавать,
+договариваться и действовать вместе.`,
       prog_tag: "Как проходит МИРоКИТ",
       prog_title: "Программы и активности",
       prog_sub: "Команды проходят туры, где важны знания, творчество, смекалка и командный дух!",
@@ -224,7 +240,7 @@ Object.assign(T.en, { news_full_1_title: "Online drawing competition <br>of the 
 Object.assign(T.de, { news_full_1_title: "Online-Zeichenwettbewerb <br>der Internationalen MIRoKIT-Liga", news_full_1_excerpt: "Am 1. August 2026 startet die Internationale MIRoKIT-Liga ihren internationalen Online-Zeichenwettbewerb!", news_full_2_title: "In Düsseldorf fand ein MIRoKIT-Spiel statt.", news_full_2_excerpt: "Am 10. Juli 2026 fanden in Düsseldorf ein Spiel und ein Schachturnier des Internationalen Kultur-Spiel-Triathlons «MIRoKIT» statt.", news_full_3_title: "Fotoreportage aus dem Sommercamp in Deutschland", news_full_3_excerpt: "Zehn Tage am See: Teamspiele, Lagerfeuer am Abend und die erste gemeinsame Aufführung.", news_full_4_title: "Ankündigung: Der MIRoKIT-Winterpokal findet im Januar statt", news_full_4_excerpt: "Die Teamregistrierung ist geöffnet — wir berichten über neue Regeln und warum diese Ausgabe anspruchsvoller wird.", news_full_5_title: "Teilnehmende berichten vom Projekt in Tunesien", news_full_5_excerpt: "«Ich dachte, ich fahre einfach in ein Camp, aber ich habe Freunde fürs Leben gefunden» — sagen Jugendliche der ersten tunesischen Gruppe.", news_full_6_title: "Freundschaft zwischen Völkern: Kulturaustausch in Russland", news_full_6_excerpt: "Eine Woche mit Treffen, Workshops und gemeinsamen Projekten zwischen russischen und deutschen Standorten." });
 
 Object.assign(T.ru, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Vdochnovenije", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "E-mail", telegram_label: "Telegram", video_report: "Репортаж · 05:16", video_interview: "Интервью · 07:24", video_behind: "За кадром · 02:58" });
-Object.assign(T.en, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Vdochnovenije", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "Email", telegram_label: "Telegram", video_report: "Report · 05:16", video_interview: "Interview · 07:24", video_behind: "Behind the scenes · 02:58" });
+Object.assign(T.en, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Center for the Realization of Creative Initiatives 'Inspiration'", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "Email", telegram_label: "Telegram", video_report: "Report · 05:16", video_interview: "Interview · 07:24", video_behind: "Behind the scenes · 02:58" });
 Object.assign(T.de, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Vdochnovenije", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "E-Mail", telegram_label: "Telegram", video_report: "Reportage · 05:16", video_interview: "Interview · 07:24", video_behind: "Hinter den Kulissen · 02:58" });
 
 Object.assign(T.ru, { photo_open_1: "Открыть фото: Цвета дружбы без границ", photo_open_2: "Открыть фото: Команды из разных стран", photo_open_3: "Открыть фото: Движение вместе", photo_open_4: "Открыть фото: Игра, в которой все свои", video_open_label: "Открыть видео на весь экран", video_list_1_title: "Турнир: азарт, стратегия и дружба", video_list_2_title: "Что дети рассказывают друг другу без переводчика", video_list_3_title: "Как создавалась международная онлайн-выставка" });
@@ -248,6 +264,82 @@ Object.assign(T.de, {
 });
 
 Object.assign(T.ru, { op0t: "МИРоКИТ без границ", op1t: "Онлайн-проекты, которые объединяют", op2d: "Конкурсы, встречи и творческие лаборатории, где участники из разных стран создают общее пространство для игры, знаний и дружбы.", op3t: "Участвовать можно из любой страны", op4t: "Один экран — много культур, идей и новых друзей", op5t: "Онлайн-формат помогает командам встречаться регулярно, работать над совместными заданиями и показывать результаты международной аудитории. Здесь собраны текущие инициативы и архив уже завершённых проектов.", op0d: "стран-участниц", op1d: "формата участия", op_access: "доступ к материалам" });
+Object.assign(T.ru, {
+   ageGroups_eyebrow: "Возрастные группы",
+   ageGroups_title: "Участники",
+   ageGroups_subtitle: "Участники · Наставники",
+   ageGroups_image_alt: "Участники культурно-игрового триатлона «МИРоКИТ»",
+   ageGroups_participants_title: "Участники",
+   ageGroups_participants_text: `В культурно-игровом триатлоне «МИРоКИТ» принимают участие дети,
+подростки и молодёжь в возрасте от 7 до 25 лет, объединённые в
+команды. Методика триатлона создаёт условия для развития
+интеллектуальных, творческих и коммуникативных способностей,
+формирования навыков сотрудничества, лидерства и межкультурного
+взаимодействия.`,
+   ageGroups_mentors_title: "Наставники",
+   ageGroups_mentors_text: `Наставниками команд могут быть педагоги, преподаватели, родители,
+студенты, руководители детских и молодёжных объединений, а также
+представители образовательных, культурных и общественных
+организаций. Наставники сопровождают команды на всех этапах подготовки
+и участия в триатлоне, помогают организовать командную работу и
+обеспечивают реализацию культурно игрового триатлона «МИРоКИТ».`,
+});
+Object.assign(T.en, {
+   ageGroups_eyebrow: "Age groups",
+   ageGroups_title: "Participants",
+   ageGroups_subtitle: "Participants · Mentors",
+   ageGroups_image_alt: "Participants in the cultural-game triathlon «MIRoKIT»",
+   ageGroups_participants_title: "Participants",
+   ageGroups_participants_text: `Children, teenagers and young people aged 7 to 25 take part in the cultural-game triathlon «MIRoKIT», joining together in teams. The triathlon methodology creates conditions for developing intellectual, creative and communication skills, as well as cooperation, leadership and intercultural interaction.`,
+   ageGroups_mentors_title: "Mentors",
+   ageGroups_mentors_text: `Team mentors may be educators, teachers, parents, students, leaders of children's and youth groups, as well as representatives of educational, cultural and civic organisations. Mentors accompany teams through all stages of preparation and participation in the triathlon, help organise teamwork and support the implementation of the cultural-game triathlon «MIRoKIT».`,
+});
+Object.assign(T.de, {
+   ageGroups_eyebrow: "Altersgruppen",
+   ageGroups_title: "Teilnehmende",
+   ageGroups_subtitle: "Teilnehmende · Mentoren",
+   ageGroups_image_alt: "Teilnehmende des kulturell-spielerischen Triathlons «MIRoKIT»",
+   ageGroups_participants_title: "Teilnehmende",
+   ageGroups_participants_text: `Am kulturell-spielerischen Triathlon «MIRoKIT» nehmen Kinder, Jugendliche und junge Erwachsene im Alter von 7 bis 25 Jahren teil, die in Teams zusammengeschlossen sind. Die Methodik des Triathlons schafft Bedingungen für die Entwicklung intellektueller, kreativer und kommunikativer Fähigkeiten sowie für den Aufbau von Kompetenzen in Zusammenarbeit, Führung und interkultureller Interaktion.`,
+   ageGroups_mentors_title: "Mentoren",
+   ageGroups_mentors_text: `Mentoren der Teams können Pädagogen, Lehrkräfte, Eltern, Studierende, Leiter von Kinder- und Jugendvereinigungen sowie Vertreter von Bildungs-, Kultur- und gesellschaftlichen Organisationen sein. Die Mentoren begleiten die Teams in allen Phasen der Vorbereitung und Teilnahme am Triathlon, helfen bei der Organisation der Teamarbeit und gewährleisten die Umsetzung des kulturell-spielerischen Triathlons «MIRoKIT».`,
+});
+Object.assign(T.en, {
+   gamePrinciple_eyebrow: "Cultural-game triathlon «MIRoKIT»",
+   gamePrinciple_title: "Game principle.",
+   gamePrinciple_subtitle: "You can only complete this course together.",
+   gamePrinciple_image_alt: "MIRoKIT game principle: dialogue, creativity and team",
+   gamePrinciple_lead: `Not all triathlons take place in a stadium. In the «MIRoKIT» triathlon, participants
+join teams and cover the course in three areas:`,
+   gamePrinciple_stage_1: "Dialogue and diplomacy",
+   gamePrinciple_stage_2: "Intellectual games",
+   gamePrinciple_stage_3: "Creativity and art",
+   gamePrinciple_together: "You can only complete this course together.",
+   gamePrinciple_body: `There are no random tasks in «MIRoKIT». The game takes place in the format of a cultural-
+game triathlon, where each stage reveals a new side of the participant.`,
+   gamePrinciple_finale: `First comes dialogue and logic, then creativity and imagination; the finale is the unity
+of the team and its ability to make a joint decision.
+Victory here is born not only from knowledge, but from the ability to think, create,
+negotiate and act together.`,
+});
+Object.assign(T.de, {
+   gamePrinciple_eyebrow: "Kulturell-spielerischer Triathlon «MIRoKIT»",
+   gamePrinciple_title: "Spielprinzip.",
+   gamePrinciple_subtitle: "Diese Strecke kann man nur gemeinsam bewältigen.",
+   gamePrinciple_image_alt: "Spielprinzip «MIRoKIT»: Dialog, Kreativität und Team",
+   gamePrinciple_lead: `Nicht alle Triathlons finden in einem Stadion statt. Im Triathlon «MIRoKIT» schließen sich die Teilnehmenden
+zu Teams zusammen und bewältigen die Strecke in drei Richtungen:`,
+   gamePrinciple_stage_1: "Dialog und Diplomatie",
+   gamePrinciple_stage_2: "Intellektuelle Spiele",
+   gamePrinciple_stage_3: "Kreativität und Kunst",
+   gamePrinciple_together: "Diese Strecke kann man nur gemeinsam bewältigen.",
+   gamePrinciple_body: `Bei «MIRoKIT» gibt es keine zufälligen Aufgaben. Das Spiel findet im Format eines kulturell-
+spielerischen Triathlons statt, bei dem jede Etappe eine neue Seite der Teilnehmenden sichtbar macht.`,
+   gamePrinciple_finale: `Zuerst kommen Dialog und Logik, dann Kreativität und Vorstellungskraft; den Abschluss bilden die Einheit
+des Teams und die Fähigkeit, gemeinsam eine Entscheidung zu treffen.
+Der Sieg entsteht hier nicht nur aus Wissen, sondern aus der Fähigkeit zu denken, zu gestalten,
+zu verhandeln und gemeinsam zu handeln.`,
+});
 Object.assign(T.ru, { mail_subject: "Заявка MIRoKIT", mail_name: "Имя", mail_email: "E-mail", mail_message: "Сообщение" });
 Object.assign(T.en, { mail_subject: "MIRoKIT sign-up request", mail_name: "Name", mail_email: "Email", mail_message: "Message" });
 Object.assign(T.de, { mail_subject: "MIRoKIT-Anmeldung", mail_name: "Name", mail_email: "E-Mail", mail_message: "Nachricht" });
@@ -258,6 +350,201 @@ Object.assign(T.en, {
 
 Object.assign(T.de, {
    menu_world: "MIRoKIT weltweit", about_subtitle: "", op0t: "MIRoKIT ohne Grenzen", op1t: "Online-Projekte, die verbinden", op2d: "Wettbewerbe, Treffen und Kreativlabore, in denen Teilnehmende aus verschiedenen Ländern einen gemeinsamen Raum für Spiel, Wissen und Freundschaft schaffen.", op3t: "Teilnahme aus jedem Land möglich", op4t: "Ein Bildschirm — viele Kulturen, Ideen und neue Freunde", op5t: "Das Online-Format hilft Teams, sich regelmäßig zu treffen, gemeinsame Aufgaben zu bearbeiten und Ergebnisse einem internationalen Publikum zu zeigen. Hier finden sich aktuelle Initiativen und ein Archiv abgeschlossener Projekte.", op0d: "teilnehmende Länder", op1d: "Teilnahmeformate", op_access: "Zugang zu Materialien",
+});
+
+Object.assign(T.ru, {
+   world_eyebrow: "Международная Лига",
+   world_title: "«МИРоКИТ» в Мире.",
+   world_subtitle: "Культура, творчество и дружба без границ.",
+   world_manifesto_label: "Открытое международное пространство",
+   world_text_1: "Совместный проект — это шаг к взаимопониманию между странами, культурами и людьми. Именно поэтому была создана Международная Лига «МИРоКИТ» — международное сообщество, объединяющее детей, молодёжь, педагогов, родителей разных стран.",
+   world_text_2: "Лига открывает новые возможности для общения. Участники знакомятся с культурой и традициями разных народов, приобретают новых друзей, обмениваются опытом и учатся работать в команде.",
+   world_text_3: "География Международной Лиги «МИРоКИТ» продолжает расширяться. Всё больше детей, молодёжи, педагогов и организаций из разных стран присоединяются к нашим инициативам, внося в них свои традиции, опыт и культурное многообразие. Нас объединяет стремление создавать условия для развития талантов и укрепления международного сотрудничества.",
+   world_text_4: "МИРоКИТ — это пространство, где знания объединяют, творчество вдохновляет, а международное сотрудничество становится основой дружбы, взаимопонимания и общего будущего.",
+   world_visual_label: "Мир МИРоКИТ",
+   world_visual_kicker: "WORLD / TOGETHER",
+   world_visual_title: "Разные страны. Общее будущее.",
+   world_visual_desc: "Каждая культура приносит в Лигу свою историю, свой голос и новые идеи.",
+   world_values_label: "Ключевые идеи МИРоКИТ",
+   world_value_1: "Знания",
+   world_value_2: "Творчество",
+   world_value_3: "Диалог",
+   world_value_4: "Дружба",
+   world_pillars_label: "Что объединяет Международную Лигу «МИРоКИТ»",
+   world_pillar_1_title: "Общение",
+   world_pillar_1_desc: "Новые встречи становятся началом взаимопонимания.",
+   world_pillar_2_title: "Многообразие",
+   world_pillar_2_desc: "Традиции и опыт разных стран усиливают общий проект.",
+   world_pillar_3_title: "Сотрудничество",
+   world_pillar_3_desc: "Вместе мы создаём условия для талантов и дружбы.",
+});
+
+Object.assign(T.en, {
+   world_eyebrow: "International League",
+   world_title: "MIRoKIT in the World.",
+   world_subtitle: "Culture, creativity and friendship without borders.",
+   world_manifesto_label: "An open international space",
+   world_text_1: "A joint project is a step towards mutual understanding between countries, cultures and people. That is why the International MIRoKIT League was created — an international community bringing together children, young people, educators and parents from different countries.",
+   world_text_2: "The League opens up new opportunities for connection. Participants discover the culture and traditions of different peoples, make new friends, exchange experience and learn to work as a team.",
+   world_text_3: "The geography of the International MIRoKIT League continues to expand. More and more children, young people, educators and organisations from different countries are joining our initiatives, bringing their traditions, experience and cultural diversity with them. We are united by the desire to create conditions for developing talents and strengthening international cooperation.",
+   world_text_4: "MIRoKIT is a space where knowledge brings people together, creativity inspires, and international cooperation becomes the foundation for friendship, mutual understanding and a shared future.",
+   world_visual_label: "The world of MIRoKIT",
+   world_visual_kicker: "WORLD / TOGETHER",
+   world_visual_title: "Different countries. One shared future.",
+   world_visual_desc: "Every culture brings its own story, voice and new ideas to the League.",
+   world_values_label: "MIRoKIT key ideas",
+   world_value_1: "Knowledge",
+   world_value_2: "Creativity",
+   world_value_3: "Dialogue",
+   world_value_4: "Friendship",
+   world_pillars_label: "What unites the International MIRoKIT League",
+   world_pillar_1_title: "Connection",
+   world_pillar_1_desc: "New encounters become the beginning of mutual understanding.",
+   world_pillar_2_title: "Diversity",
+   world_pillar_2_desc: "The traditions and experience of different countries strengthen the shared project.",
+   world_pillar_3_title: "Cooperation",
+   world_pillar_3_desc: "Together, we create conditions for talent and friendship to grow.",
+});
+
+Object.assign(T.de, {
+   world_eyebrow: "Internationale Liga",
+   world_title: "MIRoKIT in der Welt.",
+   world_subtitle: "Kultur, Kreativität und Freundschaft ohne Grenzen.",
+   world_manifesto_label: "Ein offener internationaler Raum",
+   world_text_1: "Ein gemeinsames Projekt ist ein Schritt zu mehr Verständnis zwischen Ländern, Kulturen und Menschen. Deshalb wurde die Internationale MIRoKIT-Liga gegründet — eine internationale Gemeinschaft, die Kinder, Jugendliche, Pädagoginnen und Pädagogen sowie Eltern aus verschiedenen Ländern verbindet.",
+   world_text_2: "Die Liga eröffnet neue Möglichkeiten für Begegnung und Austausch. Die Teilnehmenden lernen die Kultur und Traditionen verschiedener Völker kennen, gewinnen neue Freunde, tauschen Erfahrungen aus und lernen, im Team zu arbeiten.",
+   world_text_3: "Die Geografie der Internationalen MIRoKIT-Liga wächst weiter. Immer mehr Kinder, Jugendliche, Pädagoginnen und Pädagogen sowie Organisationen aus verschiedenen Ländern schließen sich unseren Initiativen an und bringen ihre Traditionen, Erfahrungen und kulturelle Vielfalt ein. Uns verbindet der Wunsch, Bedingungen für die Entwicklung von Talenten und die Stärkung internationaler Zusammenarbeit zu schaffen.",
+   world_text_4: "MIRoKIT ist ein Raum, in dem Wissen verbindet, Kreativität inspiriert und internationale Zusammenarbeit zur Grundlage für Freundschaft, gegenseitiges Verständnis und eine gemeinsame Zukunft wird.",
+   world_visual_label: "Die Welt von MIRoKIT",
+   world_visual_kicker: "WORLD / TOGETHER",
+   world_visual_title: "Verschiedene Länder. Eine gemeinsame Zukunft.",
+   world_visual_desc: "Jede Kultur bringt ihre eigene Geschichte, Stimme und neue Ideen in die Liga ein.",
+   world_values_label: "Zentrale Ideen von MIRoKIT",
+   world_value_1: "Wissen",
+   world_value_2: "Kreativität",
+   world_value_3: "Dialog",
+   world_value_4: "Freundschaft",
+   world_pillars_label: "Was die Internationale MIRoKIT-Liga verbindet",
+   world_pillar_1_title: "Begegnung",
+   world_pillar_1_desc: "Neue Begegnungen werden zum Anfang gegenseitigen Verständnisses.",
+   world_pillar_2_title: "Vielfalt",
+   world_pillar_2_desc: "Traditionen und Erfahrungen verschiedener Länder stärken das gemeinsame Projekt.",
+   world_pillar_3_title: "Zusammenarbeit",
+   world_pillar_3_desc: "Gemeinsam schaffen wir Bedingungen für Talente und Freundschaft.",
+});
+
+Object.assign(T.ru, {
+   world_logo_alt: "Логотип мира МИРоКИТ",
+   world_image_alt: "Синяя объёмная карта мира",
+   world_image_kicker: "WORLD / ONE PLANET",
+   world_image_caption: "Одна планета — множество голосов.",
+   world_map_kicker: "LIVE NETWORK / 2026",
+   world_map_title: "Карта международных площадок МИРоКИТ",
+   world_map_desc: "Синие точки показывают места уже проведённых событий, красные — направления для новых встреч и партнёрских площадок.",
+   world_map_live: "LIVE",
+   world_map_fallback: "Карта временно недоступна.",
+   world_country_feed_kicker: "COUNTRY SIGNALS",
+   world_country_feed_title: "Страны и города Лиги",
+   world_country_feed_desc: "Этот список собирается автоматически из массива точек карты: страны, флаги, города и текущий статус всегда синхронизированы.",
+   world_country_feed_label: "Страны и города проекта",
+   world_cities_label: "города",
+   world_done_short: "проведено",
+   world_planned_short: "планируется",
+   world_status_hq: "главный штаб",
+   world_status_done: "событие прошло",
+   world_status_planned: "планируется",
+   world_country_germany: "Германия",
+   world_country_russia: "Россия",
+   world_country_tunisia: "Тунис",
+   world_country_poland: "Польша",
+   world_country_czechia: "Чехия",
+   world_country_kazakhstan: "Казахстан",
+   world_country_turkiye: "Турция",
+   world_city_dusseldorf: "Дюссельдорф",
+   world_city_moscow: "Москва",
+   world_city_saint_petersburg: "Санкт-Петербург",
+   world_city_tunis: "Тунис",
+   world_city_berlin: "Берлин",
+   world_city_warsaw: "Варшава",
+   world_city_prague: "Прага",
+   world_city_almaty: "Алматы",
+   world_city_istanbul: "Стамбул",
+});
+
+Object.assign(T.en, {
+   world_logo_alt: "MIRoKIT world logo",
+   world_image_alt: "Blue 3D world map",
+   world_image_kicker: "WORLD / ONE PLANET",
+   world_image_caption: "One planet — many voices.",
+   world_map_kicker: "LIVE NETWORK / 2026",
+   world_map_title: "Map of international MIRoKIT venues",
+   world_map_desc: "Blue points show places where events have already taken place; red points mark directions for new meetings and partner venues.",
+   world_map_live: "LIVE",
+   world_map_fallback: "The map is temporarily unavailable.",
+   world_country_feed_kicker: "COUNTRY SIGNALS",
+   world_country_feed_title: "League countries and cities",
+   world_country_feed_desc: "This list is built automatically from the map point array: countries, flags, cities and live status always stay in sync.",
+   world_country_feed_label: "Project countries and cities",
+   world_cities_label: "cities",
+   world_done_short: "held",
+   world_planned_short: "planned",
+   world_status_hq: "headquarters",
+   world_status_done: "event held",
+   world_status_planned: "planned",
+   world_country_germany: "Germany",
+   world_country_russia: "Russia",
+   world_country_tunisia: "Tunisia",
+   world_country_poland: "Poland",
+   world_country_czechia: "Czechia",
+   world_country_kazakhstan: "Kazakhstan",
+   world_country_turkiye: "Türkiye",
+   world_city_dusseldorf: "Düsseldorf",
+   world_city_moscow: "Moscow",
+   world_city_saint_petersburg: "Saint Petersburg",
+   world_city_tunis: "Tunis",
+   world_city_berlin: "Berlin",
+   world_city_warsaw: "Warsaw",
+   world_city_prague: "Prague",
+   world_city_almaty: "Almaty",
+   world_city_istanbul: "Istanbul",
+});
+
+Object.assign(T.de, {
+   world_logo_alt: "Welt-Logo von MIRoKIT",
+   world_image_alt: "Blaue 3D-Weltkarte",
+   world_image_kicker: "WORLD / ONE PLANET",
+   world_image_caption: "Ein Planet — viele Stimmen.",
+   world_map_kicker: "LIVE NETWORK / 2026",
+   world_map_title: "Karte internationaler MIRoKIT-Standorte",
+   world_map_desc: "Blaue Punkte zeigen Orte bereits durchgeführter Veranstaltungen; rote Punkte markieren Richtungen für neue Treffen und Partnerstandorte.",
+   world_map_live: "LIVE",
+   world_map_fallback: "Die Karte ist vorübergehend nicht verfügbar.",
+   world_country_feed_kicker: "COUNTRY SIGNALS",
+   world_country_feed_title: "Länder und Städte der Liga",
+   world_country_feed_desc: "Diese Liste wird automatisch aus dem Karten-Punkte-Array erzeugt: Länder, Flaggen, Städte und Status bleiben immer synchron.",
+   world_country_feed_label: "Projektländer und -städte",
+   world_cities_label: "Städte",
+   world_done_short: "durchgeführt",
+   world_planned_short: "geplant",
+   world_status_hq: "Hauptsitz",
+   world_status_done: "Veranstaltung durchgeführt",
+   world_status_planned: "geplant",
+   world_country_germany: "Deutschland",
+   world_country_russia: "Russland",
+   world_country_tunisia: "Tunesien",
+   world_country_poland: "Polen",
+   world_country_czechia: "Tschechien",
+   world_country_kazakhstan: "Kasachstan",
+   world_country_turkiye: "Türkei",
+   world_city_dusseldorf: "Düsseldorf",
+   world_city_moscow: "Moskau",
+   world_city_saint_petersburg: "Sankt Petersburg",
+   world_city_tunis: "Tunis",
+   world_city_berlin: "Berlin",
+   world_city_warsaw: "Warschau",
+   world_city_prague: "Prag",
+   world_city_almaty: "Almaty",
+   world_city_istanbul: "Istanbul",
 });
 
 /**
@@ -329,6 +616,7 @@ function setLang(lang) {
       select.value = currentLang;
    });
    syncLanguageThemeLabels(dictionary);
+   document.dispatchEvent(new CustomEvent("mirokit:languagechange", { detail: { lang: currentLang } }));
 }
 
 document.querySelectorAll(".lang-btn").forEach((button) => button.addEventListener("click", () => setLang(button.dataset.lang)));

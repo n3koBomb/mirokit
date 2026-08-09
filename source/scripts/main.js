@@ -183,7 +183,7 @@
             } catch (error) {
                console.warn("MIRoKIT intro SVG could not be inlined.", error);
                const fallback = document.createElement("img");
-               fallback.src = introLogo.dataset.svg-src;
+               fallback.src = introLogo.dataset.svgSrc;
                fallback.alt = "SVG-LOGOofMIRoKIT";
                fallback.setAttribute("aria-hidden", "true");
                fallback.className = "intro-logo-fallback";
@@ -197,7 +197,7 @@
             introLoader.dataset.finished = "true";
             document.body.classList.remove("intro-loading");
             introLoader.classList.add("is-finished");
-            window.setTimeout(() => introLoader.remove(), 750);
+            // window.setTimeout(() => introLoader.remove(), 750);
          };
 
          const moveLogoToHeader = () => {

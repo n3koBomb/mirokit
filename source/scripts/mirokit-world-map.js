@@ -6,28 +6,132 @@
 async function initWorldCanvas() {
   const canvas = document.getElementById("worldCanvas");
   const shell = canvas?.closest(".world-map-shell");
+  const fallback = shell?.querySelector(".world-map-fallback");
 
   if (!canvas || !shell || canvas.dataset.worldMapInitialized === "true") return;
   canvas.dataset.worldMapInitialized = "true";
 
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
+  if (fallback) fallback.hidden = true;
 
   const WORLD_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json";
 
+  // One data source drives the map, country cards, city statuses and labels.
+  // Add a point here and the country feed updates automatically.
   const points = [
-    { label: "Дюссельдорф", country: "Германия", lon: 6.77, lat: 51.23, hq: true, hqLabel: "Главный офис" ,
-      // flag: ["#0f0f0f", "#bf0000", "#dfdf00"] 
-    },
-    { label: "Москва", country: "Россия", lon: 37.62, lat: 55.75, status: "done" },
-    { label: "Санкт-Петербург", country: "Россия", lon: 30.31, lat: 59.94, status: "done" },
-    { label: "Тунис", country: "Тунис", lon: 10.18, lat: 36.8, status: "done" },
-    { label: "Берлин", country: "Германия", lon: 13.4, lat: 52.52, status: "planned"},
-    { label: "Варшава", country: "Польша", lon: 21.01, lat: 52.23, status: "planned" },
-    { label: "Прага", country: "Чехия", lon: 14.44, lat: 50.08, status: "planned" },
-    { label: "Алматы", country: "Казахстан", lon: 76.95, lat: 43.24, status: "planned" },
-    { label: "Стамбул", country: "Турция", lon: 28.98, lat: 41.01, status: "planned" },
+    { label: "Düsseldorf", cityKey: "world_city_dusseldorf", country: "Germany", countryKey: "world_country_germany", flag: "🇩🇪", 
+      // flagColors: ["#111111", "#d21f2b", "#f4c430"], 
+      lon: 6.77, lat: 51.23, hq: true, status: "hq", hqLabelKey: "world_status_hq" },
+    { label: "Moscow", cityKey: "world_city_moscow", country: "Russia", countryKey: "world_country_russia", flag: "🇷🇺", lon: 37.62, lat: 55.75, status: "done" },
+    { label: "Saint Petersburg", cityKey: "world_city_saint_petersburg", country: "Russia", countryKey: "world_country_russia", flag: "🇷🇺", lon: 30.31, lat: 59.94, status: "done" },
+    { label: "Tunis", cityKey: "world_city_tunis", country: "Tunisia", countryKey: "world_country_tunisia", flag: "🇹🇳", lon: 10.18, lat: 36.8, status: "done" },
+    { label: "Berlin", cityKey: "world_city_berlin", country: "Germany", countryKey: "world_country_germany", flag: "🇩🇪", lon: 13.4, lat: 52.52, status: "planned" },
+    { label: "Warsaw", cityKey: "world_city_warsaw", country: "Poland", countryKey: "world_country_poland", flag: "🇵🇱", lon: 21.01, lat: 52.23, status: "planned" },
+    { label: "Prague", cityKey: "world_city_prague", country: "Czechia", countryKey: "world_country_czechia", flag: "🇨🇿", lon: 14.44, lat: 50.08, status: "planned" },
+    { label: "Almaty", cityKey: "world_city_almaty", country: "Kazakhstan", countryKey: "world_country_kazakhstan", flag: "🇰🇿", lon: 76.95, lat: 43.24, status: "planned" },
+    { label: "Istanbul", cityKey: "world_city_istanbul", country: "Türkiye", countryKey: "world_country_turkiye", flag: "🇹🇷", lon: 28.98, lat: 41.01, status: "planned" },
   ];
+
+  const countryFeed = document.getElementById("worldCountryFeed");
+  const countryCount = document.getElementById("worldCountryCount");
+
+  function getDictionary() {
+    return T[currentLang] || T.ru;
+  }
+
+  function translate(key, fallback) {
+    return getDictionary()[key] || fallback;
+  }
+
+  function createTextElement(tagName, className, value) {
+    const element = document.createElement(tagName);
+    element.className = className;
+    element.textContent = value;
+    return element;
+  }
+
+  function getPointCity(point) {
+    return translate(point.cityKey, point.label);
+  }
+
+  function getPointCountry(point) {
+    return translate(point.countryKey, point.country);
+  }
+
+  function getStatusLabel(status) {
+    if (status === "hq") return translate("world_status_hq", "Headquarters");
+    if (status === "planned") return translate("world_status_planned", "Planned");
+    return translate("world_status_done", "Event held");
+  }
+
+  function renderCountryFeed() {
+    if (!countryFeed) return;
+
+    const countries = [...points.reduce((groups, point) => {
+      const key = point.countryKey || point.country;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(point);
+      return groups;
+    }, new Map()).entries()];
+
+    countries.sort(([, firstPoints], [, secondPoints]) => {
+      const firstPriority = firstPoints.some((point) => point.hq) ? 0 : firstPoints.some((point) => point.status === "done") ? 1 : 2;
+      const secondPriority = secondPoints.some((point) => point.hq) ? 0 : secondPoints.some((point) => point.status === "done") ? 1 : 2;
+      return firstPriority - secondPriority || getPointCountry(firstPoints[0]).localeCompare(getPointCountry(secondPoints[0]));
+    });
+
+    countryFeed.replaceChildren(...countries.map(([, countryPoints]) => {
+      const card = document.createElement("article");
+      card.className = "world-country-card";
+
+      card.append(createTextElement("span", "world-country-flag", countryPoints[0].flag));
+
+      const main = document.createElement("div");
+      main.className = "world-country-main";
+
+      const topLine = document.createElement("div");
+      topLine.className = "world-country-topline";
+      topLine.append(createTextElement("strong", "world-country-name", getPointCountry(countryPoints[0])));
+
+      const countryStatus = countryPoints.some((point) => point.hq)
+        ? "hq"
+        : countryPoints.some((point) => point.status === "planned") && !countryPoints.some((point) => point.status === "done")
+          ? "planned"
+          : "done";
+      const statusElement = createTextElement("span", `world-country-status is-${countryStatus}`, getStatusLabel(countryStatus));
+      topLine.append(statusElement);
+      main.append(topLine);
+
+      const cityList = document.createElement("ul");
+      cityList.className = "world-city-list";
+      countryPoints.forEach((point) => {
+        const row = document.createElement("li");
+        row.className = "world-city-row";
+        row.append(createTextElement("span", "world-city-name", getPointCity(point)));
+        row.append(createTextElement("span", `world-city-status${point.status === "planned" ? " is-planned" : ""}`, getStatusLabel(point.status)));
+        cityList.append(row);
+      });
+      main.append(cityList);
+
+      const doneCount = countryPoints.filter((point) => point.status === "done").length;
+      const plannedCount = countryPoints.filter((point) => point.status === "planned").length;
+      const summary = [
+        `${countryPoints.length} ${translate("world_cities_label", "cities")}`,
+        doneCount ? `${doneCount} ${translate("world_done_short", "held")}` : "",
+        plannedCount ? `${plannedCount} ${translate("world_planned_short", "planned")}` : "",
+      ].filter(Boolean).join(" · ");
+      main.append(createTextElement("small", "world-country-meta", summary));
+
+      card.append(main);
+      return card;
+    }));
+
+    if (countryCount) countryCount.textContent = String(countries.length).padStart(2, "0");
+  }
+
+  renderCountryFeed();
+  document.addEventListener("mirokit:languagechange", renderCountryFeed);
 
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let resizeFrame = 0;
@@ -136,7 +240,9 @@ async function initWorldCanvas() {
     }
 
     function getHoverLabel(point) {
-      return point.hq ? `${point.label} · ${point.hqLabel}` : point.label + (point.country ? ` · ${point.country}` : "");
+      const city = getPointCity(point);
+      const country = getPointCountry(point);
+      return point.hq ? `${city} · ${translate(point.hqLabelKey, getStatusLabel("hq"))}` : `${city} · ${country}`;
     }
 
     function smoothStep(value) {
@@ -213,7 +319,7 @@ async function initWorldCanvas() {
       ctx.shadowColor = "rgba(1, 51, 123, 0.20)";
       ctx.shadowBlur = 10;
       ctx.shadowOffsetY = 3;
-      point.flag.forEach((color, index) => {
+      point.flagColors.forEach((color, index) => {
         ctx.fillStyle = color;
         ctx.fillRect(poleX + 2, poleTop + index * (flagHeight / 3), flagWidth, flagHeight / 3 + 0.5);
       });
@@ -245,8 +351,6 @@ async function initWorldCanvas() {
         currentRatio = ratio;
         canvas.width = Math.round(width * ratio);
         canvas.height = Math.round(height * ratio);
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
       }
 
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -375,7 +479,7 @@ async function initWorldCanvas() {
         ctx.strokeStyle = "#ffffff";
         ctx.stroke();
 
-        if (point?.hq && point.flag) { drawHeadquartersFlag(position, point, compact); } else return;
+        if (point?.hq && point.flagColors) { drawHeadquartersFlag(position, point, compact); } else return;
       });
 
       ctx.restore();
@@ -510,6 +614,8 @@ async function initWorldCanvas() {
   } catch (error) {
     console.error("MIRoKIT world map could not be initialized:", error);
 
+    if (fallback) fallback.hidden = false;
+
     const rect = shell.getBoundingClientRect();
     const width = Math.max(320, Math.round(rect.width));
     const height = Math.max(260, Math.round(rect.height));
@@ -517,9 +623,6 @@ async function initWorldCanvas() {
 
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
     ctx.fillRect(0, 0, width, height);
