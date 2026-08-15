@@ -1,0 +1,72 @@
+{
+   "$schema": "node_modules/wrangler/config-schema.json",
+
+   "name": "mirokit-site",
+
+   "main": "src/index.js",
+
+   "compatibility_date": "2026-08-15",
+
+   "workers_dev": false,
+
+   "assets": {
+      "directory": "../site",
+      "binding": "ASSETS",
+
+      "run_worker_first": [
+         "/api/*"
+      ]
+   },
+
+   "routes": [
+      {
+         "pattern": "mirokit.com",
+         "custom_domain": true
+      },
+      {
+         "pattern": "mirokit.ru",
+         "custom_domain": true
+      },
+      {
+         "pattern": "ligamirokit.com",
+         "custom_domain": true
+      },
+      {
+         "pattern": "ligamirokit.ru",
+         "custom_domain": true
+      }
+   ],
+
+   "send_email": [
+      {
+         "name": "CONTACT_EMAIL",
+
+         "destination_address":
+            "mirokit2025@gmail.com",
+
+         "allowed_sender_addresses": [
+            "info@forms.mirokit.com"
+         ]
+      }
+   ],
+
+   "vars": {
+      "ALLOWED_ORIGINS":
+         "https://mirokit.com,https://mirokit.ru,https://ligamirokit.com,https://ligamirokit.ru",
+
+      "TURNSTILE_HOSTNAMES":
+         "mirokit.com,mirokit.ru,ligamirokit.com,ligamirokit.ru",
+
+      "MAIL_TO":
+         "mirokit2025@gmail.com",
+
+      "MAIL_FROM":
+         "info@forms.mirokit.com"
+   },
+
+   "secrets": {
+      "required": [
+         "TURNSTILE_SECRET"
+      ]
+   }
+}

@@ -4,17 +4,18 @@
       <!-- Basic Meta -->
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title data-key="page_title">Мирокит — Игра, Творчество, Диалог, Общение</title>
+      <title data-key="page_title">Мирокит — Диалог, Игра, Творчество</title>
       <meta name="description" content="Мирокит — культурно-игровой триатлон для детей и молодёжи. Пространство творчества, диалога, уважения и международного общения." />
       <meta name="keywords" content="Мирокит, МироКит, культурный проект, дети, молодёжь, творчество, диалог, международный клуб, викторины, интеллектуальные игры, командные задания, культура, фестиваль" />
       <meta name="author" content="Мирокит" />
       <meta name="robots" content="index, follow" />
       <meta name="theme-color" content="#1e73ff" />
+      <meta name="mirokit-turnstile-sitekey" content="0x4AAAAAAEQPdxBRtxKjVF_c" />
 
       <!-- Open Graph -->
       <meta property="og:type" content="website" />
       <meta property="og:locale" content="ru_RU" />
-      <meta property="og:title" content="Мирокит — Игра, Творчество, Диалог, Общение" />
+      <meta property="og:title" content="Мирокит — Диалог, Игра, Творчество" />
       <meta property="og:description" content="Мирокит — это культурно-игровой триатлон для детей и молодёжи. Пространство детской дипломатии, творчества и взаимопонимания." />
       <meta property="og:image" content="https://mirokit.com/assets/brand/miroKit_logo_full-1.jpg" />
       <meta property="og:image:alt" content="Плакат проекта Мирокит" />
@@ -23,7 +24,7 @@
 
       <!-- Twitter / X -->
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Мирокит — Игра, Творчество, Диалог, Общение" />
+      <meta name="twitter:title" content="Мирокит — Диалог, Игра, Творчество" />
       <meta name="twitter:description" content="Культурно-игровой триатлон для детей и молодёжи: творчество, общение, международный диалог и командные задания." />
       <meta name="twitter:image" content="https://mirokit.com/assets/brand/miroKit_logo_full-1.jpg" />
 
@@ -125,6 +126,7 @@
             }
          }
       </style>
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
    </head>
 
    <body class="intro-loading">
@@ -143,7 +145,7 @@
       <header class="topbar">
          <a class="brand" href="#hero" data-nav-link>
             <!-- <span class="brand-mark">🌍</span><span data-key="brand">МИРоКИТ</span> -->
-            <img class="logo-placeholder" src="./public/assets/brand/miroKit_logo_full-1.png" alt="МИРоКИТ logo placeholder" />
+            <img class="logo-placeholder" src="./public/assets/brand/miroKit_logo_full-1.png" alt="МИРоКИТ logo placeholder" fetchpriority="high" decoding="async" loading="eager"/>
          </a>
          <nav aria-label="Hauptnavigation" data-i18n-attrs="aria-label:nav_label">
             <ul class="desktop-nav">
@@ -339,7 +341,7 @@
       </aside>
       <main class="site-main scroller" id="site-main" aria-label="Vertically scrolling sections">
          <section id="hero" class="panel home-panel">
-            <aside class="hero" aria-label="МИРоКИТ — культурно-игровой триатлон">
+            <aside class="hero" aria-label="МИРоКИТ — Культурно-Игровой Триатлон">
                <div class="hero-grid-lines" aria-hidden="true"></div>
                <div class="hero-orbit hero-orbit--one" aria-hidden="true"></div>
                <div class="hero-orbit hero-orbit--two" aria-hidden="true"></div>
@@ -351,12 +353,12 @@
                   <div class="hero-copy">
                      <div class="hero-kicker">
                         <span class="hero-signal" aria-hidden="true"><i></i><i></i><i></i></span>
-                        <span data-key="hero_badge">Международный клуб для детей и молодёжи</span>
+                        <span data-key="hero_badge">Международная Лига для детей и молодёжи</span>
                         <span class="hero-kicker-index">01 / 04</span>
                      </div>
 
                      <div class="hero-title-wrap">
-                        <span class="hero-overline" data-key="hero_overline">MIROKIT / 2026</span>
+                        <span class="hero-overline" data-key="hero_overline">MIRoKIT / 2026</span>
                         <h1 class="hero-title" data-key="hero_h1"><span class="c-bl">Игра.</span> <span class="c-rd">Творчество.</span><br />Диалог. Общение!</h1>
                      </div>
 
@@ -368,10 +370,10 @@
                      </div>
 
                      <div class="hero-tags" aria-label="Ключевые направления">
-                        <span class="hero-tag"><strong>01</strong><span data-key="tag1">Международный</span></span>
-                        <span class="hero-tag"><strong>7–25</strong><span data-key="tag2">лет</span></span>
-                        <span class="hero-tag"><strong>02</strong><span data-key="tag3">Творчество</span></span>
-                        <span class="hero-tag"><strong>03</strong><span data-key="tag4">Диалог</span></span>
+                        <span class="hero-tag"><span data-key="tag1">Международный</span></span>
+                        <span class="hero-tag"><span data-key="tag3">Командный</span></span>
+                        <span class="hero-tag"><span data-key="tag4">Триатлон</span></span>
+                        <span class="hero-tag"><span data-key="tag5"></span><strong>7–25</strong><span data-key="tag2">лет</span></span>
                      </div>
                   </div>
 
@@ -1697,12 +1699,12 @@
                                  </div>
                               </div>
                               <div class="field">
-                                 <label for="cf-org"><span data-key="city">Город</span> <span class="req">*</span></label>
-                                 <input type="text" id="cf-city" name="city" placeholder="Введите название города" data-i18n-attrs="placeholder:input_city" />
+                                 <label for="cf-city"><span data-key="city">Город</span> <span class="req">*</span></label>
+                                 <input type="text" id="cf-city" name="city" placeholder="Введите название города" data-i18n-attrs="placeholder:input_city" required />
                               </div>
                               <div class="field">
                                  <label for="cf-org"><span data-key="organization">Название организации</span> <span class="req">*</span></label>
-                                 <input type="text" id="cf-org" name="organization" placeholder="Введите название организации" data-i18n-attrs="placeholder:input_organization" />
+                                 <input type="text" id="cf-org" name="organization" placeholder="Введите название организации" data-i18n-attrs="placeholder:input_organization" required />
                               </div>
                               <div class="field">
                                  <label for="cf-phone" data-key="phone">Телефон / WhatsApp / Telegram</label>
@@ -1737,6 +1739,13 @@
                               <label class="consent-check">
                                  <input type="checkbox" name="consent_optional" />
                                  <span data-key="consent_news">Согласие на получение новостей о проектах.</span>
+                              </label>
+                           </div>
+
+                           <div class="mirokit-turnstile" id="contactTurnstile" aria-label="Cloudflare Sicherheitsprüfung"></div>
+                           <div class="contact-honeypot" aria-hidden="true">
+                              <label>Info
+                                 <input type="text" name="website_check" tabindex="-1" autocomplete="off"/>
                               </label>
                            </div>
 
@@ -1907,6 +1916,13 @@
                         </div>
                      </fieldset>
 
+                     <div class="mirokit-turnstile" id="leagueTurnstile" aria-label="Cloudflare Sicherheitsprüfung"></div>
+                     <div class="contact-honeypot" aria-hidden="true">
+                        <label>Info
+                           <input type="text" name="website_check" tabindex="-1" autocomplete="off"/>
+                        </label>
+                     </div>
+
                      <div class="form-footer league-form-footer">
                         <p class="form-note"><span class="req">*</span> <span data-key="required_note">Поля, обязательные для заполнения.</span></p>
                         <div class="form-actions">
@@ -2028,6 +2044,7 @@
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
       <script src="source/scripts/language.js"></script>
       <script src="source/scripts/main.js"></script>
+      <script src="source/scripts/contact-mail.js" defer></script>
       <script src="source/scripts/mirokit-world-map.js" defer></script>
    </body>
 </html>

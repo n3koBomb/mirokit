@@ -1,11 +1,10 @@
 .agents
+AGENTS*
 .claude
 .codex
 .github/
 .vscode
 claude-philosophy
-index_*.html
-source/style/style_*.css
 build/
 *.mp4
 
