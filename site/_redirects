@@ -1,0 +1,3 @@
+# Stable, crawlable document URLs.
+/index.html / 301
+/page/privacyPolicy /page/privacyPolicy/ 301

@@ -1,0 +1,4 @@
+Contact: mailto:mirokit2025@gmail.com
+Expires: 2027-08-29T00:00:00.000Z
+Preferred-Languages: ru, en, de
+Canonical: https://mirokit.com/.well-known/security.txt

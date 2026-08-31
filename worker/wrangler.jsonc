@@ -1,23 +1,36 @@
 {
    "$schema": "node_modules/wrangler/config-schema.json",
-
    "name": "mirokit-site",
-
    "main": "src/index.js",
-
-   "compatibility_date": "2026-08-15",
-
+   "compatibility_date": "2026-08-29",
    "workers_dev": false,
-
    "assets": {
       "directory": "../site",
+      "not_found_handling": "404-page",
       "binding": "ASSETS",
-
       "run_worker_first": [
-         "/api/*"
+         "/api/*",
+         "/",
+         "/index.html",
+         "/page/*",
+         "/robots.txt",
+         "/sitemap.xml",
+         "/public/assets/archive/*",
+         "/public/assets/uploads/*",
+         "/public/assets/media/interviews/transcripts/*",
+         "/public/assets/media/press/*"
       ]
    },
-
+   "ratelimits": [
+      {
+         "name": "CONTACT_FORM_RATE_LIMITER",
+         "namespace_id": "1001",
+         "simple": {
+            "limit": 5,
+            "period": 60
+         }
+      }
+   ],
    "routes": [
       {
          "pattern": "mirokit.com",
@@ -36,34 +49,21 @@
          "custom_domain": true
       }
    ],
-
    "send_email": [
       {
          "name": "CONTACT_EMAIL",
-
-         "destination_address":
-            "mirokit2025@gmail.com",
-
+         "destination_address": "mirokit2025@gmail.com",
          "allowed_sender_addresses": [
-            "info@forms.mirokit.com"
+            "info@mirokit.com",
+            "info@mirokit.ru"
          ]
       }
    ],
-
    "vars": {
-      "ALLOWED_ORIGINS":
-         "https://mirokit.com,https://mirokit.ru,https://ligamirokit.com,https://ligamirokit.ru",
-
-      "TURNSTILE_HOSTNAMES":
-         "mirokit.com,mirokit.ru,ligamirokit.com,ligamirokit.ru",
-
-      "MAIL_TO":
-         "mirokit2025@gmail.com",
-
-      "MAIL_FROM":
-         "info@forms.mirokit.com"
+      "MAIL_TO": "mirokit2025@gmail.com",
+      "ALLOWED_ORIGINS": "https://mirokit.com,https://mirokit.ru,https://ligamirokit.com,https://ligamirokit.ru",
+      "TURNSTILE_HOSTNAMES": "mirokit.com,mirokit.ru,ligamirokit.com,ligamirokit.ru"
    },
-
    "secrets": {
       "required": [
          "TURNSTILE_SECRET"

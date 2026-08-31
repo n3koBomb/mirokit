@@ -1,0 +1,5 @@
+# Internal storage and archive files are not public website assets.
+public/assets/archive/*
+public/assets/uploads/*
+public/assets/media/interviews/transcripts/*
+public/assets/media/press/*

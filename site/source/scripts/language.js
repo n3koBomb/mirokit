@@ -236,9 +236,6 @@ Object.assign(T.de, {
    contact_eyebrow: "Wir sind immer erreichbar!", contact_title: "Kontakt", our_contacts: "Unsere Kontakte", social_label: "Wir in den sozialen Netzwerken", write_us: "Schreiben Sie uns", input_name: "Namen eingeben", input_email: "E-Mail eingeben", choose_country: "Land auswählen", country: "Land", country_tunisia: "Tunesien", city: "Stadt", input_city: "Stadt eingeben", organization: "Name der Organisation", input_organization: "Name der Organisation eingeben", phone: "Telefon / WhatsApp / Telegram", input_phone: "Telefonnummer oder Nutzernamen eingeben", topic: "Betreff", choose_topic: "Betreff auswählen", join_league: "Der Liga beitreten", hold_event: "Veranstaltung durchführen", message: "Nachricht", input_message: "Nachricht eingeben", consent_required: "Ich stimme der Datenverarbeitung gemäß der <a href=\"./page/privacyPolicy/\">Datenschutzerklärung</a> zu", consent_news: "Ich möchte Projekt-News erhalten.", security_note: "Ihre Daten sind geschützt und werden nicht an Dritte weitergegeben. Wir nutzen sie nur zur Kontaktaufnahme und im Rahmen des Projekts.", clear_form: "Formular leeren", send_message: "Nachricht senden", quick_join: "Der Liga beitreten", quick_join_desc: "Teilnahmeantrag stellen", quick_method: "Methodischer Leitfaden", quick_method_desc: "Materialien und Empfehlungen erhalten", quick_tournaments: "Turniere", quick_tournaments_desc: "Teilnehmende registrieren", quick_online: "Online-Wettbewerbe", quick_online_desc: "Arbeit für den Wettbewerb einreichen", league_eyebrow: "Internationale Gemeinschaft", league_title: "Antrag auf Beitritt zur internationalen Liga <span class=\"tx-red\">«MIRoKIT»</span>", league_subtitle: "Füllen Sie den Organisationsantrag aus — nach der Prüfung melden wir uns bei Ihnen.", organization_details: "Angaben zur Organisation", full_org_name: "Vollständiger Organisationsname", short_org_name: "Kurzbezeichnung", street: "Straße und Hausnummer", region: "Region / Bundesland", postcode: "Postleitzahl", contact_person: "Kontaktperson", full_name: "Vor- und Nachname", position: "Position", social_media: "Soziale Medien", organization_info: "Informationen zur Organisation", activity_question: "Haupttätigkeitsbereiche", education: "Bildung", culture: "Kultur", youth_policy: "Jugendarbeit", sport: "Sport", board_games: "Brettspiele", further_education: "Weiterbildung", international_cooperation: "internationale Zusammenarbeit", volunteering: "Ehrenamt", members_question: "Anzahl der Organisationsteilnehmenden", up_to_20: "bis 20", more_100: "mehr als 100", league_goals: "Ziele des Liga-Beitritts", goal_triathlon: "den kulturellen Spiel-Triathlon «MIRoKIT» durchführen", goal_tournaments: "an internationalen Turnieren teilnehmen", goal_online: "an Online-Wettbewerben teilnehmen", goal_national: "nationale Etappen organisieren", goal_cooperation: "internationale Zusammenarbeit entwickeln", goal_regional: "regionale Koordination übernehmen", org_summary: "Kurze Informationen zur Organisation", resources: "Internetressourcen", site: "Website", confirmations: "Bestätigungen", confirm_accuracy: "Wir bestätigen die Richtigkeit der Angaben.", confirm_goals: "Wir kennen die Ziele und Grundsätze der Internationalen «MIRoKIT»-Liga.", confirm_privacy: "Wir stimmen der Verarbeitung personenbezogener Daten gemäß der <a href=\"./page/privacyPolicy/\">Datenschutzerklärung</a> zu.", required_note: "Pflichtfelder.", submit_application: "Antrag senden", archive_label: "Archiv 2026", gallery_photo_modal: "Fotoansicht", gallery_video_modal: "Videoansicht", gallery_video_note: "Für diesen Clip wurde noch keine Videodatei hinzugefügt. Sobald unter <code>data-video-src</code> eine Adresse eingetragen ist, stehen Wiedergabe, Lautstärke, Untertitel und Vollbild zur Verfügung.", news_empty: "In dieser Kategorie gibt es noch keine News — schauen Sie später wieder vorbei.", news_full: "Vollständig lesen", news_prev: "Vorherige News", news_next: "Nächste News", gallery_prev: "Vorheriges Foto", gallery_next: "Nächstes Foto", logo_about_alt: "MIRoKIT-Logo für Über uns", partner_logo_label: "MIRoKIT-Partnerlogos", online_project_1_label: "Internationalen Online-Zeichenwettbewerb öffnen", online_project_2_label: "Online-Quiz Kultureller Code öffnen", online_project_3_label: "Archiv des Freundschaftslabors öffnen", request_materials: "Methodische Materialien anfragen",
 });
 
-Object.assign(T.ru, { news_full_1_title: "Онлайн-конкурс рисунков <br>Международной Лиги «МИРоКИТ»", news_full_1_excerpt: "С 1 августа 2026 года Международная Лига «МИРоКИТ» объявляет о старте Международного онлайн-конкурса рисунков!", news_full_2_title: "В Дюссельдорфе состоялась игра «МИРоКИТ».", news_full_2_excerpt: "10 июля 2026 года в Дюссельдорфе (Германия) прошла игра и шахматный турнир Международного культурно-игрового триатлона «МИРоКИТ». Мероприятие собрало юных любителей шахмат, их родителей и гостей.", news_full_3_title: "Фоторепортаж с летнего лагеря в Германии", news_full_3_excerpt: "Десять дней у озера: командные игры, вечерние костры и первый совместный спектакль лагерной смены.", news_full_4_title: "Анонс: зимний кубок МИРоКИТ пройдёт в январе", news_full_4_excerpt: "Регистрация команд уже открыта — расскажем, что нового в правилах и почему в этот раз будет сложнее.", news_full_5_title: "Участники поделились впечатлениями после проекта в Тунисе", news_full_5_excerpt: "«Я думал, что еду просто в лагерь, а нашёл друзей на всю жизнь» — говорят подростки из первой тунисской смены.", news_full_6_title: "Дружба народов: как прошёл культурный обмен в России", news_full_6_excerpt: "Неделя встреч, мастер-классов и совместных проектов между российской и немецкой площадками." });
-Object.assign(T.en, { news_full_1_title: "Online drawing competition <br>of the International MIRoKIT League", news_full_1_excerpt: "On 1 August 2026, the International MIRoKIT League launches its international online drawing competition!", news_full_2_title: "A MIRoKIT game took place in Düsseldorf.", news_full_2_excerpt: "On 10 July 2026, a game and chess tournament of the International Cultural-Game Triathlon «MIRoKIT» took place in Düsseldorf, Germany.", news_full_3_title: "Photo report from the summer camp in Germany", news_full_3_excerpt: "Ten days by the lake: team games, evening campfires and the first shared camp performance.", news_full_4_title: "Announcement: the MIRoKIT Winter Cup takes place in January", news_full_4_excerpt: "Team registration is open — we will share what is new in the rules and why this edition will be more challenging.", news_full_5_title: "Participants share impressions after the project in Tunisia", news_full_5_excerpt: "«I thought I was simply going to a camp, but I found friends for life» — teenagers from the first Tunisian session say.", news_full_6_title: "Friendship between peoples: cultural exchange in Russia", news_full_6_excerpt: "A week of meetings, workshops and shared projects between Russian and German venues." });
-Object.assign(T.de, { news_full_1_title: "Online-Zeichenwettbewerb <br>der Internationalen MIRoKIT-Liga", news_full_1_excerpt: "Am 1. August 2026 startet die Internationale MIRoKIT-Liga ihren internationalen Online-Zeichenwettbewerb!", news_full_2_title: "In Düsseldorf fand ein MIRoKIT-Spiel statt.", news_full_2_excerpt: "Am 10. Juli 2026 fanden in Düsseldorf ein Spiel und ein Schachturnier des Internationalen Kultur-Spiel-Triathlons «MIRoKIT» statt.", news_full_3_title: "Fotoreportage aus dem Sommercamp in Deutschland", news_full_3_excerpt: "Zehn Tage am See: Teamspiele, Lagerfeuer am Abend und die erste gemeinsame Aufführung.", news_full_4_title: "Ankündigung: Der MIRoKIT-Winterpokal findet im Januar statt", news_full_4_excerpt: "Die Teamregistrierung ist geöffnet — wir berichten über neue Regeln und warum diese Ausgabe anspruchsvoller wird.", news_full_5_title: "Teilnehmende berichten vom Projekt in Tunesien", news_full_5_excerpt: "«Ich dachte, ich fahre einfach in ein Camp, aber ich habe Freunde fürs Leben gefunden» — sagen Jugendliche der ersten tunesischen Gruppe.", news_full_6_title: "Freundschaft zwischen Völkern: Kulturaustausch in Russland", news_full_6_excerpt: "Eine Woche mit Treffen, Workshops und gemeinsamen Projekten zwischen russischen und deutschen Standorten." });
 
 Object.assign(T.ru, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Vdochnovenije", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "E-mail", telegram_label: "Telegram", video_report: "Репортаж · 05:16", video_interview: "Интервью · 07:24", video_behind: "За кадром · 02:58" });
 Object.assign(T.en, { partner_initiative: "Initiative Erleben", partner_vdochnovenije: "Center for the Realization of Creative Initiatives 'Inspiration'", partner_integral: "Integral e.V.", partner_bricks: "Bricks Charity", partner_klumba: "Klumba", partner_nko: "NKO no Border", partner_iskra: "Iskra PNDJ", email_label: "Email", telegram_label: "Telegram", video_report: "Report · 05:16", video_interview: "Interview · 07:24", video_behind: "Behind the scenes · 02:58" });
@@ -248,9 +245,9 @@ Object.assign(T.ru, { photo_open_1: "Открыть фото: Цвета дру�
 Object.assign(T.en, { photo_open_1: "Open photo: Colours of friendship without borders", photo_open_2: "Open photo: Teams from different countries", photo_open_3: "Open photo: Moving together", photo_open_4: "Open photo: A game where everyone belongs", video_open_label: "Open video full screen", video_list_1_title: "Tournament: excitement, strategy and friendship", video_list_2_title: "What children tell one another without a translator", video_list_3_title: "How the international online exhibition was created" });
 Object.assign(T.de, { photo_open_1: "Foto öffnen: Farben der Freundschaft ohne Grenzen", photo_open_2: "Foto öffnen: Teams aus verschiedenen Ländern", photo_open_3: "Foto öffnen: Gemeinsam in Bewegung", photo_open_4: "Foto öffnen: Ein Spiel, in dem alle dazugehören", video_open_label: "Video im Vollbild öffnen", video_list_1_title: "Turnier: Spannung, Strategie und Freundschaft", video_list_2_title: "Was Kinder einander ohne Übersetzer erzählen", video_list_3_title: "Wie die internationale Online-Ausstellung entstand" });
 
-Object.assign(T.ru, { hero_overline: "MIROKIT / 2026", news_slide_1_title: "Международный онлайн-конкурс рисунков «МИРоКИТ»", news_slide_1_desc: "Творчество объединяет Мир: каждый рисунок станет рассказом о традициях своего народа, а вместе они создают большой «Хоровод узоров Мира»", news_slide_2_title: "В Дюссельдорфе состоялась игра «МИРоКИТ»", news_slide_2_desc: "Команды встретились за игровым столом и снова доказали: общение — это лучший маршрут к дружбе.", news_slide_3_title: "Дружба народов в игре, творчестве и общении", news_slide_3_desc: "Живые встречи, общие идеи и моменты, в которых разные культуры становятся одной командой." });
-Object.assign(T.en, { hero_overline: "MIROKIT / 2026", news_slide_1_title: "International MIRoKIT online drawing competition", news_slide_1_desc: "Creativity connects the world: participants from different countries meet through drawing, play and imagination.", news_slide_2_title: "A MIRoKIT game took place in Düsseldorf", news_slide_2_desc: "Teams met around the game table and proved once again that communication is the best route to friendship.", news_slide_3_title: "Friendship between peoples through play, creativity and communication", news_slide_3_desc: "Live meetings, shared ideas and moments in which different cultures become one team." });
-Object.assign(T.de, { hero_overline: "MIROKIT / 2026", news_slide_1_title: "Internationaler Online-Zeichenwettbewerb «MIRoKIT»", news_slide_1_desc: "Kreativität verbindet die Welt: Teilnehmende aus verschiedenen Ländern begegnen sich durch Zeichnung, Spiel und Fantasie.", news_slide_2_title: "In Düsseldorf fand ein MIRoKIT-Spiel statt", news_slide_2_desc: "Teams trafen sich am Spieltisch und bewiesen erneut: Kommunikation ist der beste Weg zur Freundschaft.", news_slide_3_title: "Freundschaft zwischen Völkern durch Spiel, Kreativität und Austausch", news_slide_3_desc: "Lebendige Treffen, gemeinsame Ideen und Momente, in denen verschiedene Kulturen zu einem Team werden." });
+Object.assign(T.ru, { hero_overline: "MIROKIT / 2026" });
+Object.assign(T.en, { hero_overline: "MIROKIT / 2026" });
+Object.assign(T.de, { hero_overline: "MIROKIT / 2026" });
 
 Object.assign(T.ru, {
    online_creativity: "Творчество", online_ages: "8–18 лет", online_tag: "Онлайн", online_1_title: "Международный конкурс рисунков «Мир глазами детей»", online_1_desc: "Участники создают работы о дружбе народов, традициях и общем будущем. На странице проекта будут опубликованы условия, галерея, календарь и результаты.", open_project: "Открыть проект", watch_gallery: "Смотреть галерею", quiz: "Викторина", online_2_title: "Онлайн-квиз «Культурный код»", online_2_desc: "Игровая серия о языках, музыке, кухне и традициях мира с прямыми эфирами и командным финалом.", format_details: "Подробнее о формате", dialogue: "Диалог", online_3_title: "Лаборатория дружбы", online_3_desc: "Участники записывали интервью, создавали мини-фильмы и собирали цифровую карту историй своих городов.", view_results: "Посмотреть результаты", for_organisers: "Для организаторов", webinar: "Вебинар", online_4_title: "Онлайн-школа координаторов", online_4_desc: "Практические встречи, готовые сценарии, рабочие материалы и поддержка для запуска проекта в своём городе.", creative_track: "Творческий трек", project_card_1_title: "Международная мастерская рисунка", project_card_1_desc: "Онлайн-курс и конкурс для детей, где личная история превращается в визуальный рассказ о культуре, семье, городе и дружбе.", work_gallery: "Галерея работ", mentors: "Наставники", details: "Подробнее", works: "Работы", game_format: "Игровой формат", project_card_2_title: "Культурный код: командный квиз", project_card_2_desc: "Серия раундов о традициях, языках, музыке, кухне и символах разных стран. Формат готовится для школ и клубов.", online_teams: "Команды", points: "Баллы", request: "Запросить", international_network: "Международная сеть", project_card_3_title: "Карта MIRoKIT Worldwide", project_card_3_desc: "Живая карта стран, городов, локальных координаторов, партнёров и статусов будущих событий.", cities: "Города", partners_short: "Партнёры", contacts_short: "Контакты", view_map: "Смотреть карту", project_card_4_title: "Методический пакет проекта", project_card_4_desc: "Регламенты, чек-листы, письма партнёрам, структура туров и шаблоны для запуска локального этапа.", scripts: "Сценарии", templates: "Шаблоны", get: "Получить", idea_desc: "Формулируем тему, аудиторию, партнёров и результат.", teams_desc: "Подключаем школы, клубы, семьи и культурные площадки.", play: "Игра", play_desc: "Проводим раунды, творческие задания и командные миссии.", final_desc: "Публикуем итоги, медиа, дипломы и партнёрский отчёт.", current_project_path: "Путь текущего проекта", dusseldorf: "Дюссельдорф", archive_card_1_title: "Локальный турнир дружбы", archive_card_1_desc: "Командная встреча с игровыми станциями, культурными вопросами, творческими заданиями и финальным награждением.", event: "Событие", report: "Отчёт", results: "Итоги", archive_card_2_title: "Диалоговая встреча Tunis", archive_card_2_desc: "Пилотный международный блок про взаимное представление культур, семейные истории и командное общение.", pilot: "Пилот", connections: "Связи", stage_format: "Сценический формат", archive_card_3_title: "Творческая лаборатория дружбы", archive_card_3_desc: "Мини-выступления, роли, музыка и короткие презентации стран как подготовка к большому фестивальному дню.", stage: "Сцена", repeat: "Повторить", launch_title: "Идея превращается в сценарий", launch_desc: "Собираются темы, партнёры, роли, площадки и правила для участников.", run_title: "Команды проходят общую игру", run_desc: "Каждый этап фиксирует не только баллы, но и истории, фотографии, видео и обратную связь.", archive_title: "Материалы остаются живыми", archive_desc: "Проект можно повторить, адаптировать для другой страны или показать новым партнёрам.",
@@ -344,6 +341,9 @@ zu verhandeln und gemeinsam zu handeln.`,
 Object.assign(T.ru, { mail_subject: "Заявка MIRoKIT", mail_name: "Имя", mail_email: "E-mail", mail_message: "Сообщение" });
 Object.assign(T.en, { mail_subject: "MIRoKIT sign-up request", mail_name: "Name", mail_email: "Email", mail_message: "Message" });
 Object.assign(T.de, { mail_subject: "MIRoKIT-Anmeldung", mail_name: "Name", mail_email: "E-Mail", mail_message: "Nachricht" });
+
+Object.assign(T.en, { formats: "Formats", music: "Music", tag5: "from" });
+Object.assign(T.de, { formats: "Formate", music: "Musik", tag5: "ab" });
 
 Object.assign(T.en, {
    menu_world: "MIRoKIT Worldwide", about_subtitle: "", op0t: "MIRoKIT without borders", op1t: "Online projects that bring people together", op2d: "Competitions, meetings and creative labs where participants from different countries create a shared space for play, knowledge and friendship.", op3t: "Anyone can participate from any country", op4t: "One screen — many cultures, ideas and new friends", op5t: "The online format helps teams meet regularly, work on shared tasks and present results to an international audience. Current initiatives and an archive of completed projects are collected here.", op0d: "participating countries", op1d: "participation formats", op_access: "access to materials",
@@ -461,6 +461,14 @@ Object.assign(T.ru, {
    world_country_czechia: "Чехия",
    world_country_kazakhstan: "Казахстан",
    world_country_turkiye: "Турция",
+   world_country_france: "Франция",
+   world_country_spain: "Испания",
+   world_country_finland: "Финляндия",
+   world_country_japan: "Япония",
+   world_country_kyrgyzstan: "Киргизия",
+   world_country_belarus: "Беларусь",
+   world_country_uzbekistan: "Узбекистан",
+   world_country_turkmenistan: "Туркменистан",
    world_city_dusseldorf: "Дюссельдорф",
    world_city_moscow: "Москва",
    world_city_saint_petersburg: "Санкт-Петербург",
@@ -470,6 +478,14 @@ Object.assign(T.ru, {
    world_city_prague: "Прага",
    world_city_almaty: "Алматы",
    world_city_istanbul: "Стамбул",
+   world_city_paris: "Париж",
+   world_city_madrid: "Мадрид",
+   world_city_helsinki: "Хельсинки",
+   world_city_tokyo: "Токио",
+   world_city_bishkek: "Бишкек",
+   world_city_minsk: "Минск",
+   world_city_tashkent: "Ташкент",
+   world_city_ashgabat: "Ашхабад",
 });
 
 Object.assign(T.en, {
@@ -499,6 +515,14 @@ Object.assign(T.en, {
    world_country_czechia: "Czechia",
    world_country_kazakhstan: "Kazakhstan",
    world_country_turkiye: "Türkiye",
+   world_country_france: "France",
+   world_country_spain: "Spain",
+   world_country_finland: "Finland",
+   world_country_japan: "Japan",
+   world_country_kyrgyzstan: "Kyrgyzstan",
+   world_country_belarus: "Belarus",
+   world_country_uzbekistan: "Uzbekistan",
+   world_country_turkmenistan: "Turkmenistan",
    world_city_dusseldorf: "Düsseldorf",
    world_city_moscow: "Moscow",
    world_city_saint_petersburg: "Saint Petersburg",
@@ -508,6 +532,14 @@ Object.assign(T.en, {
    world_city_prague: "Prague",
    world_city_almaty: "Almaty",
    world_city_istanbul: "Istanbul",
+   world_city_paris: "Paris",
+   world_city_madrid: "Madrid",
+   world_city_helsinki: "Helsinki",
+   world_city_tokyo: "Tokyo",
+   world_city_bishkek: "Bishkek",
+   world_city_minsk: "Minsk",
+   world_city_tashkent: "Tashkent",
+   world_city_ashgabat: "Ashgabat",
 });
 
 Object.assign(T.de, {
@@ -537,6 +569,14 @@ Object.assign(T.de, {
    world_country_czechia: "Tschechien",
    world_country_kazakhstan: "Kasachstan",
    world_country_turkiye: "Türkei",
+   world_country_france: "Frankreich",
+   world_country_spain: "Spanien",
+   world_country_finland: "Finnland",
+   world_country_japan: "Japan",
+   world_country_kyrgyzstan: "Kirgisistan",
+   world_country_belarus: "Belarus",
+   world_country_uzbekistan: "Usbekistan",
+   world_country_turkmenistan: "Turkmenistan",
    world_city_dusseldorf: "Düsseldorf",
    world_city_moscow: "Moskau",
    world_city_saint_petersburg: "Sankt Petersburg",
@@ -546,6 +586,65 @@ Object.assign(T.de, {
    world_city_prague: "Prag",
    world_city_almaty: "Almaty",
    world_city_istanbul: "Istanbul",
+   world_city_paris: "Paris",
+   world_city_madrid: "Madrid",
+   world_city_helsinki: "Helsinki",
+   world_city_tokyo: "Tokio",
+   world_city_bishkek: "Bischkek",
+   world_city_minsk: "Minsk",
+   world_city_tashkent: "Taschkent",
+   world_city_ashgabat: "Aschgabat",
+});
+
+Object.assign(T.ru, {
+   online_projects_tabs_label: "Направления онлайн-проектов", online_projects_previous: "Предыдущие направления", online_projects_next: "Следующие направления",
+   op_status_live: "Идёт сейчас", op_status_soon: "Скоро", op_status_archive: "Архив", op_format_label: "Формат", op_audience_label: "Участники", op_result_label: "Результат", op_route_label: "Маршрут", op_participate: "Участвовать", op_open_related: "Открыть связанные материалы",
+   op_index_01: "01", op_index_02: "02", op_index_03: "03", op_index_04: "04", op_index_05: "05", op_index_06: "06", op_index_07: "07", op_index_08: "08", op_index_09: "09", op_index_10: "10",
+   op_nav_drawing: "Рисование", op_nav_photo: "Художественная фотография", op_nav_video: "Видеоролики", op_nav_reading: "Художественное чтение", op_nav_essay: "Эссе и литературное творчество", op_nav_poetry: "Авторские стихотворения", op_nav_stories: "Рассказы и сказки", op_nav_crafts: "Декоративно-прикладное творчество", op_nav_music: "Музыкальное и вокальное искусство", op_nav_theatre: "Театральные мини-постановки",
+   op_drawing_title: "Мир глазами детей", op_drawing_desc: "Рисунки о дружбе народов, семейных традициях и будущем, которое мы создаём вместе.", op_drawing_format: "Рисунок и иллюстрация", op_drawing_audience: "7–18 лет", op_drawing_result: "Онлайн-выставка", op_drawing_route: "Работа → галерея → диплом",
+   op_photo_title: "История в одном кадре", op_photo_desc: "Фотографии людей, городов и маленьких деталей, которые рассказывают о культуре без перевода.", op_photo_format: "Фотоистория", op_photo_audience: "7–25 лет", op_photo_result: "Цифровая экспозиция", op_photo_route: "Кадр → история → выставка",
+   op_video_title: "Минута, которая объединяет", op_video_desc: "Короткие ролики о встречах, играх, семейных историях и творческих открытиях участников.", op_video_format: "Видео до 3 минут", op_video_audience: "Команды и семьи", op_video_result: "Публичный показ", op_video_route: "Сценарий → съёмка → эфир",
+   op_reading_title: "Голос текста", op_reading_desc: "Читаем любимые произведения так, чтобы интонация, язык и настроение путешествовали между странами.", op_reading_format: "Выразительное чтение", op_reading_audience: "Соло и дуэты", op_reading_result: "Сцена голосов", op_reading_route: "Текст → голос → встреча",
+   op_essay_title: "Письмо миру", op_essay_desc: "Тексты, в которых личное наблюдение становится честным разговором о доме, дружбе и будущем.", op_essay_format: "Эссе до 1000 слов", op_essay_audience: "Подростки и молодёжь", op_essay_result: "Литературный сборник", op_essay_route: "Мысль → текст → публикация",
+   op_poetry_title: "Стихотворение как открытка", op_poetry_desc: "Авторские строки о языке, городе, мечте и том, что помогает нам слышать друг друга.", op_poetry_format: "Стихотворение и аудио", op_poetry_audience: "10–25 лет", op_poetry_result: "Аудиоальбом", op_poetry_route: "Строка → запись → плейлист",
+   op_stories_title: "История из моего окна", op_stories_desc: "Сказки, рассказы и семейные легенды, которые превращают разные города в одну большую библиотеку.", op_stories_format: "Рассказ до 5 страниц", op_stories_audience: "Семьи и школьники", op_stories_result: "Общий сборник", op_stories_route: "Герой → история → книга",
+   op_crafts_title: "Сделано руками, придумано сердцем", op_crafts_desc: "Орнаменты, предметы и маленькие арт-объекты, в которых встречаются традиции семьи и энергия современного дизайна.", op_crafts_format: "Объект или серия", op_crafts_audience: "Без возрастных границ", op_crafts_result: "Виртуальная витрина", op_crafts_route: "Материал → форма → витрина",
+   op_music_title: "Музыка без границ", op_music_desc: "Песни, инструментальные миниатюры и вокальные приветствия, из которых складывается общий международный концерт.", op_music_format: "Песня или клип", op_music_audience: "Соло, дуэты, ансамбли", op_music_result: "Общий плейлист", op_music_route: "Звук → запись → концерт",
+   op_theatre_title: "Сцена в маленьком экране", op_theatre_desc: "Короткие спектакли, сценические этюды и истории, которые можно поставить дома, в классе или в студии.", op_theatre_format: "Мини-постановка до 7 минут", op_theatre_audience: "Команды от 2 человек", op_theatre_result: "Онлайн-фестиваль", op_theatre_route: "Роль → репетиция → показ",
+});
+
+Object.assign(T.en, {
+   online_projects_tabs_label: "Online project directions", online_projects_previous: "Previous directions", online_projects_next: "Next directions",
+   op_status_live: "Live now", op_status_soon: "Coming soon", op_status_archive: "Archive", op_format_label: "Format", op_audience_label: "Participants", op_result_label: "Result", op_route_label: "Route", op_participate: "Participate", op_open_related: "Open related material",
+   op_index_01: "01", op_index_02: "02", op_index_03: "03", op_index_04: "04", op_index_05: "05", op_index_06: "06", op_index_07: "07", op_index_08: "08", op_index_09: "09", op_index_10: "10",
+   op_nav_drawing: "Drawing", op_nav_photo: "Artistic photography", op_nav_video: "Video", op_nav_reading: "Artistic reading", op_nav_essay: "Essay and literary creativity", op_nav_poetry: "Author poetry", op_nav_stories: "Stories and fairy tales", op_nav_crafts: "Decorative and applied arts", op_nav_music: "Musical and vocal art", op_nav_theatre: "Theatre mini-performances",
+   op_drawing_title: "The world through children's eyes", op_drawing_desc: "Drawings about friendship between peoples, family traditions and the future we create together.", op_drawing_format: "Drawing and illustration", op_drawing_audience: "Ages 7–18", op_drawing_result: "Online exhibition", op_drawing_route: "Artwork → gallery → diploma",
+   op_photo_title: "A story in one frame", op_photo_desc: "Photographs of people, cities and small details that tell a cultural story without translation.", op_photo_format: "Photo story", op_photo_audience: "Ages 7–25", op_photo_result: "Digital exhibition", op_photo_route: "Frame → story → exhibition",
+   op_video_title: "A minute that brings us together", op_video_desc: "Short films about meetings, games, family stories and the creative discoveries of participants.", op_video_format: "Video up to 3 minutes", op_video_audience: "Teams and families", op_video_result: "Public screening", op_video_route: "Script → filming → broadcast",
+   op_reading_title: "The voice of a text", op_reading_desc: "Read favourite works so that intonation, language and mood can travel between countries.", op_reading_format: "Expressive reading", op_reading_audience: "Solo and duo entries", op_reading_result: "A stage of voices", op_reading_route: "Text → voice → meeting",
+   op_essay_title: "A letter to the world", op_essay_desc: "Texts where a personal observation becomes an honest conversation about home, friendship and the future.", op_essay_format: "Essay up to 1,000 words", op_essay_audience: "Teenagers and young adults", op_essay_result: "Literary collection", op_essay_route: "Thought → text → publication",
+   op_poetry_title: "A poem like a postcard", op_poetry_desc: "Original lines about language, cities, dreams and what helps us hear one another.", op_poetry_format: "Poem and audio", op_poetry_audience: "Ages 10–25", op_poetry_result: "Audio album", op_poetry_route: "Line → recording → playlist",
+   op_stories_title: "A story from my window", op_stories_desc: "Fairy tales, stories and family legends that turn different cities into one large library.", op_stories_format: "Story up to 5 pages", op_stories_audience: "Families and schoolchildren", op_stories_result: "Shared collection", op_stories_route: "Hero → story → book",
+   op_crafts_title: "Made by hand, imagined by heart", op_crafts_desc: "Patterns, objects and small art pieces where family traditions meet the energy of contemporary design.", op_crafts_format: "Object or series", op_crafts_audience: "All ages", op_crafts_result: "Virtual showcase", op_crafts_route: "Material → form → showcase",
+   op_music_title: "Music without borders", op_music_desc: "Songs, instrumental miniatures and vocal greetings that become one international concert.", op_music_format: "Song or music video", op_music_audience: "Solo, duos and ensembles", op_music_result: "Shared playlist", op_music_route: "Sound → recording → concert",
+   op_theatre_title: "A stage on a small screen", op_theatre_desc: "Short plays, stage studies and stories that can be performed at home, in class or in a studio.", op_theatre_format: "Mini-performance up to 7 minutes", op_theatre_audience: "Teams of 2 or more", op_theatre_result: "Online festival", op_theatre_route: "Role → rehearsal → show",
+});
+
+Object.assign(T.de, {
+   online_projects_tabs_label: "Online-Projektbereiche", online_projects_previous: "Vorherige Bereiche", online_projects_next: "Nächste Bereiche",
+   op_status_live: "Jetzt aktiv", op_status_soon: "Demnächst", op_status_archive: "Archiv", op_format_label: "Format", op_audience_label: "Teilnehmende", op_result_label: "Ergebnis", op_route_label: "Route", op_participate: "Teilnehmen", op_open_related: "Verwandtes Material öffnen",
+   op_index_01: "01", op_index_02: "02", op_index_03: "03", op_index_04: "04", op_index_05: "05", op_index_06: "06", op_index_07: "07", op_index_08: "08", op_index_09: "09", op_index_10: "10",
+   op_nav_drawing: "Zeichnen", op_nav_photo: "Künstlerische Fotografie", op_nav_video: "Videobeiträge", op_nav_reading: "Künstlerisches Lesen", op_nav_essay: "Essay und literarisches Schaffen", op_nav_poetry: "Eigene Gedichte", op_nav_stories: "Geschichten und Märchen", op_nav_crafts: "Dekorative und angewandte Kunst", op_nav_music: "Musik und Vokalkunst", op_nav_theatre: "Theatralische Mini-Inszenierungen",
+   op_drawing_title: "Die Welt aus Kinderaugen", op_drawing_desc: "Zeichnungen über Freundschaft zwischen Völkern, Familientraditionen und die Zukunft, die wir gemeinsam gestalten.", op_drawing_format: "Zeichnung und Illustration", op_drawing_audience: "7–18 Jahre", op_drawing_result: "Online-Ausstellung", op_drawing_route: "Werk → Galerie → Urkunde",
+   op_photo_title: "Eine Geschichte in einem Bild", op_photo_desc: "Fotos von Menschen, Städten und kleinen Details, die Kultur ohne Übersetzung erzählen.", op_photo_format: "Fotogeschichte", op_photo_audience: "7–25 Jahre", op_photo_result: "Digitale Ausstellung", op_photo_route: "Bild → Geschichte → Ausstellung",
+   op_video_title: "Eine Minute, die verbindet", op_video_desc: "Kurze Filme über Begegnungen, Spiele, Familiengeschichten und kreative Entdeckungen der Teilnehmenden.", op_video_format: "Video bis 3 Minuten", op_video_audience: "Teams und Familien", op_video_result: "Öffentliche Vorführung", op_video_route: "Drehbuch → Dreh → Ausstrahlung",
+   op_reading_title: "Die Stimme eines Textes", op_reading_desc: "Lieblingswerke so lesen, dass Intonation, Sprache und Stimmung zwischen Ländern reisen können.", op_reading_format: "Ausdrucksvolles Lesen", op_reading_audience: "Solo und Duette", op_reading_result: "Bühne der Stimmen", op_reading_route: "Text → Stimme → Begegnung",
+   op_essay_title: "Ein Brief an die Welt", op_essay_desc: "Texte, in denen eine persönliche Beobachtung zu einem ehrlichen Gespräch über Zuhause, Freundschaft und Zukunft wird.", op_essay_format: "Essay bis 1.000 Wörter", op_essay_audience: "Jugendliche und junge Erwachsene", op_essay_result: "Literarische Sammlung", op_essay_route: "Gedanke → Text → Veröffentlichung",
+   op_poetry_title: "Ein Gedicht wie eine Postkarte", op_poetry_desc: "Eigene Zeilen über Sprache, Städte, Träume und das, was uns einander zuhören lässt.", op_poetry_format: "Gedicht und Audio", op_poetry_audience: "10–25 Jahre", op_poetry_result: "Audioalbum", op_poetry_route: "Zeile → Aufnahme → Playlist",
+   op_stories_title: "Eine Geschichte aus meinem Fenster", op_stories_desc: "Märchen, Erzählungen und Familienlegenden, die verschiedene Städte zu einer großen Bibliothek verbinden.", op_stories_format: "Geschichte bis 5 Seiten", op_stories_audience: "Familien und Schulkinder", op_stories_result: "Gemeinsame Sammlung", op_stories_route: "Held → Geschichte → Buch",
+   op_crafts_title: "Mit Händen gemacht, mit Herz erdacht", op_crafts_desc: "Muster, Gegenstände und kleine Kunstobjekte, in denen Familientraditionen auf modernes Design treffen.", op_crafts_format: "Objekt oder Serie", op_crafts_audience: "Alle Altersgruppen", op_crafts_result: "Virtuelle Ausstellung", op_crafts_route: "Material → Form → Schaufenster",
+   op_music_title: "Musik ohne Grenzen", op_music_desc: "Lieder, instrumentale Miniaturen und musikalische Grüße, die zu einem internationalen Konzert werden.", op_music_format: "Lied oder Musikvideo", op_music_audience: "Solo, Duette und Ensembles", op_music_result: "Gemeinsame Playlist", op_music_route: "Klang → Aufnahme → Konzert",
+   op_theatre_title: "Eine Bühne auf kleinem Bildschirm", op_theatre_desc: "Kurze Stücke, Bühnenstudien und Geschichten, die zu Hause, im Unterricht oder im Studio entstehen können.", op_theatre_format: "Mini-Inszenierung bis 7 Minuten", op_theatre_audience: "Teams ab 2 Personen", op_theatre_result: "Online-Festival", op_theatre_route: "Rolle → Probe → Aufführung",
 });
 
 /**

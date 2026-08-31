@@ -3,8 +3,355 @@ const FORM_TYPES = new Set([
 	"extra-contact",
 ]);
 
+const FORM_FIELD_ALLOWLIST = Object.freeze({
+	"main-contact": new Set([
+		"name",
+		"email",
+		"country",
+		"city",
+		"organization",
+		"phone",
+		"topic",
+		"message",
+		"consent_required",
+		"consent_optional",
+		"website_check",
+	]),
+	"extra-contact": new Set([
+		"organization_full",
+		"organization_short",
+		"address",
+		"country",
+		"city",
+		"region",
+		"postcode",
+		"contact_name",
+		"role",
+		"email",
+		"phone",
+		"sozialMedia",
+		"activities",
+		"member_count",
+		"goals",
+		"about",
+		"website",
+		"confirm_accuracy",
+		"confirm_goals",
+		"confirm_privacy",
+		"website_check",
+	]),
+});
+
+const MULTI_VALUE_FIELDS = new Set(["activities", "goals"]);
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+
 const TURNSTILE_TEST_SECRET =
 	"1x0000000000000000000000000000000AA";
+
+const COMMON_RESPONSE_HEADERS = Object.freeze({
+	"X-Content-Type-Options": "nosniff",
+	"Referrer-Policy": "strict-origin-when-cross-origin",
+	"Permissions-Policy":
+		"camera=(), microphone=(), geolocation=(), payment=()",
+});
+
+const SITEMAP_PATHS = Object.freeze([
+	{
+		path: "/",
+		changefreq: "weekly",
+		priority: "1.0",
+	},
+	{
+		path: "/page/privacyPolicy/",
+		changefreq: "yearly",
+		priority: "0.3",
+	},
+]);
+
+const PROTECTED_ASSET_PREFIXES = Object.freeze([
+	"/public/assets/archive/",
+	"/public/assets/uploads/",
+	"/public/assets/media/interviews/transcripts/",
+	"/public/assets/media/press/",
+]);
+
+function escapeXml(value) {
+	return String(value)
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&apos;");
+}
+
+function getCanonicalSiteHostname(hostname) {
+	const normalizedHostname = String(hostname || "")
+		.trim()
+		.toLowerCase()
+		.replace(/\.$/, "");
+
+	if (
+		normalizedHostname === "mirokit.ru" ||
+		normalizedHostname.endsWith(".ru")
+	) {
+		return "mirokit.ru";
+	}
+
+	if (
+		normalizedHostname === "mirokit.com" ||
+		normalizedHostname.endsWith(".com")
+	) {
+		return "mirokit.com";
+	}
+
+	return null;
+}
+
+function isProductionHostname(hostname) {
+	return Boolean(getCanonicalSiteHostname(hostname));
+}
+
+function isProtectedAssetPath(pathname) {
+	return PROTECTED_ASSET_PREFIXES.some((prefix) =>
+		pathname.startsWith(prefix)
+	);
+}
+
+function forbiddenAssetResponse() {
+	return new Response(
+		`<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><title>403 — Access denied | MIRoKIT</title></head>
+<body style="margin:0;padding:3rem;background:#eef4ff;color:#0d1b4b;font:16px system-ui,sans-serif;text-align:center">
+<main><h1>403 — Access denied</h1><p>Oops, this content is reserved for the MIRoKIT website and is not available as a direct file.</p></main>
+</body>
+</html>`,
+		{
+			status: 403,
+			headers: {
+				...COMMON_RESPONSE_HEADERS,
+				"Content-Type": "text/html; charset=utf-8",
+				"Cache-Control": "no-store",
+				"X-Robots-Tag": "noindex, nofollow",
+			},
+		}
+	);
+}
+
+function createRobotsTxt(hostname) {
+	const canonicalSiteHostname = getCanonicalSiteHostname(hostname);
+
+	if (!canonicalSiteHostname) {
+		return [
+			"User-agent: *",
+			"Disallow: /",
+			"",
+		].join("\n");
+	}
+
+	return [
+		"User-agent: *",
+		"Allow: /",
+		"Disallow: /api/",
+		"",
+		`Sitemap: https://${canonicalSiteHostname}/sitemap.xml`,
+		"",
+	].join("\n");
+}
+
+function createSitemapXml(hostname) {
+	const canonicalSiteHostname = getCanonicalSiteHostname(hostname);
+
+	if (!canonicalSiteHostname) {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>";
+	}
+
+	const alternateHosts = {
+		en: "mirokit.com",
+		de: "mirokit.com",
+		ru: "mirokit.ru",
+		"x-default": "mirokit.com",
+	};
+
+	const entries = SITEMAP_PATHS.map(({ path, changefreq, priority }) => {
+		const canonicalUrl = `https://${canonicalSiteHostname}${path}`;
+		const alternateLinks = Object.entries(alternateHosts)
+			.map(
+				([language, alternateHost]) =>
+					`    <xhtml:link rel="alternate" hreflang="${language}" href="https://${alternateHost}${path}" />`
+			)
+			.join("\n");
+
+		return [
+			"  <url>",
+			`    <loc>${escapeXml(canonicalUrl)}</loc>`,
+			"    <lastmod>2026-08-29</lastmod>",
+			`    <changefreq>${changefreq}</changefreq>`,
+			`    <priority>${priority}</priority>`,
+			alternateLinks,
+			"  </url>",
+		].join("\n");
+	}).join("\n");
+
+	return [
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+		"<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">",
+		entries,
+		"</urlset>",
+		"",
+	].join("\n");
+}
+
+function textResponse(body, contentType, cacheControl = "public, max-age=3600") {
+	return new Response(body, {
+		status: 200,
+		headers: {
+			...COMMON_RESPONSE_HEADERS,
+			"Content-Type": contentType,
+			"Cache-Control": cacheControl,
+		},
+	});
+}
+
+function withSiteHeaders(response, pathname) {
+	const headers = new Headers(response.headers);
+
+	Object.entries(COMMON_RESPONSE_HEADERS).forEach(([name, value]) => {
+		headers.set(name, value);
+	});
+
+	if (
+		pathname === "/" ||
+		pathname === "/index.html" ||
+		pathname.startsWith("/page/")
+	) {
+		headers.set("Cache-Control", "public, max-age=0, must-revalidate");
+	}
+
+	return new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers,
+	});
+}
+
+function rewriteDocumentMetadata(response, url) {
+	if (
+		!isDocumentPath(url.pathname) ||
+		url.pathname === "/index.html" ||
+		url.pathname === "/page/privacyPolicy" ||
+		!response.headers.get("content-type")?.includes("text/html")
+	) {
+		return response;
+	}
+
+	const canonicalSiteHostname = getCanonicalSiteHostname(url.hostname);
+	const canonicalPath =
+		url.pathname === "/" ? "/" : "/page/privacyPolicy/";
+	const canonicalUrl =
+		`https://${canonicalSiteHostname}${canonicalPath}`;
+
+	return new HTMLRewriter()
+		.on('link[rel="canonical"]', {
+			element(element) {
+				element.setAttribute("href", canonicalUrl);
+			},
+		})
+		.on('meta[property="og:url"]', {
+			element(element) {
+				element.setAttribute("content", canonicalUrl);
+			},
+		})
+		.transform(response);
+}
+
+function isDocumentPath(pathname) {
+	return (
+		pathname === "/" ||
+		pathname === "/index.html" ||
+		pathname === "/page/privacyPolicy" ||
+		pathname === "/page/privacyPolicy/"
+	);
+}
+
+function canonicalDocumentRedirect(request, url) {
+	if (
+		(request.method !== "GET" && request.method !== "HEAD") ||
+		!isDocumentPath(url.pathname) ||
+		!isProductionHostname(url.hostname)
+	) {
+		return null;
+	}
+
+	const normalizedHostname = url.hostname
+		.toLowerCase()
+		.replace(/\.$/, "");
+
+	if (
+		url.pathname === "/" ||
+		url.pathname === "/page/privacyPolicy/"
+	) {
+		return null;
+	}
+
+	const canonicalPath =
+		url.pathname === "/" || url.pathname === "/index.html"
+			? "/"
+			: "/page/privacyPolicy/";
+	const location = `https://${normalizedHostname}${canonicalPath}${url.search}`;
+
+	return new Response(null, {
+		status: 301,
+		headers: {
+			...COMMON_RESPONSE_HEADERS,
+			Location: location,
+			"Cache-Control": "public, max-age=86400",
+		},
+	});
+}
+
+/*
+ * The request hostname decides which MIRoKIT sender address is used.
+ * Keep this explicit instead of trusting a hostname sent by the browser.
+ */
+const MAIL_FROM_BY_HOSTNAME = Object.freeze({
+	"mirokit.com": "info@mirokit.com",
+	"www.mirokit.com": "info@mirokit.com",
+	"ligamirokit.com": "info@mirokit.com",
+	"www.ligamirokit.com": "info@mirokit.com",
+
+	"mirokit.ru": "info@mirokit.ru",
+	"www.mirokit.ru": "info@mirokit.ru",
+	"ligamirokit.ru": "info@mirokit.ru",
+	"www.ligamirokit.ru": "info@mirokit.ru",
+});
+
+function getMailFromForHostname(hostname, env) {
+	const normalizedHostname = String(hostname || "")
+		.trim()
+		.toLowerCase()
+		.replace(/\.$/, "");
+
+	const configuredSender =
+		MAIL_FROM_BY_HOSTNAME[normalizedHostname];
+
+	if (configuredSender) {
+		return configuredSender;
+	}
+
+	/*
+	 * Local Wrangler development only.
+	 * This fallback is never used by the four production domains above.
+	 */
+	if (
+		normalizedHostname === "localhost" ||
+		normalizedHostname === "127.0.0.1"
+	) {
+		return String(env.MAIL_FROM || "info@mirokit.com").trim();
+	}
+
+	return null;
+}
 
 const PRIVATE_FIELDS = new Set([
 	"website_check",
@@ -69,6 +416,34 @@ function getAllowedOrigins(env) {
 	);
 }
 
+function getClientAddress(request) {
+	const forwardedFor = request.headers.get("X-Forwarded-For");
+
+	return (
+		request.headers.get("CF-Connecting-IP") ||
+		forwardedFor?.split(",", 1)[0]?.trim() ||
+		"unknown"
+	);
+}
+
+async function checkContactRateLimit(request, env, formType) {
+	const limiter = env.CONTACT_FORM_RATE_LIMITER;
+
+	if (!limiter || typeof limiter.limit !== "function") {
+		console.error("CONTACT_FORM_RATE_LIMITER is not configured");
+		return { success: false, unavailable: true };
+	}
+
+	try {
+		return await limiter.limit({
+			key: `${formType}:${getClientAddress(request)}`,
+		});
+	} catch (error) {
+		console.error("Contact form rate-limit check failed", error);
+		return { success: false, unavailable: true };
+	}
+}
+
 function isLocalOrigin(origin) {
 	if (!origin) return false;
 
@@ -101,19 +476,25 @@ function jsonResponse(
 	data,
 	status,
 	origin,
-	env
+	env,
+	extraHeaders = {}
 ) {
 	return new Response(JSON.stringify(data), {
 		status,
 
 		headers: {
+			...COMMON_RESPONSE_HEADERS,
 			"Content-Type":
 				"application/json; charset=utf-8",
+
+			"X-Robots-Tag":
+				"noindex, nofollow",
 
 			"Cache-Control":
 				"no-store",
 
 			...corsHeaders(origin, env),
+			...extraHeaders,
 		},
 	});
 }
@@ -169,7 +550,7 @@ function displayValue(key, value) {
 		.join(", ");
 }
 
-function validateFields(fields) {
+function validateFields(formType, fields) {
 	if (
 		!fields ||
 		typeof fields !== "object" ||
@@ -178,15 +559,25 @@ function validateFields(fields) {
 		throw new Error("Invalid fields");
 	}
 
+	const allowedFields = FORM_FIELD_ALLOWLIST[formType];
+
+	if (!allowedFields) {
+		throw new Error("Unknown form type");
+	}
+
 	const entries = Object.entries(fields);
 
-	if (entries.length > 100) {
+	if (entries.length > allowedFields.size) {
 		throw new Error("Too many fields");
 	}
 
 	for (const [key, value] of entries) {
-		if (key.length > 80) {
-			throw new Error("Invalid field name");
+		if (!allowedFields.has(key)) {
+			throw new Error(`Unknown field: ${key}`);
+		}
+
+		if (Array.isArray(value) && !MULTI_VALUE_FIELDS.has(key)) {
+			throw new Error(`Multiple values not allowed: ${key}`);
 		}
 
 		const values = toArray(value);
@@ -196,6 +587,10 @@ function validateFields(fields) {
 		}
 
 		for (const item of values) {
+			if (typeof item !== "string") {
+				throw new Error(`Invalid field value: ${key}`);
+			}
+
 			if (String(item).length > 10_000) {
 				throw new Error(
 					`Field too long: ${key}`
@@ -386,13 +781,14 @@ function createEmailHtml({
 	formType,
 	fields,
 	meta,
+	sourceDomain,
 }) {
 	const isLeague =
 		formType === "extra-contact";
 
 	const title = isLeague
-		? "Neue MIRoKIT Liga-Anfrage"
-		: "Neue Nachricht über mirokit.com";
+		? `Neue MIRoKIT Liga-Anfrage über ${sourceDomain}`
+		: `Neue Nachricht über ${sourceDomain}`;
 
 	const badge = isLeague
 		? "LIGA-ANTRAG"
@@ -670,24 +1066,64 @@ function createTextEmail({
 export default {
 	async fetch(request, env) {
 		const url = new URL(request.url);
+		const requestHostname = url.hostname.toLowerCase();
 		const origin = request.headers.get("Origin");
 
-		if (url.pathname !== "/api/contact") {
-			return jsonResponse(
-				{ success: false, message: "Not found" },
-				404,
-				origin,
-				env
+		if (isProtectedAssetPath(url.pathname)) {
+			return forbiddenAssetResponse();
+		}
+
+		if (
+			url.pathname === "/robots.txt" &&
+			(request.method === "GET" || request.method === "HEAD")
+		) {
+			return textResponse(
+				createRobotsTxt(requestHostname),
+				"text/plain; charset=utf-8"
 			);
+		}
+
+		if (
+			url.pathname === "/sitemap.xml" &&
+			(request.method === "GET" || request.method === "HEAD")
+		) {
+			return textResponse(
+				createSitemapXml(requestHostname),
+				"application/xml; charset=utf-8"
+			);
+		}
+
+		const documentRedirect = canonicalDocumentRedirect(request, url);
+		if (documentRedirect) return documentRedirect;
+
+		if (url.pathname !== "/api/contact") {
+			if (url.pathname.startsWith("/api/")) {
+				return jsonResponse(
+					{ success: false, message: "Not found" },
+					404,
+					origin,
+					env
+				);
+			}
+
+			const assetResponse = await env.ASSETS.fetch(request);
+			const siteResponse = withSiteHeaders(
+				assetResponse,
+				url.pathname
+			);
+
+			if (request.method === "HEAD") return siteResponse;
+
+			return rewriteDocumentMetadata(siteResponse, url);
 		}
 
 		if (request.method === "OPTIONS") {
 			return new Response(null, {
 				status: 204,
-				headers: corsHeaders(
-					origin,
-					env
-				),
+				headers: {
+					...COMMON_RESPONSE_HEADERS,
+					...corsHeaders(origin, env),
+				},
 			});
 		}
 
@@ -779,8 +1215,39 @@ export default {
 			);
 		}
 
+		const rateLimit = await checkContactRateLimit(
+			request,
+			env,
+			formType
+		);
+
+		if (rateLimit.unavailable) {
+			return jsonResponse(
+				{
+					success: false,
+					message: "Server security configuration is unavailable",
+				},
+				503,
+				origin,
+				env
+			);
+		}
+
+		if (!rateLimit.success) {
+			return jsonResponse(
+				{
+					success: false,
+					message: "Too many requests",
+				},
+				429,
+				origin,
+				env,
+				{ "Retry-After": String(RATE_LIMIT_WINDOW_SECONDS) }
+			);
+		}
+
 		try {
-			validateFields(fields);
+			validateFields(formType, fields);
 			validateRequiredFields(
 				formType,
 				fields
@@ -907,12 +1374,29 @@ export default {
 		const senderEmail =
 			String(fields.email).trim();
 
-		const requestOrigin =
-			request.headers.get("Origin");
+		/*
+		 * requestHostname comes from request.url, i.e. the domain that
+		 * actually received /api/contact. It is not supplied by form data.
+		 */
+		const sourceDomain = requestHostname;
+		const mailFrom =
+			getMailFromForHostname(sourceDomain, env);
 
-		const sourceDomain = requestOrigin
-			? new URL(requestOrigin).hostname
-			: "unknown";
+		if (!mailFrom) {
+			console.warn("Unsupported MIRoKIT request hostname", {
+				sourceDomain,
+			});
+
+			return jsonResponse(
+				{
+					success: false,
+					message: "Unsupported website domain",
+				},
+				403,
+				origin,
+				env
+			);
+		}
 
 		const senderName =
 			stripHeaderCharacters(
@@ -932,7 +1416,7 @@ export default {
 
 					from: {
 						email:
-							env.MAIL_FROM,
+							mailFrom,
 
 						name:
 							"MIRoKIT INFO System",
@@ -953,6 +1437,7 @@ export default {
 							formType,
 							fields,
 							meta,
+							sourceDomain,
 						}),
 
 					text:
@@ -969,6 +1454,8 @@ export default {
 						result.messageId,
 
 					formType,
+					sourceDomain,
+					mailFrom,
 				}
 			);
 
@@ -1002,4 +1489,12 @@ export default {
 			);
 		}
 	},
+};
+
+export {
+	FORM_FIELD_ALLOWLIST,
+	checkContactRateLimit,
+	getAllowedOrigins,
+	isLocalOrigin,
+	validateFields,
 };

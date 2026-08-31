@@ -132,6 +132,26 @@ Bereits berücksichtigt oder für die Produktion vorgesehen sind:
 
 Vor einer Veröffentlichung sind automatisierte und manuelle Prüfungen gegen **WCAG 2.2** erforderlich. Dazu gehören insbesondere Tastaturtests, Screenreader-Tests, Kontrastmessungen und Tests bei 200 bis 400 Prozent Zoom.
 
+### Temporär deaktivierte Elemente
+
+Für Bereiche, die vorübergehend nicht verfügbar sein sollen, kann der Marker an jedes Element angehängt werden:
+
+```html
+<a class="module-link" href="#projects" data-temporarily-disabled>
+  Projekt öffnen
+</a>
+
+<section class="panel" data-temporarily-disabled data-disabled-label="Bald verfügbar">
+  ...
+</section>
+```
+
+Alternativ funktioniert die Klasse `is-temporarily-disabled`. Der Marker dimmt und verwischt den Inhalt weich, zeigt das optionale Label zentriert, verhindert Klicks und nimmt enthaltene Links oder Buttons aus der Tastatur-Reihenfolge. Zum Reaktivieren einfach `data-temporarily-disabled` beziehungsweise die Klasse entfernen.
+
+### Zentrale News-Daten
+
+Alle News-Inhalte liegen in [`site/source/scripts/news-data.js`](site/source/scripts/news-data.js). Jeder Eintrag enthält lokalisierte Werte für `ru`, `en` und `de`, das Veröffentlichungsdatum `publishedAt`, das Bild, den vollständigen Modal-Inhalt sowie `featured`. Die Werte `featured: 1`, `2` und `3` ordnen die drei aktuellsten veröffentlichten Meldungen im Hero manuell; `featured: false` lässt die Datumsreihenfolge entscheiden. Zukünftige Meldungen werden automatisch bis zum Veröffentlichungsdatum ausgeblendet.
+
 ## SEO und Metadaten
 
 Die Prototypen enthalten beziehungsweise planen:
@@ -209,6 +229,18 @@ Danach ist sie üblicherweise unter folgender Adresse erreichbar:
 ```text
 http://localhost:8080
 ```
+
+Für lokale Formular-POSTs muss zusätzlich der Worker laufen. Die erlaubten
+Entwicklungs-Origin stehen in `worker/.dev.vars.example`; einmalig kopieren:
+
+```bash
+cp worker/.dev.vars.example worker/.dev.vars
+cd worker
+npm run dev
+```
+
+Damit sind die üblichen lokalen Ports `8080` und `8787` für die Formular-API
+freigegeben. `worker/.dev.vars` bleibt lokal und wird nicht versioniert.
 
 Das direkte Öffnen einer HTML-Datei über `file://` sollte vermieden werden, weil Browser dabei Module, Fetch-Aufrufe und bestimmte Sicherheitsmechanismen anders behandeln.
 

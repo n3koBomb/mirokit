@@ -8,11 +8,21 @@ claude-philosophy
 build/
 *.mp4
 
+# Local MIRoKIT future ideas
+/FUTURE_IDEAS.md
+
+# Audits of the site
+/theme-audit.txt
+
 # Monorepo (packages/, apps/)
 node_modules
 dist
 .vite
 *.tsbuildinfo
+
+# Wrangler local variables and secrets
+**/.dev.vars
+**/.dev.vars.local
 
 # Playwright
 /test-results/

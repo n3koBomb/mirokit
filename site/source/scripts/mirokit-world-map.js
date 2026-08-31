@@ -31,6 +31,14 @@ async function initWorldCanvas() {
     { label: "Prague", cityKey: "world_city_prague", country: "Czechia", countryKey: "world_country_czechia", flag: "🇨🇿", lon: 14.44, lat: 50.08, status: "planned" },
     { label: "Almaty", cityKey: "world_city_almaty", country: "Kazakhstan", countryKey: "world_country_kazakhstan", flag: "🇰🇿", lon: 76.95, lat: 43.24, status: "planned" },
     { label: "Istanbul", cityKey: "world_city_istanbul", country: "Türkiye", countryKey: "world_country_turkiye", flag: "🇹🇷", lon: 28.98, lat: 41.01, status: "planned" },
+    { label: "Paris", cityKey: "world_city_paris", country: "France", countryKey: "world_country_france", flag: "🇫🇷", lon: 2.35, lat: 48.86, status: "planned" },
+    { label: "Madrid", cityKey: "world_city_madrid", country: "Spain", countryKey: "world_country_spain", flag: "🇪🇸", lon: -3.70, lat: 40.42, status: "planned" },
+    { label: "Helsinki", cityKey: "world_city_helsinki", country: "Finland", countryKey: "world_country_finland", flag: "🇫🇮", lon: 24.94, lat: 60.17, status: "planned" },
+    { label: "Tokyo", cityKey: "world_city_tokyo", country: "Japan", countryKey: "world_country_japan", flag: "🇯🇵", lon: 139.69, lat: 35.69, status: "planned" },
+    { label: "Bishkek", cityKey: "world_city_bishkek", country: "Kyrgyzstan", countryKey: "world_country_kyrgyzstan", flag: "🇰🇬", lon: 74.57, lat: 42.87, status: "planned" },
+    { label: "Minsk", cityKey: "world_city_minsk", country: "Belarus", countryKey: "world_country_belarus", flag: "🇧🇾", lon: 27.56, lat: 53.90, status: "planned" },
+    { label: "Tashkent", cityKey: "world_city_tashkent", country: "Uzbekistan", countryKey: "world_country_uzbekistan", flag: "🇺🇿", lon: 69.24, lat: 41.30, status: "planned" },
+    { label: "Ashgabat", cityKey: "world_city_ashgabat", country: "Turkmenistan", countryKey: "world_country_turkmenistan", flag: "🇹🇲", lon: 58.38, lat: 37.96, status: "planned" },
   ];
 
   const countryFeed = document.getElementById("worldCountryFeed");

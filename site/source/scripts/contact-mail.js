@@ -147,6 +147,24 @@
       });
    }
 
+   let turnstileScriptPromise = null;
+
+   function loadTurnstileScript() {
+      if (window.turnstile?.render) return Promise.resolve(window.turnstile);
+      if (turnstileScriptPromise) return turnstileScriptPromise;
+
+      turnstileScriptPromise = new Promise((resolve, reject) => {
+         const script = document.createElement("script");
+         script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+         script.async = true;
+         script.onload = () => waitForTurnstile().then(resolve, reject);
+         script.onerror = () => reject(new Error("Cloudflare Turnstile konnte nicht geladen werden."));
+         document.head.append(script);
+      });
+
+      return turnstileScriptPromise;
+   }
+
    function resetTurnstile(config) {
       const state = turnstileState.get(config.type);
       if (!state) return;
@@ -369,7 +387,7 @@
          );
       }
 
-      const turnstile = await waitForTurnstile();
+      const turnstile = await loadTurnstileScript();
 
       for (const config of FORM_CONFIGS) {
          const form = config.element;
@@ -408,9 +426,39 @@
 
    FORM_CONFIGS.forEach(bindForm);
 
-   initTurnstile().catch((error) => {
-      console.error("[MIRoKIT] Turnstile initialization failed:", error);
-      FORM_CONFIGS.forEach((config) => setSecurityReady(config, false));
-      showContactToast("Die Sicherheitsprüfung konnte nicht initialisiert werden.");
-   });
+   function scheduleTurnstileInitialization() {
+      const contactSection = document.getElementById("contact");
+      if (!contactSection) return;
+
+      let started = false;
+      const start = () => {
+         if (started) return;
+         started = true;
+         initTurnstile().catch((error) => {
+            console.error("[MIRoKIT] Turnstile initialization failed:", error);
+            FORM_CONFIGS.forEach((config) => setSecurityReady(config, false));
+            showContactToast("Die Sicherheitsprüfung konnte nicht initialisiert werden.");
+         });
+      };
+
+      contactSection.addEventListener("focusin", start, { once: true });
+      contactSection.addEventListener("pointerdown", start, { once: true });
+
+      if (!("IntersectionObserver" in window)) {
+         window.addEventListener("load", () => window.setTimeout(start, 1200), { once: true });
+         return;
+      }
+
+      const observer = new IntersectionObserver(
+         (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            observer.disconnect();
+            start();
+         },
+         { rootMargin: "700px 0px", threshold: 0.01 },
+      );
+      observer.observe(contactSection);
+   }
+
+   scheduleTurnstileInitialization();
 })();

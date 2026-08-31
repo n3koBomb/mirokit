@@ -1,0 +1,46 @@
+# Shared hardening for static assets served by Cloudflare Workers Static Assets.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  X-Frame-Options: SAMEORIGIN
+
+# Keep HTML fresh after deployments. CSS, JavaScript, and media are safe to
+# cache briefly because this project does not currently use fingerprinted names.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/page/*
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/source/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+  X-Robots-Tag: noindex, nofollow
+
+/public/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+
+/public/assets/archive/*
+  X-Robots-Tag: noindex, nofollow
+
+/public/assets/uploads/*
+  X-Robots-Tag: noindex, nofollow
+
+/public/assets/media/interviews/transcripts/*
+  X-Robots-Tag: noindex, nofollow
+
+/public/assets/media/press/*
+  X-Robots-Tag: noindex, nofollow
+
+# API responses are handled by the Worker and receive the same policy there;
+# this rule is also useful if the API path is ever served as a static fallback.
+/api/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
+# Do not let an eventual workers.dev preview become an indexed duplicate.
+https://:version.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex, nofollow

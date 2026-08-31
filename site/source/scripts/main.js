@@ -12,13 +12,197 @@
       const revealElements = [...document.querySelectorAll(".fu")];
       const themeToggles = [...document.querySelectorAll("[data-theme-toggle]")];
       const newsRotator = document.querySelector("[data-news-rotator]");
-      const newsSlides = newsRotator ? [...newsRotator.querySelectorAll("[data-news-slide]")] : [];
-      const newsDots = [...document.querySelectorAll("[data-news-rotate-target]")];
-      const newsCurrent = document.querySelector("[data-news-current]");
+      const newsGridFull = document.querySelector("[data-news-grid]");
+      const newsFilterBtns = [...document.querySelectorAll(".news-filter-btn")];
+      const newsEmpty = document.getElementById("newsEmpty");
+      let activeNewsFilter = "all";
+      let newsHeroItems = [];
       let newsSlideIndex = 0;
       let newsRotationTimer = 0;
       let revealFrame = 0;
       let revealObserver = null;
+      let deferredImageObserver = null;
+      let deferredBackgroundObserver = null;
+
+      function loadDeferredImage(image) {
+         if (!image?.dataset.src) return;
+         if (image.dataset.srcset) image.setAttribute("srcset", image.dataset.srcset);
+         image.setAttribute("fetchpriority", "low");
+         image.setAttribute("src", image.dataset.src);
+         delete image.dataset.src;
+      }
+
+      function loadDeferredBackground(element) {
+         const source = element?.dataset.deferredBackground;
+         if (!source || element.dataset.backgroundLoaded === "true") return;
+         const absoluteSource = new URL(source, document.baseURI).href;
+         const safeSource = absoluteSource.replace(/["\\)]/g, "\\$&");
+         element.style.setProperty("--deferred-background", `url("${safeSource}")`);
+         element.dataset.backgroundLoaded = "true";
+      }
+
+      function initDeferredMedia() {
+         const images = [...document.querySelectorAll("img[data-src]")];
+         const heroPartnerImages = images.filter((image) => image.closest("#hero .partner-showcase"));
+         const viewportImages = images.filter((image) => !heroPartnerImages.includes(image));
+         const backgrounds = [...document.querySelectorAll("[data-deferred-background]")];
+
+         if ("IntersectionObserver" in window) {
+            deferredImageObserver = new IntersectionObserver(
+               (entries) => entries.forEach((entry) => {
+                  if (!entry.isIntersecting) return;
+                  loadDeferredImage(entry.target);
+                  deferredImageObserver.unobserve(entry.target);
+               }),
+               { rootMargin: "100px 0px", threshold: 0.01 },
+            );
+            viewportImages.forEach((image) => deferredImageObserver.observe(image));
+
+            deferredBackgroundObserver = new IntersectionObserver(
+               (entries) => entries.forEach((entry) => {
+                  if (!entry.isIntersecting) return;
+                  loadDeferredBackground(entry.target);
+                  deferredBackgroundObserver.unobserve(entry.target);
+               }),
+               { rootMargin: "500px 0px", threshold: 0.01 },
+            );
+            backgrounds.forEach((element) => deferredBackgroundObserver.observe(element));
+         } else {
+            window.setTimeout(() => {
+               const viewportLimit = window.innerHeight + 100;
+               viewportImages.forEach((image) => {
+                  const bounds = image.getBoundingClientRect();
+                  if (bounds.top <= viewportLimit && bounds.bottom >= -100) loadDeferredImage(image);
+               });
+               backgrounds.forEach((element) => {
+                  const bounds = element.getBoundingClientRect();
+                  if (bounds.top <= window.innerHeight + 500 && bounds.bottom >= -500) loadDeferredBackground(element);
+               });
+            }, 1500);
+         }
+
+         const releaseHeroPartnerImages = () => heroPartnerImages.forEach(loadDeferredImage);
+         const partnerShowcase = document.querySelector("#hero .partner-showcase");
+         window.addEventListener("scroll", releaseHeroPartnerImages, { once: true, passive: true });
+         partnerShowcase?.addEventListener("pointerenter", releaseHeroPartnerImages, { once: true });
+         partnerShowcase?.addEventListener("focusin", releaseHeroPartnerImages, { once: true });
+      }
+
+      function initDeferredWorldMap() {
+         const worldSection = document.getElementById("world");
+         if (!worldSection) return;
+
+         let started = false;
+         const start = () => {
+            if (started) return;
+            started = true;
+            const scriptUrl = new URL("source/scripts/mirokit-world-map.js", document.baseURI).href;
+            import(scriptUrl).catch((error) => console.warn("MIRoKIT world map could not be loaded.", error));
+         };
+
+         if (!("IntersectionObserver" in window)) {
+            window.addEventListener("load", () => window.setTimeout(start, 1200), { once: true });
+            return;
+         }
+
+         const observer = new IntersectionObserver(
+            (entries) => {
+               if (!entries.some((entry) => entry.isIntersecting)) return;
+               observer.disconnect();
+               start();
+            },
+            { rootMargin: "600px 0px", threshold: 0.01 },
+         );
+         observer.observe(worldSection);
+      }
+
+      // Temporary deactivation hook for links, controls, cards, and sections.
+      const temporaryDisabledSelector = "[data-temporarily-disabled], .is-temporarily-disabled";
+      const temporaryDisabledStates = new WeakMap();
+      let trackedTemporaryDisabledElements = new Set();
+
+      function rememberAndDisable(element, removeFromTabOrder = false) {
+         if (!temporaryDisabledStates.has(element)) {
+            temporaryDisabledStates.set(element, {
+               ariaDisabled: element.getAttribute("aria-disabled"),
+               tabindex: element.getAttribute("tabindex"),
+            });
+         }
+         element.setAttribute("aria-disabled", "true");
+         if (removeFromTabOrder && !element.matches("[disabled]")) element.tabIndex = -1;
+      }
+
+      function restoreTemporaryDisabled(element) {
+         const state = temporaryDisabledStates.get(element);
+         if (!state) return;
+         if (state.ariaDisabled === null) element.removeAttribute("aria-disabled");
+         else element.setAttribute("aria-disabled", state.ariaDisabled);
+         if (state.tabindex === null) element.removeAttribute("tabindex");
+         else element.setAttribute("tabindex", state.tabindex);
+         temporaryDisabledStates.delete(element);
+      }
+
+      function syncTemporaryDisabled() {
+         const activeElements = new Set();
+
+         document.querySelectorAll(temporaryDisabledSelector).forEach((element) => {
+            activeElements.add(element);
+            rememberAndDisable(element);
+
+            const controls = element.matches("a[href], button, input, select, textarea, [tabindex]")
+               ? [element]
+               : [...element.querySelectorAll("a[href], button, input, select, textarea, [tabindex]")];
+            controls.forEach((control) => {
+               if (control.disabled) return;
+               activeElements.add(control);
+               rememberAndDisable(control, true);
+            });
+         });
+
+         trackedTemporaryDisabledElements.forEach((element) => {
+            if (!activeElements.has(element)) restoreTemporaryDisabled(element);
+         });
+         trackedTemporaryDisabledElements = activeElements;
+      }
+
+      function initTemporaryDisabled() {
+         syncTemporaryDisabled();
+
+         document.addEventListener("click", (event) => {
+            const target = event.target instanceof Element ? event.target.closest(temporaryDisabledSelector) : null;
+            if (!target) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+         }, true);
+
+         document.addEventListener("submit", (event) => {
+            const target = event.target instanceof Element ? event.target.closest(temporaryDisabledSelector) : null;
+            if (!target) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+         }, true);
+
+         const observer = new MutationObserver((records) => {
+            const markerChanged = records.some((record) => {
+               if (record.type === "childList") return true;
+               if (record.attributeName === "data-temporarily-disabled") return true;
+               if (record.attributeName !== "class" || !(record.target instanceof Element)) return false;
+               const wasDisabled = /(?:^|\s)is-temporarily-disabled(?:\s|$)/.test(record.oldValue || "");
+               const isDisabled = record.target.classList.contains("is-temporarily-disabled");
+               return wasDisabled !== isDisabled;
+            });
+            if (markerChanged) syncTemporaryDisabled();
+         });
+         observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class", "data-temporarily-disabled"],
+            attributeOldValue: true,
+            childList: true,
+            subtree: true,
+         });
+      }
+
+      initTemporaryDisabled();
 
       function syncThemeControls() {
          const isDark = currentTheme === "dark";
@@ -50,6 +234,61 @@
          syncThemeControls();
       }
 
+      const newsCategoryClasses = {
+         blue: "cat-blue",
+         green: "cat-green",
+         red: "cat-red",
+         violet: "cat-violet",
+      };
+
+      function newsText(item, field) {
+         const values = item[field] || {};
+         return values[currentLang] || values.en || values.ru || "";
+      }
+
+      function escapeHtml(value) {
+         const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+         return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
+      }
+
+      function formatNewsDate(date) {
+         const locale = { ru: "ru-RU", en: "en-GB", de: "de-DE" }[currentLang] || "en-GB";
+         return new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${date}T12:00:00`));
+      }
+
+      function isPublishedNews(item) {
+         return new Date(`${item.publishedAt}T23:59:59`).getTime() <= Date.now();
+      }
+
+      function newsFeaturedRank(item) {
+         const rank = Number(item.featured);
+         return Number.isFinite(rank) && rank > 0 ? rank : Number.POSITIVE_INFINITY;
+      }
+
+      function sortNews(items) {
+         return [...items].sort((a, b) => {
+            const dateDifference = new Date(`${b.publishedAt}T12:00:00`) - new Date(`${a.publishedAt}T12:00:00`);
+            return dateDifference || String(a.id).localeCompare(String(b.id));
+         });
+      }
+
+      function getPublishedNews() {
+         return sortNews(MIRoKIT_NEWS.filter(isPublishedNews));
+      }
+
+      function getVisibleNews() {
+         return getPublishedNews().filter((item) => activeNewsFilter === "all" || item.category === activeNewsFilter);
+      }
+
+      function getHeroNews() {
+         return getPublishedNews().slice(0, 3).sort((a, b) => {
+            const aRank = newsFeaturedRank(a);
+            const bRank = newsFeaturedRank(b);
+            if (aRank !== bRank) return aRank === Number.POSITIVE_INFINITY ? 1 : bRank === Number.POSITIVE_INFINITY ? -1 : aRank - bRank;
+            return new Date(`${b.publishedAt}T12:00:00`) - new Date(`${a.publishedAt}T12:00:00`);
+         });
+      }
+
       function stopNewsRotation() {
          window.clearTimeout(newsRotationTimer);
          newsRotationTimer = 0;
@@ -57,37 +296,125 @@
 
       function scheduleNewsRotation() {
          stopNewsRotation();
-         if (newsSlides.length < 2 || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+         if (!newsRotator || newsHeroItems.length < 2 || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
          newsRotationTimer = window.setTimeout(() => showNewsSlide(newsSlideIndex + 1), 6500);
       }
 
       function showNewsSlide(index) {
-         if (!newsSlides.length) return;
-         newsSlideIndex = (index + newsSlides.length) % newsSlides.length;
-         newsSlides.forEach((slide, slideIndex) => {
+         if (!newsRotator || !newsHeroItems.length) return;
+         newsSlideIndex = (index + newsHeroItems.length) % newsHeroItems.length;
+         newsRotator.querySelectorAll("[data-news-slide]").forEach((slide, slideIndex) => {
             const isActive = slideIndex === newsSlideIndex;
             slide.hidden = !isActive;
             slide.classList.toggle("is-active", isActive);
          });
-         newsDots.forEach((dot) => {
+         newsRotator.querySelectorAll("[data-news-rotate-target]").forEach((dot) => {
             const isActive = Number(dot.dataset.newsRotateTarget) === newsSlideIndex;
             dot.classList.toggle("is-active", isActive);
             dot.setAttribute("aria-current", String(isActive));
          });
-         if (newsCurrent) newsCurrent.textContent = String(newsSlideIndex + 1).padStart(2, "0");
+         const current = newsRotator.querySelector("[data-news-current]");
+         if (current) current.textContent = String(newsSlideIndex + 1).padStart(2, "0");
          scheduleNewsRotation();
       }
 
-      themeToggles.forEach((toggle) => toggle.addEventListener("click", () => setTheme(currentTheme === "dark" ? "light" : "dark")));
-      newsDots.forEach((dot) => dot.addEventListener("click", () => showNewsSlide(Number(dot.dataset.newsRotateTarget))));
+      function newsHeroSlideMarkup(item, index) {
+         const title = newsText(item, "title");
+         const summary = newsText(item, "summary");
+         const category = newsText(item, "categoryLabel");
+         const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
+         const position = String(index + 1).padStart(2, "0");
+         const readableLabel = T[currentLang]?.news_full || "Read in full";
+         const storyLabel = T[currentLang]?.news_read || "Read the story";
+
+         return `<article class="news-slide" data-news-slide="${index}" hidden>
+            <a class="news-slide-media" href="#news" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
+               <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span>
+            </a>
+            <div class="news-slide-content"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+         </article>`;
+      }
+
+      function renderHeroNews() {
+         if (!newsRotator) return;
+         const previousId = newsHeroItems[newsSlideIndex]?.id;
+         newsHeroItems = getHeroNews();
+         const chooseNewsLabel = T[currentLang]?.choose_news || "Choose a news item";
+         const dots = newsHeroItems.map((_, index) => {
+            const isActive = index === 0;
+            const label = T[currentLang]?.[`show_news_${index + 1}`] || `Show news item ${index + 1}`;
+            return `<button class="news-rotator-dot${isActive ? " is-active" : ""}" type="button" data-news-rotate-target="${index}" aria-label="${escapeHtml(label)}" aria-current="${String(isActive)}"></button>`;
+         }).join("");
+         const controls = newsHeroItems.length > 1 ? `<div class="news-rotator-controls" aria-label="${escapeHtml(chooseNewsLabel)}"><div class="news-rotator-dots">${dots}</div><span class="news-rotator-status"><span data-news-current>01</span> / ${String(newsHeroItems.length).padStart(2, "0")}</span></div>` : "";
+         newsRotator.innerHTML = newsHeroItems.map(newsHeroSlideMarkup).join("") + controls;
+         const restoredIndex = newsHeroItems.findIndex((item) => item.id === previousId);
+         showNewsSlide(restoredIndex >= 0 ? restoredIndex : 0);
+      }
+
+      function newsCardMarkup(item, index, isHero = false) {
+         const title = newsText(item, "title");
+         const summary = newsText(item, "summary");
+         const category = newsText(item, "categoryLabel");
+         const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
+         const cardClass = isHero ? (item.featured === 1 ? "news-card--featured" : "news-card--compact") : "";
+         const position = String(index + 1).padStart(2, "0");
+         const readableLabel = T[currentLang]?.news_full || "Read in full";
+
+         if (!isHero) {
+            return `<div class="news-card-full-wrap${item.featured === 1 ? " featured" : ""}" data-category="${escapeHtml(item.category)}" data-news-id="${escapeHtml(item.id)}">
+               <button type="button" class="news-card-full" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
+                  <span class="news-full-img-wrap"><img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span></span>
+                  <span class="news-full-body"><span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}</span><span class="news-full-title">${escapeHtml(title)}</span><span class="news-full-excerpt">${escapeHtml(summary)}</span><span class="news-full-readmore">${escapeHtml(readableLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></span>
+               </button>
+            </div>`;
+         }
+
+         const storyLabel = T[currentLang]?.news_read || "Read the story";
+         return `<article class="news-card ${cardClass}" data-news-id="${escapeHtml(item.id)}">
+            <a class="news-card-media" href="#news" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
+               <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="news-card-index">${position}</span><span class="category ${accentClass}">${escapeHtml(category)}</span><span class="news-card-scan" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            </a>
+            <div class="news-body"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-footer"><span>${escapeHtml(category)}</span><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
+         </article>`;
+      }
+
+      function renderNewsViews() {
+         renderHeroNews();
+
+         const visibleNews = getVisibleNews();
+         if (newsGridFull) newsGridFull.innerHTML = visibleNews.map((item, index) => newsCardMarkup(item, index)).join("");
+         if (newsEmpty) newsEmpty.hidden = visibleNews.length > 0;
+      }
+
+      newsRotator?.addEventListener("click", (event) => {
+         const dot = event.target instanceof Element ? event.target.closest("[data-news-rotate-target]") : null;
+         if (!dot || !newsRotator.contains(dot)) return;
+         showNewsSlide(Number(dot.dataset.newsRotateTarget));
+      });
       newsRotator?.addEventListener("mouseenter", stopNewsRotation);
       newsRotator?.addEventListener("mouseleave", scheduleNewsRotation);
       newsRotator?.addEventListener("focusin", stopNewsRotation);
       newsRotator?.addEventListener("focusout", (event) => {
          if (!newsRotator.contains(event.relatedTarget)) scheduleNewsRotation();
       });
+
+      newsFilterBtns.forEach((button) => button.addEventListener("click", () => {
+         activeNewsFilter = button.dataset.filter || "all";
+         newsFilterBtns.forEach((filterButton) => {
+            const isActive = filterButton === button;
+            filterButton.classList.toggle("is-active", isActive);
+            filterButton.setAttribute("aria-pressed", String(isActive));
+         });
+         renderNewsViews();
+      }));
+
+      document.addEventListener("mirokit:languagechange", renderNewsViews);
+      renderNewsViews();
+      initDeferredMedia();
+      initDeferredWorldMap();
+
+      themeToggles.forEach((toggle) => toggle.addEventListener("click", () => setTheme(currentTheme === "dark" ? "light" : "dark")));
       syncThemeControls();
-      showNewsSlide(0);
 
       function revealVisibleElements() {
          revealFrame = 0;
@@ -290,6 +617,106 @@
       }
 
       setGalleryView();
+
+      const onlineProjectsPanel = document.getElementById("onlineProjects");
+      const onlineProjectsViews = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-view]") || [])];
+      const onlineProjectsLinks = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-link]") || [])];
+      const onlineProjectsNavViewport = onlineProjectsPanel?.querySelector("[data-online-projects-nav-viewport]");
+      const onlineProjectsScrollButtons = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-scroll]") || [])];
+      const onlineProjectsReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+
+      function updateOnlineProjectsScrollControls() {
+         if (!onlineProjectsNavViewport || !onlineProjectsScrollButtons.length) return;
+
+         const maxScroll = Math.max(0, onlineProjectsNavViewport.scrollWidth - onlineProjectsNavViewport.clientWidth);
+         const hasOverflow = maxScroll > 2;
+         const atStart = onlineProjectsNavViewport.scrollLeft <= 2;
+         const atEnd = onlineProjectsNavViewport.scrollLeft >= maxScroll - 2;
+
+         onlineProjectsScrollButtons.forEach((button) => {
+            const isPrevious = button.dataset.onlineProjectsScroll === "previous";
+            button.hidden = !hasOverflow;
+            button.disabled = !hasOverflow || (isPrevious ? atStart : atEnd);
+            button.setAttribute("aria-disabled", String(button.disabled));
+         });
+      }
+
+      function scrollOnlineProjectsNav(direction) {
+         if (!onlineProjectsNavViewport) return;
+         const distance = Math.max(180, onlineProjectsNavViewport.clientWidth * 0.72);
+         onlineProjectsNavViewport.scrollBy({
+            left: direction * distance,
+            behavior: onlineProjectsReducedMotion?.matches ? "auto" : "smooth",
+         });
+      }
+
+      function setOnlineProjectsView(viewKey = "drawing") {
+         if (!onlineProjectsViews.length) return;
+         const selectedKey = onlineProjectsViews.some((view) => view.dataset.onlineProjectsView === viewKey) ? viewKey : "drawing";
+
+         onlineProjectsViews.forEach((view) => {
+            const isCurrent = view.dataset.onlineProjectsView === selectedKey;
+            view.hidden = !isCurrent;
+            view.classList.toggle("is-current", isCurrent);
+         });
+
+         onlineProjectsLinks.forEach((link) => {
+            const isCurrent = link.dataset.linkKey === selectedKey;
+            link.classList.toggle("is-active", isCurrent);
+            link.classList.toggle("is-current", isCurrent);
+            link.setAttribute("aria-selected", String(isCurrent));
+            link.tabIndex = isCurrent ? 0 : -1;
+         });
+
+         const selectedLink = onlineProjectsLinks.find((link) => link.dataset.linkKey === selectedKey);
+         if (selectedLink && onlineProjectsNavViewport && window.matchMedia?.("(max-width: 760px)").matches) {
+            selectedLink.scrollIntoView({
+               behavior: onlineProjectsReducedMotion?.matches ? "auto" : "smooth",
+               block: "nearest",
+               inline: "nearest",
+            });
+         }
+
+         scheduleReveal();
+         updateOnlineProjectsScrollControls();
+      }
+
+      onlineProjectsLinks.forEach((link) => {
+         link.addEventListener("click", () => setOnlineProjectsView(link.dataset.linkKey || "drawing"));
+         link.addEventListener("keydown", (event) => {
+            if (!onlineProjectsLinks.length || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+            event.preventDefault();
+            const currentIndex = onlineProjectsLinks.indexOf(link);
+            let nextIndex = currentIndex;
+            if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + onlineProjectsLinks.length) % onlineProjectsLinks.length;
+            if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % onlineProjectsLinks.length;
+            if (event.key === "Home") nextIndex = 0;
+            if (event.key === "End") nextIndex = onlineProjectsLinks.length - 1;
+            const nextLink = onlineProjectsLinks[nextIndex];
+            nextLink.focus();
+            setOnlineProjectsView(nextLink.dataset.linkKey || "drawing");
+         });
+      });
+
+      onlineProjectsScrollButtons.forEach((button) => {
+         button.addEventListener("click", () => scrollOnlineProjectsNav(button.dataset.onlineProjectsScroll === "previous" ? -1 : 1));
+      });
+
+      onlineProjectsNavViewport?.addEventListener("scroll", updateOnlineProjectsScrollControls, { passive: true });
+      onlineProjectsNavViewport?.addEventListener("keydown", (event) => {
+         if (event.target !== onlineProjectsNavViewport) return;
+         if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            scrollOnlineProjectsNav(-1);
+         }
+         if (event.key === "ArrowRight") {
+            event.preventDefault();
+            scrollOnlineProjectsNav(1);
+         }
+      });
+      window.addEventListener("resize", updateOnlineProjectsScrollControls, { passive: true });
+      document.addEventListener("mirokit:languagechange", updateOnlineProjectsScrollControls);
+      setOnlineProjectsView();
 
       const projectsPanel = document.getElementById("projects");
       const projectsViews = [...document.querySelectorAll("[data-projects-view]")];
@@ -610,29 +1037,6 @@
          }
       });
 
-      // --- #news: Kategorie-Filter ---
-      const newsFilterBtns = document.querySelectorAll(".news-filter-btn");
-      const newsWraps = Array.from(document.querySelectorAll(".news-card-full-wrap"));
-      const newsEmpty = document.getElementById("newsEmpty");
-      newsFilterBtns.forEach((btn) =>
-         btn.addEventListener("click", () => {
-            newsFilterBtns.forEach((b) => {
-               b.classList.remove("is-active");
-               b.setAttribute("aria-pressed", "false");
-            });
-            btn.classList.add("is-active");
-            btn.setAttribute("aria-pressed", "true");
-            const f = btn.dataset.filter;
-            let visibleCount = 0;
-            newsWraps.forEach((w) => {
-               const match = f === "all" || w.dataset.category === f;
-               w.hidden = !match;
-               if (match) visibleCount++;
-            });
-            newsEmpty.hidden = visibleCount > 0;
-         }),
-      );
-
       // --- #news: Modal mit Vor/Zurück-Navigation zwischen den Karten ---
       const newsModal = document.getElementById("newsModal");
       const newsModalCard = newsModal.querySelector(".news-modal-card");
@@ -645,32 +1049,22 @@
       let newsIndex = 0;
       let newsOpenedFrom = null;
 
-      function newsCardData(wrap) {
-         const btn = wrap.querySelector(".news-card-full");
-         const catEl = btn.querySelector(".category");
-         return {
-            img: btn.querySelector(".news-full-img-wrap img"),
-            categoryText: catEl.textContent.trim(),
-            categoryClass: [...catEl.classList].find((c) => c.startsWith("cat-")) || "",
-            date: btn.querySelector(".news-full-date").innerHTML,
-            title: btn.querySelector(".news-full-title").textContent.trim(),
-            template: wrap.querySelector("template"),
-         };
-      }
-
       function renderNewsModal(index) {
-         const visible = newsWraps.filter((w) => !w.hidden);
+         const visible = getVisibleNews();
          if (!visible.length) return;
          newsIndex = (index + visible.length) % visible.length;
-         const data = newsCardData(visible[newsIndex]);
-         newsModalImg.src = data.img.src;
-         newsModalImg.alt = data.img.alt;
-         newsModalCategory.textContent = data.categoryText;
-         newsModalCategory.className = "category news-modal-category " + data.categoryClass;
-         newsModalDate.innerHTML = data.date;
-         newsModalTitle.textContent = data.title;
-         newsModalBody.innerHTML = "";
-         if (data.template) newsModalBody.appendChild(data.template.content.cloneNode(true));
+         const item = visible[newsIndex];
+         newsModalImg.src = item.image;
+         newsModalImg.alt = newsText(item, "alt");
+         newsModalCategory.textContent = newsText(item, "categoryLabel");
+         newsModalCategory.className = `category news-modal-category ${newsCategoryClasses[item.accent] || newsCategoryClasses.blue}`;
+         newsModalDate.innerHTML = `<i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}`;
+         newsModalTitle.textContent = newsText(item, "title");
+         newsModalBody.replaceChildren(...(newsText(item, "content") || []).map((paragraph) => {
+            const node = document.createElement("p");
+            node.textContent = paragraph;
+            return node;
+         }));
          newsModalCounter.textContent = `${newsIndex + 1} / ${visible.length}`;
       }
 
@@ -690,11 +1084,31 @@
          newsOpenedFrom?.focus();
       }
 
-      newsWraps.forEach((wrap) => {
-         wrap.querySelector(".news-card-full").addEventListener("click", () => {
-            const visible = newsWraps.filter((w) => !w.hidden);
-            openNewsModal(visible.indexOf(wrap));
-         });
+      function openNewsById(newsId) {
+         let visible = getVisibleNews();
+         let itemIndex = visible.findIndex((item) => item.id === newsId);
+         if (itemIndex < 0) {
+            activeNewsFilter = "all";
+            newsFilterBtns.forEach((button) => {
+               const isActive = button.dataset.filter === "all";
+               button.classList.toggle("is-active", isActive);
+               button.setAttribute("aria-pressed", String(isActive));
+            });
+            renderNewsViews();
+            visible = getVisibleNews();
+            itemIndex = visible.findIndex((item) => item.id === newsId);
+         }
+         if (itemIndex >= 0) openNewsModal(itemIndex);
+      }
+
+      document.addEventListener("click", (event) => {
+         const trigger = event.target instanceof Element ? event.target.closest("[data-news-open]") : null;
+         if (!trigger) return;
+         event.preventDefault();
+         openNewsById(trigger.dataset.newsOpen);
+      });
+      document.addEventListener("mirokit:languagechange", () => {
+         if (newsModal.classList.contains("show")) renderNewsModal(newsIndex);
       });
       newsModal.querySelector(".news-modal-close").addEventListener("click", closeNewsModal);
       newsModal.querySelector(".news-modal-prev").addEventListener("click", () => renderNewsModal(newsIndex - 1));
