@@ -1,0 +1,15 @@
+{
+  "d1_databases": [
+    {
+      "binding": "NEWS_DB",
+      "database_name": "mirokit-news",
+      "database_id": "PASTE_THE_UUID_FROM_WRANGLER_D1_CREATE"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "NEWS_MEDIA",
+      "bucket_name": "mirokit-news-media"
+    }
+  ]
+}

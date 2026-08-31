@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>MIRoKIT News Admin</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">MIRoKIT / CONTENT DESK</p>
+          <h1>News verwalten</h1>
+          <p class="intro">Entwürfe bearbeiten, Bilder hochladen und Meldungen dreisprachig veröffentlichen.</p>
+        </div>
+        <button class="button button-secondary" id="newNews" type="button">Neue News</button>
+      </header>
+
+      <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+      <section class="admin-grid">
+        <aside class="panel">
+          <div class="panel-heading">
+            <h2>Meldungen</h2>
+            <button class="button button-small" id="reloadNews" type="button">Neu laden</button>
+          </div>
+          <div id="newsList" class="news-list" aria-live="polite"></div>
+        </aside>
+
+        <section class="panel">
+          <form id="newsForm">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">EDITOR</p>
+                <h2 id="formHeading">Neue Meldung</h2>
+              </div>
+              <span class="status-badge" id="currentStatus">Entwurf</span>
+            </div>
+
+            <div class="field-grid field-grid-three">
+              <label>ID / Slug <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="summer-camp-report" /></label>
+              <label>Veröffentlichungsdatum <input id="publishedAt" name="publishedAt" type="date" required /></label>
+              <label>Kategorie
+                <select id="category" name="category"><option value="event">Event</option><option value="interview">Interview</option><option value="photo">Foto</option><option value="announce">Ankündigung</option></select>
+              </label>
+              <label>Akzent
+                <select id="accent" name="accent"><option value="blue">Blau</option><option value="red">Rot</option><option value="green">Grün</option><option value="amber">Amber</option><option value="violet">Violett</option></select>
+              </label>
+              <label>Hero-Rang <input id="featured" name="featured" type="number" min="1" max="10" placeholder="optional" /></label>
+              <label>Bild-URL <input id="image" name="image" type="text" required maxlength="2000" placeholder="/news-media/news/... oder https://..." /></label>
+            </div>
+
+            <div class="upload-row">
+              <label class="file-label">Bild hochladen <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label>
+              <span class="muted">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+            </div>
+
+            <div class="translations">
+              <fieldset><legend>Русский / RU</legend><label>Alt-Text <input data-language="ru" data-field="alt" required maxlength="500" /></label><label>Titel <input data-language="ru" data-field="title" required maxlength="500" /></label><label>Zusammenfassung <textarea data-language="ru" data-field="summary" required maxlength="2000"></textarea></label><label>Inhalt <span class="muted">Ein Absatz pro Zeile</span><textarea data-language="ru" data-field="content" required></textarea></label></fieldset>
+              <fieldset><legend>English / EN</legend><label>Alt text <input data-language="en" data-field="alt" required maxlength="500" /></label><label>Title <input data-language="en" data-field="title" required maxlength="500" /></label><label>Summary <textarea data-language="en" data-field="summary" required maxlength="2000"></textarea></label><label>Content <span class="muted">One paragraph per line</span><textarea data-language="en" data-field="content" required></textarea></label></fieldset>
+              <fieldset><legend>Deutsch / DE</legend><label>Alt-Text <input data-language="de" data-field="alt" required maxlength="500" /></label><label>Titel <input data-language="de" data-field="title" required maxlength="500" /></label><label>Zusammenfassung <textarea data-language="de" data-field="summary" required maxlength="2000"></textarea></label><label>Inhalt <span class="muted">Ein Absatz pro Zeile</span><textarea data-language="de" data-field="content" required></textarea></label></fieldset>
+            </div>
+
+            <div class="form-actions"><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishNews" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveNews" type="button">Archivieren</button></div>
+          </form>
+        </section>
+      </section>
+    </main>
+    <script src="./admin.js" type="module"></script>
+  </body>
+</html>

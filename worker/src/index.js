@@ -1,3 +1,14 @@
+import { authorizeAdmin, isLocalHostname } from "./access.js";
+import {
+	NEWS_ADMIN_QUERY,
+	NEWS_PUBLIC_QUERY,
+	newsError,
+	normalizeNewsInput,
+	newsToStatements,
+	rowsToAdminNews,
+	rowsToNews,
+} from "./news.js";
+
 const FORM_TYPES = new Set([
 	"main-contact",
 	"extra-contact",
@@ -44,6 +55,10 @@ const FORM_FIELD_ALLOWLIST = Object.freeze({
 
 const MULTI_VALUE_FIELDS = new Set(["activities", "goals"]);
 const RATE_LIMIT_WINDOW_SECONDS = 60;
+const NEWS_API_PATH = "/api/news";
+const NEWS_ADMIN_PREFIX = "/news-admin";
+const NEWS_ADMIN_API_PREFIX = "/news-admin/api";
+const NEWS_MEDIA_PREFIX = "/news-media/";
 
 const TURNSTILE_TEST_SECRET =
 	"1x0000000000000000000000000000000AA";
@@ -153,6 +168,7 @@ function createRobotsTxt(hostname) {
 		"User-agent: *",
 		"Allow: /",
 		"Disallow: /api/",
+		"Disallow: /news-admin/",
 		"",
 		`Sitemap: https://${canonicalSiteHostname}/sitemap.xml`,
 		"",
@@ -1063,6 +1079,218 @@ function createTextEmail({
 	].join("\n");
 }
 
+function newsJsonResponse(data, status, origin, env, cacheControl = "no-store") {
+	return jsonResponse(data, status, origin, env, {
+		"Cache-Control": cacheControl,
+	});
+}
+
+function newsDatabaseUnavailable(origin, env) {
+	console.error("NEWS_DB is not configured");
+	return newsJsonResponse(
+		{ success: false, message: "News storage is not configured" },
+		503,
+		origin,
+		env
+	);
+}
+
+function isNewsAdminPath(pathname) {
+	return pathname === NEWS_ADMIN_PREFIX || pathname.startsWith(`${NEWS_ADMIN_PREFIX}/`);
+}
+
+function isNewsAdminApiPath(pathname) {
+	return pathname === NEWS_ADMIN_API_PREFIX || pathname.startsWith(`${NEWS_ADMIN_API_PREFIX}/`);
+}
+
+function newsAdminUnauthorized(origin, env) {
+	return newsJsonResponse(
+		{ success: false, message: "Admin authentication required" },
+		401,
+		origin,
+		env
+	);
+}
+
+async function readJsonRequest(request) {
+	try {
+		return await request.json();
+	} catch {
+		throw newsError("Invalid JSON");
+	}
+}
+
+async function getAdminNews(env) {
+	const result = await env.NEWS_DB.prepare(NEWS_ADMIN_QUERY).all();
+	return rowsToAdminNews(result.results || []);
+}
+
+async function saveNewsRecord(env, news, status) {
+	const statements = newsToStatements(news, status, new Date().toISOString());
+	await env.NEWS_DB.batch(
+		statements.map((statement) =>
+			env.NEWS_DB.prepare(statement.sql).bind(...statement.params)
+		)
+	);
+}
+
+async function handlePublicNews(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse(
+			{ success: false, message: "Method not allowed" },
+			405,
+			origin,
+			env
+		);
+	}
+
+	if (!env.NEWS_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const today = new Date().toISOString().slice(0, 10);
+		const result = await env.NEWS_DB.prepare(NEWS_PUBLIC_QUERY).bind(today).all();
+		return newsJsonResponse(
+			{ success: true, news: rowsToNews(result.results || []) },
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public news query failed", error);
+		return newsJsonResponse(
+			{ success: false, message: "News service unavailable" },
+			503,
+			origin,
+			env
+		);
+	}
+}
+
+async function handleNewsAdminApi(request, env, url, origin) {
+	const identity = await authorizeAdmin(request, env);
+	if (!identity) return newsAdminUnauthorized(origin, env);
+	if (!env.NEWS_DB) return newsDatabaseUnavailable(origin, env);
+
+	if (
+		request.method !== "GET" &&
+		origin &&
+		origin !== url.origin
+	) {
+		return newsJsonResponse(
+			{ success: false, message: "Cross-origin admin request denied" },
+			403,
+			origin,
+			env
+		);
+	}
+
+	const relativePath = url.pathname.slice(NEWS_ADMIN_API_PREFIX.length).replace(/\/$/, "") || "/";
+
+	try {
+		if (relativePath === "/news" && request.method === "GET") {
+			return newsJsonResponse(
+				{ success: true, news: await getAdminNews(env) },
+				200,
+				origin,
+				env
+			);
+		}
+
+		if (relativePath === "/news" && request.method === "POST") {
+			const body = await readJsonRequest(request);
+			const news = normalizeNewsInput(body);
+			if ((await getAdminNews(env)).some((item) => item.id === news.id)) {
+				return newsJsonResponse({ success: false, message: "News ID already exists" }, 409, origin, env);
+			}
+			await saveNewsRecord(env, news, "draft");
+			return newsJsonResponse({ success: true, news }, 201, origin, env);
+		}
+
+		const publishMatch = relativePath.match(/^\/news\/([^/]+)\/publish$/);
+		if (publishMatch && request.method === "POST") {
+			const id = decodeURIComponent(publishMatch[1]);
+			const existing = (await getAdminNews(env)).find((item) => item.id === id);
+			if (!existing) return newsJsonResponse({ success: false, message: "News not found" }, 404, origin, env);
+
+			const news = normalizeNewsInput(existing);
+			await saveNewsRecord(env, news, "published");
+			return newsJsonResponse({ success: true, news: { ...news, status: "published" } }, 200, origin, env);
+		}
+
+		const itemMatch = relativePath.match(/^\/news\/([^/]+)$/);
+		if (itemMatch) {
+			const id = decodeURIComponent(itemMatch[1]);
+
+			if (request.method === "PUT") {
+				const body = await readJsonRequest(request);
+				const news = normalizeNewsInput({ ...body, id });
+				await saveNewsRecord(env, news, "draft");
+				return newsJsonResponse({ success: true, news }, 200, origin, env);
+			}
+
+			if (request.method === "DELETE") {
+				const result = await env.NEWS_DB
+					.prepare("UPDATE news SET status = 'archived', updated_at = ? WHERE id = ?")
+					.bind(new Date().toISOString(), id)
+					.run();
+				if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "News not found" }, 404, origin, env);
+				return newsJsonResponse({ success: true }, 200, origin, env);
+			}
+		}
+
+		if (relativePath === "/media" && request.method === "POST") {
+			if (!env.NEWS_MEDIA) return newsDatabaseUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			const allowedTypes = {
+				"image/jpeg": "jpg",
+				"image/png": "png",
+				"image/webp": "webp",
+				"image/avif": "avif",
+			};
+			if (!(file instanceof File) || !allowedTypes[file.type] || file.size === 0 || file.size > 8 * 1024 * 1024) {
+				return newsJsonResponse({ success: false, message: "Unsupported image or image too large" }, 400, origin, env);
+			}
+
+			const key = `news/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
+			await env.NEWS_MEDIA.put(key, file.stream(), {
+				httpMetadata: {
+					contentType: file.type,
+					cacheControl: "public, max-age=31536000, immutable",
+				},
+			});
+			return newsJsonResponse({ success: true, image: `${NEWS_MEDIA_PREFIX}${key}` }, 201, origin, env);
+		}
+
+		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+	} catch (error) {
+		const status = Number.isInteger(error?.status) ? error.status : 500;
+		if (status < 500) {
+			return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
+		}
+		console.error("News admin request failed", error);
+		return newsJsonResponse({ success: false, message: "News service unavailable" }, 503, origin, env);
+	}
+}
+
+async function handleNewsMedia(request, env, url) {
+	if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405 });
+	if (!env.NEWS_MEDIA) return new Response("News media storage is not configured", { status: 503 });
+
+	const key = url.pathname.slice(NEWS_MEDIA_PREFIX.length);
+	if (!/^news\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key)) return new Response("Not found", { status: 404 });
+
+	const object = await env.NEWS_MEDIA.get(key);
+	if (!object) return new Response("Not found", { status: 404 });
+
+	const headers = new Headers();
+	object.writeHttpMetadata(headers);
+	headers.set("Cache-Control", "public, max-age=31536000, immutable");
+	headers.set("X-Content-Type-Options", "nosniff");
+	return new Response(request.method === "HEAD" ? null : object.body, { status: 200, headers });
+}
+
 export default {
 	async fetch(request, env) {
 		const url = new URL(request.url);
@@ -1071,6 +1299,33 @@ export default {
 
 		if (isProtectedAssetPath(url.pathname)) {
 			return forbiddenAssetResponse();
+		}
+
+		if (url.pathname === NEWS_API_PATH) {
+			return handlePublicNews(request, env, origin);
+		}
+
+		if (isNewsAdminApiPath(url.pathname)) {
+			return handleNewsAdminApi(request, env, url, origin);
+		}
+
+		if (url.pathname.startsWith(NEWS_MEDIA_PREFIX)) {
+			return handleNewsMedia(request, env, url);
+		}
+
+		if (url.pathname === NEWS_ADMIN_PREFIX && (request.method === "GET" || request.method === "HEAD")) {
+			return new Response(null, {
+				status: 301,
+				headers: {
+					...COMMON_RESPONSE_HEADERS,
+					Location: `${NEWS_ADMIN_PREFIX}/`,
+				},
+			});
+		}
+
+		if (isNewsAdminPath(url.pathname) && !isLocalHostname(requestHostname)) {
+			const identity = await authorizeAdmin(request, env);
+			if (!identity) return newsAdminUnauthorized(origin, env);
 		}
 
 		if (

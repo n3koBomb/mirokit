@@ -16,6 +16,7 @@
       const newsFilterBtns = [...document.querySelectorAll(".news-filter-btn")];
       const newsEmpty = document.getElementById("newsEmpty");
       let activeNewsFilter = "all";
+      let newsItems = MIRoKIT_NEWS;
       let newsHeroItems = [];
       let newsSlideIndex = 0;
       let newsRotationTimer = 0;
@@ -273,7 +274,7 @@
       }
 
       function getPublishedNews() {
-         return sortNews(MIRoKIT_NEWS.filter(isPublishedNews));
+         return sortNews(newsItems.filter(isPublishedNews));
       }
 
       function getVisibleNews() {
@@ -410,6 +411,21 @@
 
       document.addEventListener("mirokit:languagechange", renderNewsViews);
       renderNewsViews();
+
+      async function loadRemoteNews() {
+         try {
+            const response = await fetch("/api/news", { headers: { Accept: "application/json" }, cache: "no-store" });
+            if (!response.ok) throw new Error(`News API returned ${response.status}`);
+            const payload = await response.json();
+            if (!Array.isArray(payload.news)) throw new Error("News API returned invalid data");
+            newsItems = payload.news.filter((item) => item && typeof item.id === "string" && typeof item.publishedAt === "string" && item.title && item.summary && item.alt && item.content);
+            renderNewsViews();
+         } catch (error) {
+            console.info("[MIRoKIT] Using bundled news fallback:", error.message);
+         }
+      }
+
+      loadRemoteNews();
       initDeferredMedia();
       initDeferredWorldMap();
 

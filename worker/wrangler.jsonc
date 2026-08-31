@@ -9,8 +9,10 @@
       "not_found_handling": "404-page",
       "binding": "ASSETS",
       "run_worker_first": [
-         "/api/*",
-         "/",
+      "/api/*",
+      "/news-admin/*",
+      "/news-media/*",
+      "/",
          "/index.html",
          "/page/*",
          "/robots.txt",
@@ -21,6 +23,13 @@
          "/public/assets/media/press/*"
       ]
    },
+   "d1_databases": [
+      {
+         "binding": "NEWS_DB",
+         "database_name": "mirokit-news",
+         "database_id": "a90bd2da-bdd9-4cf8-9cf9-3b221a37fc81"
+      }
+   ],
    "ratelimits": [
       {
          "name": "CONTACT_FORM_RATE_LIMITER",

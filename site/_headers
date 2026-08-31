@@ -41,6 +41,10 @@
   Cache-Control: no-store
   X-Robots-Tag: noindex, nofollow
 
+/news-admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
 # Do not let an eventual workers.dev preview become an indexed duplicate.
 https://:version.:subdomain.workers.dev/*
   X-Robots-Tag: noindex, nofollow

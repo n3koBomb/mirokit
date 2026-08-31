@@ -1,3 +1,7 @@
 # Local-only values. Copy this file to .dev.vars before running Wrangler.
 ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080,http://localhost:8787,http://127.0.0.1:8787
 TURNSTILE_SECRET=local-only-unused
+NEWS_ADMIN_DEV_TOKEN=replace-with-a-local-token
+ACCESS_TEAM_DOMAIN=https://your-team.cloudflareaccess.com
+ACCESS_AUDIENCE=replace-with-access-application-audience
+ACCESS_ADMIN_EMAILS=admin@example.com

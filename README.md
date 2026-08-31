@@ -152,6 +152,38 @@ Alternativ funktioniert die Klasse `is-temporarily-disabled`. Der Marker dimmt u
 
 Alle News-Inhalte liegen in [`site/source/scripts/news-data.js`](site/source/scripts/news-data.js). Jeder Eintrag enthält lokalisierte Werte für `ru`, `en` und `de`, das Veröffentlichungsdatum `publishedAt`, das Bild, den vollständigen Modal-Inhalt sowie `featured`. Die Werte `featured: 1`, `2` und `3` ordnen die drei aktuellsten veröffentlichten Meldungen im Hero manuell; `featured: false` lässt die Datumsreihenfolge entscheiden. Zukünftige Meldungen werden automatisch bis zum Veröffentlichungsdatum ausgeblendet.
 
+### News-Admin und dynamische Veröffentlichung
+
+Der geschützte Editor liegt unter `/news-admin/`. Er schreibt Meldungen in D1
+und Bilder in den privaten R2-Bucket; die öffentliche Seite liest nur
+veröffentlichte Meldungen über `/api/news`. Die bestehende statische
+`news-data.js` bleibt als sofortiger Fallback erhalten, damit die Seite bei
+einem noch nicht eingerichteten Speicher nicht leer startet.
+
+Einmalige Cloudflare-Einrichtung:
+
+```bash
+cd worker
+npx wrangler d1 create mirokit-news --location weur
+npx wrangler r2 bucket create mirokit-news-media
+npm run db:migrate:remote
+npm run seed:news -- mirokit-news
+```
+
+Falls Wrangler meldet, dass R2 erst im Cloudflare-Dashboard aktiviert werden
+muss, R2 dort einmal freischalten und den Bucket-Befehl wiederholen. Der
+News-Editor bleibt bis zur R2-Bindung sicher erreichbar, kann aber erst dann
+neue Bilder hochladen.
+
+Die von `wrangler d1 create` gelieferte `database_id` sowie die R2-Bindung
+werden nach [`worker/wrangler.news.bindings.example.jsonc`](worker/wrangler.news.bindings.example.jsonc)
+in `worker/wrangler.jsonc` übernommen. Für die lokale Verwaltung stehen
+`NEWS_ADMIN_DEV_TOKEN`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUDIENCE` und
+`ACCESS_ADMIN_EMAILS` in `worker/.dev.vars` bereit. In Produktion wird
+Cloudflare Access auf `mirokit.com/news-admin/*` beziehungsweise dem
+verwendeten Admin-Host eingerichtet; Access-Anwendungstoken werden zusätzlich
+im Worker validiert.
+
 ## SEO und Metadaten
 
 Die Prototypen enthalten beziehungsweise planen:
@@ -237,6 +269,14 @@ Entwicklungs-Origin stehen in `worker/.dev.vars.example`; einmalig kopieren:
 cp worker/.dev.vars.example worker/.dev.vars
 cd worker
 npm run dev
+```
+
+Der lokale Worker startet mit `wrangler.local.jsonc` und simuliert D1, R2 und
+das Rate-Limit. Die lokale News-Datenbank wird so vorbereitet:
+
+```bash
+npm run db:migrate:local
+npm run seed:news -- mirokit-news-local --local
 ```
 
 Damit sind die üblichen lokalen Ports `8080` und `8787` für die Formular-API
