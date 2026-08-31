@@ -166,4 +166,80 @@ describe("news API and admin access", () => {
 		expect(response.status).toBe(200);
 		expect(body.news[0].translations.en.title).toBe("Test");
 	});
+
+	it("checks whether a news slug is available", async () => {
+		const availabilityDatabase = {
+			prepare: (sql) => ({
+				bind: (id) => ({
+					all: async () => ({ results: sql.includes("SELECT id") && id === "taken-slug" ? [{ id }] : [] }),
+				}),
+			}),
+		};
+		const headers = { "X-MiroKIT-Admin-Token": "local-token" };
+
+		const available = await worker.fetch(
+			new Request("http://localhost:8787/news-admin/api/news/availability?id=new-slug", { headers }),
+			{ NEWS_DB: availabilityDatabase, NEWS_ADMIN_DEV_TOKEN: "local-token" }
+		);
+		const taken = await worker.fetch(
+			new Request("http://localhost:8787/news-admin/api/news/availability?id=taken-slug", { headers }),
+			{ NEWS_DB: availabilityDatabase, NEWS_ADMIN_DEV_TOKEN: "local-token" }
+		);
+
+		expect((await available.json()).available).toBe(true);
+		expect((await taken.json()).available).toBe(false);
+	});
+
+	it("promotes a pending R2 image when a news item is saved", async () => {
+		const operations = [];
+		const pendingImage = "/news-media/news/pending/550e8400-e29b-41d4-a716-446655440000.webp";
+		const pendingNews = {
+			id: "pending-news",
+			publishedAt: "2026-08-31",
+			category: "event",
+			accent: "blue",
+			image: pendingImage,
+			featured: false,
+			translations: {
+				ru: { alt: "Тест", title: "Тест", summary: "Тест", content: ["Текст"] },
+				en: { alt: "Test", title: "Test", summary: "Test", content: ["Text"] },
+				de: { alt: "Test", title: "Test", summary: "Test", content: ["Text"] },
+			},
+		};
+		const database = {
+			prepare: (sql) => ({
+				all: async () => ({ results: sql === "SELECT id FROM news WHERE id = ? LIMIT 1" ? [] : [] }),
+				bind: () => ({ all: async () => ({ results: [] }) }),
+			}),
+			batch: async (statements) => operations.push(...statements),
+		};
+		const media = {
+			get: async (key) => {
+				operations.push(["get", key]);
+				return {
+					body: "image-body",
+					writeHttpMetadata: (headers) => {
+						headers.set("content-type", "image/webp");
+						headers.set("cache-control", "public, max-age=31536000, immutable");
+					},
+				};
+			},
+			put: async (key) => operations.push(["put", key]),
+			delete: async (key) => operations.push(["delete", key]),
+		};
+		const response = await worker.fetch(
+			new Request("http://localhost:8787/news-admin/api/news", {
+				method: "POST",
+				headers: { "X-MiroKIT-Admin-Token": "local-token", "Content-Type": "application/json" },
+				body: JSON.stringify(pendingNews),
+			}),
+			{ NEWS_DB: database, NEWS_MEDIA: media, NEWS_ADMIN_DEV_TOKEN: "local-token" }
+		);
+		const body = await response.json();
+
+		expect(response.status).toBe(201);
+		expect(body.news.image).toBe("/news-media/news/550e8400-e29b-41d4-a716-446655440000.webp");
+		expect(operations).toContainEqual(["put", "news/550e8400-e29b-41d4-a716-446655440000.webp"]);
+		expect(operations).toContainEqual(["delete", "news/pending/550e8400-e29b-41d4-a716-446655440000.webp"]);
+	});
 });

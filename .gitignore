@@ -1,10 +1,11 @@
 .agents
 AGENTS*
-.claude
-.codex
+.claude/
+.codex/
 .github/
-.vscode
-claude-philosophy
+.vscode/
+.cloudflare/
+claude-philosophy/
 build/
 *.mp4
 

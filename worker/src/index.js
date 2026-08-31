@@ -3,6 +3,7 @@ import {
 	NEWS_ADMIN_QUERY,
 	NEWS_PUBLIC_QUERY,
 	newsError,
+	normalizeNewsId,
 	normalizeNewsInput,
 	newsToStatements,
 	rowsToAdminNews,
@@ -1126,12 +1127,43 @@ async function getAdminNews(env) {
 }
 
 async function saveNewsRecord(env, news, status) {
-	const statements = newsToStatements(news, status, new Date().toISOString());
+	const savedNews = {
+		...news,
+		image: await promotePendingNewsImage(env, news.image),
+	};
+	const statements = newsToStatements(savedNews, status, new Date().toISOString());
 	await env.NEWS_DB.batch(
 		statements.map((statement) =>
 			env.NEWS_DB.prepare(statement.sql).bind(...statement.params)
 		)
 	);
+	return savedNews;
+}
+
+async function promotePendingNewsImage(env, image) {
+	const match = image.match(
+		/^\/news-media\/(news\/pending\/[a-f0-9-]+\.(?:jpg|png|webp|avif))$/
+	);
+	if (!match) return image;
+	if (!env.NEWS_MEDIA) {
+		throw newsError("News media storage is not configured", 503);
+	}
+
+	const sourceKey = match[1];
+	const destinationKey = sourceKey.replace("news/pending/", "news/");
+	const object = await env.NEWS_MEDIA.get(sourceKey);
+	if (!object) throw newsError("Uploaded image no longer exists", 409);
+
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata(metadataHeaders);
+	await env.NEWS_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+		},
+	});
+	await env.NEWS_MEDIA.delete(sourceKey);
+	return `${NEWS_MEDIA_PREFIX}${destinationKey}`;
 }
 
 async function handlePublicNews(request, env, origin) {
@@ -1188,6 +1220,20 @@ async function handleNewsAdminApi(request, env, url, origin) {
 	const relativePath = url.pathname.slice(NEWS_ADMIN_API_PREFIX.length).replace(/\/$/, "") || "/";
 
 	try {
+		if (relativePath === "/news/availability" && request.method === "GET") {
+			const id = normalizeNewsId(url.searchParams.get("id"));
+			const result = await env.NEWS_DB
+				.prepare("SELECT id FROM news WHERE id = ? LIMIT 1")
+				.bind(id)
+				.all();
+			return newsJsonResponse(
+				{ success: true, id, available: !(result.results || []).length },
+				200,
+				origin,
+				env
+			);
+		}
+
 		if (relativePath === "/news" && request.method === "GET") {
 			return newsJsonResponse(
 				{ success: true, news: await getAdminNews(env) },
@@ -1203,8 +1249,8 @@ async function handleNewsAdminApi(request, env, url, origin) {
 			if ((await getAdminNews(env)).some((item) => item.id === news.id)) {
 				return newsJsonResponse({ success: false, message: "News ID already exists" }, 409, origin, env);
 			}
-			await saveNewsRecord(env, news, "draft");
-			return newsJsonResponse({ success: true, news }, 201, origin, env);
+			const savedNews = await saveNewsRecord(env, news, "draft");
+			return newsJsonResponse({ success: true, news: { ...savedNews, status: "draft" } }, 201, origin, env);
 		}
 
 		const publishMatch = relativePath.match(/^\/news\/([^/]+)\/publish$/);
@@ -1214,8 +1260,8 @@ async function handleNewsAdminApi(request, env, url, origin) {
 			if (!existing) return newsJsonResponse({ success: false, message: "News not found" }, 404, origin, env);
 
 			const news = normalizeNewsInput(existing);
-			await saveNewsRecord(env, news, "published");
-			return newsJsonResponse({ success: true, news: { ...news, status: "published" } }, 200, origin, env);
+			const savedNews = await saveNewsRecord(env, news, "published");
+			return newsJsonResponse({ success: true, news: { ...savedNews, status: "published" } }, 200, origin, env);
 		}
 
 		const itemMatch = relativePath.match(/^\/news\/([^/]+)$/);
@@ -1225,8 +1271,8 @@ async function handleNewsAdminApi(request, env, url, origin) {
 			if (request.method === "PUT") {
 				const body = await readJsonRequest(request);
 				const news = normalizeNewsInput({ ...body, id });
-				await saveNewsRecord(env, news, "draft");
-				return newsJsonResponse({ success: true, news }, 200, origin, env);
+				const savedNews = await saveNewsRecord(env, news, "draft");
+				return newsJsonResponse({ success: true, news: { ...savedNews, status: "draft" } }, 200, origin, env);
 			}
 
 			if (request.method === "DELETE") {
@@ -1253,7 +1299,7 @@ async function handleNewsAdminApi(request, env, url, origin) {
 				return newsJsonResponse({ success: false, message: "Unsupported image or image too large" }, 400, origin, env);
 			}
 
-			const key = `news/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
+			const key = `news/pending/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
 			await env.NEWS_MEDIA.put(key, file.stream(), {
 				httpMetadata: {
 					contentType: file.type,
@@ -1279,7 +1325,7 @@ async function handleNewsMedia(request, env, url) {
 	if (!env.NEWS_MEDIA) return new Response("News media storage is not configured", { status: 503 });
 
 	const key = url.pathname.slice(NEWS_MEDIA_PREFIX.length);
-	if (!/^news\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key)) return new Response("Not found", { status: 404 });
+	if (!/^news\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key)) return new Response("Not found", { status: 404 });
 
 	const object = await env.NEWS_MEDIA.get(key);
 	if (!object) return new Response("Not found", { status: 404 });

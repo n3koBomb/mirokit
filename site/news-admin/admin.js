@@ -10,6 +10,9 @@ const newsList = document.getElementById("newsList");
 const formHeading = document.getElementById("formHeading");
 const currentStatus = document.getElementById("currentStatus");
 const imageFile = document.getElementById("imageFile");
+const newsId = document.getElementById("newsId");
+const checkSlugButton = document.getElementById("checkSlug");
+const slugStatus = document.getElementById("slugStatus");
 
 function showNotice(message, error = false) {
 	notice.textContent = message;
@@ -54,6 +57,9 @@ function setFormValue(id, value = "") {
 function clearForm() {
 	editingId = null;
 	form.reset();
+	newsId.disabled = false;
+	checkSlugButton.hidden = false;
+	slugStatus.textContent = "";
 	setFormValue("accent", "blue");
 	setFormValue("category", "event");
 	formHeading.textContent = "Neue Meldung";
@@ -64,6 +70,9 @@ function clearForm() {
 
 function populateForm(item) {
 	editingId = item.id;
+	newsId.disabled = true;
+	checkSlugButton.hidden = true;
+	slugStatus.textContent = "Bestehender Slug bleibt unverändert.";
 	setFormValue("newsId", item.id);
 	setFormValue("publishedAt", item.publishedAt);
 	setFormValue("category", item.category);
@@ -80,6 +89,21 @@ function populateForm(item) {
 	formHeading.textContent = item.id;
 	currentStatus.textContent = item.status === "published" ? "Veröffentlicht" : item.status === "archived" ? "Archiviert" : "Entwurf";
 	document.getElementById("archiveNews").hidden = item.status === "archived";
+}
+
+async function checkSlugAvailability() {
+	const slug = newsId.value.trim();
+	if (!slug) {
+		slugStatus.textContent = "Slug eingeben.";
+		return;
+	}
+
+	try {
+		const response = await api(`/news-admin/api/news/availability?id=${encodeURIComponent(slug)}`);
+		slugStatus.textContent = response.available ? "✓ Slug ist verfügbar." : "✕ Slug ist bereits vergeben.";
+	} catch (error) {
+		slugStatus.textContent = error.message;
+	}
 }
 
 function formPayload() {
@@ -144,6 +168,8 @@ form.addEventListener("submit", async (event) => {
 });
 
 document.getElementById("newNews").addEventListener("click", clearForm);
+checkSlugButton.addEventListener("click", checkSlugAvailability);
+newsId.addEventListener("input", () => { slugStatus.textContent = ""; });
 document.getElementById("reloadNews").addEventListener("click", () => loadNews().catch((error) => showNotice(error.message, true)));
 document.getElementById("publishNews").addEventListener("click", async () => {
 	try {

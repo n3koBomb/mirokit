@@ -101,6 +101,12 @@ function validateContent(value, language) {
 	return value.map((paragraph) => requireString(paragraph, `content.${language}`, 5_000));
 }
 
+function normalizeNewsId(value) {
+	const id = requireString(value, "id", 100).toLowerCase();
+	if (!NEWS_ID_PATTERN.test(id)) throw newsError("Invalid id");
+	return id;
+}
+
 function validateTranslation(value, language) {
 	if (!value || typeof value !== "object" || Array.isArray(value)) {
 		throw newsError(`Invalid translation for ${language}`);
@@ -119,8 +125,7 @@ function normalizeNewsInput(input, { includeStatus = false } = {}) {
 		throw newsError("Invalid news payload");
 	}
 
-	const id = requireString(input.id, "id", 100).toLowerCase();
-	if (!NEWS_ID_PATTERN.test(id)) throw newsError("Invalid id");
+	const id = normalizeNewsId(input.id);
 
 	const category = requireString(input.category, "category", 20);
 	if (!NEWS_CATEGORIES.has(category)) throw newsError("Invalid category");
@@ -286,6 +291,7 @@ export {
 	NEWS_LANGUAGES,
 	NEWS_PUBLIC_QUERY,
 	newsError,
+	normalizeNewsId,
 	normalizeNewsInput,
 	newsToStatements,
 	rowsToAdminNews,

@@ -40,7 +40,7 @@
             </div>
 
             <div class="field-grid field-grid-three">
-              <label>ID / Slug <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="summer-camp-report" /></label>
+              <label>ID / Slug <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="summer-camp-report" aria-describedby="slugStatus" /><button class="button button-small" id="checkSlug" type="button">Slug prüfen</button><span class="muted" id="slugStatus" aria-live="polite"></span></label>
               <label>Veröffentlichungsdatum <input id="publishedAt" name="publishedAt" type="date" required /></label>
               <label>Kategorie
                 <select id="category" name="category"><option value="event">Event</option><option value="interview">Interview</option><option value="photo">Foto</option><option value="announce">Ankündigung</option></select>

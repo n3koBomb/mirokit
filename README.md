@@ -175,6 +175,14 @@ muss, R2 dort einmal freischalten und den Bucket-Befehl wiederholen. Der
 News-Editor bleibt bis zur R2-Bindung sicher erreichbar, kann aber erst dann
 neue Bilder hochladen.
 
+Für unvollständige News-Bearbeitungen im R2-Dashboard zusätzlich eine
+Lifecycle-Regel anlegen: Prefix `news/pending/`, Aktion „Expire objects“ nach
+1 Tag. Neue Uploads landen zunächst dort und werden beim Speichern in
+`news/` verschoben. Die vorhandene Regel zum Abbrechen unvollständiger
+Multipart-Uploads nach 7 Tagen bleibt aktiviert. Keine Ablaufregel auf dem
+gesamten Prefix `news/` anlegen, sonst könnten veröffentlichte Bilder gelöscht
+werden.
+
 Die von `wrangler d1 create` gelieferte `database_id` sowie die R2-Bindung
 werden nach [`worker/wrangler.news.bindings.example.jsonc`](worker/wrangler.news.bindings.example.jsonc)
 in `worker/wrangler.jsonc` übernommen. Für die lokale Verwaltung stehen
