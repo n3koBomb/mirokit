@@ -9,6 +9,31 @@ import {
 	rowsToAdminNews,
 	rowsToNews,
 } from "./news.js";
+import {
+	PARTNERS_ADMIN_QUERY,
+	PARTNERS_PUBLIC_QUERY,
+	WORLD_ADMIN_QUERY,
+	WORLD_PUBLIC_QUERY,
+	contentError,
+	normalizePartnerInput,
+	normalizeWorldPointInput,
+	partnerStatements,
+	rowsToPartners,
+	rowsToPublicPartners,
+	rowsToPublicWorldPoints,
+	rowsToWorldPoints,
+	worldPointStatements,
+} from "./content.js";
+import {
+	VIDEO_ASSET_PATTERN,
+	VIDEOS_ADMIN_QUERY,
+	VIDEOS_PUBLIC_QUERY,
+	normalizeVideoInput,
+	rowsToPublicVideos,
+	rowsToVideos,
+	videoError,
+	videoStatements,
+} from "./videos.js";
 
 const FORM_TYPES = new Set([
 	"main-contact",
@@ -56,10 +81,54 @@ const FORM_FIELD_ALLOWLIST = Object.freeze({
 
 const MULTI_VALUE_FIELDS = new Set(["activities", "goals"]);
 const RATE_LIMIT_WINDOW_SECONDS = 60;
-const NEWS_API_PATH = "/api/news";
-const NEWS_ADMIN_PREFIX = "/news-admin";
-const NEWS_ADMIN_API_PREFIX = "/news-admin/api";
-const NEWS_MEDIA_PREFIX = "/news-media/";
+const SITE_API_PREFIX = "/api/v1";
+const NEWS_API_PATH = `${SITE_API_PREFIX}/news`;
+const GALLERY_API_PATH = `${SITE_API_PREFIX}/gallery`;
+const WORLD_POINTS_API_PATH = `${SITE_API_PREFIX}/world-points`;
+const PARTNERS_API_PATH = `${SITE_API_PREFIX}/partners`;
+const VIDEOS_API_PATH = `${SITE_API_PREFIX}/videos`;
+const CONTACT_API_PATH = `${SITE_API_PREFIX}/contact`;
+const ADMIN_PANEL_PREFIX = "/admin";
+const ADMIN_PANEL_API_PREFIX = `${SITE_API_PREFIX}/admin`;
+const SITE_MEDIA_PREFIX = "/media/v1/";
+const GALLERY_PREFIX = "gallery/";
+const GALLERY_KEY_PATTERN = /^gallery\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/;
+const GALLERY_PERMANENT_KEY_PATTERN = /^gallery\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/;
+const GALLERY_LANGUAGES = Object.freeze(["ru", "en", "de"]);
+const GALLERY_STATUSES = new Set(["published", "archived"]);
+const GALLERY_COLLECTIONS = new Set(["gallery", "online-projects"]);
+const GALLERY_QUOTE_LANGUAGES = Object.freeze(["ru", "en", "de"]);
+const GALLERY_IMAGE_TYPES = Object.freeze({
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/webp": "webp",
+	"image/avif": "avif",
+});
+const GALLERY_REMOTE_IMAGE_HOSTS = new Set([
+	"drive.google.com",
+	"drive.usercontent.google.com",
+	"docs.google.com",
+]);
+const GALLERY_IMAGE_MAX_BYTES = 8 * 1024 * 1024;
+const VIDEO_UPLOAD_MAX_BYTES = 95 * 1024 * 1024;
+const VIDEO_POSTER_MAX_BYTES = 8 * 1024 * 1024;
+
+const GALLERY_QUOTES_PUBLIC_QUERY = `
+SELECT q.id, q.status, q.created_at, q.updated_at,
+  t.language, t.quote, t.byline
+FROM gallery_quotes q
+JOIN gallery_quote_translations t ON t.quote_id = q.id
+WHERE q.status = 'published'
+ORDER BY q.created_at DESC, q.id ASC, t.language ASC
+`;
+
+const GALLERY_QUOTES_ADMIN_QUERY = `
+SELECT q.id, q.status, q.created_at, q.updated_at,
+  t.language, t.quote, t.byline
+FROM gallery_quotes q
+JOIN gallery_quote_translations t ON t.quote_id = q.id
+ORDER BY q.created_at DESC, q.updated_at DESC, q.id ASC, t.language ASC
+`;
 
 const TURNSTILE_TEST_SECRET =
 	"1x0000000000000000000000000000000AA";
@@ -81,6 +150,11 @@ const SITEMAP_PATHS = Object.freeze([
 		path: "/page/privacyPolicy/",
 		changefreq: "yearly",
 		priority: "0.3",
+	},
+	{
+		path: "/page/onlineProjects/",
+		changefreq: "weekly",
+		priority: "0.7",
 	},
 ]);
 
@@ -169,7 +243,7 @@ function createRobotsTxt(hostname) {
 		"User-agent: *",
 		"Allow: /",
 		"Disallow: /api/",
-		"Disallow: /news-admin/",
+		"Disallow: /admin/",
 		"",
 		`Sitemap: https://${canonicalSiteHostname}/sitemap.xml`,
 		"",
@@ -256,15 +330,13 @@ function rewriteDocumentMetadata(response, url) {
 	if (
 		!isDocumentPath(url.pathname) ||
 		url.pathname === "/index.html" ||
-		url.pathname === "/page/privacyPolicy" ||
 		!response.headers.get("content-type")?.includes("text/html")
 	) {
 		return response;
 	}
 
 	const canonicalSiteHostname = getCanonicalSiteHostname(url.hostname);
-	const canonicalPath =
-		url.pathname === "/" ? "/" : "/page/privacyPolicy/";
+	const canonicalPath = getCanonicalDocumentPath(url.pathname);
 	const canonicalUrl =
 		`https://${canonicalSiteHostname}${canonicalPath}`;
 
@@ -282,12 +354,20 @@ function rewriteDocumentMetadata(response, url) {
 		.transform(response);
 }
 
+function getCanonicalDocumentPath(pathname) {
+	if (pathname === "/") return "/";
+	if (pathname === "/page/onlineProjects" || pathname === "/page/onlineProjects/") return "/page/onlineProjects/";
+	return "/page/privacyPolicy/";
+}
+
 function isDocumentPath(pathname) {
 	return (
 		pathname === "/" ||
 		pathname === "/index.html" ||
 		pathname === "/page/privacyPolicy" ||
-		pathname === "/page/privacyPolicy/"
+		pathname === "/page/privacyPolicy/" ||
+		pathname === "/page/onlineProjects" ||
+		pathname === "/page/onlineProjects/"
 	);
 }
 
@@ -311,10 +391,7 @@ function canonicalDocumentRedirect(request, url) {
 		return null;
 	}
 
-	const canonicalPath =
-		url.pathname === "/" || url.pathname === "/index.html"
-			? "/"
-			: "/page/privacyPolicy/";
+	const canonicalPath = getCanonicalDocumentPath(url.pathname);
 	const location = `https://${normalizedHostname}${canonicalPath}${url.search}`;
 
 	return new Response(null, {
@@ -1087,7 +1164,7 @@ function newsJsonResponse(data, status, origin, env, cacheControl = "no-store") 
 }
 
 function newsDatabaseUnavailable(origin, env) {
-	console.error("NEWS_DB is not configured");
+	console.error("SITE_DB is not configured");
 	return newsJsonResponse(
 		{ success: false, message: "News storage is not configured" },
 		503,
@@ -1096,12 +1173,23 @@ function newsDatabaseUnavailable(origin, env) {
 	);
 }
 
-function isNewsAdminPath(pathname) {
-	return pathname === NEWS_ADMIN_PREFIX || pathname.startsWith(`${NEWS_ADMIN_PREFIX}/`);
+function newsMediaUnavailable(origin, env) {
+	console.error("SITE_MEDIA is not configured");
+	return newsJsonResponse(
+		{ success: false, message: "News media storage is not configured" },
+		503,
+		origin,
+		env
+	);
 }
 
-function isNewsAdminApiPath(pathname) {
-	return pathname === NEWS_ADMIN_API_PREFIX || pathname.startsWith(`${NEWS_ADMIN_API_PREFIX}/`);
+function isAdminPanelPath(pathname) {
+	return pathname === ADMIN_PANEL_PREFIX || pathname.startsWith(`${ADMIN_PANEL_PREFIX}/`);
+}
+
+function getAdminApiPrefix(pathname) {
+	if (pathname === ADMIN_PANEL_API_PREFIX || pathname.startsWith(`${ADMIN_PANEL_API_PREFIX}/`)) return ADMIN_PANEL_API_PREFIX;
+	return null;
 }
 
 function newsAdminUnauthorized(origin, env) {
@@ -1122,7 +1210,7 @@ async function readJsonRequest(request) {
 }
 
 async function getAdminNews(env) {
-	const result = await env.NEWS_DB.prepare(NEWS_ADMIN_QUERY).all();
+	const result = await env.SITE_DB.prepare(NEWS_ADMIN_QUERY).all();
 	return rowsToAdminNews(result.results || []);
 }
 
@@ -1132,9 +1220,9 @@ async function saveNewsRecord(env, news, status) {
 		image: await promotePendingNewsImage(env, news.image),
 	};
 	const statements = newsToStatements(savedNews, status, new Date().toISOString());
-	await env.NEWS_DB.batch(
+	await env.SITE_DB.batch(
 		statements.map((statement) =>
-			env.NEWS_DB.prepare(statement.sql).bind(...statement.params)
+			env.SITE_DB.prepare(statement.sql).bind(...statement.params)
 		)
 	);
 	return savedNews;
@@ -1142,28 +1230,247 @@ async function saveNewsRecord(env, news, status) {
 
 async function promotePendingNewsImage(env, image) {
 	const match = image.match(
-		/^\/news-media\/(news\/pending\/[a-f0-9-]+\.(?:jpg|png|webp|avif))$/
+		/^\/media\/v1\/(news\/pending\/[a-f0-9-]+\.(?:jpg|png|webp|avif))$/
 	);
 	if (!match) return image;
-	if (!env.NEWS_MEDIA) {
+	if (!env.SITE_MEDIA) {
 		throw newsError("News media storage is not configured", 503);
 	}
 
 	const sourceKey = match[1];
 	const destinationKey = sourceKey.replace("news/pending/", "news/");
-	const object = await env.NEWS_MEDIA.get(sourceKey);
+	const object = await env.SITE_MEDIA.get(sourceKey);
 	if (!object) throw newsError("Uploaded image no longer exists", 409);
 
 	const metadataHeaders = new Headers();
 	object.writeHttpMetadata(metadataHeaders);
-	await env.NEWS_MEDIA.put(destinationKey, object.body, {
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
 		httpMetadata: {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
 			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
 		},
 	});
-	await env.NEWS_MEDIA.delete(sourceKey);
-	return `${NEWS_MEDIA_PREFIX}${destinationKey}`;
+	await env.SITE_MEDIA.delete(sourceKey);
+	return `${SITE_MEDIA_PREFIX}${destinationKey}`;
+}
+
+function galleryTextValue(value, field) {
+	if (typeof value !== "string") throw newsError(`Invalid gallery ${field}`);
+	const normalized = value.trim();
+	if (!normalized || normalized.length > 500) throw newsError(`Invalid gallery ${field}`);
+	return normalized;
+}
+
+function galleryOptionalTextValue(value, field, maxLength = 1_000) {
+	if (value === null || value === undefined) return "";
+	if (typeof value !== "string") throw newsError(`Invalid gallery ${field}`);
+	const normalized = value.trim();
+	if (normalized.length > maxLength) throw newsError(`Invalid gallery ${field}`);
+	return normalized;
+}
+
+function normalizeGallerySourceUrl(value) {
+	const source = galleryOptionalTextValue(value, "source_url", 2_000);
+	if (!source) return "";
+
+	let url;
+	try {
+		url = new URL(source);
+	} catch {
+		throw newsError("Drive image URL must be a valid HTTPS URL");
+	}
+	if (url.protocol !== "https:" || !GALLERY_REMOTE_IMAGE_HOSTS.has(url.hostname.toLowerCase())) {
+		throw newsError("Only public Google Drive image URLs are supported");
+	}
+
+	const fileId = url.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || url.searchParams.get("id");
+	if (!fileId || !/^[A-Za-z0-9_-]+$/.test(fileId)) throw newsError("Could not find a Google Drive file id");
+	return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+}
+
+function normalizeGalleryMetadata(formData) {
+	const metadata = {
+		asset_type: "gallery-image",
+		status: String(formData.get("status") || "published").trim(),
+		collection: String(formData.get("collection") || "gallery").trim(),
+		featured: String(formData.get("featured") || "").trim().toLowerCase() === "true" ? "true" : "false",
+		uploaded_at: new Date().toISOString(),
+	};
+
+	if (!GALLERY_STATUSES.has(metadata.status)) throw newsError("Invalid gallery status");
+	if (!GALLERY_COLLECTIONS.has(metadata.collection)) throw newsError("Invalid gallery collection");
+
+	for (const language of GALLERY_LANGUAGES) {
+		metadata[`title_${language}`] = galleryTextValue(formData.get(`title_${language}`), `title_${language}`);
+		metadata[`alt_${language}`] = galleryTextValue(formData.get(`alt_${language}`), `alt_${language}`);
+		metadata[`subtitle_${language}`] = galleryOptionalTextValue(formData.get(`subtitle_${language}`), `subtitle_${language}`);
+		metadata[`quote_${language}`] = galleryOptionalTextValue(formData.get(`quote_${language}`), `quote_${language}`);
+	}
+
+	return metadata;
+}
+
+async function readRemoteGalleryImage(sourceUrl) {
+	const response = await fetch(sourceUrl, {
+		headers: { Accept: "image/avif,image/webp,image/png,image/jpeg" },
+		redirect: "follow",
+	});
+	if (!response.ok) throw newsError(`Google Drive image returned ${response.status}`);
+
+	const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
+	if (!GALLERY_IMAGE_TYPES[contentType]) throw newsError("Google Drive URL did not return a supported image");
+	const contentLength = Number(response.headers.get("content-length") || 0);
+	if (contentLength > GALLERY_IMAGE_MAX_BYTES) throw newsError("Image exceeds the 8 MB limit");
+
+	const body = await response.arrayBuffer();
+	if (!body.byteLength || body.byteLength > GALLERY_IMAGE_MAX_BYTES) throw newsError("Image exceeds the 8 MB limit");
+	return { body, contentType, extension: GALLERY_IMAGE_TYPES[contentType] };
+}
+
+function galleryQuoteTextValue(value, field, maxLength) {
+	if (typeof value !== "string") throw newsError(`Invalid gallery quote ${field}`);
+	const normalized = value.trim();
+	if (!normalized || normalized.length > maxLength) {
+		throw newsError(`Invalid gallery quote ${field}`);
+	}
+	return normalized;
+}
+
+function galleryQuoteOptionalTextValue(value, field, maxLength) {
+	if (value === null || value === undefined) return "";
+	if (typeof value !== "string") throw newsError(`Invalid gallery quote ${field}`);
+	const normalized = value.trim();
+	if (normalized.length > maxLength) throw newsError(`Invalid gallery quote ${field}`);
+	return normalized;
+}
+
+function normalizeGalleryQuoteInput(input) {
+	if (!input || typeof input !== "object" || Array.isArray(input)) {
+		throw newsError("Invalid gallery quote payload");
+	}
+
+	const translations = {};
+	for (const language of GALLERY_QUOTE_LANGUAGES) {
+		const translation = input.translations?.[language];
+		if (!translation || typeof translation !== "object" || Array.isArray(translation)) {
+			throw newsError(`Invalid gallery quote translation for ${language}`);
+		}
+		translations[language] = {
+			quote: galleryQuoteTextValue(translation.quote, `quote_${language}`, 2_000),
+			byline: galleryQuoteOptionalTextValue(translation.byline, `byline_${language}`, 300),
+		};
+	}
+
+	return { translations };
+}
+
+function rowsToGalleryQuotes(rows) {
+	const grouped = new Map();
+	for (const row of rows || []) {
+		if (!grouped.has(row.id)) {
+			grouped.set(row.id, {
+				id: row.id,
+				status: row.status,
+				createdAt: row.created_at,
+				updatedAt: row.updated_at,
+				quote: {},
+				byline: {},
+			});
+		}
+		const item = grouped.get(row.id);
+		item.quote[row.language] = row.quote;
+		item.byline[row.language] = row.byline || "";
+	}
+	return [...grouped.values()];
+}
+
+async function listGalleryQuotes(env, includeArchived = false) {
+	if (!env.SITE_DB) return [];
+	const query = includeArchived ? GALLERY_QUOTES_ADMIN_QUERY : GALLERY_QUOTES_PUBLIC_QUERY;
+	const result = await env.SITE_DB.prepare(query).all();
+	return rowsToGalleryQuotes(result.results || []);
+}
+
+async function saveGalleryQuoteRecord(env, quote, status = "published") {
+	const timestamp = new Date().toISOString();
+	const statements = [
+		env.SITE_DB.prepare(
+			`INSERT INTO gallery_quotes (id, status, created_at, updated_at)
+			 VALUES (?, ?, ?, ?)
+			 ON CONFLICT(id) DO UPDATE SET status = excluded.status, updated_at = excluded.updated_at`
+		).bind(quote.id, status, timestamp, timestamp),
+		env.SITE_DB.prepare("DELETE FROM gallery_quote_translations WHERE quote_id = ?").bind(quote.id),
+		...GALLERY_QUOTE_LANGUAGES.map((language) =>
+			env.SITE_DB.prepare(
+				"INSERT INTO gallery_quote_translations (quote_id, language, quote, byline) VALUES (?, ?, ?, ?)"
+			).bind(quote.id, language, quote.translations[language].quote, quote.translations[language].byline)
+		),
+	];
+	await env.SITE_DB.batch(statements);
+	return {
+		id: quote.id,
+		status,
+		createdAt: timestamp,
+		updatedAt: timestamp,
+		quote: Object.fromEntries(GALLERY_QUOTE_LANGUAGES.map((language) => [language, quote.translations[language].quote])),
+		byline: Object.fromEntries(GALLERY_QUOTE_LANGUAGES.map((language) => [language, quote.translations[language].byline])),
+	};
+}
+
+function galleryItemFromObject(object) {
+	const metadata = object.customMetadata || {};
+	return {
+		key: object.key,
+		image: `${SITE_MEDIA_PREFIX}${object.key}`,
+		status: metadata.status || "published",
+		collection: metadata.collection || "gallery",
+		sourceType: metadata.source_type || "r2",
+		featured: metadata.featured === "true" || metadata.featured === "1",
+		uploadedAt: metadata.uploaded_at || (object.uploaded instanceof Date ? object.uploaded.toISOString() : String(object.uploaded || "")),
+		title: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`title_${language}`] || ""])),
+		alt: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`alt_${language}`] || ""])),
+		subtitle: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`subtitle_${language}`] || ""])),
+		quote: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`quote_${language}`] || ""])),
+	};
+}
+
+async function listGallery(env, includeArchived = false, collection = "") {
+	if (!env.SITE_MEDIA) throw newsError("News media storage is not configured", 503);
+
+	const objects = [];
+	let cursor;
+	do {
+		const options = { prefix: GALLERY_PREFIX, include: ["customMetadata"] };
+		if (cursor) options.cursor = cursor;
+		const page = await env.SITE_MEDIA.list(options);
+		objects.push(...(page.objects || []));
+		cursor = page.truncated ? page.cursor : undefined;
+	} while (cursor);
+
+	return objects
+		.filter((object) => GALLERY_PERMANENT_KEY_PATTERN.test(object.key))
+		.map(galleryItemFromObject)
+		.filter((item) => includeArchived || item.status === "published")
+		.filter((item) => !collection || item.collection === collection)
+		.sort((a, b) => String(b.uploadedAt).localeCompare(String(a.uploadedAt)));
+}
+
+async function promotePendingGalleryImage(env, sourceKey) {
+	const destinationKey = sourceKey.replace("gallery/pending/", "gallery/");
+	const object = await env.SITE_MEDIA.get(sourceKey);
+	if (!object) throw newsError("Uploaded gallery image no longer exists", 409);
+
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata?.(metadataHeaders);
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+		},
+		customMetadata: object.customMetadata || {},
+	});
+	await env.SITE_MEDIA.delete(sourceKey);
+	return destinationKey;
 }
 
 async function handlePublicNews(request, env, origin) {
@@ -1176,11 +1483,11 @@ async function handlePublicNews(request, env, origin) {
 		);
 	}
 
-	if (!env.NEWS_DB) return newsDatabaseUnavailable(origin, env);
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
 
 	try {
 		const today = new Date().toISOString().slice(0, 10);
-		const result = await env.NEWS_DB.prepare(NEWS_PUBLIC_QUERY).bind(today).all();
+		const result = await env.SITE_DB.prepare(NEWS_PUBLIC_QUERY).bind(today).all();
 		return newsJsonResponse(
 			{ success: true, news: rowsToNews(result.results || []) },
 			200,
@@ -1199,10 +1506,356 @@ async function handlePublicNews(request, env, origin) {
 	}
 }
 
-async function handleNewsAdminApi(request, env, url, origin) {
+async function handlePublicGallery(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_MEDIA && !env.SITE_DB) return newsMediaUnavailable(origin, env);
+
+	try {
+		const collection = String(new URL(request.url).searchParams.get("collection") || "").trim();
+		if (collection && !GALLERY_COLLECTIONS.has(collection)) return newsJsonResponse({ success: false, message: "Invalid gallery collection" }, 400, origin, env);
+		const gallery = env.SITE_MEDIA ? await listGallery(env, false, collection) : [];
+		const quotes = await listGalleryQuotes(env);
+		return newsJsonResponse(
+			{ success: true, gallery, quotes },
+			200,
+			origin,
+			env
+		);
+	} catch (error) {
+		console.error("Public gallery query failed", error);
+		return newsJsonResponse({ success: false, message: "Gallery service unavailable" }, 503, origin, env);
+	}
+}
+
+async function handlePublicWorldPoints(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const result = await env.SITE_DB.prepare(WORLD_PUBLIC_QUERY).all();
+		return newsJsonResponse(
+			{ success: true, points: rowsToPublicWorldPoints(result.results || []) },
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public world points query failed", error);
+		return newsJsonResponse({ success: false, message: "World points service unavailable" }, 503, origin, env);
+	}
+}
+
+async function handlePublicPartners(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const result = await env.SITE_DB.prepare(PARTNERS_PUBLIC_QUERY).all();
+		return newsJsonResponse(
+			{ success: true, partners: rowsToPublicPartners(result.results || []) },
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public partners query failed", error);
+		return newsJsonResponse({ success: false, message: "Partners service unavailable" }, 503, origin, env);
+	}
+}
+
+async function handlePublicVideos(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const result = await env.SITE_DB.prepare(VIDEOS_PUBLIC_QUERY).all();
+		return newsJsonResponse(
+			{ success: true, videos: rowsToPublicVideos(result.results || []) },
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public videos query failed", error);
+		return newsJsonResponse({ success: false, message: "Video service unavailable" }, 503, origin, env);
+	}
+}
+
+async function promotePendingVideoAsset(env, value, folders) {
+	if (!value || !value.startsWith(SITE_MEDIA_PREFIX)) return value;
+	const sourceKey = value.slice(SITE_MEDIA_PREFIX.length);
+	const folder = folders.find((candidate) => sourceKey.startsWith(`${candidate}/pending/`));
+	if (!folder) return value;
+	if (!env.SITE_MEDIA) throw videoError("Video media storage is not configured", 503);
+	const destinationKey = sourceKey.replace(`${folder}/pending/`, `${folder}/`);
+	const object = await env.SITE_MEDIA.get(sourceKey);
+	if (!object) throw videoError("Uploaded video asset no longer exists", 409);
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata?.(metadataHeaders);
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+		},
+		customMetadata: object.customMetadata || {},
+	});
+	await env.SITE_MEDIA.delete(sourceKey);
+	return `${SITE_MEDIA_PREFIX}${destinationKey}`;
+}
+
+async function prepareVideoForStorage(env, video) {
+	const savedVideo = {
+		...video,
+		sourceUrl: video.sourceType === "r2" ? await promotePendingVideoAsset(env, video.sourceUrl, ["videos"]) : video.sourceUrl,
+		poster: await promotePendingVideoAsset(env, video.poster, ["video-posters"]),
+		subtitles: [],
+	};
+	for (const subtitle of video.subtitles) {
+		let src = await promotePendingVideoAsset(env, subtitle.src, ["subtitles"]);
+		if (subtitle.content) {
+			if (!env.SITE_MEDIA) throw videoError("Video media storage is not configured", 503);
+			let key = src.startsWith(`${SITE_MEDIA_PREFIX}subtitles/`) ? src.slice(SITE_MEDIA_PREFIX.length) : `subtitles/${video.id}-${crypto.randomUUID()}.vtt`;
+			if (key.startsWith("subtitles/pending/")) key = key.replace("subtitles/pending/", "subtitles/");
+			await env.SITE_MEDIA.put(key, subtitle.content, {
+				httpMetadata: { contentType: "text/vtt; charset=utf-8", cacheControl: "public, max-age=31536000, immutable" },
+			});
+			src = `${SITE_MEDIA_PREFIX}${key}`;
+		}
+		savedVideo.subtitles.push({ ...subtitle, src, content: "" });
+	}
+	return savedVideo;
+}
+
+async function getAdminVideos(env) {
+	const result = await env.SITE_DB.prepare(VIDEOS_ADMIN_QUERY).all();
+	return rowsToVideos(result.results || []);
+}
+
+async function saveVideoRecord(env, video, status) {
+	const savedVideo = await prepareVideoForStorage(env, video);
+	const statements = videoStatements(savedVideo, status, new Date().toISOString());
+	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
+	return { ...savedVideo, status };
+}
+
+async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 	const identity = await authorizeAdmin(request, env);
 	if (!identity) return newsAdminUnauthorized(origin, env);
-	if (!env.NEWS_DB) return newsDatabaseUnavailable(origin, env);
+	if (request.method !== "GET" && origin && origin !== url.origin) {
+		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	try {
+		if (relativePath === "/videos" && request.method === "GET") {
+			return newsJsonResponse({ success: true, videos: await getAdminVideos(env) }, 200, origin, env);
+		}
+
+		if (relativePath === "/videos/media" && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			const kind = String(formData.get("kind") || "").trim();
+			const types = kind === "video"
+				? { "video/mp4": "mp4", "video/webm": "webm", "video/ogg": "ogv" }
+				: { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif" };
+			const limit = kind === "video" ? VIDEO_UPLOAD_MAX_BYTES : VIDEO_POSTER_MAX_BYTES;
+			if (!(file instanceof File) || !types[file.type] || file.size === 0 || file.size > limit) {
+				return newsJsonResponse({ success: false, message: kind === "video" ? "Unsupported video or video exceeds 95 MB" : "Unsupported poster or poster exceeds 8 MB" }, 400, origin, env);
+			}
+			const folder = kind === "video" ? "videos" : "video-posters";
+			const key = `${folder}/pending/${crypto.randomUUID()}.${types[file.type]}`;
+			await env.SITE_MEDIA.put(key, file.stream(), {
+				httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
+			});
+			return newsJsonResponse({ success: true, url: `${SITE_MEDIA_PREFIX}${key}`, kind }, 201, origin, env);
+		}
+
+		const publishMatch = relativePath.match(/^\/videos\/([^/]+)\/publish$/);
+		if (publishMatch && request.method === "POST") {
+			const id = decodeURIComponent(publishMatch[1]);
+			const existing = (await getAdminVideos(env)).find((item) => item.id === id);
+			if (!existing) return newsJsonResponse({ success: false, message: "Video not found" }, 404, origin, env);
+			const saved = await saveVideoRecord(env, normalizeVideoInput(existing, { includeStatus: false }), "published");
+			return newsJsonResponse({ success: true, video: saved }, 200, origin, env);
+		}
+
+		if (relativePath === "/videos" && request.method === "POST") {
+			const video = normalizeVideoInput(await readJsonRequest(request), { includeStatus: false });
+			if ((await getAdminVideos(env)).some((item) => item.id === video.id)) return newsJsonResponse({ success: false, message: "Video ID already exists" }, 409, origin, env);
+			const saved = await saveVideoRecord(env, video, "draft");
+			return newsJsonResponse({ success: true, video: saved }, 201, origin, env);
+		}
+
+		const itemMatch = relativePath.match(/^\/videos\/([^/]+)$/);
+		if (itemMatch) {
+			const id = decodeURIComponent(itemMatch[1]);
+			if (request.method === "PUT") {
+				const video = normalizeVideoInput({ ...(await readJsonRequest(request)), id }, { includeStatus: false });
+				const saved = await saveVideoRecord(env, video, "draft");
+				return newsJsonResponse({ success: true, video: saved }, 200, origin, env);
+			}
+			if (request.method === "DELETE") {
+				const result = await env.SITE_DB.prepare("UPDATE videos SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'").bind(new Date().toISOString(), id).run();
+				if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "Video not found" }, 404, origin, env);
+				return newsJsonResponse({ success: true, id }, 200, origin, env);
+			}
+		}
+
+		if (relativePath !== "/videos" && relativePath.startsWith("/videos/")) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+	} catch (error) {
+		const status = Number.isInteger(error?.status) ? error.status : 500;
+		if (status < 500) return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
+		console.error("Video admin request failed", error);
+		return newsJsonResponse({ success: false, message: "Video service unavailable" }, 503, origin, env);
+	}
+}
+
+async function saveWorldPointRecord(env, point, status) {
+	const statements = worldPointStatements(point, status, new Date().toISOString());
+	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
+	return { ...point, status };
+}
+
+async function savePartnerRecord(env, partner, status) {
+	const savedPartner = { ...partner, image: await promotePendingPartnerImage(env, partner.image) };
+	const statements = partnerStatements(savedPartner, status, new Date().toISOString());
+	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
+	return { ...savedPartner, status };
+}
+
+async function promotePendingPartnerImage(env, image) {
+	const match = image.match(/^\/media\/v1\/(partners\/pending\/[a-f0-9-]+\.(?:jpg|png|webp|avif))$/);
+	if (!match) return image;
+	if (!env.SITE_MEDIA) throw contentError("Partner media storage is not configured", 503);
+
+	const sourceKey = match[1];
+	const destinationKey = sourceKey.replace("partners/pending/", "partners/");
+	const object = await env.SITE_MEDIA.get(sourceKey);
+	if (!object) throw contentError("Uploaded partner logo no longer exists", 409);
+
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata?.(metadataHeaders);
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+		},
+	});
+	await env.SITE_MEDIA.delete(sourceKey);
+	return `${SITE_MEDIA_PREFIX}${destinationKey}`;
+}
+
+async function handleContentAdminApi(request, env, url, origin, apiPrefix) {
+	const identity = await authorizeAdmin(request, env);
+	if (!identity) return newsAdminUnauthorized(origin, env);
+	if (request.method !== "GET" && origin && origin !== url.origin) {
+		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	const isWorld = relativePath === "/world-points" || relativePath.startsWith("/world-points/");
+	const isPartners = relativePath === "/partners" || relativePath.startsWith("/partners/");
+	if (!isWorld && !isPartners) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+
+	try {
+		if (relativePath === "/world-points" && request.method === "GET") {
+			const result = await env.SITE_DB.prepare(WORLD_ADMIN_QUERY).all();
+			return newsJsonResponse({ success: true, points: rowsToWorldPoints(result.results || []) }, 200, origin, env);
+		}
+		if (relativePath === "/partners" && request.method === "GET") {
+			const result = await env.SITE_DB.prepare(PARTNERS_ADMIN_QUERY).all();
+			return newsJsonResponse({ success: true, partners: rowsToPartners(result.results || []) }, 200, origin, env);
+		}
+
+		if (relativePath === "/partners/media" && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			const allowedTypes = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif" };
+			if (!(file instanceof File) || !allowedTypes[file.type] || file.size === 0 || file.size > 4 * 1024 * 1024) {
+				return newsJsonResponse({ success: false, message: "Unsupported logo or logo too large" }, 400, origin, env);
+			}
+			const key = `partners/pending/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
+			await env.SITE_MEDIA.put(key, file.stream(), {
+				httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
+			});
+			return newsJsonResponse({ success: true, image: `${SITE_MEDIA_PREFIX}${key}` }, 201, origin, env);
+		}
+
+		const collection = isWorld ? "world-points" : "partners";
+		if ((relativePath === `/${collection}`) && request.method === "POST") {
+			const body = await readJsonRequest(request);
+			const normalized = isWorld ? normalizeWorldPointInput(body, { includeStatus: false }) : normalizePartnerInput(body, { includeStatus: false });
+			const query = isWorld ? WORLD_ADMIN_QUERY : PARTNERS_ADMIN_QUERY;
+			const existingResult = await env.SITE_DB.prepare(query).all();
+			const existingItems = isWorld ? rowsToWorldPoints(existingResult.results || []) : rowsToPartners(existingResult.results || []);
+			if (existingItems.some((item) => item.id === normalized.id)) {
+				return newsJsonResponse({ success: false, message: `${collection} ID already exists` }, 409, origin, env);
+			}
+			const saved = isWorld ? await saveWorldPointRecord(env, normalized, "draft") : await savePartnerRecord(env, normalized, "draft");
+			return newsJsonResponse({ success: true, [isWorld ? "point" : "partner"]: saved }, 201, origin, env);
+		}
+		const itemMatch = relativePath.match(new RegExp(`^/${collection}/([^/]+)(?:/(publish))?$`));
+		if (!itemMatch) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+		const id = decodeURIComponent(itemMatch[1]);
+		const isPublish = itemMatch[2] === "publish";
+
+		if (request.method === "POST" && isPublish) {
+			const query = isWorld ? WORLD_ADMIN_QUERY : PARTNERS_ADMIN_QUERY;
+			const result = await env.SITE_DB.prepare(query).all();
+			const existing = (isWorld ? rowsToWorldPoints(result.results || []) : rowsToPartners(result.results || [])).find((item) => item.id === id);
+			if (!existing) return newsJsonResponse({ success: false, message: `${collection} item not found` }, 404, origin, env);
+			const saved = isWorld
+				? await saveWorldPointRecord(env, normalizeWorldPointInput(existing, { includeStatus: false }), "published")
+				: await savePartnerRecord(env, normalizePartnerInput(existing, { includeStatus: false }), "published");
+			return newsJsonResponse({ success: true, [isWorld ? "point" : "partner"]: saved }, 200, origin, env);
+		}
+
+		if (request.method === "DELETE") {
+			const table = isWorld ? "world_points" : "partners";
+			const result = await env.SITE_DB.prepare(`UPDATE ${table} SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'`).bind(new Date().toISOString(), id).run();
+			if (!result.meta?.changes) return newsJsonResponse({ success: false, message: `${collection} item not found` }, 404, origin, env);
+			return newsJsonResponse({ success: true, id }, 200, origin, env);
+		}
+
+		if (request.method !== "POST" && request.method !== "PUT") return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+		const body = await readJsonRequest(request);
+		if (body.id !== id) body.id = id;
+		const normalized = isWorld ? normalizeWorldPointInput(body, { includeStatus: false }) : normalizePartnerInput(body, { includeStatus: false });
+		const query = isWorld ? WORLD_ADMIN_QUERY : PARTNERS_ADMIN_QUERY;
+		const existingResult = await env.SITE_DB.prepare(query).all();
+		const existingItems = isWorld ? rowsToWorldPoints(existingResult.results || []) : rowsToPartners(existingResult.results || []);
+		if (request.method === "POST" && existingItems.some((item) => item.id === id)) {
+			return newsJsonResponse({ success: false, message: `${collection} ID already exists` }, 409, origin, env);
+		}
+		const saved = isWorld ? await saveWorldPointRecord(env, normalized, "draft") : await savePartnerRecord(env, normalized, "draft");
+		return newsJsonResponse({ success: true, [isWorld ? "point" : "partner"]: saved }, request.method === "POST" ? 201 : 200, origin, env);
+	} catch (error) {
+		const status = Number.isInteger(error?.status) ? error.status : 500;
+		if (status < 500) return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
+		console.error("Content admin request failed", error);
+		return newsJsonResponse({ success: false, message: "Content service unavailable" }, 503, origin, env);
+	}
+}
+
+async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
+	const identity = await authorizeAdmin(request, env);
+	if (!identity) return newsAdminUnauthorized(origin, env);
 
 	if (
 		request.method !== "GET" &&
@@ -1217,12 +1870,94 @@ async function handleNewsAdminApi(request, env, url, origin) {
 		);
 	}
 
-	const relativePath = url.pathname.slice(NEWS_ADMIN_API_PREFIX.length).replace(/\/$/, "") || "/";
+	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	const isGalleryQuotePath = relativePath === "/gallery/quotes" || relativePath.startsWith("/gallery/quotes/");
+	const isGalleryPath = relativePath === "/gallery" || (relativePath.startsWith("/gallery/") && !isGalleryQuotePath);
+	if (isGalleryQuotePath && !env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+	if (!env.SITE_DB && !isGalleryPath && relativePath !== "/media") return newsDatabaseUnavailable(origin, env);
 
 	try {
+		if (isGalleryQuotePath && request.method === "GET") {
+			return newsJsonResponse({ success: true, quotes: await listGalleryQuotes(env, true) }, 200, origin, env);
+		}
+
+		if (relativePath === "/gallery/quotes" && request.method === "POST") {
+			const quote = normalizeGalleryQuoteInput(await readJsonRequest(request));
+			const savedQuote = await saveGalleryQuoteRecord(env, { id: crypto.randomUUID(), ...quote });
+			return newsJsonResponse({ success: true, quote: savedQuote }, 201, origin, env);
+		}
+
+		const galleryQuoteMatch = relativePath.match(/^\/gallery\/quotes\/([^/]+)$/);
+		if (galleryQuoteMatch && request.method === "DELETE") {
+			const id = decodeURIComponent(galleryQuoteMatch[1]);
+			const result = await env.SITE_DB
+				.prepare("UPDATE gallery_quotes SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'")
+				.bind(new Date().toISOString(), id)
+				.run();
+			if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "Gallery quote not found" }, 404, origin, env);
+			return newsJsonResponse({ success: true, id }, 200, origin, env);
+		}
+
+		if (isGalleryPath && request.method === "GET") {
+			return newsJsonResponse({ success: true, gallery: await listGallery(env, true) }, 200, origin, env);
+		}
+
+		if (isGalleryPath && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			const metadata = normalizeGalleryMetadata(formData);
+			const sourceUrl = normalizeGallerySourceUrl(formData.get("source_url"));
+			if (file instanceof File && sourceUrl) throw newsError("Choose a file or a Google Drive URL, not both");
+			if (!(file instanceof File) && !sourceUrl) throw newsError("Choose an image file or provide a Google Drive URL");
+
+			let body;
+			let contentType;
+			let extension;
+			if (file instanceof File) {
+				if (!GALLERY_IMAGE_TYPES[file.type] || file.size === 0 || file.size > GALLERY_IMAGE_MAX_BYTES) {
+					return newsJsonResponse({ success: false, message: "Unsupported image or image too large" }, 400, origin, env);
+				}
+				body = file.stream();
+				contentType = file.type;
+				extension = GALLERY_IMAGE_TYPES[file.type];
+			} else {
+				const remoteImage = await readRemoteGalleryImage(sourceUrl);
+				body = remoteImage.body;
+				contentType = remoteImage.contentType;
+				extension = remoteImage.extension;
+			}
+
+			metadata.source_type = sourceUrl ? "drive" : "r2";
+			const pendingKey = `gallery/pending/${crypto.randomUUID()}.${extension}`;
+			await env.SITE_MEDIA.put(pendingKey, body, {
+				httpMetadata: {
+					contentType,
+					cacheControl: "public, max-age=31536000, immutable",
+				},
+				customMetadata: metadata,
+			});
+			const key = await promotePendingGalleryImage(env, pendingKey);
+			return newsJsonResponse({ success: true, gallery: galleryItemFromObject({ key, customMetadata: metadata }) }, 201, origin, env);
+		}
+
+		const galleryItemMatch = relativePath.match(/^\/gallery\/(.+)$/);
+		if (galleryItemMatch && request.method === "DELETE") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			let key;
+			try {
+				key = decodeURIComponent(galleryItemMatch[1]);
+			} catch {
+				throw newsError("Invalid gallery key");
+			}
+			if (!GALLERY_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
+			await env.SITE_MEDIA.delete(key);
+			return newsJsonResponse({ success: true, key }, 200, origin, env);
+		}
+
 		if (relativePath === "/news/availability" && request.method === "GET") {
 			const id = normalizeNewsId(url.searchParams.get("id"));
-			const result = await env.NEWS_DB
+			const result = await env.SITE_DB
 				.prepare("SELECT id FROM news WHERE id = ? LIMIT 1")
 				.bind(id)
 				.all();
@@ -1276,7 +2011,7 @@ async function handleNewsAdminApi(request, env, url, origin) {
 			}
 
 			if (request.method === "DELETE") {
-				const result = await env.NEWS_DB
+				const result = await env.SITE_DB
 					.prepare("UPDATE news SET status = 'archived', updated_at = ? WHERE id = ?")
 					.bind(new Date().toISOString(), id)
 					.run();
@@ -1286,7 +2021,7 @@ async function handleNewsAdminApi(request, env, url, origin) {
 		}
 
 		if (relativePath === "/media" && request.method === "POST") {
-			if (!env.NEWS_MEDIA) return newsDatabaseUnavailable(origin, env);
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			const formData = await request.formData();
 			const file = formData.get("file");
 			const allowedTypes = {
@@ -1300,13 +2035,13 @@ async function handleNewsAdminApi(request, env, url, origin) {
 			}
 
 			const key = `news/pending/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
-			await env.NEWS_MEDIA.put(key, file.stream(), {
+			await env.SITE_MEDIA.put(key, file.stream(), {
 				httpMetadata: {
 					contentType: file.type,
 					cacheControl: "public, max-age=31536000, immutable",
 				},
 			});
-			return newsJsonResponse({ success: true, image: `${NEWS_MEDIA_PREFIX}${key}` }, 201, origin, env);
+			return newsJsonResponse({ success: true, image: `${SITE_MEDIA_PREFIX}${key}` }, 201, origin, env);
 		}
 
 		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
@@ -1322,18 +2057,32 @@ async function handleNewsAdminApi(request, env, url, origin) {
 
 async function handleNewsMedia(request, env, url) {
 	if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405 });
-	if (!env.NEWS_MEDIA) return new Response("News media storage is not configured", { status: 503 });
+	if (!env.SITE_MEDIA) return new Response("News media storage is not configured", { status: 503 });
 
-	const key = url.pathname.slice(NEWS_MEDIA_PREFIX.length);
-	if (!/^news\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key)) return new Response("Not found", { status: 404 });
+	const key = url.pathname.slice(SITE_MEDIA_PREFIX.length);
+	if (!/^news\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key) && !GALLERY_KEY_PATTERN.test(key) && !/^partners\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key) && !VIDEO_ASSET_PATTERN.test(url.pathname)) return new Response("Not found", { status: 404 });
 
-	const object = await env.NEWS_MEDIA.get(key);
+	const rangeHeader = request.headers.get("Range");
+	let range;
+	if (rangeHeader) {
+		const match = rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
+		if (match) {
+			range = { offset: match[1] ? Number(match[1]) : undefined, length: match[2] && match[1] ? Number(match[2]) - Number(match[1]) + 1 : undefined };
+		}
+	}
+	const object = await env.SITE_MEDIA.get(key, range ? { range } : undefined);
 	if (!object) return new Response("Not found", { status: 404 });
 
 	const headers = new Headers();
 	object.writeHttpMetadata(headers);
 	headers.set("Cache-Control", "public, max-age=31536000, immutable");
 	headers.set("X-Content-Type-Options", "nosniff");
+	headers.set("Accept-Ranges", "bytes");
+	if (rangeHeader && object.range) {
+		headers.set("Content-Range", `bytes ${object.range.offset}-${object.range.offset + object.range.length - 1}/${object.size}`);
+		headers.set("Content-Length", String(object.range.length));
+		return new Response(request.method === "HEAD" ? null : object.body, { status: 206, headers });
+	}
 	return new Response(request.method === "HEAD" ? null : object.body, { status: 200, headers });
 }
 
@@ -1351,25 +2100,48 @@ export default {
 			return handlePublicNews(request, env, origin);
 		}
 
-		if (isNewsAdminApiPath(url.pathname)) {
-			return handleNewsAdminApi(request, env, url, origin);
+		if (url.pathname === GALLERY_API_PATH) {
+			return handlePublicGallery(request, env, origin);
 		}
 
-		if (url.pathname.startsWith(NEWS_MEDIA_PREFIX)) {
+		if (url.pathname === WORLD_POINTS_API_PATH) {
+			return handlePublicWorldPoints(request, env, origin);
+		}
+
+		if (url.pathname === PARTNERS_API_PATH) {
+			return handlePublicPartners(request, env, origin);
+		}
+
+		if (url.pathname === VIDEOS_API_PATH) {
+			return handlePublicVideos(request, env, origin);
+		}
+
+		const adminApiPrefix = getAdminApiPrefix(url.pathname);
+		if (adminApiPrefix) {
+			if (url.pathname.startsWith(`${adminApiPrefix}/videos`)) {
+				return handleVideoAdminApi(request, env, url, origin, adminApiPrefix);
+			}
+			if (url.pathname.startsWith(`${adminApiPrefix}/world-points`) || url.pathname.startsWith(`${adminApiPrefix}/partners`)) {
+				return handleContentAdminApi(request, env, url, origin, adminApiPrefix);
+			}
+			return handleNewsAdminApi(request, env, url, origin, adminApiPrefix);
+		}
+
+		if (url.pathname.startsWith(SITE_MEDIA_PREFIX)) {
 			return handleNewsMedia(request, env, url);
 		}
 
-		if (url.pathname === NEWS_ADMIN_PREFIX && (request.method === "GET" || request.method === "HEAD")) {
+		if (url.pathname === ADMIN_PANEL_PREFIX && (request.method === "GET" || request.method === "HEAD")) {
 			return new Response(null, {
 				status: 301,
 				headers: {
 					...COMMON_RESPONSE_HEADERS,
-					Location: `${NEWS_ADMIN_PREFIX}/`,
+					Location: `${ADMIN_PANEL_PREFIX}/`,
 				},
 			});
 		}
 
-		if (isNewsAdminPath(url.pathname) && !isLocalHostname(requestHostname)) {
+		if (isAdminPanelPath(url.pathname) && !isLocalHostname(requestHostname)) {
 			const identity = await authorizeAdmin(request, env);
 			if (!identity) return newsAdminUnauthorized(origin, env);
 		}
@@ -1397,7 +2169,7 @@ export default {
 		const documentRedirect = canonicalDocumentRedirect(request, url);
 		if (documentRedirect) return documentRedirect;
 
-		if (url.pathname !== "/api/contact") {
+		if (url.pathname !== CONTACT_API_PATH) {
 			if (url.pathname.startsWith("/api/")) {
 				return jsonResponse(
 					{ success: false, message: "Not found" },
@@ -1677,7 +2449,7 @@ export default {
 
 		/*
 		 * requestHostname comes from request.url, i.e. the domain that
-		 * actually received /api/contact. It is not supplied by form data.
+		 * actually received /api/v1/contact. It is not supplied by form data.
 		 */
 		const sourceDomain = requestHostname;
 		const mailFrom =
@@ -1797,5 +2569,6 @@ export {
 	checkContactRateLimit,
 	getAllowedOrigins,
 	isLocalOrigin,
+	rowsToGalleryQuotes,
 	validateFields,
 };

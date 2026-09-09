@@ -107,7 +107,7 @@ const MIRoKIT_NEWS = [
       publishedAt: "2025-05-18",
       category: "photo",
       accent: "green",
-      image: "./public/assets/gallery/example.png",
+      image: "./public/assets/media/photos/events/example.png",
       featured: 3,
       alt: {
          ru: "Фоторепортаж о летнем лагере МИРоКИТ в Германии",
@@ -149,7 +149,7 @@ const MIRoKIT_NEWS = [
       publishedAt: "2025-05-10",
       category: "announce",
       accent: "violet",
-      image: "./public/assets/gallery/example.png",
+      image: "./public/assets/media/photos/events/example.png",
       featured: false,
       alt: {
          ru: "Анонс зимнего кубка МИРоКИТ",
@@ -191,7 +191,7 @@ const MIRoKIT_NEWS = [
       publishedAt: "2025-05-03",
       category: "interview",
       accent: "red",
-      image: "./public/assets/gallery/example.png",
+      image: "./public/assets/media/photos/events/example.png",
       featured: false,
       alt: {
          ru: "Участники проекта МИРоКИТ в Тунисе",
@@ -233,7 +233,7 @@ const MIRoKIT_NEWS = [
       publishedAt: "2025-04-20",
       category: "event",
       accent: "blue",
-      image: "./public/assets/gallery/example.png",
+      image: "./public/assets/media/photos/events/example.png",
       featured: false,
       alt: {
          ru: "Культурный обмен МИРоКИТ в России",

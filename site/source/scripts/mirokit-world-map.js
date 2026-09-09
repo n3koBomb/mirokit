@@ -19,7 +19,7 @@ async function initWorldCanvas() {
 
   // One data source drives the map, country cards, city statuses and labels.
   // Add a point here and the country feed updates automatically.
-  const points = [
+  let points = [
     { label: "Düsseldorf", cityKey: "world_city_dusseldorf", country: "Germany", countryKey: "world_country_germany", flag: "🇩🇪", 
       // flagColors: ["#111111", "#d21f2b", "#f4c430"], 
       lon: 6.77, lat: 51.23, hq: true, status: "hq", hqLabelKey: "world_status_hq" },
@@ -41,8 +41,28 @@ async function initWorldCanvas() {
     { label: "Ashgabat", cityKey: "world_city_ashgabat", country: "Turkmenistan", countryKey: "world_country_turkmenistan", flag: "🇹🇲", lon: 58.38, lat: 37.96, status: "planned" },
   ];
 
+  try {
+    const response = await fetch("/api/v1/world-points", { headers: { Accept: "application/json" }, cache: "no-store" });
+    if (!response.ok) throw new Error(`World points API returned ${response.status}`);
+    const payload = await response.json();
+    if (!Array.isArray(payload.points)) throw new Error("World points API returned invalid data");
+    if (payload.points.length === 0) throw new Error("World points API returned no published points");
+    points = payload.points.map((point) => ({
+      label: point.translations?.en?.city || point.id,
+      city: Object.fromEntries(["ru", "en", "de"].map((language) => [language, point.translations?.[language]?.city || point.id])),
+      country: Object.fromEntries(["ru", "en", "de"].map((language) => [language, point.translations?.[language]?.country || ""])),
+      lon: point.longitude,
+      lat: point.latitude,
+      flag: point.flag || "",
+      hq: point.pointStatus === "hq",
+      status: point.pointStatus,
+    }));
+  } catch (error) {
+    console.info("[MIRoKIT] Using bundled world points fallback:", error.message);
+  }
+
   const countryFeed = document.getElementById("worldCountryFeed");
-  const countryCount = document.getElementById("worldCountryCount");
+  const countryCountLabels = [...document.querySelectorAll("[data-country-count]")];
 
   function getDictionary() {
     return T[currentLang] || T.ru;
@@ -60,11 +80,17 @@ async function initWorldCanvas() {
   }
 
   function getPointCity(point) {
+    if (point.city && typeof point.city === "object") return point.city[currentLang] || point.city.en || point.city.ru || point.label;
     return translate(point.cityKey, point.label);
   }
 
   function getPointCountry(point) {
+    if (point.country && typeof point.country === "object") return point.country[currentLang] || point.country.en || point.country.ru || "";
     return translate(point.countryKey, point.country);
+  }
+
+  function getPointStatus(point) {
+    return point.pointStatus || point.status || "planned";
   }
 
   function getStatusLabel(status) {
@@ -77,15 +103,15 @@ async function initWorldCanvas() {
     if (!countryFeed) return;
 
     const countries = [...points.reduce((groups, point) => {
-      const key = point.countryKey || point.country;
+      const key = point.countryKey || (typeof point.country === "object" ? point.country.en || point.country.ru : point.country);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push(point);
       return groups;
     }, new Map()).entries()];
 
     countries.sort(([, firstPoints], [, secondPoints]) => {
-      const firstPriority = firstPoints.some((point) => point.hq) ? 0 : firstPoints.some((point) => point.status === "done") ? 1 : 2;
-      const secondPriority = secondPoints.some((point) => point.hq) ? 0 : secondPoints.some((point) => point.status === "done") ? 1 : 2;
+      const firstPriority = firstPoints.some((point) => point.hq) ? 0 : firstPoints.some((point) => getPointStatus(point) === "done") ? 1 : 2;
+      const secondPriority = secondPoints.some((point) => point.hq) ? 0 : secondPoints.some((point) => getPointStatus(point) === "done") ? 1 : 2;
       return firstPriority - secondPriority || getPointCountry(firstPoints[0]).localeCompare(getPointCountry(secondPoints[0]));
     });
 
@@ -104,7 +130,7 @@ async function initWorldCanvas() {
 
       const countryStatus = countryPoints.some((point) => point.hq)
         ? "hq"
-        : countryPoints.some((point) => point.status === "planned") && !countryPoints.some((point) => point.status === "done")
+        : countryPoints.some((point) => getPointStatus(point) === "planned") && !countryPoints.some((point) => getPointStatus(point) === "done")
           ? "planned"
           : "done";
       const statusElement = createTextElement("span", `world-country-status is-${countryStatus}`, getStatusLabel(countryStatus));
@@ -117,13 +143,13 @@ async function initWorldCanvas() {
         const row = document.createElement("li");
         row.className = "world-city-row";
         row.append(createTextElement("span", "world-city-name", getPointCity(point)));
-        row.append(createTextElement("span", `world-city-status${point.status === "planned" ? " is-planned" : ""}`, getStatusLabel(point.status)));
+        row.append(createTextElement("span", `world-city-status${getPointStatus(point) === "planned" ? " is-planned" : ""}`, getStatusLabel(getPointStatus(point))));
         cityList.append(row);
       });
       main.append(cityList);
 
-      const doneCount = countryPoints.filter((point) => point.status === "done").length;
-      const plannedCount = countryPoints.filter((point) => point.status === "planned").length;
+      const doneCount = countryPoints.filter((point) => getPointStatus(point) === "done").length;
+      const plannedCount = countryPoints.filter((point) => getPointStatus(point) === "planned").length;
       const summary = [
         `${countryPoints.length} ${translate("world_cities_label", "cities")}`,
         doneCount ? `${doneCount} ${translate("world_done_short", "held")}` : "",
@@ -135,7 +161,7 @@ async function initWorldCanvas() {
       return card;
     }));
 
-    if (countryCount) countryCount.textContent = String(countries.length).padStart(2, "0");
+    if (countryCountLabels) countryCountLabels.forEach((label) => {label.textContent = String(countries.length).padStart(2, "0")});
   }
 
   renderCountryFeed();
@@ -441,7 +467,7 @@ async function initWorldCanvas() {
         .filter((point) => !point.hq)
         .forEach((point) => {
           const route = makeGreatCircleRoute(hq, point);
-          const planned = point.status === "planned";
+          const planned = getPointStatus(point) === "planned";
 
           ctx.save();
           ctx.beginPath();
@@ -461,7 +487,7 @@ async function initWorldCanvas() {
         const position = projection([point.lon, point.lat]);
         if (!position) return;
 
-        const planned = point.status === "planned";
+        const planned = getPointStatus(point) === "planned";
         const color = planned ? "#e8172b" : "#1565ff";
         const mainColor = "#e8af00";
         const halo = planned ? "rgba(232, 23, 43, 0.18)" : "rgba(21, 101, 255, 0.18)";

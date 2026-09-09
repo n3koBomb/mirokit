@@ -1,5 +1,5 @@
 /* ============================================================================
-   MIROKIT — HAUPT-STYLESHEET
+   MIRoKIT — HAUPT-STYLESHEET
    ============================================================================
 
    DATEI-PRINZIP
@@ -1153,7 +1153,7 @@ p {
 }
 
 /* ============================================================================
-   DESKTOP-NAVIGATION — MEHRSTUFIGE MIROKIT-DROPDOWNS
+   DESKTOP-NAVIGATION — MEHRSTUFIGE MIRoKIT-DROPDOWNS
    ============================================================================ */
 
 .desktop-nav {
@@ -1743,7 +1743,7 @@ p {
 	gap: 8px;
 }
 
-/* --- Mobile navigation: MiroKit Buttons und verschachtelte Accordions --- */
+/* --- Mobile navigation: MIRoKIT Buttons und verschachtelte Accordions --- */
 
 .mobile-links>li {
 	min-width: 0;
@@ -2961,7 +2961,6 @@ body #join {
 	color: var(--bld);
 	font-weight: 900;
 	font-size: 12px;
-	text-transform: uppercase;
 	letter-spacing: 2px;
 	padding: 6px 15px;
 	border-radius: 50px;
@@ -2972,7 +2971,6 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: clamp(26px, 4vw, 44px);
-	text-transform: uppercase;
 	line-height: 1.15;
 	color: var(--bld);
 }
@@ -4257,7 +4255,6 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-size: 0.95rem;
 	font-weight: 900;
-	text-transform: uppercase;
 }
 
 #aboutUs .about-kicker i {
@@ -4278,7 +4275,6 @@ body #join {
 #aboutUs .about-league p strong {
 	font-weight: 800;
 	text-decoration: underline;
-	text-transform: uppercase;
 }
 
 #aboutUs .about-story-copy p+p {
@@ -4652,7 +4648,6 @@ body #join {
 	margin-bottom: 5px;
 	font-size: 0.7rem;
 	font-weight: 900;
-	text-transform: uppercase;
 	letter-spacing: 0;
 	color: var(--yl);
 }
@@ -4863,7 +4858,6 @@ body #join {
 	font-size: 11px;
 	font-weight: 900;
 	letter-spacing: 0.16em;
-	text-transform: uppercase;
 }
 
 #world .world-index {
@@ -5024,8 +5018,9 @@ body #join {
 #world .world-visual p {
 	max-width: 32ch;
 	margin: 0;
-	color: color-mix(in srgb, var(--paper) 78%, transparent);
+	color: var(--miro-red) !important;
 	font-size: 14px;
+	font-weight: 600 !important;
 	line-height: 1.6;
 }
 
@@ -5440,7 +5435,6 @@ body #join {
 	font-size: 10px;
 	font-weight: 900;
 	letter-spacing: 0.04em;
-	text-transform: uppercase;
 }
 
 #world .world-country-status {
@@ -5655,7 +5649,6 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-size: 0.78rem;
 	font-weight: 900;
-	text-transform: uppercase;
 }
 
 #partners .partner-kicker i,
@@ -5800,6 +5793,10 @@ body #join {
 	gap: 20px;
 }
 
+#partners .partner-logo-groups[hidden] {
+	display: none;
+}
+
 #partners .partner-logo-group {
 	position: relative;
 	padding-top: 18px;
@@ -5819,13 +5816,17 @@ body #join {
 	font-size: 0.84rem;
 	font-weight: 900;
 	line-height: 1.2;
-	text-transform: uppercase;
 }
 
 #partners .partner-logo-wall {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 10px;
+}
+
+#partners .partner-logo-link {
+	color: inherit;
+	text-decoration: none;
 }
 
 #partners .partner-logo-tile {
@@ -6073,7 +6074,7 @@ body #join {
 
 #gamePrinciple .game-principle-stage {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(320px, 0.94fr);
+	grid-template-columns: minmax(0, 0.7fr) minmax(320px, 1.3fr);
 	align-items: stretch;
 	gap: clamp(18px, 3vw, 34px);
 }
@@ -6102,7 +6103,7 @@ body #join {
 	display: grid;
 	grid-template-columns: auto minmax(0, 1fr);
 	gap: clamp(14px, 2vw, 24px);
-	align-items: start;
+	align-items: center;
 	padding: clamp(20px, 2.8vw, 32px);
 	border: 1px solid color-mix(in srgb, var(--bl) 22%, transparent);
 	border-radius: clamp(20px, 3vw, 32px);
@@ -6129,17 +6130,14 @@ body #join {
 
 #gamePrinciple .game-principle-route {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: clamp(10px, 1.4vw, 16px);
 }
 
 #gamePrinciple .game-principle-route-card {
 	position: relative;
 	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	gap: 22px;
-	min-height: clamp(150px, 15vw, 205px);
+	align-items: center;
+	gap: 12px;
 	padding: clamp(14px, 1.8vw, 22px);
 	border: 1px solid color-mix(in srgb, var(--bl) 15%, transparent);
 	border-radius: clamp(18px, 2.4vw, 28px);
@@ -6195,12 +6193,14 @@ body #join {
 #gamePrinciple .game-principle-route-card h3 {
 	position: relative;
 	z-index: 1;
-	max-width: 13ch;
+	width: 100%;
+	max-width: 100%;
 	color: var(--bld);
 	font-family: "Montserrat", sans-serif;
-	font-size: clamp(15px, 1.7vw, 22px);
+	font-size: clamp(14px, 1.35vw, 20px);
 	font-weight: 900;
 	line-height: 1.12;
+	overflow-wrap: anywhere;
 }
 
 #gamePrinciple .game-principle-together {
@@ -6286,10 +6286,6 @@ body #join {
 	#gamePrinciple .game-principle-layout {
 		padding: 14px;
 		border-radius: 24px;
-	}
-
-	#gamePrinciple .game-principle-route {
-		grid-template-columns: 1fr;
 	}
 
 	#gamePrinciple .game-principle-route-card {
@@ -6389,7 +6385,6 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: 12px;
-	text-transform: uppercase;
 	color: var(--bld);
 	margin-bottom: 8px;
 	line-height: 1.35;
@@ -6606,13 +6601,11 @@ body #join {
 }
 
 #onlineProjects::before {
-	z-index: -2;
 	background-image: var(--deferred-background, none);
-	background-position: center 28%;
+	background-position: center center;
+	background-repeat: no-repeat;
 	background-size: cover;
 	content: "";
-	filter: blur(4px) saturate(0.92);
-	transform: scale(1.035);
 }
 
 #onlineProjects::after {
@@ -6632,6 +6625,29 @@ body #join {
 	margin-top: 16px;
 	font-size: clamp(15px, 1.5vw, 18px);
 	line-height: 1.6;
+}
+
+#onlineProjects .online-projects-page-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	margin-top: 16px;
+	color: var(--bld);
+	font-size: 11px;
+	font-weight: 900;
+	text-decoration: none;
+}
+
+#onlineProjects .online-projects-page-link:hover {
+	color: var(--bl);
+}
+
+#onlineProjects .online-projects-page-link i {
+	transition: transform 0.2s ease;
+}
+
+#onlineProjects .online-projects-page-link:hover i {
+	transform: translate(2px, -2px);
 }
 
 /* ============================================================================
@@ -6840,7 +6856,6 @@ body #join {
 	font-size: 10px;
 	font-weight: 900;
 	letter-spacing: 0.04em;
-	text-transform: uppercase;
 }
 
 #onlineProjects .online-project-status.is-live i {
@@ -6907,7 +6922,6 @@ body #join {
 	font-size: 9px;
 	font-weight: 900;
 	letter-spacing: 0.06em;
-	text-transform: uppercase;
 }
 
 #onlineProjects .online-project-info-grid strong,
@@ -7237,7 +7251,6 @@ body #join {
 	font-size: 12px;
 	font-weight: 900;
 	letter-spacing: 0;
-	text-transform: uppercase;
 }
 
 #projects .projects-kicker i {
@@ -7396,7 +7409,6 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-size: 12px;
 	font-weight: 900;
-	text-transform: uppercase;
 }
 
 #projects .projects-context ul {
@@ -7561,7 +7573,6 @@ body #join {
 	color: #fff;
 	font-size: 10px;
 	font-weight: 900;
-	text-transform: uppercase;
 	box-shadow: 0 8px 20px rgba(1, 51, 123, 0.18);
 }
 
@@ -7616,7 +7627,6 @@ body #join {
 	color: var(--theme-danger-text, var(--rd));
 	font-size: 10px;
 	font-weight: 900;
-	text-transform: uppercase;
 }
 
 #projects .project-body h3 {
@@ -7713,7 +7723,6 @@ body #join {
 	color: var(--theme-danger-text, var(--rd));
 	font-size: 11px;
 	font-weight: 900;
-	text-transform: uppercase;
 }
 
 #projects .projects-flow strong,
@@ -8586,7 +8595,7 @@ body #join {
 	font-size: 11px;
 	font-weight: 900;
 	letter-spacing: 0.05em;
-	text-transform: uppercase;
+
 }
 
 #gallery .gallery-eyeline i,
@@ -8608,6 +8617,7 @@ body #join {
 	color: var(--bld);
 	font-size: 13px;
 	line-height: 1.6;
+	white-space: pre-line;
 }
 
 #gallery .gallery-portal-grid {
@@ -8687,7 +8697,7 @@ body #join {
 	font-size: 12px;
 	font-weight: 900;
 	letter-spacing: 0.05em;
-	text-transform: uppercase;
+
 }
 
 #gallery .gallery-portal strong {
@@ -8762,6 +8772,10 @@ body #join {
 	gap: 16px;
 }
 
+#gallery .photo-story-grid[hidden] {
+	display: none !important;
+}
+
 #gallery .photo-story {
 	position: relative;
 	overflow: hidden;
@@ -8817,7 +8831,7 @@ body #join {
 #gallery .photo-story>span small {
 	font-size: 12px;
 	font-weight: 800;
-	text-transform: uppercase;
+
 }
 
 #gallery .photo-story>span strong {
@@ -8948,24 +8962,50 @@ body #join {
 
 #gallery .video-list {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
 	gap: 14px;
 }
 
+#gallery .video-list:has(.video-card:only-child) {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+#gallery .video-remote-library {
+	display: grid;
+	gap: 18px;
+}
+
+#gallery .video-remote-library[hidden] {
+	display: none;
+}
+
 #gallery .video-card {
-	display: flex;
+	display: grid;
+	grid-template-columns: minmax(140px, 0.4fr) minmax(0, 0.6fr);
+	align-items: stretch;
 	gap: 12px;
 	min-width: 0;
+	min-height: 136px;
 	padding: 10px;
 	border: 1px solid rgba(21, 101, 255, 0.1);
 	border-radius: 18px;
 	background: #fff;
+	cursor: pointer;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+#gallery .video-card:hover,
+#gallery .video-card:focus-visible {
+	border-color: rgba(21, 101, 255, 0.34);
+	box-shadow: 0 14px 28px rgba(13, 27, 75, 0.12);
+	transform: translateY(-2px);
 }
 
 #gallery .video-card>span {
 	position: relative;
-	width: 92px;
-	height: 72px;
+	width: 100%;
+	height: 100%;
+	min-height: 114px;
 	overflow: hidden;
 	border-radius: 12px;
 	flex: 0 0 auto;
@@ -9005,7 +9045,7 @@ body #join {
 	color: var(--bld);
 	font-size: 12px;
 	font-weight: 900;
-	text-transform: uppercase;
+
 }
 
 #gallery .video-card strong {
@@ -9059,6 +9099,15 @@ body #join {
 		grid-row: auto;
 	}
 
+	#gallery .video-card {
+		grid-template-columns: 100px minmax(0, 1fr);
+		min-height: 108px;
+	}
+
+	#gallery .video-card>span {
+		min-height: 86px;
+	}
+
 	#gallery .gallery-detail-toolbar,
 	#gallery .gallery-detail-footer {
 		align-items: flex-start;
@@ -9083,6 +9132,19 @@ body #join {
 	display: grid;
 }
 
+/* The modal lives next to the main page content, not inside #gallery. Keep
+   native hidden states authoritative even when the renderer has a display
+   rule of its own. */
+.gallery-video-player-shell[hidden],
+.gallery-video-stage[hidden],
+.gallery-video-modal-card .gallery-modal-video[hidden],
+.gallery-video-modal-card .gallery-modal-youtube[hidden],
+.gallery-video-modal-card .gallery-video-controls[hidden],
+.gallery-video-settings[hidden],
+.gallery-video-modal-card .gallery-video-modal-note[hidden] {
+	display: none !important;
+}
+
 .gallery-media-modal-card {
 	width: min(1120px, 100%);
 	max-height: 92dvh;
@@ -9091,6 +9153,19 @@ body #join {
 	border-radius: 26px;
 	background: #fff;
 	box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+}
+
+/* Keep video playback inside the viewport. The photo lightbox may scroll for
+   very tall photos, but the video dialog remains a compact player. */
+.gallery-media-modal-card.gallery-video-modal-card {
+	display: flex;
+	flex-direction: column;
+	align-self: center;
+	justify-self: center;
+	width: min(960px, calc(100vw - 24px), 120dvh);
+	height: fit-content;
+	max-height: calc(100dvh - 24px);
+	overflow: hidden;
 }
 
 .gallery-media-modal-head,
@@ -9189,6 +9264,387 @@ body #join {
 	background: var(--bld);
 }
 
+.gallery-modal-youtube {
+	display: block;
+	width: 100%;
+	height: min(68dvh, 640px);
+	border: 0;
+	background: #07132f;
+}
+
+.gallery-video-modal-card .gallery-modal-video,
+.gallery-video-modal-card .gallery-modal-youtube {
+	width: 100%;
+	height: auto;
+	max-height: none;
+	aspect-ratio: 16 / 9;
+	object-fit: contain;
+	flex: 0 0 auto;
+}
+
+/* The modal has one fixed 16:9 stage. Exactly one renderer is visible on it;
+   the inactive HTML5 or YouTube element is removed from layout completely. */
+.gallery-video-player-shell {
+	position: relative;
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	background: #07132f;
+}
+
+.gallery-video-stage {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	background: #07132f;
+	flex: 0 0 auto;
+}
+
+.gallery-video-stage > .gallery-modal-video,
+.gallery-video-stage > .gallery-modal-youtube {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-height: none;
+	aspect-ratio: auto;
+	object-fit: contain;
+}
+
+.gallery-video-stage-feedback {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 3;
+	display: grid;
+	width: 76px;
+	height: 76px;
+	place-items: center;
+	border: 2px solid rgba(255, 255, 255, 0.8);
+	border-radius: 50%;
+	background: linear-gradient(145deg, rgba(21, 101, 255, 0.94), rgba(118, 54, 190, 0.94));
+	box-shadow: 0 12px 36px rgba(0, 0, 0, 0.38), 0 0 0 8px rgba(255, 204, 64, 0.13);
+	color: #fff;
+	font-size: 27px;
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, -50%) scale(0.72);
+}
+
+.gallery-video-stage-feedback.is-visible {
+	animation: gallery-video-feedback 700ms ease-out both;
+}
+
+@keyframes gallery-video-feedback {
+	0% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.72);
+	}
+
+	22% {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(1.14);
+	}
+}
+
+.gallery-video-modal-card[data-video-renderer="youtube"] .gallery-modal-video,
+.gallery-video-modal-card[data-video-renderer="html5"] .gallery-modal-youtube,
+.gallery-video-modal-card[data-video-renderer="none"] .gallery-modal-video,
+.gallery-video-modal-card[data-video-renderer="none"] .gallery-modal-youtube {
+	display: none !important;
+}
+
+.gallery-video-modal-card .gallery-video-modal-note {
+	display: -webkit-box;
+	max-height: 3.8rem;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+.gallery-video-seek {
+	position: relative;
+	display: flex;
+	width: 100%;
+	min-width: 0;
+	grid-area: seek;
+	align-items: center;
+	padding-top: 6px;
+}
+
+.gallery-video-seek::before,
+.gallery-video-seek::after {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 3px;
+	border-radius: 99px;
+	content: "";
+	pointer-events: none;
+}
+
+.gallery-video-seek::before {
+	width: 100%;
+	background: linear-gradient(90deg, #2d6dff, #ff3c4f 48%, #ffc928);
+	opacity: 0.95;
+}
+
+.gallery-video-seek::after {
+	width: var(--seek-fill, 0%);
+	background: linear-gradient(90deg, #ffd34e, #ff8c38);
+	box-shadow: 0 0 9px rgba(255, 198, 58, 0.55);
+}
+
+.gallery-video-seek [data-video-control="seek"] {
+	position: relative;
+	z-index: 1;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.gallery-video-controls {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto auto minmax(0, 1fr) auto auto auto auto;
+	grid-template-areas:
+		"seek seek seek seek seek seek seek"
+		"play time mute volume captions settings fullscreen";
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px 14px;
+	border-top: 1px solid rgba(255, 255, 255, 0.16);
+	background: linear-gradient(110deg, #06122f 0%, #0b2b71 58%, #104cae 100%);
+	box-shadow: 0 -18px 34px rgba(3, 14, 43, 0.32);
+	color: #fff;
+}
+
+.gallery-video-controls button {
+	display: inline-grid;
+	width: 36px;
+	height: 36px;
+	place-items: center;
+	flex: 0 0 auto;
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.11);
+	color: #fff;
+	cursor: pointer;
+	transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.gallery-video-controls button:hover,
+.gallery-video-controls button:focus-visible {
+	border-color: #ffd34e;
+	background: rgba(255, 211, 78, 0.22);
+	transform: translateY(-2px) scale(1.04);
+}
+
+.gallery-video-controls button[data-video-control="play"] {
+	grid-area: play;
+	width: 42px;
+	height: 42px;
+	border-color: #ffd34e;
+	background: linear-gradient(145deg, #ffcf3a, #ff7b35);
+	color: #07132f;
+	box-shadow: 0 7px 18px rgba(255, 174, 51, 0.3);
+}
+
+.gallery-video-controls input[type="range"] {
+	width: 100%;
+	height: 5px;
+	margin: 0;
+	appearance: none;
+	border-radius: 99px;
+	background: linear-gradient(90deg, #ffd34e var(--range-fill, 0%), rgba(255, 255, 255, 0.28) var(--range-fill, 0%));
+	cursor: pointer;
+}
+
+.gallery-video-controls [data-video-control="seek"] {
+	background: linear-gradient(90deg, #ffd34e var(--range-fill, 0%), rgba(255, 255, 255, 0.28) var(--range-fill, 0%));
+}
+
+.gallery-video-controls input[type="range"]::-webkit-slider-thumb {
+	width: 15px;
+	height: 15px;
+	appearance: none;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: #ffcf3a;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-video-controls input[type="range"]::-moz-range-thumb {
+	width: 11px;
+	height: 11px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: #ffcf3a;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-video-controls [data-video-control="seek"] {
+	min-width: 0;
+}
+
+.gallery-video-volume-control {
+	display: inline-flex;
+	width: 82px;
+	grid-area: volume;
+	align-items: center;
+	gap: 6px;
+	flex: 0 0 auto;
+}
+
+.gallery-video-controls [data-video-control="volume"] {
+	width: 48px;
+	flex: 1 1 auto;
+}
+
+.gallery-video-volume-control output {
+	min-width: 27px;
+	color: #fff;
+	font-size: 10px;
+	font-variant-numeric: tabular-nums;
+	font-weight: 900;
+	text-align: right;
+}
+
+.gallery-video-controls [data-video-control="time"] {
+	grid-area: time;
+	min-width: 90px;
+	padding: 6px 8px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 8px;
+	background: rgba(2, 12, 39, 0.42);
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	font-weight: 800;
+	white-space: nowrap;
+}
+
+.gallery-video-controls select {
+	max-width: 130px;
+	padding: 7px;
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 8px;
+	background: rgba(2, 12, 39, 0.42);
+	color: #fff;
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.gallery-video-controls .gallery-video-captions-toggle {
+	grid-area: captions;
+	width: 38px;
+	height: 32px;
+	border-radius: 9px;
+	font-size: 11px;
+	font-weight: 900;
+	letter-spacing: 0.04em;
+}
+
+.gallery-video-controls .gallery-video-captions-toggle.is-active {
+	border-color: #ffd34e;
+	background: #ffd34e;
+	color: #07132f;
+	box-shadow: 0 0 0 3px rgba(255, 211, 78, 0.16);
+}
+
+.gallery-video-controls button:disabled {
+	opacity: 0.38;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.gallery-video-settings {
+	position: absolute;
+	right: 14px;
+	bottom: 63px;
+	z-index: 5;
+	display: grid;
+	min-width: 190px;
+	gap: 8px;
+	padding: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.26);
+	border-radius: 14px;
+	background: rgba(4, 18, 53, 0.97);
+	box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+	color: #fff;
+}
+
+.gallery-video-controls [data-video-control="mute"] {
+	grid-area: mute;
+}
+
+.gallery-video-controls [data-video-control="settings"] {
+	grid-area: settings;
+}
+
+.gallery-video-controls [data-video-control="fullscreen"] {
+	grid-area: fullscreen;
+}
+
+.gallery-video-settings strong {
+	color: #ffd34e;
+	font-size: 12px;
+}
+
+.gallery-video-settings label {
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.gallery-video-settings select {
+	width: 100%;
+	padding: 8px 9px;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	border-radius: 8px;
+	background: #07132f;
+	color: #fff;
+	font-size: 11px;
+}
+
+.gallery-video-player-shell:fullscreen {
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: radial-gradient(circle at 50% 15%, #17499b 0%, #07132f 52%, #020818 100%);
+}
+
+.gallery-video-player-shell:fullscreen .gallery-video-stage,
+.gallery-video-player-shell:fullscreen .gallery-video-controls {
+	width: min(1280px, calc(100vw - 48px), 160dvh);
+}
+
+.gallery-video-player-shell:fullscreen .gallery-video-controls {
+	flex: 0 0 auto;
+	border-radius: 0 0 14px 14px;
+}
+
+.gallery-video-player-shell:fullscreen .gallery-video-stage {
+	border-radius: 14px 14px 0 0;
+	box-shadow: 0 22px 80px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-video-modal-meta {
+	margin: 0;
+	padding: 10px 18px 0;
+	color: var(--bld);
+	font-size: 12px;
+	font-weight: 900;
+}
+
 .gallery-video-modal-note {
 	margin: 0;
 	padding: 14px 18px 18px;
@@ -9204,6 +9660,35 @@ body #join {
 }
 
 @media (max-width: 620px) {
+	.gallery-video-controls {
+		grid-template-columns: auto minmax(0, 82px) minmax(0, 1fr) auto auto auto;
+		grid-template-areas:
+			"seek seek seek seek seek seek"
+			"play time mute volume captions settings"
+			"fullscreen fullscreen fullscreen fullscreen fullscreen fullscreen";
+		gap: 7px;
+	}
+
+	.gallery-video-seek {
+		width: 100%;
+	}
+
+	.gallery-video-volume-control {
+		width: 76px;
+	}
+
+	.gallery-video-controls [data-video-control="time"] {
+		min-width: 0;
+		padding-inline: 5px;
+		font-size: 10px;
+	}
+
+	.gallery-video-controls .gallery-video-captions-toggle,
+	.gallery-video-controls [data-video-control="settings"],
+	.gallery-video-controls [data-video-control="fullscreen"] {
+		width: 34px;
+		height: 34px;
+	}
 
 	.gallery-media-modal-head,
 	.gallery-media-modal-footer {
@@ -9294,7 +9779,7 @@ body #join {
 	color: var(--muted);
 	font-size: 10px;
 	font-weight: 800;
-	text-transform: uppercase;
+
 }
 
 #gallery .gallery-portal-grid {
@@ -9606,7 +10091,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: 15px;
-	text-transform: uppercase;
+
 	letter-spacing: 0.02em;
 	color: var(--bld);
 }
@@ -9661,7 +10146,7 @@ body #join {
 #contact .contact-text > strong {
 	font-family: "Montserrat", sans-serif;
 	font-size: 12px;
-	text-transform: uppercase;
+
 	letter-spacing: 0.02em;
 	color: #8890a6;
 }
@@ -9698,7 +10183,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: 11px;
-	text-transform: uppercase;
+
 	letter-spacing: 0.02em;
 	color: #8890a6;
 }
@@ -9846,7 +10331,7 @@ body #join {
 	font-size: clamp(13px, 1.7vw, 16px);
 	font-weight: 900;
 	line-height: 1.3;
-	text-transform: uppercase;
+
 	color: var(--bld);
 }
 
@@ -10236,7 +10721,7 @@ body #join {
 	font-weight: 900;
 	font-size: 21px;
 	color: var(--bld);
-	text-transform: uppercase;
+
 	margin-bottom: 12px;
 }
 
@@ -10307,7 +10792,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: 14px;
-	text-transform: uppercase;
+
 	margin-bottom: 4px;
 }
 
@@ -10352,7 +10837,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: clamp(24px, 4.5vw, 32px);
-	text-transform: uppercase;
+
 }
 
 #benefits .benefit-sub {
@@ -10406,7 +10891,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: 13px;
-	text-transform: uppercase;
+
 	margin-bottom: 4px;
 }
 
@@ -10450,7 +10935,7 @@ body #join {
 	font-family: "Montserrat", sans-serif;
 	font-weight: 900;
 	font-size: clamp(28px, 6vw, 52px);
-	text-transform: uppercase;
+
 	line-height: 1.1;
 	margin-bottom: 16px;
 }
@@ -10620,7 +11105,7 @@ body.privacy-page .privacy-topbar {
 	font-size: 11px;
 	font-weight: 800;
 	letter-spacing: 0.08em;
-	text-transform: uppercase;
+
 }
 
 .privacy-document h1 {
@@ -11420,7 +11905,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-size: 0.58rem;
 	font-weight: 700;
 	letter-spacing: 0.1em;
-	text-transform: uppercase;
+
 }
 
 #hero .partner-showcase-meta span:last-child {
@@ -11776,7 +12261,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-weight: 800;
 	letter-spacing: 0.18em;
 	line-height: 1;
-	text-transform: uppercase;
+
 }
 
 #hero .module-kicker i {
@@ -11936,7 +12421,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-size: 0.52rem;
 	font-weight: 800;
 	letter-spacing: 0.04em;
-	text-transform: uppercase;
+
 }
 
 #hero .news-card .news-body {
@@ -11964,7 +12449,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-weight: 800;
 	letter-spacing: 0.13em;
 	line-height: 1.2;
-	text-transform: uppercase;
+
 }
 
 #hero .news-card-meta time {
@@ -12011,7 +12496,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-weight: 800;
 	letter-spacing: 0.05em;
 	text-decoration: none;
-	text-transform: uppercase;
+
 }
 
 #hero .news-read-link i {
@@ -12119,7 +12604,7 @@ body .site-main #gamePrinciple .game-principle-finale {
 	font-weight: 800;
 	letter-spacing: 0.05em;
 	text-decoration: none;
-	text-transform: uppercase;
+
 }
 
 #hero .partner-group {
@@ -12972,7 +13457,7 @@ body.theme-dark .site-main :where(.card, [class$="-card"], [class$="-panel"], .g
 	border-color: var(--theme-border) !important;
 	background-color: var(--theme-surface-2) !important;
 	color: var(--theme-text-primary) !important;
-	box-shadow: var(--theme-shadow-md) !important;
+	box-shadow: var(--theme-shadow-sm) !important;
 }
 
 body.theme-dark :where(.btn-secondary, .mini-ghost, .news-filter-btn, .online-projects-scroll-btn, .gallery-back-button, .news-modal-nav, .news-modal-prev, .news-modal-next, .gallery-modal-close, .gallery-modal-prev, .gallery-modal-next) {

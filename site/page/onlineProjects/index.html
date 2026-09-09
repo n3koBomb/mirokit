@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ru">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="description" content="Фотоархив онлайн-проектов Международной лиги «МИРоКИТ»." />
+      <meta name="robots" content="index, follow" />
+      <title>Онлайн-проекты — МИРоКИТ</title>
+      <link rel="canonical" href="https://mirokit.com/page/onlineProjects/" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+      <link rel="icon" type="image/x-icon" href="../../public/favicon/favicon.ico" />
+      <link rel="stylesheet" href="../../source/style/style.css" />
+      <style>
+         :root {
+            --online-page-blue: #0d337a;
+            --online-page-soft: #eef5ff;
+         }
+
+         body.online-project-page {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--online-page-soft);
+            color: var(--online-page-blue);
+            font-family: "Rubik", sans-serif;
+         }
+
+         .online-project-page-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            min-height: 72px;
+            padding: 10px clamp(18px, 4vw, 64px);
+            border-bottom: 1px solid rgba(13, 51, 122, 0.1);
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 12px 32px rgba(13, 27, 75, 0.08);
+            backdrop-filter: blur(18px);
+         }
+
+         .online-project-page-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--online-page-blue);
+            font-family: "Montserrat", sans-serif;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+         }
+
+         .online-project-page-brand img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+         }
+
+         .online-project-page-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+         }
+
+         .online-project-page-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 999px;
+            color: var(--online-page-blue);
+            font-size: 11px;
+            font-weight: 900;
+            text-decoration: none;
+         }
+
+         .online-project-page-actions a:hover {
+            background: #e0ecff;
+         }
+
+         .online-project-page-actions .online-project-page-primary {
+            background: #1565ff;
+            color: #fff;
+            box-shadow: 0 9px 20px rgba(21, 101, 255, 0.2);
+         }
+
+         .online-project-page-main {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            min-height: calc(100vh - 72px);
+            padding: clamp(34px, 6vw, 86px) clamp(18px, 5vw, 72px) 72px;
+         }
+
+         .online-project-page-main::before {
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            background: linear-gradient(180deg, rgba(247, 251, 255, 0.78), rgba(231, 241, 255, 0.94)), url("../../public/assets/backgrounds/online-projects-stage.png") center top / cover no-repeat;
+            content: "";
+         }
+
+         .online-project-page-main::after {
+            position: absolute;
+            right: -120px;
+            bottom: -160px;
+            z-index: -1;
+            width: 420px;
+            height: 420px;
+            border: 1px solid rgba(21, 101, 255, 0.16);
+            border-radius: 50%;
+            box-shadow: 0 0 0 22px rgba(21, 101, 255, 0.05), 0 0 0 54px rgba(21, 101, 255, 0.035);
+            content: "";
+         }
+
+         .online-project-page-content {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+         }
+
+         .online-project-page-intro {
+            max-width: 820px;
+            margin-bottom: clamp(26px, 4vw, 46px);
+         }
+
+         .online-project-page-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            color: #1565ff;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+         }
+
+         .online-project-page-kicker::before {
+            width: 30px;
+            height: 3px;
+            border-radius: 999px;
+            background: #ef233c;
+            content: "";
+         }
+
+         .online-project-page h1 {
+            margin: 0;
+            color: var(--online-page-blue);
+            font-family: "Montserrat", sans-serif;
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 900;
+            letter-spacing: -0.045em;
+            line-height: 0.98;
+         }
+
+         .online-project-page-intro p {
+            max-width: 70ch;
+            margin: 18px 0 0;
+            color: #51627e;
+            font-size: clamp(15px, 1.7vw, 19px);
+            line-height: 1.65;
+         }
+
+         .online-project-page-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+         }
+
+         .online-project-page-toolbar h2 {
+            margin: 0;
+            color: var(--online-page-blue);
+            font-family: "Montserrat", sans-serif;
+            font-size: clamp(20px, 3vw, 30px);
+            font-weight: 900;
+         }
+
+         .online-project-page-count {
+            color: #5e6e88;
+            font-size: 12px;
+            font-weight: 800;
+         }
+
+         .online-project-photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+         }
+
+         .online-project-photo {
+            position: relative;
+            display: grid;
+            min-width: 0;
+            min-height: 240px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid rgba(21, 101, 255, 0.16);
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 16px 34px rgba(13, 27, 75, 0.1);
+            cursor: zoom-in;
+            text-align: left;
+         }
+
+         .online-project-photo:first-child {
+            grid-column: span 2;
+            min-height: 370px;
+         }
+
+         .online-project-photo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: inherit;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+         }
+
+         .online-project-photo:hover img,
+         .online-project-photo:focus-visible img {
+            transform: scale(1.04);
+         }
+
+         .online-project-photo span {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: grid;
+            gap: 4px;
+            padding: 44px 18px 16px;
+            background: linear-gradient(transparent, rgba(5, 22, 58, 0.86));
+            color: #fff;
+         }
+
+         .online-project-photo small {
+            font-size: 10px;
+            font-weight: 800;
+            opacity: 0.78;
+         }
+
+         .online-project-photo strong {
+            font-family: "Montserrat", sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.15;
+         }
+
+         .online-project-page-empty {
+            padding: 34px;
+            border: 1px dashed rgba(21, 101, 255, 0.32);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.75);
+            color: #51627e;
+            font-size: 15px;
+            line-height: 1.6;
+         }
+
+         .online-project-page-modal[hidden] {
+            display: none;
+         }
+
+         .online-project-page-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(3, 13, 36, 0.84);
+         }
+
+         .online-project-page-modal-card {
+            position: relative;
+            display: grid;
+            width: min(1100px, 100%);
+            max-height: calc(100vh - 48px);
+            grid-template-rows: minmax(0, 1fr) auto;
+            overflow: hidden;
+            border-radius: 22px;
+            background: #071b45;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+         }
+
+         .online-project-page-modal-stage {
+            display: grid;
+            min-height: 0;
+            place-items: center;
+            padding: 20px;
+         }
+
+         .online-project-page-modal-stage img {
+            display: block;
+            width: 100%;
+            height: min(70vh, 720px);
+            object-fit: contain;
+         }
+
+         .online-project-page-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 16px;
+            color: #fff;
+         }
+
+         .online-project-page-modal-footer p {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 800;
+         }
+
+         .online-project-page-modal button {
+            min-width: 38px;
+            min-height: 38px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            cursor: pointer;
+         }
+
+         .online-project-page-modal button:hover {
+            background: rgba(255, 255, 255, 0.22);
+         }
+
+         @media (max-width: 760px) {
+            .online-project-page-header {
+               align-items: flex-start;
+               flex-direction: column;
+            }
+
+            .online-project-page-actions {
+               justify-content: flex-start;
+            }
+
+            .online-project-photo-grid {
+               grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .online-project-photo:first-child {
+               grid-column: span 2;
+            }
+         }
+
+         @media (max-width: 480px) {
+            .online-project-photo-grid {
+               grid-template-columns: 1fr;
+            }
+
+            .online-project-photo,
+            .online-project-photo:first-child {
+               grid-column: auto;
+               min-height: 260px;
+            }
+         }
+      </style>
+   </head>
+   <body class="online-project-page">
+      <header class="online-project-page-header">
+         <a class="online-project-page-brand" href="../../index.html" aria-label="Вернуться на главную страницу МИРоКИТ">
+            <img src="../../public/assets/brand/miroKit_logo_full-1.png" alt="МИРоКИТ" />
+            <span>Онлайн-проекты</span>
+         </a>
+         <nav class="online-project-page-actions" aria-label="Навигация страницы онлайн-проектов">
+            <a href="../../index.html#gallery"><i class="fa-solid fa-images" aria-hidden="true"></i> Галерея</a>
+            <a class="online-project-page-primary" href="../../index.html#contact"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Участвовать</a>
+         </nav>
+      </header>
+
+      <main class="online-project-page-main">
+         <div class="online-project-page-content">
+            <section class="online-project-page-intro" aria-labelledby="onlineProjectPageTitle">
+               <span class="online-project-page-kicker">МИРоКИТ без границ</span>
+               <h1 id="onlineProjectPageTitle">Онлайн-проекты, которые объединяют</h1>
+               <p>Конкурсы, встречи и творческие лаборатории, где участники из разных стран создают общее пространство для игры, знаний и дружбы.</p>
+            </section>
+
+            <section aria-labelledby="onlineProjectPhotosTitle">
+               <div class="online-project-page-toolbar">
+                  <h2 id="onlineProjectPhotosTitle">Фотоистории проектов</h2>
+                  <span class="online-project-page-count" id="onlineProjectPhotoCount">Загрузка…</span>
+               </div>
+               <div class="online-project-photo-grid" id="onlineProjectPhotoGrid" aria-live="polite"></div>
+            </section>
+         </div>
+      </main>
+
+      <div class="online-project-page-modal" id="onlineProjectPhotoModal" hidden role="dialog" aria-modal="true" aria-labelledby="onlineProjectModalTitle">
+         <div class="online-project-page-modal-card">
+            <div class="online-project-page-modal-stage"><img id="onlineProjectModalImage" src="" alt="" /></div>
+            <div class="online-project-page-modal-footer">
+               <button type="button" id="onlineProjectModalPrevious" aria-label="Предыдущее фото">←</button>
+               <p id="onlineProjectModalTitle"></p>
+               <button type="button" id="onlineProjectModalNext" aria-label="Следующее фото">→</button>
+               <button type="button" id="onlineProjectModalClose" aria-label="Закрыть">×</button>
+            </div>
+         </div>
+      </div>
+
+      <script>
+         const projectPageLanguage = window.location.hostname.endsWith(".ru") ? "ru" : "en";
+         const projectPageGrid = document.getElementById("onlineProjectPhotoGrid");
+         const projectPageCount = document.getElementById("onlineProjectPhotoCount");
+         const projectPageModal = document.getElementById("onlineProjectPhotoModal");
+         const projectPageModalImage = document.getElementById("onlineProjectModalImage");
+         const projectPageModalTitle = document.getElementById("onlineProjectModalTitle");
+         let projectPageItems = [];
+         let projectPageIndex = 0;
+
+         function projectPageEscape(value) {
+            return String(value || "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[character]));
+         }
+
+         function projectPageText(item, field) {
+            return item?.[field]?.[projectPageLanguage] || item?.[field]?.en || item?.[field]?.ru || "";
+         }
+
+         function renderProjectPagePhotos() {
+            if (!projectPageItems.length) {
+               projectPageCount.textContent = projectPageLanguage === "ru" ? "Фото пока не добавлены" : "No photos yet";
+               projectPageGrid.innerHTML = `<p class="online-project-page-empty">${projectPageLanguage === "ru" ? "Фотографии онлайн-проектов появятся здесь после публикации через админ-панель." : "Online-project photos will appear here after they are published in the admin panel."}</p>`;
+               return;
+            }
+
+            projectPageCount.textContent = `${projectPageItems.length} ${projectPageLanguage === "ru" ? "фото" : "photos"}`;
+            projectPageGrid.innerHTML = projectPageItems.map((item, index) => {
+               const title = projectPageText(item, "title") || "MIRoKIT Online Projects";
+               const alt = projectPageText(item, "alt") || title;
+               const subtitle = projectPageText(item, "subtitle") || "Online projects";
+               return `<button class="online-project-photo" type="button" data-online-photo-index="${index}" aria-label="Open photo: ${projectPageEscape(title)}"><img loading="lazy" src="${projectPageEscape(item.image)}" alt="${projectPageEscape(alt)}" /><span><small>${projectPageEscape(subtitle)}</small><strong>${projectPageEscape(title)}</strong></span></button>`;
+            }).join("");
+         }
+
+         function openProjectPagePhoto(index) {
+            if (!projectPageItems.length) return;
+            projectPageIndex = (index + projectPageItems.length) % projectPageItems.length;
+            const item = projectPageItems[projectPageIndex];
+            projectPageModalImage.src = item.image;
+            projectPageModalImage.alt = projectPageText(item, "alt") || projectPageText(item, "title");
+            projectPageModalTitle.textContent = `${projectPageIndex + 1} / ${projectPageItems.length} — ${projectPageText(item, "title") || "MIRoKIT"}`;
+            projectPageModal.hidden = false;
+            document.body.style.overflow = "hidden";
+            document.getElementById("onlineProjectModalClose").focus();
+         }
+
+         function closeProjectPagePhoto() {
+            projectPageModal.hidden = true;
+            projectPageModalImage.removeAttribute("src");
+            document.body.style.overflow = "";
+         }
+
+         projectPageGrid.addEventListener("click", (event) => {
+            const photo = event.target.closest("[data-online-photo-index]");
+            if (photo) openProjectPagePhoto(Number(photo.dataset.onlinePhotoIndex));
+         });
+         document.getElementById("onlineProjectModalClose").addEventListener("click", closeProjectPagePhoto);
+         document.getElementById("onlineProjectModalPrevious").addEventListener("click", () => openProjectPagePhoto(projectPageIndex - 1));
+         document.getElementById("onlineProjectModalNext").addEventListener("click", () => openProjectPagePhoto(projectPageIndex + 1));
+         projectPageModal.addEventListener("click", (event) => { if (event.target === projectPageModal) closeProjectPagePhoto(); });
+         document.addEventListener("keydown", (event) => {
+            if (projectPageModal.hidden) return;
+            if (event.key === "Escape") closeProjectPagePhoto();
+            if (event.key === "ArrowLeft") openProjectPagePhoto(projectPageIndex - 1);
+            if (event.key === "ArrowRight") openProjectPagePhoto(projectPageIndex + 1);
+         });
+
+         fetch("../../api/v1/gallery?collection=online-projects", { headers: { Accept: "application/json" }, cache: "no-store" })
+            .then((response) => { if (!response.ok) throw new Error(`Gallery returned ${response.status}`); return response.json(); })
+            .then((payload) => {
+               projectPageItems = Array.isArray(payload.gallery) ? payload.gallery : [];
+               renderProjectPagePhotos();
+            })
+            .catch(() => {
+               projectPageCount.textContent = projectPageLanguage === "ru" ? "Фото временно недоступны" : "Photos unavailable";
+               projectPageGrid.innerHTML = `<p class="online-project-page-empty">${projectPageLanguage === "ru" ? "Не удалось загрузить фотоархив. Попробуйте обновить страницу позже." : "The photo archive could not be loaded. Please try again later."}</p>`;
+            });
+      </script>
+   </body>
+</html>

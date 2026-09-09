@@ -7,31 +7,41 @@
     "directory": "../site",
     "not_found_handling": "404-page",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/news-admin/*", "/news-media/*", "/", "/index.html", "/page/*"]
+    "run_worker_first": [
+      "/api/*",
+      "/admin/*",
+      "/media/v1/*",
+      "/",
+      "/index.html",
+      "/page/*"
+    ]
   },
   "d1_databases": [
     {
-      "binding": "NEWS_DB",
-      "database_name": "mirokit-news-local",
+      "binding": "SITE_DB",
+      "database_name": "mirokit-database-local",
       "database_id": "00000000-0000-0000-0000-000000000001"
     }
   ],
   "r2_buckets": [
     {
-      "binding": "NEWS_MEDIA",
-      "bucket_name": "mirokit-news-media-local"
+      "binding": "SITE_MEDIA",
+      "bucket_name": "mirokit-media-local"
     }
   ],
   "ratelimits": [
     {
       "name": "CONTACT_FORM_RATE_LIMITER",
       "namespace_id": "1001",
-      "simple": { "limit": 5, "period": 60 }
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
     }
   ],
   "vars": {
     "ALLOWED_ORIGINS": "http://localhost:8080,http://127.0.0.1:8080,http://localhost:8787,http://127.0.0.1:8787",
-    "NEWS_ADMIN_DEV_TOKEN": "local-news-admin-token",
+    "ADMIN_DEV_TOKEN": "local-admin-token",
     "MAIL_TO": "mirokit2025@gmail.com",
     "TURNSTILE_HOSTNAMES": "localhost,127.0.0.1"
   }

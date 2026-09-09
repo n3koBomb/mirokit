@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /news-admin/
+Disallow: /admin/
 
 Sitemap: https://mirokit.com/sitemap.xml

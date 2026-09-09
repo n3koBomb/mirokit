@@ -86,7 +86,7 @@ async function verifyAccessJwt(token, env) {
 
 async function authorizeAdmin(request, env) {
 	const url = new URL(request.url);
-	const localToken = String(env.NEWS_ADMIN_DEV_TOKEN || "");
+	const localToken = String(env.ADMIN_DEV_TOKEN || "");
 	if (isLocalHostname(url.hostname) && localToken) {
 		if (request.headers.get("X-MiroKIT-Admin-Token") === localToken) {
 			return { email: "local@mirokit.test", local: true };

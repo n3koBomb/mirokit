@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="de">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="robots" content="noindex, nofollow" />
+      <meta name="theme-color" content="#1565ff" />
+      <title>MIRoKIT · Content Desk</title>
+
+      <!-- Shared site icons; absolute paths also work below /admin/. -->
+      <link rel="icon" type="image/x-icon" href="/public/favicon/favicon.ico" />
+      <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon/favicon-16x16.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon/favicon-32x32.png" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png" />
+
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+      <link rel="stylesheet" href="admin.css" />
+   </head>
+   <body>
+      <div class="page-decoration page-decoration-left" aria-hidden="true"></div>
+      <div class="page-decoration page-decoration-right" aria-hidden="true"></div>
+
+      <main class="admin-shell">
+         <header class="admin-header">
+            <div class="brand-lockup">
+               <div class="brand-mark" aria-hidden="true">
+                  <span class="brand-globe"></span>
+                  <span class="brand-orbit brand-orbit-a"></span>
+                  <span class="brand-orbit brand-orbit-b"></span>
+                  <span class="brand-plane">➤</span>
+               </div>
+
+               <div class="brand-copy">
+                  <p class="eyebrow">МИРоКИТ · CONTENT DESK</p>
+                  <h1>Content <span>verwalten</span></h1>
+                  <p class="intro">News, Gallery, World Points und Partners übersichtlich bearbeiten und in RU, EN und DE veröffentlichen.</p>
+                  <div class="header-tags" aria-label="Bereiche des Content Desk">
+                     <span>News</span>
+                     <span>Gallery</span>
+                     <span>Videos</span>
+                     <span>World · Partners</span>
+                     <span>RU · EN · DE</span>
+                  </div>
+               </div>
+            </div>
+
+            <div class="header-actions">
+               <div class="header-note">
+                  <strong>Redaktionsbereich</strong>
+                  <span>Inhalte prüfen, speichern und veröffentlichen.</span>
+               </div>
+               <button class="button button-secondary button-new" id="newNews" type="button">
+                  <span aria-hidden="true">＋</span>
+                  Neue News
+               </button>
+            </div>
+         </header>
+
+         <div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+         <nav class="admin-tabs" aria-label="Content-Bereiche" role="tablist">
+            <button class="admin-tab is-active" id="newsTab" type="button" role="tab" aria-selected="true" aria-controls="adminViewNews" data-admin-tab="news">
+               <span class="tab-icon" aria-hidden="true">▤</span>
+               <span>News Panel</span>
+            </button>
+            <button class="admin-tab" id="galleryTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="gallery">
+               <span class="tab-icon" aria-hidden="true">▧</span>
+               <span>Gallery Panel</span>
+            </button>
+            <button class="admin-tab" id="videosTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewVideos" data-admin-tab="videos">
+               <span class="tab-icon" aria-hidden="true">▶</span>
+               <span>Videos</span>
+            </button>
+            <button class="admin-tab" id="worldTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewWorld" data-admin-tab="world">
+               <span class="tab-icon" aria-hidden="true">◎</span>
+               <span>World Points</span>
+            </button>
+            <button class="admin-tab" id="partnersTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewPartners" data-admin-tab="partners">
+               <span class="tab-icon" aria-hidden="true">♧</span>
+               <span>Partners</span>
+            </button>
+         </nav>
+
+         <section class="admin-grid admin-view" id="adminViewNews" data-admin-view="news">
+            <aside class="panel panel-list">
+               <div class="panel-heading">
+                  <div>
+                     <p class="panel-kicker">ÜBERSICHT</p>
+                     <h2>Meldungen</h2>
+                  </div>
+                  <button class="button button-small" id="reloadNews" type="button">↻ Neu laden</button>
+               </div>
+               <p class="panel-helper">Eine Meldung auswählen, um sie rechts zu bearbeiten.</p>
+               <div id="newsList" class="news-list" aria-live="polite"></div>
+            </aside>
+
+            <section class="panel panel-editor">
+               <form id="newsForm">
+                  <div class="panel-heading editor-heading">
+                     <div>
+                        <p class="eyebrow">NEWS EDITOR</p>
+                        <h2 id="formHeading">Neue Meldung</h2>
+                     </div>
+                     <span class="status-badge" id="currentStatus">Entwurf</span>
+                  </div>
+
+                  <section class="editor-section" aria-labelledby="baseDataHeading">
+                     <div class="section-caption">
+                        <span class="section-index">01</span>
+                        <div>
+                           <h3 id="baseDataHeading">Grunddaten</h3>
+                           <p>Technische Angaben, Kategorie und Platzierung der Meldung.</p>
+                        </div>
+                     </div>
+
+                     <div class="field-grid field-grid-three">
+                        <div class="field-slug">
+                           <label for="newsId">ID / Slug</label>
+                           <span class="slug-control">
+                              <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="summer-camp-report" aria-describedby="slugStatus" />
+                              <button class="slug-check-button" id="checkSlug" type="button">Slug prüfen</button>
+                           </span>
+                           <span class="muted slug-status" id="slugStatus" aria-live="polite"></span>
+                        </div>
+
+                        <label>
+                           <span>Veröffentlichungsdatum</span>
+                           <input id="publishedAt" name="publishedAt" type="date" required />
+                        </label>
+
+                        <label>
+                           <span>Kategorie</span>
+                           <select id="category" name="category">
+                              <option value="event">Event</option>
+                              <option value="interview">Interview</option>
+                              <option value="photo">Foto</option>
+                              <option value="announce">Ankündigung</option>
+                           </select>
+                        </label>
+
+                        <label>
+                           <span>Akzent</span>
+                           <select id="accent" name="accent">
+                              <option value="blue">Blau</option>
+                              <option value="red">Rot</option>
+                              <option value="green">Grün</option>
+                              <option value="amber">Amber</option>
+                              <option value="violet">Violett</option>
+                           </select>
+                        </label>
+
+                        <label>
+                           <span>Feature-/Hero-Rang</span>
+                           <input id="featured" name="featured" type="number" min="1" max="10" placeholder="optional" />
+                           <span class="field-hint">Rang 1 macht die Karte hervorgehoben; 1–3 ordnen den Hero.</span>
+                        </label>
+
+                        <label>
+                           <span>Bild-URL</span>
+                           <input id="image" name="image" type="text" required maxlength="2000" placeholder="/media/v1/news/... oder https://..." />
+                        </label>
+                     </div>
+                  </section>
+
+                  <section class="editor-section media-section" aria-labelledby="mediaHeading">
+                     <div class="section-caption">
+                        <span class="section-index">02</span>
+                        <div>
+                           <h3 id="mediaHeading">Titelbild</h3>
+                           <p>Neue Datei hochladen oder eine bereits vorhandene Bild-URL verwenden.</p>
+                        </div>
+                     </div>
+
+                     <div class="upload-row">
+                        <div class="upload-icon" aria-hidden="true">↥</div>
+                        <label class="file-label">
+                           <span>Bild hochladen</span>
+                           <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
+                        </label>
+                        <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                     </div>
+                  </section>
+
+                  <section class="editor-section translations-section" aria-labelledby="translationsHeading">
+                     <div class="section-caption">
+                        <span class="section-index">03</span>
+                        <div>
+                           <h3 id="translationsHeading">Sprachversionen</h3>
+                           <p>Alle drei Sprachen vollständig ausfüllen, bevor die Meldung veröffentlicht wird.</p>
+                        </div>
+                     </div>
+
+                     <div class="translations">
+                        <fieldset class="language-card language-ru">
+                           <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
+                           <label>
+                              <span>Alt-Text</span>
+                              <input data-language="ru" data-field="alt" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Titel</span>
+                              <input data-language="ru" data-field="title" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Zusammenfassung</span>
+                              <textarea data-language="ru" data-field="summary" required maxlength="2000"></textarea>
+                           </label>
+                           <label>
+                              <span>Inhalt <small class="field-hint">Ein Absatz pro Zeile</small></span>
+                              <textarea class="content-textarea" data-language="ru" data-field="content" required></textarea>
+                           </label>
+                        </fieldset>
+
+                        <fieldset class="language-card language-en">
+                           <legend><span class="language-dot"></span> English <small>EN</small></legend>
+                           <label>
+                              <span>Alt text</span>
+                              <input data-language="en" data-field="alt" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Title</span>
+                              <input data-language="en" data-field="title" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Summary</span>
+                              <textarea data-language="en" data-field="summary" required maxlength="2000"></textarea>
+                           </label>
+                           <label>
+                              <span>Content <small class="field-hint">One paragraph per line</small></span>
+                              <textarea class="content-textarea" data-language="en" data-field="content" required></textarea>
+                           </label>
+                        </fieldset>
+
+                        <fieldset class="language-card language-de">
+                           <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
+                           <label>
+                              <span>Alt-Text</span>
+                              <input data-language="de" data-field="alt" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Titel</span>
+                              <input data-language="de" data-field="title" required maxlength="500" />
+                           </label>
+                           <label>
+                              <span>Zusammenfassung</span>
+                              <textarea data-language="de" data-field="summary" required maxlength="2000"></textarea>
+                           </label>
+                           <label>
+                              <span>Inhalt <small class="field-hint">Ein Absatz pro Zeile</small></span>
+                              <textarea class="content-textarea" data-language="de" data-field="content" required></textarea>
+                           </label>
+                        </fieldset>
+                     </div>
+                  </section>
+
+                  <div class="form-actions">
+                     <div class="action-copy">
+                        <strong>Änderungen fertig?</strong>
+                        <span>Entwurf speichern oder direkt veröffentlichen.</span>
+                     </div>
+                     <div class="action-buttons">
+                        <button class="button button-primary" type="submit">Als Entwurf speichern</button>
+                        <button class="button button-publish" id="publishNews" type="button">Veröffentlichen</button>
+                        <button class="button button-danger" id="archiveNews" type="button">Archivieren</button>
+                     </div>
+                  </div>
+               </form>
+            </section>
+         </section>
+
+         <section class="panel gallery-admin-panel admin-view" id="adminViewGallery" data-admin-view="gallery" hidden>
+            <div class="panel-heading gallery-heading">
+               <div>
+                  <p class="eyebrow">R2 · GALLERY</p>
+                  <h2>Gallery-Bilder</h2>
+               </div>
+               <button class="button button-small" id="reloadGallery" type="button">↻ Neu laden</button>
+            </div>
+
+            <div class="gallery-intro">
+               <div class="gallery-intro-icon" aria-hidden="true">▧</div>
+               <div>
+                  <strong>Medienarchiv der MIRoKIT-Seite</strong>
+                  <p class="muted gallery-help">Bilder werden separat in R2 gespeichert. Titel, Alt-Text, Untertitel und das Hervorgehoben-Flag werden als Metadaten am Bild abgelegt und auf der öffentlichen Foto-Seite verwendet. Die Zitat-Karte bleibt separat im Grid.</p>
+               </div>
+            </div>
+
+            <form id="galleryForm">
+               <section class="editor-section gallery-upload-section" aria-labelledby="galleryUploadHeading">
+                  <div class="section-caption">
+                     <span class="section-index">01</span>
+                     <div>
+                        <h3 id="galleryUploadHeading">Bild auswählen</h3>
+                        <p>Eine Datei oder ein öffentliches Google-Drive-Bild für das Medienarchiv vorbereiten.</p>
+                     </div>
+                  </div>
+
+                  <div class="upload-row">
+                     <div class="upload-icon" aria-hidden="true">↥</div>
+                     <label class="file-label">
+                        <span>Bild auswählen</span>
+                        <input id="galleryFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
+                     </label>
+                     <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                  </div>
+                  <div class="gallery-source-fields">
+                     <label><span>Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" /></label>
+                     <label><span>Verwendung</span><select id="galleryCollection"><option value="gallery">Normale Galerie</option><option value="online-projects">Online-Projekte</option></select></label>
+                  </div>
+               </section>
+
+               <section class="editor-section translations-section" aria-labelledby="galleryLanguagesHeading">
+                  <div class="section-caption">
+                     <span class="section-index">02</span>
+                     <div>
+                        <h3 id="galleryLanguagesHeading">Bildtexte</h3>
+                        <p>Titel, Alt-Text und optionalen Untertitel für alle drei Sprachversionen eintragen.</p>
+                     </div>
+                  </div>
+
+                  <div class="translations gallery-translations">
+                     <fieldset class="language-card language-ru">
+                        <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
+                        <label><span>Titel</span><input data-gallery-language="ru" data-gallery-field="title" required maxlength="500" /></label>
+                        <label><span>Alt-Text</span><input data-gallery-language="ru" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Untertitel</span><input data-gallery-language="ru" data-gallery-field="subtitle" maxlength="500" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-en">
+                        <legend><span class="language-dot"></span> English <small>EN</small></legend>
+                        <label><span>Title</span><input data-gallery-language="en" data-gallery-field="title" required maxlength="500" /></label>
+                        <label><span>Alt text</span><input data-gallery-language="en" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Subtitle</span><input data-gallery-language="en" data-gallery-field="subtitle" maxlength="500" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-de">
+                        <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
+                        <label><span>Titel</span><input data-gallery-language="de" data-gallery-field="title" required maxlength="500" /></label>
+                        <label><span>Alt-Text</span><input data-gallery-language="de" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Untertitel</span><input data-gallery-language="de" data-gallery-field="subtitle" maxlength="500" /></label>
+                     </fieldset>
+                  </div>
+               </section>
+
+               <div class="gallery-form-actions">
+                  <label class="feature-toggle"><input id="galleryFeatured" type="checkbox" /><span>Als hervorgehobenes Bild anzeigen</span></label>
+                  <button class="button button-primary" type="submit">Bild veröffentlichen</button>
+               </div>
+            </form>
+
+            <div class="gallery-divider">
+               <span>Veröffentlichte Medien</span>
+            </div>
+            <div class="gallery-admin-list" id="galleryList" aria-live="polite"></div>
+
+            <div class="gallery-divider gallery-quotes-divider">
+               <span>Gallery-Zitate</span>
+            </div>
+            <form id="quoteForm" class="quote-admin-form">
+               <section class="editor-section translations-section" aria-labelledby="quoteHeading">
+                  <div class="section-caption">
+                     <span class="section-index">03</span>
+                     <div>
+                        <h3 id="quoteHeading">Zitat hinzufügen</h3>
+                        <p>Aktive Zitate werden separat von den Bildern gespeichert und zufällig im Gallery-Grid angezeigt.</p>
+                     </div>
+                  </div>
+
+                  <div class="translations gallery-translations">
+                     <fieldset class="language-card language-ru">
+                        <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
+                        <label><span>Zitat</span><textarea data-quote-language="ru" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
+                        <label><span>Urheber</span><input data-quote-language="ru" data-quote-field="byline" maxlength="300" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-en">
+                        <legend><span class="language-dot"></span> English <small>EN</small></legend>
+                        <label><span>Quote</span><textarea data-quote-language="en" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
+                        <label><span>Byline</span><input data-quote-language="en" data-quote-field="byline" maxlength="300" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-de">
+                        <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
+                        <label><span>Zitat</span><textarea data-quote-language="de" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
+                        <label><span>Urheber</span><input data-quote-language="de" data-quote-field="byline" maxlength="300" /></label>
+                     </fieldset>
+                  </div>
+               </section>
+
+               <div class="gallery-form-actions quote-form-actions">
+                  <button class="button button-primary" type="submit">Zitat veröffentlichen</button>
+               </div>
+            </form>
+            <div class="gallery-admin-list gallery-quote-list" id="galleryQuoteList" aria-live="polite"></div>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewVideos" data-admin-view="videos" hidden>
+            <aside class="panel panel-list">
+               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Videos</h2></div><button class="button button-small" id="reloadVideos" type="button">↻ Neu laden</button></div>
+               <p class="panel-helper">YouTube, direkte Dateien und R2-Videos mit Untertiteln verwalten.</p>
+               <div id="videosList" class="news-list" aria-live="polite"></div>
+            </aside>
+            <section class="panel panel-editor">
+               <form id="videoForm">
+                  <div class="panel-heading editor-heading"><div><p class="eyebrow">VIDEO EDITOR</p><h2 id="videoHeading">Neues Video</h2></div><span class="status-badge" id="videoStatus">Entwurf</span></div>
+                  <section class="editor-section">
+                     <div class="section-caption"><span class="section-index">01</span><div><h3>Quelle und Metadaten</h3><p>YouTube nutzt den YouTube-Player. R2 und direkte HTTPS-Dateien nutzen den Seiten-Player.</p></div></div>
+                     <div class="field-grid field-grid-three">
+                        <label><span>ID / Slug</span><input id="videoId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="internationaler-dialog" /></label>
+                        <label><span>Quelltyp</span><select id="videoSourceType"><option value="youtube">YouTube</option><option value="external">Direkte externe Datei</option><option value="r2">R2 / eigene Datei</option></select></label>
+                        <label><span>Video-URL</span><input id="videoSourceUrl" type="text" required maxlength="2000" placeholder="https://youtu.be/... oder /media/v1/videos/..." /></label>
+                        <label><span>Poster-URL</span><input id="videoPoster" maxlength="2000" placeholder="/media/v1/video-posters/..." /></label>
+                        <label><span>Dauer (Sekunden)</span><input id="videoDuration" type="number" min="0" max="86400" step="0.01" placeholder="wird automatisch ermittelt" /></label>
+                        <label><span>Sortierung</span><input id="videoSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                        <label><span>Breite</span><input id="videoWidth" type="number" min="1" max="100000" placeholder="automatisch" /></label>
+                        <label><span>Höhe</span><input id="videoHeight" type="number" min="1" max="100000" placeholder="automatisch" /></label>
+                        <label class="feature-toggle"><input id="videoFeatured" type="checkbox" /><span>Als hervorgehobenes Video anzeigen</span></label>
+                     </div>
+                     <div class="upload-row video-upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Videodatei hochladen</span><input id="videoFile" type="file" accept="video/mp4,video/webm,video/ogg" /></label><span class="muted upload-meta">MP4, WebM oder OGG · maximal 95 MB</span></div>
+                     <div class="upload-row video-upload-row"><div class="upload-icon" aria-hidden="true">▧</div><label class="file-label"><span>Poster hochladen</span><input id="videoPosterFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span></div>
+                  </section>
+                  <section class="editor-section translations-section">
+                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel, Alt-Text und Beschreibung für alle drei Sprachversionen.</p></div></div>
+                     <div class="translations content-translations">
+                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-video-language="ru" data-video-field="title" required maxlength="500" /></label><label><span>Alt-текст</span><input data-video-language="ru" data-video-field="alt" required maxlength="500" /></label><label><span>Описание</span><textarea data-video-language="ru" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-video-language="en" data-video-field="title" required maxlength="500" /></label><label><span>Alt text</span><input data-video-language="en" data-video-field="alt" required maxlength="500" /></label><label><span>Description</span><textarea data-video-language="en" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-video-language="de" data-video-field="title" required maxlength="500" /></label><label><span>Alt-Text</span><input data-video-language="de" data-video-field="alt" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-video-language="de" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                     </div>
+                  </section>
+                  <section class="editor-section video-subtitles-section">
+                     <div class="section-caption"><span class="section-index">03</span><div><h3>Untertitel und Cue-Editor</h3><p>Mehrere WebVTT-Spuren hinzufügen. Start und Ende lassen sich mit der aktuellen Videoposition setzen.</p></div></div>
+                     <video id="videoPreview" class="video-admin-preview" controls preload="metadata" hidden></video>
+                     <div id="videoSubtitleRows" class="video-subtitle-rows"></div>
+                     <button class="button button-secondary" id="addVideoSubtitle" type="button">＋ Untertitel hinzufügen</button>
+                     <div id="videoCueEditor" class="video-cue-editor" hidden></div>
+                  </section>
+                  <div class="form-actions"><div class="action-copy"><strong>Video fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newVideo" type="button">Neues Video</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishVideo" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveVideo" type="button">Archivieren</button></div></div>
+               </form>
+            </section>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewWorld" data-admin-view="world" hidden>
+            <aside class="panel panel-list">
+               <div class="panel-heading">
+                  <div><p class="panel-kicker">ÜBERSICHT</p><h2>World Points</h2></div>
+                  <button class="button button-small" id="reloadWorldPoints" type="button">↻ Neu laden</button>
+               </div>
+               <p class="panel-helper">Städte und internationale Standorte der Karte verwalten.</p>
+               <div id="worldPointsList" class="news-list" aria-live="polite"></div>
+            </aside>
+
+            <section class="panel panel-editor">
+               <form id="worldPointForm">
+                  <div class="panel-heading editor-heading"><div><p class="eyebrow">WORLD POINT EDITOR</p><h2 id="worldPointHeading">Neuer World Point</h2></div><span class="status-badge" id="worldPointStatus">Entwurf</span></div>
+                  <section class="editor-section">
+                     <div class="section-caption"><span class="section-index">01</span><div><h3>Koordinaten und Status</h3><p>Diese Werte bestimmen Position, Farbe und Reihenfolge auf der Weltkarte.</p></div></div>
+                     <div class="field-grid field-grid-three">
+                        <label><span>ID / Slug</span><input id="worldPointId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="berlin" /></label>
+                        <label><span>Breitengrad</span><input id="worldLatitude" type="number" min="-90" max="90" step="any" required placeholder="52.52" /></label>
+                        <label><span>Längengrad</span><input id="worldLongitude" type="number" min="-180" max="180" step="any" required placeholder="13.40" /></label>
+                        <label><span>Punktstatus</span><select id="worldPointKind"><option value="hq">HQ</option><option value="done">Event durchgeführt</option><option value="planned">Geplant</option></select></label>
+                        <label><span>Flagge / Emoji</span><input id="worldFlag" maxlength="16" placeholder="🇩🇪" /></label>
+                        <label><span>Sortierung</span><input id="worldSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                     </div>
+                  </section>
+                  <section class="editor-section translations-section">
+                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Stadt und Land werden direkt auf der Karte und in der Länderübersicht verwendet.</p></div></div>
+                     <div class="translations content-translations">
+                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Stadt</span><input data-world-language="ru" data-world-field="city" required maxlength="300" /></label><label><span>Land</span><input data-world-language="ru" data-world-field="country" required maxlength="300" /></label><label><span>Beschreibung</span><textarea data-world-language="ru" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>City</span><input data-world-language="en" data-world-field="city" required maxlength="300" /></label><label><span>Country</span><input data-world-language="en" data-world-field="country" required maxlength="300" /></label><label><span>Description</span><textarea data-world-language="en" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Stadt</span><input data-world-language="de" data-world-field="city" required maxlength="300" /></label><label><span>Land</span><input data-world-language="de" data-world-field="country" required maxlength="300" /></label><label><span>Beschreibung</span><textarea data-world-language="de" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                     </div>
+                  </section>
+                  <div class="form-actions"><div class="action-copy"><strong>World Point fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newWorldPoint" type="button">Neuer Punkt</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishWorldPoint" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveWorldPoint" type="button">Archivieren</button></div></div>
+               </form>
+            </section>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewPartners" data-admin-view="partners" hidden>
+            <aside class="panel panel-list">
+               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Partners</h2></div><button class="button button-small" id="reloadPartners" type="button">↻ Neu laden</button></div>
+               <p class="panel-helper">Logos, Namen, Kategorien und Links der Partner pflegen.</p>
+               <div id="partnersList" class="news-list" aria-live="polite"></div>
+            </aside>
+            <section class="panel panel-editor">
+               <form id="partnerForm">
+                  <div class="panel-heading editor-heading"><div><p class="eyebrow">PARTNER EDITOR</p><h2 id="partnerHeading">Neuer Partner</h2></div><span class="status-badge" id="partnerStatus">Entwurf</span></div>
+                  <section class="editor-section">
+                     <div class="section-caption"><span class="section-index">01</span><div><h3>Grunddaten und Logo</h3><p>Logo hochladen, Kategorie wählen und optional auf die Partner-Website verlinken.</p></div></div>
+                     <div class="field-grid field-grid-three">
+                        <label><span>ID / Slug</span><input id="partnerId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="initiative-erleben" /></label>
+                        <label><span>Kategorie</span><select id="partnerCategory"><option value="public">Öffentliche Organisationen</option><option value="social">Soziale Initiativen</option><option value="education">Bildung, Kultur und Netzwerke</option></select></label>
+                        <label><span>Sortierung</span><input id="partnerSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                        <label><span>Website (HTTPS)</span><input id="partnerWebsite" type="url" maxlength="2000" placeholder="https://example.org" /></label>
+                        <label><span>Logo-URL</span><input id="partnerImage" required maxlength="2000" placeholder="/media/v1/partners/..." /></label>
+                        <label class="file-label"><span>Logo hochladen</span><input id="partnerFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /><small class="field-hint">PNG, JPG, WebP oder AVIF · maximal 4 MB</small></label>
+                     </div>
+                     <label class="feature-toggle"><input id="partnerFeatured" type="checkbox" /><span>Als hervorgehobenen Partner anzeigen</span></label>
+                  </section>
+                  <section class="editor-section translations-section">
+                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Name, Alt-Text und optionale Beschreibung für RU, EN und DE.</p></div></div>
+                     <div class="translations content-translations">
+                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-partner-language="ru" data-partner-field="name" required maxlength="500" /></label><label><span>Alt-текст</span><input data-partner-language="ru" data-partner-field="alt" required maxlength="500" /></label><label><span>Описание</span><textarea data-partner-language="ru" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Name</span><input data-partner-language="en" data-partner-field="name" required maxlength="500" /></label><label><span>Alt text</span><input data-partner-language="en" data-partner-field="alt" required maxlength="500" /></label><label><span>Description</span><textarea data-partner-language="en" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Name</span><input data-partner-language="de" data-partner-field="name" required maxlength="500" /></label><label><span>Alt-Text</span><input data-partner-language="de" data-partner-field="alt" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-partner-language="de" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                     </div>
+                  </section>
+                  <div class="form-actions"><div class="action-copy"><strong>Partner fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newPartner" type="button">Neuer Partner</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishPartner" type="button">Veröffentlichen</button><button class="button button-danger" id="archivePartner" type="button">Archivieren</button></div></div>
+               </form>
+            </section>
+         </section>
+
+         <dialog class="delete-dialog" id="deleteDialog" aria-labelledby="deleteDialogTitle">
+            <form method="dialog" id="deleteDialogForm">
+               <p class="eyebrow">SICHERHEITSCHECK</p>
+               <h2 id="deleteDialogTitle">Inhalt entfernen?</h2>
+               <p id="deleteDialogMessage">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+               <label for="deleteConfirmation">Zur Bestätigung <strong>DELETE</strong> oder <strong>УДАЛИТЬ</strong> eingeben.</label>
+               <input id="deleteConfirmation" autocomplete="off" spellcheck="false" required />
+               <div class="delete-dialog-actions">
+                  <button class="button button-secondary" id="cancelDelete" type="button">Abbrechen</button>
+                  <button class="button button-danger" id="confirmDelete" type="submit" value="confirm" disabled>Entfernen</button>
+               </div>
+            </form>
+         </dialog>
+
+         <footer class="admin-footer">
+            <span class="footer-brand">МИРоКИТ</span>
+            <span>Content Desk · interner Redaktionsbereich</span>
+         </footer>
+      </main>
+
+      <script src="admin.js" type="module"></script>
+   </body>
+</html>

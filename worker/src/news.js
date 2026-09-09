@@ -79,7 +79,7 @@ function validateDate(value) {
 
 function validateImage(value) {
 	const image = requireString(value, "image", 2_000);
-	if (image.startsWith("/news-media/") || image.startsWith("/public/")) {
+	if (image.startsWith("/media/v1/") || image.startsWith("/public/")) {
 		if (image.includes("..") || /[\r\n]/.test(image)) throw newsError("Invalid image");
 		return image;
 	}
@@ -89,7 +89,7 @@ function validateImage(value) {
 		if (url.protocol !== "https:") throw new Error("protocol");
 		return url.href;
 	} catch {
-		throw newsError("Image must be an HTTPS URL or a /news-media/ path");
+		throw newsError("Image must be an HTTPS URL or a /media/v1/ path");
 	}
 }
 

@@ -8,8 +8,8 @@
     "start": "wrangler dev --config wrangler.local.jsonc",
     "test": "vitest --pool=threads",
     "test:workers": "vitest --pool=workers",
-    "db:migrate:local": "wrangler d1 migrations apply mirokit-news-local --local --config wrangler.local.jsonc",
-    "db:migrate:remote": "wrangler d1 migrations apply mirokit-news --remote",
+    "db:migrate:local": "wrangler d1 migrations apply mirokit-database-local --local --config wrangler.local.jsonc",
+    "db:migrate:remote": "wrangler d1 migrations apply mirokit-database --remote",
     "seed:news": "node scripts/seed-news.mjs"
   },
   "devDependencies": {

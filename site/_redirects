@@ -1,3 +1,16 @@
 # Stable, crawlable document URLs.
 /index.html / 301
 /page/privacyPolicy /page/privacyPolicy/ 301
+/page/onlineProjects /page/onlineProjects/ 301
+
+# Asset organization: retain previously published public URLs.
+/public/assets/photos_background_thumbnail.png /public/assets/backgrounds/photos_background_thumbnail.png 301
+/public/assets/videos_background_thumbnail.png /public/assets/backgrounds/videos_background_thumbnail.png 301
+/public/assets/gallery/world.png /public/assets/images/illustrations/world.png 301
+/public/assets/gallery/gamePrinciple.png /public/assets/images/illustrations/gamePrinciple.png 301
+/public/assets/gallery/ageGroups.png /public/assets/images/illustrations/ageGroups.png 301
+/public/assets/gallery/team-run.png /public/assets/media/photos/team/team-run.png 301
+/public/assets/gallery/events_example.webp /public/assets/media/photos/events/events_example.webp 301
+/public/assets/gallery/example.png /public/assets/media/photos/events/example.png 301
+/public/assets/gallery/d51fc400-9bbe-47f8-8fe3-0aa3ddd1bd42.png /public/assets/brand/mirokit-wordmark.png 301
+/favicon.ico /public/favicon/favicon.ico 301

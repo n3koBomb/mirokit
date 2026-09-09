@@ -5,7 +5,7 @@ import vm from "node:vm";
 const argumentsList = process.argv.slice(2);
 const dryRun = argumentsList.includes("--dry-run");
 const local = argumentsList.includes("--local");
-const databaseName = argumentsList.find((argument) => !argument.startsWith("--")) || "mirokit-news";
+const databaseName = argumentsList.find((argument) => !argument.startsWith("--")) || "mirokit-database";
 const source = readFileSync(new URL("../../site/source/scripts/news-data.js", import.meta.url), "utf8");
 const context = {};
 vm.runInNewContext(`${source}\nthis.news = MIRoKIT_NEWS;`, context);
