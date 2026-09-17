@@ -21,6 +21,7 @@ dist
 *.tsbuildinfo
 
 # Wrangler local variables and secrets
+/secrets.vars
 **/.dev.vars*
 !**/.dev.vars.example
 **/.env*
