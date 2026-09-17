@@ -1738,3 +1738,26 @@ input[type="file"]::file-selector-button {
         grid-column: 1 / -1;
     }
 }
+
+/* A dedicated Online Projects entry reuses the gallery upload and preview flow. */
+#newNews[hidden] { display: none; }
+.online-admin-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0; margin: 20px 27px 24px; list-style: none; }
+.online-admin-steps li { display: flex; align-items: flex-start; gap: 12px; padding: 18px; border: 1px solid #d6e3fc; border-radius: 16px; background: #f4f8ff; }
+.online-admin-steps li > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 50%; background: #1565ff; color: #fff; font-weight: 900; }
+.online-admin-steps strong { color: #143a79; }
+.online-admin-steps p, .online-admin-library-filter p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #526681; }
+.online-admin-destination { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 22px; align-items: end; padding: 22px; margin: 0 27px 22px; border: 1px solid #bcd2fb; border-radius: 18px; background: #eef5ff; }
+.online-admin-destination p { grid-column: 1; margin: 0; font-size: 13px; }
+.online-admin-destination a { grid-column: 2; grid-row: 1 / span 2; }
+.online-admin-library-filter { display: grid; grid-template-columns: minmax(200px, 1fr) 2fr; gap: 20px; align-items: center; margin: 0 27px 22px; }
+.gallery-topic-edit { display: grid; gap: 8px; margin-top: 8px; }
+.gallery-topic-edit label { font-size: 12px; }
+.gallery-topic-edit select { width: 100%; min-width: 0; }
+.gallery-topic-edit .button { justify-self: start; }
+.online-admin-steps[hidden], .online-admin-destination[hidden], .online-admin-library-filter[hidden], #galleryQuotesSection[hidden] { display: none; }
+@media (max-width: 850px) {
+ .online-admin-steps { grid-template-columns: 1fr; gap: 8px; }
+ .online-admin-destination, .online-admin-library-filter { grid-template-columns: 1fr; }
+ .online-admin-destination a { grid-column: 1; grid-row: auto; justify-self: start; }
+ .online-admin-steps, .online-admin-destination, .online-admin-library-filter { margin-inline: 18px; }
+}

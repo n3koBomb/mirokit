@@ -35,7 +35,7 @@
                <div class="brand-copy">
                   <p class="eyebrow">МИРоКИТ · CONTENT DESK</p>
                   <h1>Content <span>verwalten</span></h1>
-                  <p class="intro">News, Gallery, World Points und Partners übersichtlich bearbeiten und in RU, EN und DE veröffentlichen.</p>
+                  <p class="intro">News, Gallery, Online-Projekte, Videos, World Points und Partners übersichtlich bearbeiten und in RU, EN und DE veröffentlichen.</p>
                   <div class="header-tags" aria-label="Bereiche des Content Desk">
                      <span>News</span>
                      <span>Gallery</span>
@@ -69,9 +69,17 @@
                <span class="tab-icon" aria-hidden="true">▧</span>
                <span>Gallery Panel</span>
             </button>
+            <button class="admin-tab" id="onlineProjectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="online-projects">
+               <span class="tab-icon" aria-hidden="true">✦</span>
+               <span>Online-Projekte</span>
+            </button>
             <button class="admin-tab" id="videosTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewVideos" data-admin-tab="videos">
                <span class="tab-icon" aria-hidden="true">▶</span>
                <span>Videos</span>
+            </button>
+            <button class="admin-tab" id="projectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewProjects" data-admin-tab="projects">
+               <span class="tab-icon" aria-hidden="true">⌁</span>
+               <span>Projects</span>
             </button>
             <button class="admin-tab" id="worldTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewWorld" data-admin-tab="world">
                <span class="tab-icon" aria-hidden="true">◎</span>
@@ -273,8 +281,8 @@
          <section class="panel gallery-admin-panel admin-view" id="adminViewGallery" data-admin-view="gallery" hidden>
             <div class="panel-heading gallery-heading">
                <div>
-                  <p class="eyebrow">R2 · GALLERY</p>
-                  <h2>Gallery-Bilder</h2>
+                  <p class="eyebrow" id="galleryPanelEyebrow">MEDIENARCHIV</p>
+                  <h2 id="galleryPanelTitle">Gallery-Bilder</h2>
                </div>
                <button class="button button-small" id="reloadGallery" type="button">↻ Neu laden</button>
             </div>
@@ -282,12 +290,23 @@
             <div class="gallery-intro">
                <div class="gallery-intro-icon" aria-hidden="true">▧</div>
                <div>
-                  <strong>Medienarchiv der MIRoKIT-Seite</strong>
-                  <p class="muted gallery-help">Bilder werden separat in R2 gespeichert. Titel, Alt-Text, Untertitel und das Hervorgehoben-Flag werden als Metadaten am Bild abgelegt und auf der öffentlichen Foto-Seite verwendet. Die Zitat-Karte bleibt separat im Grid.</p>
+                  <strong id="galleryIntroTitle">Bilder für die öffentliche Galerie</strong>
+                  <p class="muted gallery-help" id="galleryIntroText">Wähle ein Bild aus, ergänze die Texte und veröffentliche es in der Galerie.</p>
                </div>
             </div>
+            <ol class="online-admin-steps" id="onlineProjectSteps" hidden>
+               <li><span>1</span><div><strong>Thema wählen</strong><p>Jeder der zehn Startseiten-Buttons öffnet die passende Bilderbibliothek.</p></div></li>
+               <li><span>2</span><div><strong>Bild und Texte hinzufügen</strong><p>Datei auswählen oder Drive-Link einfügen. Titel und Bildbeschreibung in RU, EN und DE ergänzen.</p></div></li>
+               <li><span>3</span><div><strong>Veröffentlichen</strong><p>Das Bild erscheint sofort in der ausgewählten Bibliothek. Über „Bibliothek öffnen“ kannst du es ansehen.</p></div></li>
+            </ol>
 
             <form id="galleryForm">
+               <input id="galleryCollection" type="hidden" value="gallery" />
+               <div class="online-admin-destination" id="onlineProjectDestination" hidden>
+                  <label for="galleryTopic"><span>Thema / Bilderbibliothek</span><select id="galleryTopic" aria-describedby="galleryTopicHelp"><option value="">Bitte ein Thema auswählen</option></select></label>
+                  <p class="muted" id="galleryTopicHelp">Wohin gehört dieses Bild? Wähle eines der zehn Themen.</p>
+                  <a class="button button-secondary" id="onlineProjectLibraryLink" href="/page/onlineProjects/index.html" target="_blank" rel="noopener noreferrer">Bibliothek öffnen ↗</a>
+               </div>
                <section class="editor-section gallery-upload-section" aria-labelledby="galleryUploadHeading">
                   <div class="section-caption">
                      <span class="section-index">01</span>
@@ -307,7 +326,6 @@
                   </div>
                   <div class="gallery-source-fields">
                      <label><span>Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" /></label>
-                     <label><span>Verwendung</span><select id="galleryCollection"><option value="gallery">Normale Galerie</option><option value="online-projects">Online-Projekte</option></select></label>
                   </div>
                </section>
 
@@ -324,21 +342,21 @@
                      <fieldset class="language-card language-ru">
                         <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
                         <label><span>Titel</span><input data-gallery-language="ru" data-gallery-field="title" required maxlength="500" /></label>
-                        <label><span>Alt-Text</span><input data-gallery-language="ru" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Bildbeschreibung (Alt-Text)</span><input data-gallery-language="ru" data-gallery-field="alt" required maxlength="500" /></label>
                         <label><span>Untertitel</span><input data-gallery-language="ru" data-gallery-field="subtitle" maxlength="500" /></label>
                      </fieldset>
 
                      <fieldset class="language-card language-en">
                         <legend><span class="language-dot"></span> English <small>EN</small></legend>
                         <label><span>Title</span><input data-gallery-language="en" data-gallery-field="title" required maxlength="500" /></label>
-                        <label><span>Alt text</span><input data-gallery-language="en" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Image description (alt text)</span><input data-gallery-language="en" data-gallery-field="alt" required maxlength="500" /></label>
                         <label><span>Subtitle</span><input data-gallery-language="en" data-gallery-field="subtitle" maxlength="500" /></label>
                      </fieldset>
 
                      <fieldset class="language-card language-de">
                         <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
                         <label><span>Titel</span><input data-gallery-language="de" data-gallery-field="title" required maxlength="500" /></label>
-                        <label><span>Alt-Text</span><input data-gallery-language="de" data-gallery-field="alt" required maxlength="500" /></label>
+                        <label><span>Bildbeschreibung (Alt-Text)</span><input data-gallery-language="de" data-gallery-field="alt" required maxlength="500" /></label>
                         <label><span>Untertitel</span><input data-gallery-language="de" data-gallery-field="subtitle" maxlength="500" /></label>
                      </fieldset>
                   </div>
@@ -346,15 +364,20 @@
 
                <div class="gallery-form-actions">
                   <label class="feature-toggle"><input id="galleryFeatured" type="checkbox" /><span>Als hervorgehobenes Bild anzeigen</span></label>
-                  <button class="button button-primary" type="submit">Bild veröffentlichen</button>
+                  <button class="button button-primary" id="galleryPublishButton" type="submit">Bild veröffentlichen</button>
                </div>
             </form>
 
             <div class="gallery-divider">
                <span>Veröffentlichte Medien</span>
             </div>
+            <div class="online-admin-library-filter" id="onlineProjectListControls" hidden>
+               <label for="galleryTopicFilter"><span>Bibliothek anzeigen</span><select id="galleryTopicFilter"><option value="all">Alle Themen</option><option value="unassigned">Noch ohne Thema</option></select></label>
+               <p class="muted">Vorhandene Bilder ohne Thema findest du unter „Noch ohne Thema“. Wähle am Bild ein Thema und klicke auf „Thema speichern“.</p>
+            </div>
             <div class="gallery-admin-list" id="galleryList" aria-live="polite"></div>
 
+            <div id="galleryQuotesSection">
             <div class="gallery-divider gallery-quotes-divider">
                <span>Gallery-Zitate</span>
             </div>
@@ -394,6 +417,7 @@
                </div>
             </form>
             <div class="gallery-admin-list gallery-quote-list" id="galleryQuoteList" aria-live="polite"></div>
+            </div>
          </section>
 
          <section class="admin-grid admin-view" id="adminViewVideos" data-admin-view="videos" hidden>
@@ -437,6 +461,43 @@
                      <div id="videoCueEditor" class="video-cue-editor" hidden></div>
                   </section>
                   <div class="form-actions"><div class="action-copy"><strong>Video fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newVideo" type="button">Neues Video</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishVideo" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveVideo" type="button">Archivieren</button></div></div>
+               </form>
+            </section>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewProjects" data-admin-view="projects" hidden>
+            <aside class="panel panel-list">
+               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Projects</h2></div><button class="button button-small" id="reloadProjects" type="button">↻ Neu laden</button></div>
+               <p class="panel-helper">MIRoKIT-Projekte als Entwurf vorbereiten und später veröffentlichen. Nach dem Enddatum erscheinen sie automatisch im Archiv.</p>
+               <div id="projectsList" class="news-list" aria-live="polite"></div>
+            </aside>
+            <section class="panel panel-editor">
+               <form id="projectForm">
+                  <div class="panel-heading editor-heading"><div><p class="eyebrow">PROJECT EDITOR</p><h2 id="projectHeading">Neues Projekt</h2></div><span class="status-badge" id="projectStatus">Entwurf</span></div>
+                  <section class="editor-section">
+                     <div class="section-caption"><span class="section-index">01</span><div><h3>Projektweg und Zeitraum</h3><p>Das Enddatum entscheidet automatisch, ob ein veröffentlichtes Projekt unter „Current“ oder „Past“ erscheint.</p></div></div>
+                     <div class="field-grid field-grid-three">
+                        <label><span>ID / Slug</span><input id="projectId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="cultural-triathlon-2026" /></label>
+                        <label><span>Startdatum</span><input id="projectStartDate" type="date" required /></label>
+                        <label><span>Enddatum <small class="field-hint">leer = läuft weiter</small></span><input id="projectEndDate" type="date" /></label>
+                        <label><span>Thema</span><select id="projectCategory"><option value="creative">Kreativität</option><option value="game">Spiel und Wettbewerb</option><option value="dialogue">Dialog und Begegnung</option><option value="media">Medien und Storytelling</option><option value="network">Internationales Netzwerk</option><option value="education">Bildung und Methodik</option></select></label>
+                        <label><span>Akzent</span><select id="projectAccent"><option value="blue">Blau</option><option value="red">Rot</option><option value="green">Grün</option><option value="amber">Amber</option><option value="violet">Violett</option></select></label>
+                        <label><span>Sortierung</span><input id="projectSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                        <label><span>Bild-URL <small class="field-hint">optional</small></span><input id="projectImage" maxlength="2000" placeholder="/media/v1/projects/... oder /public/..." /></label>
+                        <label><span>Weiterführender Link <small class="field-hint">optional</small></span><input id="projectLinkUrl" maxlength="2000" placeholder="/page/gallery/ oder https://..." /></label>
+                        <label class="feature-toggle"><input id="projectFeatured" type="checkbox" /><span>Als Leitprojekt hervorheben</span></label>
+                     </div>
+                     <div class="upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Projektbild hochladen</span><input id="projectFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span></div>
+                  </section>
+                  <section class="editor-section translations-section">
+                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel und Alt-Text sind pro Sprache erforderlich. Die Beschreibung darf leer bleiben.</p></div></div>
+                     <div class="translations content-translations">
+                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-project-language="ru" data-project-field="title" required maxlength="500" /></label><label><span>Alt-текст</span><input data-project-language="ru" data-project-field="alt" required maxlength="500" /></label><label><span>Описание <small class="field-hint">необязательно</small></span><textarea data-project-language="ru" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-project-language="en" data-project-field="title" required maxlength="500" /></label><label><span>Alt text</span><input data-project-language="en" data-project-field="alt" required maxlength="500" /></label><label><span>Description <small class="field-hint">optional</small></span><textarea data-project-language="en" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-project-language="de" data-project-field="title" required maxlength="500" /></label><label><span>Alt-Text</span><input data-project-language="de" data-project-field="alt" required maxlength="500" /></label><label><span>Beschreibung <small class="field-hint">optional</small></span><textarea data-project-language="de" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                     </div>
+                  </section>
+                  <div class="form-actions"><div class="action-copy"><strong>Projekt bereit?</strong><span>Erst als Entwurf speichern, prüfen und anschließend veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newProject" type="button">Neues Projekt</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishProject" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveProject" type="button">Archivieren</button></div></div>
                </form>
             </section>
          </section>

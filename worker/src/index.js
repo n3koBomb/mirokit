@@ -1,4 +1,10 @@
 import { authorizeAdmin, isLocalHostname } from "./access.js";
+import { getCanonicalSiteHostname } from "./hosts.js";
+import { ADMIN_MEDIA_PREFIX, PRIVATE_MEDIA_CACHE, handleMediaRequest } from "./media.js";
+import { CSP_REPORT_ONLY } from "./security-headers.js";
+import { fetchDriveImage } from "./remote-media.js";
+import { adminMethodResponse } from "./admin-methods.js";
+import { isOnlineProjectTopic } from "../../site/source/scripts/online-project-topics.js";
 import {
 	NEWS_ADMIN_QUERY,
 	NEWS_PUBLIC_QUERY,
@@ -25,7 +31,6 @@ import {
 	worldPointStatements,
 } from "./content.js";
 import {
-	VIDEO_ASSET_PATTERN,
 	VIDEOS_ADMIN_QUERY,
 	VIDEOS_PUBLIC_QUERY,
 	normalizeVideoInput,
@@ -34,6 +39,15 @@ import {
 	videoError,
 	videoStatements,
 } from "./videos.js";
+import {
+	PROJECTS_ADMIN_QUERY,
+	PROJECTS_PUBLIC_QUERY,
+	normalizeProjectInput,
+	projectError,
+	projectStatements,
+	rowsToProjects,
+	rowsToPublicProjects,
+} from "./projects.js";
 
 const FORM_TYPES = new Set([
 	"main-contact",
@@ -80,6 +94,7 @@ const FORM_FIELD_ALLOWLIST = Object.freeze({
 });
 
 const MULTI_VALUE_FIELDS = new Set(["activities", "goals"]);
+const CONTACT_COUNTRY_MAX_LENGTH = 100;
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const SITE_API_PREFIX = "/api/v1";
 const NEWS_API_PATH = `${SITE_API_PREFIX}/news`;
@@ -87,6 +102,7 @@ const GALLERY_API_PATH = `${SITE_API_PREFIX}/gallery`;
 const WORLD_POINTS_API_PATH = `${SITE_API_PREFIX}/world-points`;
 const PARTNERS_API_PATH = `${SITE_API_PREFIX}/partners`;
 const VIDEOS_API_PATH = `${SITE_API_PREFIX}/videos`;
+const PROJECTS_API_PATH = `${SITE_API_PREFIX}/projects`;
 const CONTACT_API_PATH = `${SITE_API_PREFIX}/contact`;
 const ADMIN_PANEL_PREFIX = "/admin";
 const ADMIN_PANEL_API_PREFIX = `${SITE_API_PREFIX}/admin`;
@@ -142,6 +158,11 @@ const COMMON_RESPONSE_HEADERS = Object.freeze({
 
 const SITEMAP_PATHS = Object.freeze([
 	{
+		path: "/page/gallery/",
+		changefreq: "weekly",
+		priority: "0.7",
+	},
+	{
 		path: "/",
 		changefreq: "weekly",
 		priority: "1.0",
@@ -172,29 +193,6 @@ function escapeXml(value) {
 		.replaceAll(">", "&gt;")
 		.replaceAll('"', "&quot;")
 		.replaceAll("'", "&apos;");
-}
-
-function getCanonicalSiteHostname(hostname) {
-	const normalizedHostname = String(hostname || "")
-		.trim()
-		.toLowerCase()
-		.replace(/\.$/, "");
-
-	if (
-		normalizedHostname === "mirokit.ru" ||
-		normalizedHostname.endsWith(".ru")
-	) {
-		return "mirokit.ru";
-	}
-
-	if (
-		normalizedHostname === "mirokit.com" ||
-		normalizedHostname.endsWith(".com")
-	) {
-		return "mirokit.com";
-	}
-
-	return null;
 }
 
 function isProductionHostname(hostname) {
@@ -306,6 +304,11 @@ function textResponse(body, contentType, cacheControl = "public, max-age=3600") 
 
 function withSiteHeaders(response, pathname) {
 	const headers = new Headers(response.headers);
+	headers.set("Content-Security-Policy-Report-Only", CSP_REPORT_ONLY);
+	if (isAdminPanelPath(pathname)) {
+		headers.set("Cache-Control", "private, no-store");
+		headers.set("X-Robots-Tag", "noindex, nofollow");
+	}
 
 	Object.entries(COMMON_RESPONSE_HEADERS).forEach(([name, value]) => {
 		headers.set(name, value);
@@ -336,6 +339,7 @@ function rewriteDocumentMetadata(response, url) {
 	}
 
 	const canonicalSiteHostname = getCanonicalSiteHostname(url.hostname);
+	if (!canonicalSiteHostname) return response;
 	const canonicalPath = getCanonicalDocumentPath(url.pathname);
 	const canonicalUrl =
 		`https://${canonicalSiteHostname}${canonicalPath}`;
@@ -355,13 +359,15 @@ function rewriteDocumentMetadata(response, url) {
 }
 
 function getCanonicalDocumentPath(pathname) {
-	if (pathname === "/") return "/";
+	if (["/page/gallery", "/page/gallery/", "/page/gallery/index.html"].includes(pathname)) return "/page/gallery/";
+	if (pathname === "/" || pathname === "/index.html") return "/";
 	if (pathname === "/page/onlineProjects" || pathname === "/page/onlineProjects/") return "/page/onlineProjects/";
 	return "/page/privacyPolicy/";
 }
 
 function isDocumentPath(pathname) {
 	return (
+		["/page/gallery", "/page/gallery/", "/page/gallery/index.html"].includes(pathname) ||
 		pathname === "/" ||
 		pathname === "/index.html" ||
 		pathname === "/page/privacyPolicy" ||
@@ -384,14 +390,8 @@ function canonicalDocumentRedirect(request, url) {
 		.toLowerCase()
 		.replace(/\.$/, "");
 
-	if (
-		url.pathname === "/" ||
-		url.pathname === "/page/privacyPolicy/"
-	) {
-		return null;
-	}
-
 	const canonicalPath = getCanonicalDocumentPath(url.pathname);
+	if (url.pathname === canonicalPath) return null;
 	const location = `https://${normalizedHostname}${canonicalPath}${url.search}`;
 
 	return new Response(null, {
@@ -486,13 +486,6 @@ const FIELD_LABELS = {
 };
 
 const VALUE_LABELS = {
-	country: {
-		de: "Deutschland",
-		ru: "Russland",
-		tn: "Tunesien",
-		other: "Anderes Land",
-	},
-
 	topic: {
 		join: "Der MIRoKIT-Liga beitreten",
 		event: "Veranstaltung durchführen",
@@ -683,6 +676,15 @@ function validateFields(formType, fields) {
 		for (const item of values) {
 			if (typeof item !== "string") {
 				throw new Error(`Invalid field value: ${key}`);
+			}
+
+
+			if (key === "country" && item.trim() === "") {
+				throw new Error("Invalid country");
+			}
+
+			if (key === "country" && item.length > CONTACT_COUNTRY_MAX_LENGTH) {
+				throw new Error("Country is too long");
 			}
 
 			if (String(item).length > 10_000) {
@@ -1247,7 +1249,7 @@ async function promotePendingNewsImage(env, image) {
 	await env.SITE_MEDIA.put(destinationKey, object.body, {
 		httpMetadata: {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
-			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+			cacheControl: PRIVATE_MEDIA_CACHE,
 		},
 	});
 	await env.SITE_MEDIA.delete(sourceKey);
@@ -1299,6 +1301,10 @@ function normalizeGalleryMetadata(formData) {
 
 	if (!GALLERY_STATUSES.has(metadata.status)) throw newsError("Invalid gallery status");
 	if (!GALLERY_COLLECTIONS.has(metadata.collection)) throw newsError("Invalid gallery collection");
+	if (metadata.collection === "online-projects") {
+		metadata.topic = String(formData.get("topic") || "").trim();
+		if (!isOnlineProjectTopic(metadata.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
+	}
 
 	for (const language of GALLERY_LANGUAGES) {
 		metadata[`title_${language}`] = galleryTextValue(formData.get(`title_${language}`), `title_${language}`);
@@ -1311,20 +1317,13 @@ function normalizeGalleryMetadata(formData) {
 }
 
 async function readRemoteGalleryImage(sourceUrl) {
-	const response = await fetch(sourceUrl, {
-		headers: { Accept: "image/avif,image/webp,image/png,image/jpeg" },
-		redirect: "follow",
-	});
-	if (!response.ok) throw newsError(`Google Drive image returned ${response.status}`);
-
-	const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
-	if (!GALLERY_IMAGE_TYPES[contentType]) throw newsError("Google Drive URL did not return a supported image");
-	const contentLength = Number(response.headers.get("content-length") || 0);
-	if (contentLength > GALLERY_IMAGE_MAX_BYTES) throw newsError("Image exceeds the 8 MB limit");
-
-	const body = await response.arrayBuffer();
-	if (!body.byteLength || body.byteLength > GALLERY_IMAGE_MAX_BYTES) throw newsError("Image exceeds the 8 MB limit");
-	return { body, contentType, extension: GALLERY_IMAGE_TYPES[contentType] };
+	try {
+		const { body, contentType } = await fetchDriveImage(sourceUrl, GALLERY_IMAGE_MAX_BYTES);
+		return { body, contentType, extension: GALLERY_IMAGE_TYPES[contentType] };
+	} catch (error) {
+		console.warn("Google Drive import failed", error);
+		throw newsError("Could not import a supported Google Drive image within the 8 MB limit");
+	}
 }
 
 function galleryQuoteTextValue(value, field, maxLength) {
@@ -1422,8 +1421,9 @@ function galleryItemFromObject(object) {
 	return {
 		key: object.key,
 		image: `${SITE_MEDIA_PREFIX}${object.key}`,
-		status: metadata.status || "published",
+		status: metadata.status || "archived",
 		collection: metadata.collection || "gallery",
+		topic: metadata.collection === "online-projects" && isOnlineProjectTopic(metadata.topic) ? metadata.topic : "",
 		sourceType: metadata.source_type || "r2",
 		featured: metadata.featured === "true" || metadata.featured === "1",
 		uploadedAt: metadata.uploaded_at || (object.uploaded instanceof Date ? object.uploaded.toISOString() : String(object.uploaded || "")),
@@ -1465,7 +1465,7 @@ async function promotePendingGalleryImage(env, sourceKey) {
 	await env.SITE_MEDIA.put(destinationKey, object.body, {
 		httpMetadata: {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
-			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+			cacheControl: PRIVATE_MEDIA_CACHE,
 		},
 		customMetadata: object.customMetadata || {},
 	});
@@ -1592,6 +1592,27 @@ async function handlePublicVideos(request, env, origin) {
 	}
 }
 
+async function handlePublicProjects(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const result = await env.SITE_DB.prepare(PROJECTS_PUBLIC_QUERY).all();
+		return newsJsonResponse(
+			{ success: true, projects: rowsToPublicProjects(result.results || []) },
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public projects query failed", error);
+		return newsJsonResponse({ success: false, message: "Projects service unavailable" }, 503, origin, env);
+	}
+}
+
 async function promotePendingVideoAsset(env, value, folders) {
 	if (!value || !value.startsWith(SITE_MEDIA_PREFIX)) return value;
 	const sourceKey = value.slice(SITE_MEDIA_PREFIX.length);
@@ -1606,7 +1627,7 @@ async function promotePendingVideoAsset(env, value, folders) {
 	await env.SITE_MEDIA.put(destinationKey, object.body, {
 		httpMetadata: {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
-			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+			cacheControl: PRIVATE_MEDIA_CACHE,
 		},
 		customMetadata: object.customMetadata || {},
 	});
@@ -1625,10 +1646,9 @@ async function prepareVideoForStorage(env, video) {
 		let src = await promotePendingVideoAsset(env, subtitle.src, ["subtitles"]);
 		if (subtitle.content) {
 			if (!env.SITE_MEDIA) throw videoError("Video media storage is not configured", 503);
-			let key = src.startsWith(`${SITE_MEDIA_PREFIX}subtitles/`) ? src.slice(SITE_MEDIA_PREFIX.length) : `subtitles/${video.id}-${crypto.randomUUID()}.vtt`;
-			if (key.startsWith("subtitles/pending/")) key = key.replace("subtitles/pending/", "subtitles/");
+			const key = `subtitles/${crypto.randomUUID()}.vtt`;
 			await env.SITE_MEDIA.put(key, subtitle.content, {
-				httpMetadata: { contentType: "text/vtt; charset=utf-8", cacheControl: "public, max-age=31536000, immutable" },
+				httpMetadata: { contentType: "text/vtt; charset=utf-8", cacheControl: PRIVATE_MEDIA_CACHE },
 			});
 			src = `${SITE_MEDIA_PREFIX}${key}`;
 		}
@@ -1652,6 +1672,8 @@ async function saveVideoRecord(env, video, status) {
 async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 	const identity = await authorizeAdmin(request, env);
 	if (!identity) return newsAdminUnauthorized(origin, env);
+	const methodResponse = adminMethodResponse(request, url.pathname);
+	if (methodResponse) return methodResponse;
 	if (request.method !== "GET" && origin && origin !== url.origin) {
 		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
 	}
@@ -1668,6 +1690,7 @@ async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 			const formData = await request.formData();
 			const file = formData.get("file");
 			const kind = String(formData.get("kind") || "").trim();
+			if (!["video", "poster"].includes(kind)) throw videoError("Invalid media kind");
 			const types = kind === "video"
 				? { "video/mp4": "mp4", "video/webm": "webm", "video/ogg": "ogv" }
 				: { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif" };
@@ -1678,7 +1701,7 @@ async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 			const folder = kind === "video" ? "videos" : "video-posters";
 			const key = `${folder}/pending/${crypto.randomUUID()}.${types[file.type]}`;
 			await env.SITE_MEDIA.put(key, file.stream(), {
-				httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
+				httpMetadata: { contentType: file.type, cacheControl: PRIVATE_MEDIA_CACHE },
 			});
 			return newsJsonResponse({ success: true, url: `${SITE_MEDIA_PREFIX}${key}`, kind }, 201, origin, env);
 		}
@@ -1724,6 +1747,108 @@ async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 	}
 }
 
+async function getAdminProjects(env) {
+	const result = await env.SITE_DB.prepare(PROJECTS_ADMIN_QUERY).all();
+	return rowsToProjects(result.results || []);
+}
+
+async function saveProjectRecord(env, project, status) {
+	const savedProject = {
+		...project,
+		image: await promotePendingProjectImage(env, project.image),
+	};
+	const statements = projectStatements(savedProject, status, new Date().toISOString());
+	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
+	return { ...savedProject, status };
+}
+
+async function promotePendingProjectImage(env, image) {
+	const match = String(image || "").match(/^\/media\/v1\/(projects\/pending\/[a-f0-9-]+\.(?:jpg|png|webp|avif))$/);
+	if (!match) return image || "";
+	if (!env.SITE_MEDIA) throw projectError("Project media storage is not configured", 503);
+	const sourceKey = match[1];
+	const destinationKey = sourceKey.replace("projects/pending/", "projects/");
+	const object = await env.SITE_MEDIA.get(sourceKey);
+	if (!object) throw projectError("Uploaded project image no longer exists", 409);
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata?.(metadataHeaders);
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: PRIVATE_MEDIA_CACHE,
+		},
+	});
+	await env.SITE_MEDIA.delete(sourceKey);
+	return `${SITE_MEDIA_PREFIX}${destinationKey}`;
+}
+
+async function handleProjectsAdminApi(request, env, url, origin, apiPrefix) {
+	const identity = await authorizeAdmin(request, env);
+	if (!identity) return newsAdminUnauthorized(origin, env);
+	const methodResponse = adminMethodResponse(request, url.pathname);
+	if (methodResponse) return methodResponse;
+	if (request.method !== "GET" && origin && origin !== url.origin) {
+		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	try {
+		if (relativePath === "/projects" && request.method === "GET") {
+			return newsJsonResponse({ success: true, projects: await getAdminProjects(env) }, 200, origin, env);
+		}
+		if (relativePath === "/projects/media" && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			const types = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif" };
+			if (!(file instanceof File) || !types[file.type] || file.size === 0 || file.size > GALLERY_IMAGE_MAX_BYTES) {
+				return newsJsonResponse({ success: false, message: "Unsupported project image or image too large" }, 400, origin, env);
+			}
+			const key = `projects/pending/${crypto.randomUUID()}.${types[file.type]}`;
+			await env.SITE_MEDIA.put(key, file.stream(), { httpMetadata: { contentType: file.type, cacheControl: PRIVATE_MEDIA_CACHE } });
+			return newsJsonResponse({ success: true, image: `${SITE_MEDIA_PREFIX}${key}` }, 201, origin, env);
+		}
+
+		const publishMatch = relativePath.match(/^\/projects\/([^/]+)\/publish$/);
+		if (publishMatch && request.method === "POST") {
+			const id = decodeURIComponent(publishMatch[1]);
+			const existing = (await getAdminProjects(env)).find((item) => item.id === id);
+			if (!existing) return newsJsonResponse({ success: false, message: "Project not found" }, 404, origin, env);
+			const saved = await saveProjectRecord(env, normalizeProjectInput(existing, { includeStatus: false }), "published");
+			return newsJsonResponse({ success: true, project: saved }, 200, origin, env);
+		}
+
+		if (relativePath === "/projects" && request.method === "POST") {
+			const project = normalizeProjectInput(await readJsonRequest(request), { includeStatus: false });
+			if ((await getAdminProjects(env)).some((item) => item.id === project.id)) return newsJsonResponse({ success: false, message: "Project ID already exists" }, 409, origin, env);
+			const saved = await saveProjectRecord(env, project, "draft");
+			return newsJsonResponse({ success: true, project: saved }, 201, origin, env);
+		}
+
+		const itemMatch = relativePath.match(/^\/projects\/([^/]+)$/);
+		if (itemMatch) {
+			const id = decodeURIComponent(itemMatch[1]);
+			if (request.method === "PUT") {
+				const project = normalizeProjectInput({ ...(await readJsonRequest(request)), id }, { includeStatus: false });
+				const saved = await saveProjectRecord(env, project, "draft");
+				return newsJsonResponse({ success: true, project: saved }, 200, origin, env);
+			}
+			if (request.method === "DELETE") {
+				const result = await env.SITE_DB.prepare("UPDATE projects SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'").bind(new Date().toISOString(), id).run();
+				if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "Project not found" }, 404, origin, env);
+				return newsJsonResponse({ success: true, id }, 200, origin, env);
+			}
+		}
+		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+	} catch (error) {
+		const status = Number.isInteger(error?.status) ? error.status : 500;
+		if (status < 500) return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
+		console.error("Projects admin request failed", error);
+		return newsJsonResponse({ success: false, message: "Projects service unavailable" }, 503, origin, env);
+	}
+}
+
 async function saveWorldPointRecord(env, point, status) {
 	const statements = worldPointStatements(point, status, new Date().toISOString());
 	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
@@ -1752,7 +1877,7 @@ async function promotePendingPartnerImage(env, image) {
 	await env.SITE_MEDIA.put(destinationKey, object.body, {
 		httpMetadata: {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
-			cacheControl: metadataHeaders.get("cache-control") || "public, max-age=31536000, immutable",
+			cacheControl: PRIVATE_MEDIA_CACHE,
 		},
 	});
 	await env.SITE_MEDIA.delete(sourceKey);
@@ -1762,6 +1887,8 @@ async function promotePendingPartnerImage(env, image) {
 async function handleContentAdminApi(request, env, url, origin, apiPrefix) {
 	const identity = await authorizeAdmin(request, env);
 	if (!identity) return newsAdminUnauthorized(origin, env);
+	const methodResponse = adminMethodResponse(request, url.pathname);
+	if (methodResponse) return methodResponse;
 	if (request.method !== "GET" && origin && origin !== url.origin) {
 		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
 	}
@@ -1792,7 +1919,7 @@ async function handleContentAdminApi(request, env, url, origin, apiPrefix) {
 			}
 			const key = `partners/pending/${crypto.randomUUID()}.${allowedTypes[file.type]}`;
 			await env.SITE_MEDIA.put(key, file.stream(), {
-				httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
+				httpMetadata: { contentType: file.type, cacheControl: PRIVATE_MEDIA_CACHE },
 			});
 			return newsJsonResponse({ success: true, image: `${SITE_MEDIA_PREFIX}${key}` }, 201, origin, env);
 		}
@@ -1856,6 +1983,8 @@ async function handleContentAdminApi(request, env, url, origin, apiPrefix) {
 async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 	const identity = await authorizeAdmin(request, env);
 	if (!identity) return newsAdminUnauthorized(origin, env);
+	const methodResponse = adminMethodResponse(request, url.pathname);
+	if (methodResponse) return methodResponse;
 
 	if (
 		request.method !== "GET" &&
@@ -1933,7 +2062,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 			await env.SITE_MEDIA.put(pendingKey, body, {
 				httpMetadata: {
 					contentType,
-					cacheControl: "public, max-age=31536000, immutable",
+					cacheControl: PRIVATE_MEDIA_CACHE,
 				},
 				customMetadata: metadata,
 			});
@@ -1942,6 +2071,27 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 		}
 
 		const galleryItemMatch = relativePath.match(/^\/gallery\/(.+)$/);
+		if (galleryItemMatch && !isGalleryQuotePath && request.method === "PATCH") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			let key;
+			try { key = decodeURIComponent(galleryItemMatch[1]); } catch { throw newsError("Invalid gallery key"); }
+			if (!GALLERY_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
+			const payload = await readJsonRequest(request);
+			if (!isOnlineProjectTopic(payload?.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
+			const object = await env.SITE_MEDIA.get(key);
+			if (!object) throw newsError("Gallery image not found", 404);
+			if (object.customMetadata?.collection !== "online-projects") throw newsError("Only online-project images have a topic");
+			const metadata = { ...object.customMetadata, topic: payload.topic };
+			// Preserve the original gallery ordering when assigning older images.
+			if (!metadata.uploaded_at && object.uploaded) metadata.uploaded_at = new Date(object.uploaded).toISOString();
+			const saved = await env.SITE_MEDIA.put(key, object.body, {
+				httpMetadata: object.httpMetadata,
+				customMetadata: metadata,
+				onlyIf: { etagMatches: object.etag },
+			});
+			if (!saved) throw newsError("Das Bild wurde zwischenzeitlich geändert. Bitte neu laden.", 409);
+			return newsJsonResponse({ success: true, gallery: galleryItemFromObject({ key, customMetadata: metadata }) }, 200, origin, env);
+		}
 		if (galleryItemMatch && request.method === "DELETE") {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			let key;
@@ -2038,7 +2188,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 			await env.SITE_MEDIA.put(key, file.stream(), {
 				httpMetadata: {
 					contentType: file.type,
-					cacheControl: "public, max-age=31536000, immutable",
+					cacheControl: PRIVATE_MEDIA_CACHE,
 				},
 			});
 			return newsJsonResponse({ success: true, image: `${SITE_MEDIA_PREFIX}${key}` }, 201, origin, env);
@@ -2053,37 +2203,6 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 		console.error("News admin request failed", error);
 		return newsJsonResponse({ success: false, message: "News service unavailable" }, 503, origin, env);
 	}
-}
-
-async function handleNewsMedia(request, env, url) {
-	if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405 });
-	if (!env.SITE_MEDIA) return new Response("News media storage is not configured", { status: 503 });
-
-	const key = url.pathname.slice(SITE_MEDIA_PREFIX.length);
-	if (!/^news\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key) && !GALLERY_KEY_PATTERN.test(key) && !/^partners\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)$/.test(key) && !VIDEO_ASSET_PATTERN.test(url.pathname)) return new Response("Not found", { status: 404 });
-
-	const rangeHeader = request.headers.get("Range");
-	let range;
-	if (rangeHeader) {
-		const match = rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
-		if (match) {
-			range = { offset: match[1] ? Number(match[1]) : undefined, length: match[2] && match[1] ? Number(match[2]) - Number(match[1]) + 1 : undefined };
-		}
-	}
-	const object = await env.SITE_MEDIA.get(key, range ? { range } : undefined);
-	if (!object) return new Response("Not found", { status: 404 });
-
-	const headers = new Headers();
-	object.writeHttpMetadata(headers);
-	headers.set("Cache-Control", "public, max-age=31536000, immutable");
-	headers.set("X-Content-Type-Options", "nosniff");
-	headers.set("Accept-Ranges", "bytes");
-	if (rangeHeader && object.range) {
-		headers.set("Content-Range", `bytes ${object.range.offset}-${object.range.offset + object.range.length - 1}/${object.size}`);
-		headers.set("Content-Length", String(object.range.length));
-		return new Response(request.method === "HEAD" ? null : object.body, { status: 206, headers });
-	}
-	return new Response(request.method === "HEAD" ? null : object.body, { status: 200, headers });
 }
 
 export default {
@@ -2116,8 +2235,19 @@ export default {
 			return handlePublicVideos(request, env, origin);
 		}
 
+		if (url.pathname === PROJECTS_API_PATH) {
+			return handlePublicProjects(request, env, origin);
+		}
+
+		if (url.pathname.startsWith(ADMIN_MEDIA_PREFIX)) {
+			return handleMediaRequest(request, env, url, true);
+		}
+
 		const adminApiPrefix = getAdminApiPrefix(url.pathname);
 		if (adminApiPrefix) {
+			if (url.pathname.startsWith(`${adminApiPrefix}/projects`)) {
+				return handleProjectsAdminApi(request, env, url, origin, adminApiPrefix);
+			}
 			if (url.pathname.startsWith(`${adminApiPrefix}/videos`)) {
 				return handleVideoAdminApi(request, env, url, origin, adminApiPrefix);
 			}
@@ -2128,7 +2258,7 @@ export default {
 		}
 
 		if (url.pathname.startsWith(SITE_MEDIA_PREFIX)) {
-			return handleNewsMedia(request, env, url);
+			return handleMediaRequest(request, env, url);
 		}
 
 		if (url.pathname === ADMIN_PANEL_PREFIX && (request.method === "GET" || request.method === "HEAD")) {

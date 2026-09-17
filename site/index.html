@@ -156,6 +156,7 @@
                   </button>
                   <ul class="submenu" id="submenu-about">
                      <li class="submenu-item"><a href="#aboutUs" data-nav-link data-key="menu_aboutUs">Was ist MIRoKIT?</a></li>
+                     <li class="submenu-item"><a href="#historyOfCreation" data-nav-link data-key="menu_historyOfCreation">Die Geschichte der Entstehung</a></li>
                      <li class="submenu-item"><a href="#team" data-nav-link data-key="menu_team">Team</a></li>
                      <li class="submenu-item"><a href="#world" data-nav-link data-key="menu_world">MIRoKIT weltweit</a></li>
                      <li class="submenu-item"><a href="#partners" data-nav-link data-key="menu_partners">Partner</a></li>
@@ -171,7 +172,6 @@
                      <li class="submenu-item"><a href="#gamePrinciple" data-nav-link data-key="menu_gamePrinciple">Spiel Prinzip</a></li>
                      <li class="submenu-item is-temporarily-disabled"><a href="#programs" data-nav-link data-key="menu_programs">Programme</a></li>
                      <li class="submenu-item"><a href="#ageGroups" data-nav-link data-key="menu_ageGroups">Jahres Grupen</a></li>
-                     <!-- Redirect to Vstupitj v ligu -->
                      <li class="submenu-item"><a href="#participation" data-nav-link data-key="menu_participation">Participate</a></li>
                   </ul>
                </li>
@@ -201,8 +201,8 @@
                            <span aria-hidden="true">></span>
                         </button>
                         <ul class="submenu submenu--nested" id="submenu-gallery">
-                           <li class="submenu-item"><a href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="menu_photos">Fotos</a></li>
-                           <li class="submenu-item"><a href="#gallery" data-nav-link data-gallery-link data-link-key="video" data-key="menu_videos">Videos</a></li>
+                           <li class="submenu-item"><a href="/page/gallery/?view=photos" data-key="menu_photos">Fotos</a></li>
+                           <li class="submenu-item"><a href="/page/gallery/?view=video" data-key="menu_videos">Videos</a></li>
                         </ul>
                      </li>
                      <li class="submenu-item is-temporarily-disabled"><a href="#interviews" data-nav-link data-key="menu_interviews">Interviews</a></li>
@@ -272,6 +272,7 @@
                <div class="mobile-sub" id="mobile-sub-about" aria-hidden="true">
                   <ul>
                      <li class="mobile-nav-item"><a href="#aboutUs" data-nav-link data-key="menu_aboutUs"></a></li>
+                     <li class="mobile-nav-item"><a href="#historyOfCreation" data-nav-link data-key="menu_historyOfCreation"></a></li>
                      <li class="mobile-nav-item"><a href="#team" data-nav-link data-key="menu_team"></a></li>
                      <li class="mobile-nav-item"><a href="#world" data-nav-link data-key="menu_world"></a></li>
                      <li class="mobile-nav-item"><a href="#partners" data-nav-link data-key="menu_partners"></a></li>
@@ -308,8 +309,8 @@
                         <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-gallery"><span data-key="menu_gallery"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
                         <div class="mobile-sub mobile-sub--nested" id="mobile-sub-gallery" aria-hidden="true">
                            <ul>
-                              <li class="mobile-nav-item"><a href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="menu_photos">Photos</a></li>
-                              <li class="mobile-nav-item"><a href="#gallery" data-nav-link data-gallery-link data-link-key="video" data-key="menu_videos">Videos</a></li>
+                              <li class="mobile-nav-item"><a href="/page/gallery/?view=photos" data-key="menu_photos">Photos</a></li>
+                              <li class="mobile-nav-item"><a href="/page/gallery/?view=video" data-key="menu_videos">Videos</a></li>
                            </ul>
                         </div>
                      </li>
@@ -347,7 +348,6 @@
                <div class="hero-orbit hero-orbit--three" aria-hidden="true"></div>
                <span class="hero-spark hero-spark--one" aria-hidden="true"></span>
                <span class="hero-spark hero-spark--two" aria-hidden="true"></span>
-
                <div class="hero-content">
                   <div class="hero-copy">
                      <div class="hero-kicker">
@@ -403,7 +403,7 @@
                         <span class="module-kicker" data-key="live_feed" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> LIVE FEED / 03</span>
                         <h2 class="section-title" id="home-news-title"><span class="icon-box" aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span><span data-key="news_title">Новости проекта</span></h2>
                      </div>
-                     <a class="module-link" data-nav-link href="#news" data-key="all_news" data-i18n-mode="text">Все новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                     <a class="module-link" href="/page/news/" data-key="all_news" data-i18n-mode="text">Все новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                   </header>
 
                   <div class="news-rotator" data-news-rotator aria-live="polite"></div>
@@ -517,7 +517,7 @@
                      <li class="contest-chip" data-key="contest_poetry" data-i18n-mode="text"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i> Конкурс авторские стихотворения</li>
                      <li class="contest-chip" data-key="contest_stories" data-i18n-mode="text"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Конкурс рассказы и сказки</li>
                      <li class="contest-chip" data-key="contest_crafts" data-i18n-mode="text"><i class="fa-solid fa-hands-holding" aria-hidden="true"></i> Конкурс декоративно-прикладное творчество</li>
-                     <li class="contest-chip" data-key="contest_music" data-i18n-mode="text"><i class="fa-solid fa-music" aria-hidden="true"></i> Конкурс музыкальное и вокальное искусство <br />(в видеоформате)</li>
+                     <li class="contest-chip" data-key="contest_music" data-i18n-mode="text"><i class="fa-solid fa-music" aria-hidden="true"></i> Конкурс музыкальное и вокальное искусства</li>
                      <li class="contest-chip" data-key="contest_theatre" data-i18n-mode="text"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Конкурс театральные мини-постановки</li>
                   </ul>
                </div>
@@ -533,6 +533,19 @@
                   <a class="btn-primary about-league-btn" href="#contact" data-nav-link data-link-key="extra-contact" data-key="league_join" data-i18n-mode="text"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> Вступить в Лигу</a>
                </div>
             </div>
+         </section>
+         <section id="historyOfCreation" class="panel compact-panel" data-temporarily-disabled data-disabled-label="Sorry, it's currently not avaiable!">
+            <div class="panel-inner history-layout">
+               <div class="section-header">
+                  <div class="section-logo history-logo">
+                     <img loading="lazy" data-src="" alt="History Logo MIRoKIT" />
+                  </div>
+                  <div class="section-head">
+                     <span class="eyebrow" data-key="history_eyebrow">История</span>
+                     <h2 class="title" data-key="history_title">История создания игры</h2>
+                     <p class="subtitle" data-key="history_subtitle"></p>
+                  </div>
+               </div>
          </section>
          <section id="team" class="panel compact-panel">
             <div class="panel-inner team-layout">
@@ -963,144 +976,53 @@
                </div>
             </div>
          </section>
-         <section id="onlineProjects" class="panel compact-panel" data-deferred-background="./public/assets/backgrounds/online-projects-stage.png">
+         <section id="onlineProjects" class="panel compact-panel" aria-label="Онлайн-проекты" data-i18n-attrs="aria-label:menu_onlineProjects">
+            <div class="online-projects-background" aria-hidden="true">
+               <img loading="lazy" data-src="public/assets/backgrounds/online-projects-stage.png" alt="" />
+            </div>
             <div class="panel-inner onlineProjects-layout">
-               <div class="section-header">
-                  <div class="section-logo">
-                     <img loading="lazy" data-src="public/assets/logos/sections/online_projects_page_rgba.png" alt="Logo Online-Projekte MIRoKIT" />
-                  </div>
-                  <div class="section-head">
-                     <div class="eyebrow" data-key="op0t">МИРоКИТ без границ</div>
-                     <h2 class="title" data-key="op1t">Онлайн-проекты, которые объединяют</h2>
-                     <p class="subtitle" data-key="op2d">Конкурсы, встречи и творческие лаборатории, где участники из разных стран создают общее пространство для игры, знаний и дружбы.</p>
-                     <a class="online-projects-page-link" href="/page/onlineProjects/" data-key="op_open_page" data-i18n-mode="text">Открыть страницу онлайн-проектов <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                  </div>
-               </div>
-
-               <div class="online-projects-shell">
-                  <div class="online-projects-navigation" data-online-projects-navigation>
-                     <button class="online-projects-scroll-btn" type="button" data-online-projects-scroll="previous" aria-label="Предыдущие направления" data-i18n-attrs="aria-label:online_projects_previous">
-                        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-                     </button>
-                     <div class="online-projects-nav-viewport" data-online-projects-nav-viewport tabindex="0">
-                        <div class="online-projects-nav" role="tablist" aria-label="Направления онлайн-проектов" data-i18n-attrs="aria-label:online_projects_tabs_label">
-                           <button id="online-project-tab-drawing" class="online-project-topic topic-drawing is-active" type="button" role="tab" aria-selected="true" aria-controls="online-project-view-drawing" data-online-projects-link data-link-key="drawing">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-palette" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_01">01</span><span data-key="op_nav_drawing">Рисование</span></span>
-                           </button>
-                           <button id="online-project-tab-photo" class="online-project-topic topic-photo" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-photo" data-online-projects-link data-link-key="photo" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_02">02</span><span data-key="op_nav_photo">Фотография</span></span>
-                           </button>
-                           <button id="online-project-tab-video" class="online-project-topic topic-video" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-video" data-online-projects-link data-link-key="video" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-video" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_03">03</span><span data-key="op_nav_video">Видеоролики</span></span>
-                           </button>
-                           <button id="online-project-tab-reading" class="online-project-topic topic-reading" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-reading" data-online-projects-link data-link-key="reading" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_04">04</span><span data-key="op_nav_reading">Художественное чтение</span></span>
-                           </button>
-                           <button id="online-project-tab-essay" class="online-project-topic topic-essay" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-essay" data-online-projects-link data-link-key="essay" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_05">05</span><span data-key="op_nav_essay">Эссе и литературное творчество</span></span>
-                           </button>
-                           <button id="online-project-tab-poetry" class="online-project-topic topic-poetry" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-poetry" data-online-projects-link data-link-key="poetry" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_06">06</span><span data-key="op_nav_poetry">Авторские стихотворения</span></span>
-                           </button>
-                           <button id="online-project-tab-stories" class="online-project-topic topic-stories" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-stories" data-online-projects-link data-link-key="stories" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-book" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_07">07</span><span data-key="op_nav_stories">Рассказы и сказки</span></span>
-                           </button>
-                           <button id="online-project-tab-crafts" class="online-project-topic topic-crafts" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-crafts" data-online-projects-link data-link-key="crafts" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_08">08</span><span data-key="op_nav_crafts">Декоративно-прикладное творчество</span></span>
-                           </button>
-                           <button id="online-project-tab-music" class="online-project-topic topic-music" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-music" data-online-projects-link data-link-key="music" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-music" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_09">09</span><span data-key="op_nav_music">Музыкальное и вокальное искусство</span></span>
-                           </button>
-                           <button id="online-project-tab-theatre" class="online-project-topic topic-theatre" type="button" role="tab" aria-selected="false" aria-controls="online-project-view-theatre" data-online-projects-link data-link-key="theatre" tabindex="-1">
-                              <span class="online-project-topic-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>
-                              <span class="online-project-topic-copy"><span class="online-project-topic-index" data-key="op_index_10">10</span><span data-key="op_nav_theatre">Театральные мини-постановки</span></span>
-                           </button>
-                        </div>
-                     </div>
-                     <button class="online-projects-scroll-btn" type="button" data-online-projects-scroll="next" aria-label="Следующие направления" data-i18n-attrs="aria-label:online_projects_next">
-                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                     </button>
-                  </div>
-
-                  <div class="online-projects-views">
-                     <article id="online-project-view-drawing" class="online-project-view is-current" data-online-projects-view="drawing" role="tabpanel" aria-labelledby="online-project-tab-drawing">
-                        <div class="online-project-view-heading">
-                           <div class="online-project-view-kicker"><span class="online-project-status is-live" data-key="op_status_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span><span class="online-project-index" data-key="op_index_01">01</span></div>
-                           <h3 data-key="op_drawing_title">Мир глазами детей</h3>
-                           <p data-key="op_drawing_desc">Рисунки о дружбе народов, семейных традициях и будущем, которое мы создаём вместе.</p>
-                        </div>
-                        <div class="online-project-info-grid">
-                           <article><span class="online-project-info-icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_drawing_format">Рисунок и иллюстрация</strong></span></article>
-                           <article><span class="online-project-info-icon"><i class="fa-solid fa-people-group" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_drawing_audience">7–18 лет</strong></span></article>
-                           <article><span class="online-project-info-icon"><i class="fa-solid fa-images" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_drawing_result">Онлайн-выставка</strong></span></article>
-                        </div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_drawing_route">Работа → галерея → диплом</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-key="op_open_related" data-i18n-mode="text">Открыть галерею <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-photo" class="online-project-view" data-online-projects-view="photo" role="tabpanel" aria-labelledby="online-project-tab-photo" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-soon" data-key="op_status_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span><span class="online-project-index" data-key="op_index_02">02</span></div><h3 data-key="op_photo_title">История в одном кадре</h3><p data-key="op_photo_desc">Фотографии людей, городов и маленьких деталей, которые рассказывают о культуре без перевода.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-camera-retro" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_photo_format">Фотоистория</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_photo_audience">7–25 лет</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-expand" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_photo_result">Цифровая экспозиция</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_photo_route">Кадр → история → выставка</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-link-key="photos" data-key="op_open_related" data-i18n-mode="text">Открыть галерею <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-video" class="online-project-view" data-online-projects-view="video" role="tabpanel" aria-labelledby="online-project-tab-video" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-live" data-key="op_status_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span><span class="online-project-index" data-key="op_index_03">03</span></div><h3 data-key="op_video_title">Минута, которая объединяет</h3><p data-key="op_video_desc">Короткие ролики о встречах, играх, семейных историях и творческих открытиях участников.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-film" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_video_format">Видео до 3 минут</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_video_audience">Команды и семьи</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-play" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_video_result">Публичный показ</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_video_route">Сценарий → съёмка → эфир</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-link-key="video" data-key="op_open_related" data-i18n-mode="text">Открыть видеотеку <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-reading" class="online-project-view" data-online-projects-view="reading" role="tabpanel" aria-labelledby="online-project-tab-reading" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-archive" data-key="op_status_archive" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Архив</span><span class="online-project-index" data-key="op_index_04">04</span></div><h3 data-key="op_reading_title">Голос текста</h3><p data-key="op_reading_desc">Читаем любимые произведения так, чтобы интонация, язык и настроение путешествовали между странами.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_reading_format">Выразительное чтение</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-microphone" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_reading_audience">Соло и дуэты</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-star" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_reading_result">Сцена голосов</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_reading_route">Текст → голос → встреча</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#programs" data-nav-link data-key="op_open_related" data-i18n-mode="text">Посмотреть программы <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-essay" class="online-project-view" data-online-projects-view="essay" role="tabpanel" aria-labelledby="online-project-tab-essay" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-soon" data-key="op_status_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span><span class="online-project-index" data-key="op_index_05">05</span></div><h3 data-key="op_essay_title">Письмо миру</h3><p data-key="op_essay_desc">Тексты, в которых личное наблюдение становится честным разговором о доме, дружбе и будущем.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-file-pen" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_essay_format">Эссе до 1000 слов</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-pen" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_essay_audience">Подростки и молодёжь</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-comments" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_essay_result">Литературный сборник</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_essay_route">Мысль → текст → публикация</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#news" data-nav-link data-key="op_open_related" data-i18n-mode="text">Открыть новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-poetry" class="online-project-view" data-online-projects-view="poetry" role="tabpanel" aria-labelledby="online-project-tab-poetry" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-live" data-key="op_status_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span><span class="online-project-index" data-key="op_index_06">06</span></div><h3 data-key="op_poetry_title">Стихотворение как открытка</h3><p data-key="op_poetry_desc">Авторские строки о языке, городе, мечте и том, что помогает нам слышать друг друга.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_poetry_format">Стихотворение и аудио</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-language" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_poetry_audience">10–25 лет</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-headphones" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_poetry_result">Аудиоальбом</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_poetry_route">Строка → запись → плейлист</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-link-key="video" data-key="op_open_related" data-i18n-mode="text">Слушать истории <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-stories" class="online-project-view" data-online-projects-view="stories" role="tabpanel" aria-labelledby="online-project-tab-stories" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-archive" data-key="op_status_archive" data-i18n-mode="text"><i class="fa-solid fa-check" aria-hidden="true"></i> Архив</span><span class="online-project-index" data-key="op_index_07">07</span></div><h3 data-key="op_stories_title">История из моего окна</h3><p data-key="op_stories_desc">Сказки, рассказы и семейные легенды, которые превращают разные города в одну большую библиотеку.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-book" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_stories_format">Рассказ до 5 страниц</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_stories_audience">Семьи и школьники</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_stories_result">Общий сборник</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_stories_route">Герой → история → книга</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#news" data-nav-link data-key="op_open_related" data-i18n-mode="text">Читать новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-crafts" class="online-project-view" data-online-projects-view="crafts" role="tabpanel" aria-labelledby="online-project-tab-crafts" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-soon" data-key="op_status_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span><span class="online-project-index" data-key="op_index_08">08</span></div><h3 data-key="op_crafts_title">Сделано руками, придумано сердцем</h3><p data-key="op_crafts_desc">Орнаменты, предметы и маленькие арт-объекты, в которых встречаются традиции семьи и энергия современного дизайна.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_crafts_format">Объект или серия</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-hands" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_crafts_audience">Без возрастных границ</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-swatchbook" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_crafts_result">Виртуальная витрина</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_crafts_route">Материал → форма → витрина</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-link-key="photos" data-key="op_open_related" data-i18n-mode="text">Смотреть витрину <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-music" class="online-project-view" data-online-projects-view="music" role="tabpanel" aria-labelledby="online-project-tab-music" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-live" data-key="op_status_live" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> Идёт сейчас</span><span class="online-project-index" data-key="op_index_09">09</span></div><h3 data-key="op_music_title">Музыка без границ</h3><p data-key="op_music_desc">Песни, инструментальные миниатюры и вокальные приветствия, из которых складывается общий международный концерт.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-music" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_music_format">Песня или клип</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-microphone-lines" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_music_audience">Соло, дуэты, ансамбли</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_music_result">Общий плейлист</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_music_route">Звук → запись → концерт</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#gallery" data-nav-link data-link-key="video" data-key="op_open_related" data-i18n-mode="text">Открыть видеотеку <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-
-                     <article id="online-project-view-theatre" class="online-project-view" data-online-projects-view="theatre" role="tabpanel" aria-labelledby="online-project-tab-theatre" hidden>
-                        <div class="online-project-view-heading"><div class="online-project-view-kicker"><span class="online-project-status is-soon" data-key="op_status_soon" data-i18n-mode="text"><i class="fa-regular fa-clock" aria-hidden="true"></i> Скоро</span><span class="online-project-index" data-key="op_index_10">10</span></div><h3 data-key="op_theatre_title">Сцена в маленьком экране</h3><p data-key="op_theatre_desc">Короткие спектакли, сценические этюды и истории, которые можно поставить дома, в классе или в студии.</p></div>
-                        <div class="online-project-info-grid"><article><span class="online-project-info-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span><span><small data-key="op_format_label">Формат</small><strong data-key="op_theatre_format">Мини-постановка до 7 минут</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-people-arrows" aria-hidden="true"></i></span><span><small data-key="op_audience_label">Участники</small><strong data-key="op_theatre_audience">Команды от 2 человек</strong></span></article><article><span class="online-project-info-icon"><i class="fa-solid fa-clapperboard" aria-hidden="true"></i></span><span><small data-key="op_result_label">Результат</small><strong data-key="op_theatre_result">Онлайн-фестиваль</strong></span></article></div>
-                        <div class="online-project-view-footer"><span class="online-project-route"><i class="fa-solid fa-route" aria-hidden="true"></i><span><small data-key="op_route_label">Маршрут</small><strong data-key="op_theatre_route">Роль → репетиция → показ</strong></span></span><span class="online-project-actions"><a class="btn-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="op_participate" data-i18n-mode="text">Участвовать <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><a class="online-project-context-link" href="#programs" data-nav-link data-key="op_open_related" data-i18n-mode="text">Посмотреть программы <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></span></div>
-                     </article>
-                  </div>
-               </div>
+               <nav class="online-projects-nav" aria-label="Направления онлайн-проектов" data-i18n-attrs="aria-label:online_projects_tabs_label">
+                  <a class="online-project-topic topic-drawing" href="/page/onlineProjects/index.html?topic=drawing">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-palette" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_drawing">Конкурс рисунков</span></span>
+                  </a>
+                  <a class="online-project-topic topic-photo" href="/page/onlineProjects/index.html?topic=photo">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_photo">Конкурс художественной фотографии</span></span>
+                  </a>
+                  <a class="online-project-topic topic-video" href="/page/onlineProjects/index.html?topic=video">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-video" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_video">Конкурс видеороликов</span></span>
+                  </a>
+                  <a class="online-project-topic topic-reading" href="/page/onlineProjects/index.html?topic=reading">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_reading">Конкурс художественного чтения</span></span>
+                  </a>
+                  <a class="online-project-topic topic-essay" href="/page/onlineProjects/index.html?topic=essay">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_essay">Конкурс эссе и литературного творчества</span></span>
+                  </a>
+                  <a class="online-project-topic topic-poetry" href="/page/onlineProjects/index.html?topic=poetry">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_poetry">Конкурс авторских стихотворений</span></span>
+                  </a>
+                  <a class="online-project-topic topic-stories" href="/page/onlineProjects/index.html?topic=stories">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-book" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_stories">Конкурс рассказов и сказок</span></span>
+                  </a>
+                  <a class="online-project-topic topic-crafts" href="/page/onlineProjects/index.html?topic=crafts">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_crafts">Конкурс декоративно-прикладного творчества</span></span>
+                  </a>
+                  <a class="online-project-topic topic-music" href="/page/onlineProjects/index.html?topic=music">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-music" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_music">Конкурс музыкального и вокального искусства (в видеоформате)</span></span>
+                  </a>
+                  <a class="online-project-topic topic-theatre" href="/page/onlineProjects/index.html?topic=theatre">
+                     <span class="online-project-topic-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>
+                     <span class="online-project-topic-copy"><span data-key="op_nav_theatre">Конкурс театральных мини-постановок</span></span>
+                  </a>
+               </nav>
             </div>
          </section>
          <section id="projects" class="panel compact-panel">
@@ -1131,17 +1053,19 @@
                      <article class="projects-feature fu d1">
                         <div class="projects-feature-copy">
                            <span class="projects-kicker" data-key="current_status" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Сейчас в работе</span>
-                           <h3 data-key="projects_feature_title">Культурный триатлон 2026: команды, раунды, сцена и общий международный финал</h3>
-                           <p data-key="projects_feature_desc">
+                           <h3 id="projectsFeatureTitle" data-key="projects_feature_title">Культурный триатлон 2026: команды, раунды, сцена и общий международный финал</h3>
+                           <p id="projectsFeatureDescription" data-key="projects_feature_desc">
                               Проект собирает школы, семейные команды, культурные центры и партнёров в единую игровую систему. Участники проходят интеллектуальные задания, творческие челленджи, диалоговые миссии и медиа-этапы, а организаторы получают готовую структуру для запуска локального события.
                            </p>
                            <div class="projects-feature-actions">
-                              <a class="btn-primary" href="#programs" data-nav-link data-key="open_program" data-i18n-mode="text">Открыть программу <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                              <a class="btn-primary" href="#programs" data-nav-link data-key="open_program" data-i18n-mode="text" data-temporarily-disabled>Открыть программу<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                               <a class="btn-secondary" href="#contact" data-nav-link data-link-key="extra-contact" data-key="connect_team">Подключить команду</a>
                            </div>
                         </div>
                         <div class="projects-command-center" aria-label="Статус текущего проекта" data-i18n-attrs="aria-label:current_project_status">
+                           <div class="projects-command-topline"><span>MIRoKIT / PROJECT OS</span><strong>2026</strong></div>
                            <div class="project-radar"><span></span><span></span><span></span></div>
+                           <div class="projects-command-route" aria-hidden="true"><span>IDEA</span><i class="fa-solid fa-arrow-right"></i><span>TEAM</span><i class="fa-solid fa-arrow-right"></i><span>IMPACT</span></div>
                            <dl class="projects-live-stats">
                               <div>
                                  <dt>4</dt>
@@ -1159,16 +1083,16 @@
                         </div>
                      </article>
                      <aside class="projects-context fu d2">
-                        <span class="projects-context-label" data-key="why_works">Почему это работает</span>
+                        <div class="projects-dna-heading"><span class="projects-context-label" data-key="why_works">Почему это работает</span><span class="projects-dna-mark">M·K</span></div>
                         <ul>
-                           <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span data-key="project_modular">Каждый проект состоит из понятных модулей: игра, творчество, диалог, медиа и рефлексия.</span></li>
-                           <li><i class="fa-solid fa-route" aria-hidden="true"></i><span data-key="project_start">Команда может стартовать онлайн, локально в школе или через партнёрскую площадку.</span></li>
-                           <li><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i><span data-key="project_roles">Партнёры видят роли, сроки, материалы и результат, а не просто афишу события.</span></li>
+                           <li><b>01</b><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span data-key="project_modular">Каждый проект состоит из понятных модулей: игра, творчество, диалог, медиа и рефлексия.</span></li>
+                           <li><b>02</b><i class="fa-solid fa-route" aria-hidden="true"></i><span data-key="project_start">Команда может стартовать онлайн, локально в школе или через партнёрскую площадку.</span></li>
+                           <li><b>03</b><i class="fa-solid fa-handshake-angle" aria-hidden="true"></i><span data-key="project_roles">Партнёры видят роли, сроки, материалы и результат, а не просто афишу события.</span></li>
                         </ul>
                      </aside>
                   </div>
 
-                  <div class="project-grid project-grid--current">
+                  <div class="project-grid project-grid--current" id="projectsCurrentGrid" data-projects-fallback="true">
                      <article class="project-card project-card--wide fu d1">
                         <a class="project-shot project-shot--photo" href="#news" data-nav-link aria-label="Открыть международный конкурс рисунков">
                            <img loading="lazy" data-src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Анонс онлайн курса по рисованию" />
@@ -1179,7 +1103,7 @@
                            <h3 data-key="project_card_1_title">Международная мастерская рисунка</h3>
                            <p data-key="project_card_1_desc">Онлайн-курс и конкурс для детей, где личная история превращается в визуальный рассказ о культуре, семье, городе и дружбе.</p>
                            <div class="project-meta"><span data-key="online_tag">Онлайн</span><span data-key="work_gallery">Галерея работ</span><span data-key="mentors">Наставники</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="details">Подробнее</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="works">Работы</a></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="details">Подробнее</a><a class="mini-btn mini-ghost" href="/page/gallery/?view=photos" data-key="works">Работы</a></div>
                         </div>
                      </article>
                      <article class="project-card fu d2">
@@ -1249,10 +1173,10 @@
                            <span class="projects-kicker" data-key="project_archive" data-i18n-mode="text"><i class="fa-solid fa-box-archive" aria-hidden="true"></i> Архив проектов</span>
                            <h3 data-key="project_archive_title">Завершённые форматы не исчезают: они становятся библиотекой сценариев, медиа и опыта</h3>
                      </div>
-                           <a class="btn-secondary" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="project_open_gallery">Открыть галерею</a>
+                           <a class="btn-secondary" href="/page/gallery/?view=photos" data-key="project_open_gallery">Открыть галерею</a>
                   </div>
 
-                  <div class="projects-archive-grid">
+                  <div class="projects-archive-grid" id="projectsPastGrid" data-projects-fallback="true">
                      <article class="project-card project-card--archive fu d1">
                         <a class="project-shot project-shot--photo" href="#news" data-nav-link aria-label="Открыть архив турнира в Дюссельдорфе">
                            <img loading="lazy" data-src="public/assets/images/news/turnir_dus_10-07-26.png" alt="Архив турнира MIRoKIT в Дюссельдорфе" />
@@ -1263,7 +1187,7 @@
                            <h3 data-key="archive_card_1_title">Локальный турнир дружбы</h3>
                            <p data-key="archive_card_1_desc">Командная встреча с игровыми станциями, культурными вопросами, творческими заданиями и финальным награждением.</p>
                            <div class="project-meta"><span data-key="event">Событие</span><span data-key="photos_count">Фото</span><span data-key="report">Отчёт</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="results">Итоги</a><a class="mini-btn mini-ghost" href="#gallery" data-nav-link data-gallery-link data-link-key="photos" data-key="photos_count">Фото</a></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="#news" data-nav-link data-key="results">Итоги</a><a class="mini-btn mini-ghost" href="/page/gallery/?view=photos" data-key="photos_count">Фото</a></div>
                         </div>
                      </article>
                      <article class="project-card project-card--archive fu d2">
@@ -1289,7 +1213,7 @@
                            <h3 data-key="archive_card_3_title">Творческая лаборатория дружбы</h3>
                            <p data-key="archive_card_3_desc">Мини-выступления, роли, музыка и короткие презентации стран как подготовка к большому фестивальному дню.</p>
                            <div class="project-meta"><span data-key="stage">Сцена</span><span data-key="music">Музыка</span><span data-key="online_teams">Команды</span></div>
-                           <div class="project-actions"><a class="mini-btn mini-primary" href="#gallery" data-nav-link data-gallery-link data-link-key="video" data-key="videos_count">Видео</a><a class="mini-btn mini-ghost" href="#programs" data-nav-link data-key="repeat">Повторить</a></div>
+                           <div class="project-actions"><a class="mini-btn mini-primary" href="/page/gallery/?view=video" data-key="videos_count">Видео</a><a class="mini-btn mini-ghost" href="#programs" data-nav-link data-key="repeat">Повторить</a></div>
                         </div>
                      </article>
                   </div>
@@ -1323,26 +1247,20 @@
                   <div class="section-head">
                      <span class="eyebrow" data-key="news_title">Новости проекта</span>
                      <h2 class="title" data-key="news_page_title">Что нового в МИРоКИТ</h2>
-                     <p class="subtitle" data-key="news_page_subtitle">События, интервью и репортажи из жизни клуба. Выберите категорию или откройте карточку, чтобы прочитать целиком.</p>
+                     <p class="subtitle" data-key="news_preview_note">Сначала — самые свежие истории. В полном разделе новостей собраны все опубликованные материалы.</p>
                   </div>
                </div>
-
-               <div class="news-filters fu d1" role="group" aria-label="Фильтр новостей по категориям" data-i18n-attrs="aria-label:news_filter_label">
-                  <button type="button" class="news-filter-btn is-active" aria-pressed="true" data-filter="all" data-key="news_all">Все</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="event" data-key="news_category_events">События</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="interview" data-key="news_category_interview">Интервью</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="photo" data-key="news_category_photo">Фоторепортаж</button>
-                  <button type="button" class="news-filter-btn" aria-pressed="false" data-filter="announce" data-key="news_category_announce">Анонсы</button>
+               <div class="news-grid-full news-preview-grid fu d1" id="newsGridFull" data-news-grid data-news-preview></div>
+               <div class="news-preview-footer fu d2">
+                  <p data-key="news_preview_note">Die neuesten Geschichten zuerst — im News-Archiv findest du alle veröffentlichten Meldungen.</p>
+                  <a class="btn-primary" href="/page/news/" data-key="all_news" data-i18n-mode="text">Alle News <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                </div>
-
-               <div class="news-grid-full fu d2" id="newsGridFull" data-news-grid></div>
-
                <p class="news-empty" id="newsEmpty" hidden data-key="news_empty">В этой категории пока нет новостей — загляните позже.</p>
             </div>
          </section>
          <section id="gallery" class="panel compact-panel">
             <div class="panel-inner gallery-layout">
-               <div class="gallery-view" data-gallery-view="gallery-main">
+               <div class="gallery-view">
                   <div class="section-header">
                      <div class="section-logo"><img loading="lazy" data-src="public/assets/logos/sections/gallery_page_rgba.png" alt="Logo Galerie MIRoKIT" /></div>
                      <div class="section-head">
@@ -1357,20 +1275,16 @@
                         <h3 data-key="choose_media">Выберите, что хотите посмотреть</h3>
                         <p data-key="media_desc">Фотографии и видео разделены по задачам: быстро открыть архив, найти историю или предложить новый материал.</p>
                      </div>
-                     <div class="gallery-stat-list" aria-label="Состав медиаархива" data-i18n-attrs="aria-label:media_archive">
-                        <span><strong data-gallery-count>180+</strong><small data-key="photos_count">фото</small></span>
-                        <span><strong data-video-count>24</strong><small data-key="videos_count">видео</small></span>
-                        <span><strong data-country-count>8</strong><small data-key="countries_count">стран</small></span>
-                     </div>
+                     <a class="btn-primary" href="/page/gallery/" data-key="gallery_open">Открыть</a>
                   </div>
                   <div class="gallery-portal-grid">
-                     <a class="gallery-portal gallery-portal--photos fu d2" href="#gallery" data-nav-link data-gallery-link data-link-key="photos">
+                     <a class="gallery-portal gallery-portal--photos fu d2" href="/page/gallery/?view=photos">
                         <img loading="lazy" data-src="public/assets/backgrounds/photos_background_thumbnail.png" alt="Look in the Photos" />
                         <span
                            ><i class="fa-solid fa-camera" aria-hidden="true"></i><small data-key="photo_stories">Фотоистории</small><strong data-key="watch_photos">Смотреть фотографии</strong><em data-key="photo_portal_desc">События, лица, эмоции и творческие работы</em><b data-key="gallery_open" data-i18n-mode="text">Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
                         ></span>
                      </a>
-                     <a class="gallery-portal gallery-portal--video fu d3" href="#gallery" data-nav-link data-gallery-link data-link-key="video">
+                     <a class="gallery-portal gallery-portal--video fu d3" href="/page/gallery/?view=video">
                         <img loading="lazy" data-src="public/assets/backgrounds/videos_background_thumbnail.png" alt="Watch Videos" />
                         <span
                            ><i class="fa-solid fa-play" aria-hidden="true"></i><small data-key="video_library">Видеотека</small><strong data-key="watch_videos">Смотреть видео</strong><em data-key="video_portal_desc">Репортажи, интервью и истории участников</em><b data-key="gallery_open" data-i18n-mode="text">Открыть <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></b
@@ -1383,90 +1297,6 @@
                   </div>
                </div>
 
-               <div class="gallery-view" data-gallery-view="photos" hidden>
-                  <div class="section-header">
-                     <div class="section-logo"><img loading="lazy" data-src="public/assets/logos/sections/photo_page_rgba.png" alt="Logo Fotoarchiv MIRoKIT" /></div>
-                     <div class="section-head">
-                        <div class="eyebrow" data-key="photo_eyebrow">Фотоархив</div>
-                        <h2 class="title" data-key="photo_title">Моменты, из которых складывается МИРоКИТ</h2>
-                        <p class="subtitle" data-key="photo_subtitle">Выставки, турниры, творческие лаборатории и маленькие кадры большой международной истории.</p>
-                     </div>
-                  </div>
-                  <div class="gallery-detail-toolbar">
-                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="back_gallery" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-images" aria-hidden="true"></i> <strong data-gallery-count>180+</strong> <span data-key="photos_count">фотографий</span></span>
-                  </div>
-                  <div class="photo-story-grid" data-gallery-static-grid>
-                     <button class="photo-story photo-story--feature fu d1" type="button" data-gallery-image data-gallery-title="Цвета дружбы без границ" aria-label="Фото открыть: Цвета дружбы без границ" data-i18n-attrs="data-gallery-title:photo_story_1,aria-label:photo_open_1">
-                        <img loading="lazy" data-src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Участники конкурса рисуют вместе" data-i18n-attrs="alt:photo_alt_1" /><span><small>01 / <span data-key="contest_drawings">Конкурс рисунков</span></small><strong data-key="photo_story_1">Цвета дружбы без границ</strong></span>
-                     </button>
-                     <button class="photo-story fu d2" type="button" data-gallery-image data-gallery-title="Команды из разных стран" aria-label="Фото открыть: Команды из разных стран" data-i18n-attrs="data-gallery-title:photo_story_2,aria-label:photo_open_2">
-                        <img loading="lazy" data-src="public/assets/media/photos/events/events_example.webp" alt="Международная встреча участников" data-i18n-attrs="alt:photo_alt_2" /><span><small>02 / Встреча</small><strong data-key="photo_story_2">Команды из разных стран</strong></span>
-                     </button>
-                     <button class="photo-story fu d3" type="button" data-gallery-image data-gallery-title="Движение вместе" aria-label="Фото открыть: Движение вместе" data-i18n-attrs="data-gallery-title:photo_story_3,aria-label:photo_open_3">
-                        <img loading="lazy" data-src="public/assets/media/photos/team/team-run.png" alt="Команда MIRoKIT" data-i18n-attrs="alt:photo_alt_3" /><span><small>03 / Команда</small><strong data-key="photo_story_3">Движение вместе</strong></span>
-                     </button>
-                     <article class="photo-story photo-story--quote fu d4">
-                        <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
-                        <p data-key="gallery_quote">«В одном кадре могут встретиться люди, которые ещё вчера не знали языка друг друга».</p>
-                        <small data-key="gallery_quote_by">МИРоКИТ — международный диалог</small>
-                     </article>
-                     <button class="photo-story fu d5" type="button" data-gallery-image data-gallery-title="Игра, в которой все свои" aria-label="Фото открыть: Игра, в которой все свои" data-i18n-attrs="data-gallery-title:photo_story_4,aria-label:photo_open_4">
-                        <img loading="lazy" data-src="public/assets/media/photos/events/example.png" alt="Событие MIRoKIT" data-i18n-attrs="alt:photo_alt_4" /><span><small>04 / Событие</small><strong data-key="photo_story_4">Игра, в которой все свои</strong></span>
-                     </button>
-                  </div>
-                  <div class="photo-story-grid" data-gallery-remote-grid hidden></div>
-                  <div class="gallery-detail-footer fu d5">
-                     <p data-key="new_photos"><strong>Новые фото появляются после каждого события.</strong><br />Следите за анонсами, чтобы увидеть свою историю в следующем альбоме.</p>
-                     <a class="btn-secondary" href="#news" data-nav-link data-key="all_news">Открыть новости</a>
-                  </div>
-               </div>
-
-               <div class="gallery-view" data-gallery-view="video" hidden>
-                  <div class="section-header">
-                     <div class="section-logo"><img loading="lazy" data-src="public/assets/logos/sections/video_page_rgba.png" alt="Logo Videothek MIRoKIT" /></div>
-                     <div class="section-head">
-                        <div class="eyebrow" data-key="video_eyebrow">Видеотека</div>
-                        <h2 class="title" data-key="video_title">Смотрите, слушайте, проживайте вместе с нами</h2>
-                        <p class="subtitle" data-key="video_subtitle">Видеодневники, репортажи, разговоры с участниками и самые яркие эпизоды проектов.</p>
-                     </div>
-                  </div>
-                  <div class="gallery-detail-toolbar">
-                     <a class="gallery-back-button" href="#gallery" data-nav-link data-gallery-link data-link-key="gallery-main" data-key="back_gallery" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад к галерее</a><span><i class="fa-solid fa-circle-play" aria-hidden="true"></i> <span data-video-count>24</span> <span data-key="videos_count">видеосюжета</span></span>
-                  </div>
-                  <div id="staticVideoLibrary" data-video-static>
-                  <article class="video-spotlight fu d1">
-                     <button class="video-spotlight-open" type="button" data-gallery-video data-video-src="" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog" aria-label="Видео im Vollbild öffnen: Один день, который объединил целый мир" data-i18n-attrs="data-video-title:video_feature_title,aria-label:video_open_label">
-                        <img loading="lazy" data-src="public/assets/media/photos/team/team-run.png" alt="Участники проекта MIRoKIT" /><span class="video-play-button"><i class="fa-solid fa-play" aria-hidden="true"></i></span><small>03:42</small>
-                     </button>
-                     <section>
-                        <span data-key="video_premiere">Премьера / МИРоКИТ в движении</span>
-                        <h3 data-key="video_feature_title">Один день, который объединил целый мир</h3>
-                        <p data-key="video_feature_desc">Как рождается командная игра, какие истории звучат в перерывах и почему участники не хотят расходиться после финала.</p>
-                        <button class="btn-primary" type="button" data-gallery-video data-video-src="" data-video-title="Один день, который объединил целый мир" aria-haspopup="dialog" data-key="watch_trailer" data-i18n-mode="text" data-i18n-attrs="data-video-title:video_feature_title"><i class="fa-solid fa-play" aria-hidden="true"></i> Смотреть трейлер</button>
-                     </section>
-                  </article>
-                  <div class="video-list">
-                     <article class="video-card fu d2">
-                        <span><img loading="lazy" data-src="public/assets/images/news/turnir_dus_10-07-26.png" alt="Турнир MIRoKIT" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
-                        <div><small data-key="video_report">Репортаж · 05:16</small><strong data-key="video_list_1_title">Турнир: азарт, стратегия и дружба</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Турнир: азарт, стратегия и дружба" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_1_title">Открыть в полном экране</button></div>
-                     </article>
-                     <article class="video-card fu d3">
-                        <span><img loading="lazy" data-src="public/assets/media/photos/events/events_example.webp" alt="Международная встреча" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
-                        <div>
-                           <small data-key="video_interview">Интервью · 07:24</small><strong data-key="video_list_2_title">Что дети рассказывают друг другу без переводчика</strong
-                           ><button type="button" data-gallery-video data-video-src="" data-video-title="Что дети рассказывают друг другу без переводчика" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_2_title">Открыть в полном экране</button>
-                        </div>
-                     </article>
-                     <article class="video-card fu d4">
-                        <span><img loading="lazy" data-src="public/assets/images/news/online-course_painting_01-08-26.png" alt="Конкурс рисунков" /><i class="fa-solid fa-play" aria-hidden="true"></i></span>
-                        <div>
-                           <small data-key="video_behind">За кадром · 02:58</small><strong data-key="video_list_3_title">Как создавалась международная онлайн-выставка</strong><button type="button" data-gallery-video data-video-src="" data-video-title="Как создавалась международная онлайн-выставка" aria-haspopup="dialog" data-key="open_fullscreen" data-i18n-attrs="data-video-title:video_list_3_title">Открыть в полном экране</button>
-                        </div>
-                     </article>
-                  </div>
-                  </div>
-                  <div id="remoteVideoLibrary" class="video-remote-library" data-video-remote hidden aria-live="polite"></div>
-               </div>
             </div>
          </section>
          <section id="contact" class="panel compact-panel">
@@ -1548,16 +1378,7 @@
                               </div>
                               <div class="field">
                                  <label for="cf-country"><span data-key="country">Страна</span> <span class="req">*</span></label>
-                                 <div class="select-wrap">
-                                    <select id="cf-country" name="country" required>
-                                       <option value="" disabled selected data-key="choose_country">Выберите страну</option>
-                                       <option value="de" data-key="country_germany">Германия</option>
-                                       <option value="ru" data-key="country_russia">Россия</option>
-                                       <option value="tn" data-key="country_tunisia">Тунис</option>
-                                       <option value="other" data-key="other">Другая страна</option>
-                                    </select>
-                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                                 </div>
+                                 <input type="text" id="cf-country" name="country" autocomplete="country-name" maxlength="100" placeholder="Введите название страны" data-i18n-attrs="placeholder:input_country" required />
                               </div>
                               <div class="field">
                                  <label for="cf-city"><span data-key="city">Город</span> <span class="req">*</span></label>
@@ -1673,26 +1494,20 @@
                               <input id="lf-address" name="address" type="text" autocomplete="street-address" required />
                            </div>
                            <div class="field">
-                              <label for="lf-country"><span data-key="country">Страна</span> <span class="req">*</span></label>
-                              <div class="select-wrap">
-                                 <select id="lf-country" name="country" required>
-                                    <option value="" selected disabled data-key="choose_country">Выберите страну</option>
-                                    <option value="de" data-key="country_germany">Германия</option>
-                                    <option value="ru" data-key="country_russia">Россия</option>
-                                    <option value="tn" data-key="country_tunisia">Тунис</option>
-                                    <option value="other" data-key="other">Другая страна</option>
-                                 </select>
-                                 <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                              </div>
+                              <label for="lf-postcode"><span data-key="postcode">Индекс</span> <span class="req">*</span></label
+                              ><input id="lf-postcode" name="postcode" type="text" required />
                            </div>
-                           <div class="field"><label for="lf-region" data-key="region">Регион / область</label><input id="lf-region" name="region" type="text" /></div>
                            <div class="field">
                               <label for="lf-city"><span data-key="city">Город</span> <span class="req">*</span></label
                               ><input id="lf-city" name="city" type="text" required />
                            </div>
                            <div class="field">
-                              <label for="lf-postcode"><span data-key="postcode">Индекс</span> <span class="req">*</span></label
-                              ><input id="lf-postcode" name="postcode" type="text" required />
+                              <label for="lf-region" data-key="region">Регион / область</label>
+                              <input id="lf-region" name="region" type="text" />
+                           </div>
+                           <div class="field">
+                              <label for="lf-country"><span data-key="country">Страна</span> <span class="req">*</span></label>
+                              <input id="lf-country" name="country" type="text" autocomplete="country-name" maxlength="100" placeholder="Введите название страны" data-i18n-attrs="placeholder:input_country" required />
                            </div>
                         </div>
                      </fieldset>
@@ -1701,7 +1516,7 @@
                         <legend><span>2</span> <span data-key="contact_person">Контактное лицо</span></legend>
                         <div class="form-grid">
                            <div class="field">
-                              <label for="lf-contact-name"><span data-key="full_name">ФИО</span><span class="req">*</span></label
+                              <label for="lf-contact-name"><span data-key="full_name">ФИО</span> <span class="req">*</span></label
                               ><input id="lf-contact-name" name="contact_name" type="text" required />
                            </div>
                            <div class="field"><label for="lf-role" data-key="position">Должность</label><input id="lf-role" name="role" type="text" /></div>
@@ -1710,7 +1525,7 @@
                               ><input id="lf-email" name="email" type="email" required />
                            </div>
                            <div class="field">
-                              <label for="lf-phone"><span data-key="phone">Телефон</span> <span class="req">*</span></label
+                              <label for="lf-phone"><span data-key="phone">Телефон</span></label
                               ><input id="lf-phone" name="phone" type="tel" required />
                            </div>
                            <div class="field field-full"><label for="lf-sozialMedia" data-key="social_media">Социальные медиа</label><input id="lf-sozialMedia" name="sozialMedia" type="text" /></div>
@@ -1801,7 +1616,7 @@
          <div class="fixed-footer-copy"><span data-key="footer_copy">© 2025 Клуб Интернациональный Диалог. Все права защищены.</span><span class="fixed-footer-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> <span data-key="archive_label">архив 2026</span></span></div>
          <div class="fixed-footer-actions">
             <a href="#contact" data-nav-link data-key="nav5">Контакты</a>
-            <a href="#gallery" data-nav-link data-key="menu_gallery">Медиа</a>
+            <a href="/page/gallery/?view=photos" data-key="menu_gallery">Медиа</a>
             <div class="socials" aria-label="Social links" data-i18n-attrs="aria-label:social_links">
                <a class="social tg" href="https://t.me/ligamirokit" aria-label="Telegram"
                   ><span><i class="fa-brands fa-telegram"></i></span
@@ -1879,52 +1694,6 @@
                <span class="news-modal-counter" aria-live="polite"></span>
                <button type="button" class="news-modal-next" aria-label="Следующая новость" data-i18n-attrs="aria-label:news_next" data-key="next" data-i18n-mode="text">Далее <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
-         </div>
-      </div>
-      <div class="gallery-media-modal" id="galleryImageModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="galleryImageModalTitle">
-         <div class="gallery-media-modal-card gallery-image-modal-card">
-            <div class="gallery-media-modal-head">
-               <p id="galleryImageModalTitle" data-key="gallery_photo_modal">Просмотр фотографии</p>
-               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр фотографии" data-i18n-attrs="aria-label:close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-            </div>
-            <div class="gallery-image-stage"><img loading="lazy" src="" alt="" /></div>
-            <div class="gallery-media-modal-footer">
-               <button class="gallery-modal-prev" type="button" aria-label="Предыдущая фотография" data-i18n-attrs="aria-label:gallery_prev" data-key="previous" data-i18n-mode="text"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Назад</button>
-               <p class="gallery-image-caption" aria-live="polite"></p>
-               <button class="gallery-modal-next" type="button" aria-label="Следующая фотография" data-i18n-attrs="aria-label:gallery_next" data-key="next" data-i18n-mode="text">Далее <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
-            </div>
-         </div>
-      </div>
-      <div class="gallery-media-modal" id="galleryVideoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="galleryVideoModalTitle">
-         <div class="gallery-media-modal-card gallery-video-modal-card">
-            <div class="gallery-media-modal-head">
-               <p id="galleryVideoModalTitle" data-key="gallery_video_modal">Просмотр видео</p>
-               <button class="gallery-modal-close" type="button" aria-label="Закрыть просмотр видео" data-i18n-attrs="aria-label:close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-            </div>
-            <div class="gallery-video-player-shell" id="galleryVideoPlayerShell" hidden>
-               <div class="gallery-video-stage" id="galleryVideoStage">
-                  <video class="gallery-modal-video" controls controlslist="nodownload" preload="metadata" aria-describedby="galleryVideoModalNote"></video>
-                  <iframe class="gallery-modal-youtube" title="YouTube video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen hidden></iframe>
-                  <span class="gallery-video-stage-feedback" id="galleryVideoStageFeedback" aria-hidden="true"></span>
-               </div>
-               <div class="gallery-video-controls" id="galleryVideoControls" hidden aria-label="Video-Steuerung">
-                  <button type="button" data-video-control="play" aria-label="Abspielen / pausieren"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
-                  <span data-video-control="time">00:00 / 00:00</span>
-                  <span class="gallery-video-seek" id="galleryVideoSeekWrap"><input data-video-control="seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Video-Position" /></span>
-                  <button type="button" data-video-control="mute" aria-label="Ton an oder aus"><i class="fa-solid fa-volume-high" aria-hidden="true"></i></button>
-                  <span class="gallery-video-volume-control"><input id="galleryVideoVolume" data-video-control="volume" type="range" min="0" max="1" value="1" step="0.05" aria-label="Lautstärke" /><output data-video-control="volume-percent" for="galleryVideoVolume">100%</output></span>
-                  <button class="gallery-video-captions-toggle" type="button" data-video-control="captions" aria-label="Untertitel ein oder aus" aria-pressed="false"><span aria-hidden="true">CC</span></button>
-                  <button type="button" data-video-control="settings" aria-label="Untertitel-Einstellungen" aria-expanded="false" aria-controls="galleryVideoSettings"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
-                  <button type="button" data-video-control="fullscreen" aria-label="Vollbild"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
-               </div>
-               <div class="gallery-video-settings" id="galleryVideoSettings" hidden role="dialog" aria-label="Untertitel-Einstellungen">
-                  <strong>Untertitel</strong>
-                  <label for="galleryVideoTrack">Sprache</label>
-                  <select id="galleryVideoTrack" data-video-control="track" aria-label="Untertitelsprache"><option value="">Untertitel aus</option></select>
-               </div>
-            </div>
-            <p class="gallery-video-modal-meta" id="galleryVideoModalMeta"></p>
-            <p class="gallery-video-modal-note" id="galleryVideoModalNote" data-key="gallery_video_note">Für dieses Video ist noch keine direkte Datei hinterlegt.</p>
          </div>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>

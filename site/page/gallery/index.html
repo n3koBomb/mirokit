@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Explore photos, films and shared moments from the international MIRoKIT community." />
+  <title>Gallery — MIRoKIT</title>
+  <link rel="canonical" href="https://mirokit.com/page/gallery/" />
+  <link rel="icon" href="/public/favicon/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/source/style/style.css" />
+  <link rel="stylesheet" href="gallery.css" />
+</head>
+<body class="gallery-page">
+  <a class="ga-skip" href="#galleryLibrary" data-key="ga_skip">Skip to the collection</a>
+  <header class="ga-header">
+    <a class="ga-brand" href="/#gallery" data-i18n-attrs="aria-label:op_library_home"><img src="/public/assets/brand/miroKit_logo_full-1.png" alt="MIRoKIT" width="144" height="48" /></a>
+    <a class="ga-home" href="/#gallery"><span aria-hidden="true">↖</span> <span data-key="op_library_home">Back to home</span></a>
+    <div class="ga-actions">
+      <button class="ga-theme" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span></button>
+      <label class="sr-only" for="galleryLanguage" data-key="language_label">Language</label>
+      <select id="galleryLanguage" data-lang-select data-i18n-attrs="aria-label:language_selector"><option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option></select>
+    </div>
+  </header>
+  <main class="ga-main">
+    <section id="galleryLibrary" class="ga-library" aria-labelledby="galleryCollectionTitle" tabindex="-1">
+      <div class="ga-heading"><div><span class="ga-kicker" data-key="ga_collection">Our shared archive</span><h2 id="galleryCollectionTitle" data-key="ga_discover">Find your next favourite moment</h2></div><a href="/page/onlineProjects/" data-key="ga_projects">Explore creative works ↗</a></div>
+      <div class="ga-toolbar">
+        <nav class="ga-tabs" data-i18n-attrs="aria-label:media_navigator">
+          <a href="?view=photos" data-view="photos" aria-current="page"><span aria-hidden="true">▧</span><span data-key="ga_photos">Photos</span></a>
+          <a href="?view=video" data-view="video"><span aria-hidden="true">▷</span><span data-key="ga_videos">Videos</span></a>
+        </nav>
+        <div class="ga-search-wrap"><label class="ga-search"><span aria-hidden="true">⌕</span><span class="sr-only" data-key="ga_search">Search the collection</span><input id="gallerySearch" type="search" maxlength="200" aria-autocomplete="list" aria-controls="gallerySuggestions" aria-expanded="false" data-i18n-attrs="placeholder:ga_search" placeholder="Search the collection" /></label><div class="ga-search-suggestions" id="gallerySuggestions" role="listbox" hidden></div></div>
+        <label class="ga-sort"><span class="sr-only" data-key="ga_sort">Sort by</span><select id="gallerySort"><option value="featured" data-key="ga_featured">Featured first</option><option value="newest" data-key="ga_newest">Newest first</option><option value="title" data-key="ga_az">Title A–Z</option></select></label>
+      </div>
+      <div class="ga-results"><p id="galleryCount" role="status" aria-live="polite"></p><button id="galleryClear" type="button" data-key="ga_clear" hidden>Clear search</button></div>
+      <div class="ga-status" id="galleryStatus" role="status" hidden><p id="galleryStatusText"></p><button type="button" id="galleryRetry" data-key="op_library_retry" hidden>Try again</button></div>
+      <div class="ga-grid" id="galleryGrid" aria-busy="true"></div>
+      <button class="ga-more" id="galleryMore" type="button" data-key="ga_more" hidden>Show more</button>
+      <blockquote class="ga-quote" id="galleryQuote"><span aria-hidden="true">“</span><div><p id="galleryQuoteText" data-key="gallery_quote">One frame can bring together people who did not know each other’s language yesterday.</p><cite id="galleryQuoteBy" data-key="gallery_quote_by">MIRoKIT — international dialogue</cite></div><span class="ga-quote-mark" aria-hidden="true">✳</span></blockquote>
+      <noscript><p>Enable JavaScript to browse the gallery. / Bitte JavaScript aktivieren. / Включите JavaScript для просмотра галереи.</p></noscript>
+    </section>
+    <footer class="ga-footer"><div><span class="ga-kicker">MIRoKIT / TOGETHER</span><h2 data-key="ga_contribute">Every perspective adds to our story.</h2></div><a class="ga-explore" href="/#contact"><span data-key="suggest_material">Suggest material</span><span aria-hidden="true">↗</span></a></footer>
+  </main>
+  <dialog class="ga-dialog" id="galleryViewer" aria-labelledby="galleryViewerTitle">
+    <div class="ga-viewer-top"><span id="galleryViewerCount" aria-live="polite"></span><button id="galleryClose" type="button" autofocus data-i18n-attrs="aria-label:gallery_close">✕</button></div>
+    <div class="ga-stage" id="galleryStage"></div>
+    <p class="ga-media-error" id="galleryMediaError" role="status" data-key="ga_media_error" hidden>This media could not be loaded. Please try opening the original.</p>
+    <div class="ga-viewer-footer"><div class="ga-viewer-copy"><h2 id="galleryViewerTitle"></h2><p id="galleryViewerDescription"></p><p class="ga-viewer-meta" id="galleryViewerMeta" hidden></p><blockquote id="galleryViewerQuote" hidden></blockquote></div><div class="ga-viewer-controls"><button id="galleryPrevious" type="button" data-i18n-attrs="aria-label:previous">←</button><button id="galleryNext" type="button" data-i18n-attrs="aria-label:next">→</button><a id="galleryOriginal" target="_blank" rel="noopener noreferrer" data-key="op_library_original">Open original</a></div></div>
+  </dialog>
+  <script src="/source/scripts/language.js"></script>
+  <script type="module" src="gallery.js"></script>
+</body>
+</html>

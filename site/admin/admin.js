@@ -1,3 +1,6 @@
+import { createAdminMediaPreview } from "./media-preview.js";
+import { ONLINE_PROJECT_TOPICS, isOnlineProjectTopic } from "../source/scripts/online-project-topics.js";
+
 const LANGUAGES = ["ru", "en", "de"];
 const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 let localAdminToken = sessionStorage.getItem("mirokitNewsAdminToken") || "";
@@ -7,13 +10,16 @@ let galleryQuotes = [];
 let worldPoints = [];
 let partners = [];
 let videos = [];
+let projects = [];
 let editingId = null;
 let editingWorldPointId = null;
 let editingPartnerId = null;
 let editingVideoId = null;
+let editingProjectId = null;
 let videoSubtitleState = [];
 let activeVideoSubtitleIndex = -1;
 let videoCueState = [];
+let videoPreviewVersion = 0;
 
 const form = document.getElementById("newsForm");
 const notice = document.getElementById("notice");
@@ -28,6 +34,15 @@ const galleryForm = document.getElementById("galleryForm");
 const galleryFile = document.getElementById("galleryFile");
 const gallerySourceUrl = document.getElementById("gallerySourceUrl");
 const galleryList = document.getElementById("galleryList");
+const galleryCollection = document.getElementById("galleryCollection");
+const galleryTopic = document.getElementById("galleryTopic");
+const galleryTopicFilter = document.getElementById("galleryTopicFilter");
+const galleryPublishButton = document.getElementById("galleryPublishButton");
+const onlineProjectLibraryLink = document.getElementById("onlineProjectLibraryLink");
+for (const topic of ONLINE_PROJECT_TOPICS) {
+	galleryTopic.add(new Option(topic.label, topic.id));
+	galleryTopicFilter.add(new Option(topic.label, topic.id));
+}
 const quoteForm = document.getElementById("quoteForm");
 const galleryQuoteList = document.getElementById("galleryQuoteList");
 const worldPointForm = document.getElementById("worldPointForm");
@@ -42,6 +57,9 @@ const videoSubtitleRows = document.getElementById("videoSubtitleRows");
 const videoCueEditor = document.getElementById("videoCueEditor");
 const videoFile = document.getElementById("videoFile");
 const videoPosterFile = document.getElementById("videoPosterFile");
+const projectForm = document.getElementById("projectForm");
+const projectsList = document.getElementById("projectsList");
+const projectFile = document.getElementById("projectFile");
 const newNewsButton = document.getElementById("newNews");
 const adminTabs = [...document.querySelectorAll("[data-admin-tab]")];
 const adminViews = [...document.querySelectorAll("[data-admin-view]")];
@@ -54,15 +72,40 @@ const confirmDeleteButton = document.getElementById("confirmDelete");
 let pendingDeletion = null;
 
 function setAdminView(viewKey) {
-	const selectedView = adminViews.some((view) => view.dataset.adminView === viewKey) ? viewKey : "news";
-	adminViews.forEach((view) => { view.hidden = view.dataset.adminView !== selectedView; });
+	const selectedView = viewKey === "online-projects" || adminViews.some((view) => view.dataset.adminView === viewKey) ? viewKey : "news";
+	const panelKey = selectedView === "online-projects" ? "gallery" : selectedView;
+	adminViews.forEach((view) => { view.hidden = view.dataset.adminView !== panelKey; });
 	adminTabs.forEach((tab) => {
 		const isActive = tab.dataset.adminTab === selectedView;
 		tab.classList.toggle("is-active", isActive);
 		tab.setAttribute("aria-selected", String(isActive));
 	});
 	newNewsButton.hidden = selectedView !== "news";
+	if (panelKey === "gallery") configureGalleryView(selectedView === "online-projects");
 }
+
+function configureGalleryView(isOnline) {
+	galleryCollection.value = isOnline ? "online-projects" : "gallery";
+	galleryTopic.required = isOnline;
+	galleryTopic.disabled = !isOnline;
+	for (const id of ["onlineProjectSteps", "onlineProjectDestination", "onlineProjectListControls"]) document.getElementById(id).hidden = !isOnline;
+	document.getElementById("galleryQuotesSection").hidden = isOnline;
+	document.getElementById("galleryPanelEyebrow").textContent = isOnline ? "10 THEMEN · BILDERBIBLIOTHEKEN" : "MEDIENARCHIV";
+	document.getElementById("galleryPanelTitle").textContent = isOnline ? "Online-Projekte" : "Gallery-Bilder";
+	document.getElementById("galleryIntroTitle").textContent = isOnline ? "So landet dein Bild im richtigen Thema" : "Bilder für die öffentliche Galerie";
+	document.getElementById("galleryIntroText").textContent = isOnline ? "Hier verwaltest du die Bilder hinter den zehn Online-Projekte-Buttons. Jede Bibliothek sammelt die Arbeiten zu einem Thema." : "Wähle ein Bild aus, ergänze die Texte und veröffentliche es in der Galerie.";
+	document.getElementById("adminViewGallery").setAttribute("aria-labelledby", isOnline ? "onlineProjectsTab" : "galleryTab");
+	updateGalleryDestination();
+	renderGalleryList();
+}
+
+function updateGalleryDestination() {
+	const topic = ONLINE_PROJECT_TOPICS.find((item) => item.id === galleryTopic.value);
+	onlineProjectLibraryLink.href = `/page/onlineProjects/index.html?lang=de${topic ? `&topic=${topic.id}` : ""}`;
+	galleryPublishButton.textContent = galleryCollection.value === "online-projects" && topic ? `In „${topic.label}“ veröffentlichen` : "Bild veröffentlichen";
+}
+galleryTopic.addEventListener("change", updateGalleryDestination);
+galleryTopicFilter.addEventListener("change", renderGalleryList);
 
 function showNotice(message, error = false) {
 	notice.textContent = message;
@@ -72,7 +115,7 @@ function showNotice(message, error = false) {
 
 const localizedAdminFields = new Set(["title", "alt", "summary", "content", "description", "name", "city", "country"]);
 const adminFieldIds = {
-	id: ["newsId", "videoId", "worldPointId", "partnerId"],
+	id: ["newsId", "videoId", "worldPointId", "partnerId", "projectId"],
 	sourceUrl: ["videoSourceUrl"],
 	sourceType: ["videoSourceType"],
 	poster: ["videoPoster"],
@@ -80,8 +123,12 @@ const adminFieldIds = {
 	width: ["videoWidth"],
 	height: ["videoHeight"],
 	sortOrder: ["videoSortOrder", "worldSortOrder", "partnerSortOrder"],
-	image: ["image", "galleryImage", "partnerImage"],
+	image: ["image", "galleryImage", "partnerImage", "projectImage"],
 	category: ["category", "partnerCategory"],
+	startDate: ["projectStartDate"],
+	endDate: ["projectEndDate"],
+	accent: ["accent", "projectAccent"],
+	topic: ["galleryTopic"],
 	website: ["partnerWebsite"],
 	latitude: ["worldLatitude"],
 	longitude: ["worldLongitude"],
@@ -100,14 +147,14 @@ function focusAdminErrorField(message) {
 	if (localizedMatch && localizedAdminFields.has(localizedMatch[1].toLowerCase())) {
 		const name = localizedMatch[1].toLowerCase();
 		const language = localizedMatch[2].toLowerCase();
-		const selector = `[data-language="${language}"][data-field="${name}"], [data-video-language="${language}"][data-video-field="${name}"], [data-world-language="${language}"][data-world-field="${name}"], [data-partner-language="${language}"][data-partner-field="${name}"]`;
+		const selector = `[data-language="${language}"][data-field="${name}"], [data-video-language="${language}"][data-video-field="${name}"], [data-world-language="${language}"][data-world-field="${name}"], [data-partner-language="${language}"][data-partner-field="${name}"], [data-project-language="${language}"][data-project-field="${name}"]`;
 		field = visibleAdminField([...document.querySelectorAll(selector)]);
 	}
 	if (!field) {
 		const languageMatch = text.match(/\b(?:translation|translations)\s+for\s+(ru|en|de)\b/i);
 		if (languageMatch) {
 			const language = languageMatch[1].toLowerCase();
-			field = visibleAdminField([...document.querySelectorAll(`[data-language="${language}"], [data-video-language="${language}"], [data-world-language="${language}"], [data-partner-language="${language}"]`)]);
+			field = visibleAdminField([...document.querySelectorAll(`[data-language="${language}"], [data-video-language="${language}"], [data-world-language="${language}"], [data-partner-language="${language}"], [data-project-language="${language}"]`)]);
 		}
 	}
 	if (!field) {
@@ -137,7 +184,7 @@ function isDeleteConfirmation(value) {
 
 function requestDeletion(target) {
 	pendingDeletion = target;
-	deleteDialogTitle.textContent = target.kind === "news" ? "News entfernen?" : target.kind === "gallery" ? "Gallery-Bild löschen?" : target.kind === "quote" ? "Gallery-Zitat entfernen?" : target.kind === "world" ? "World Point archivieren?" : target.kind === "video" ? "Video archivieren?" : "Partner archivieren?";
+	deleteDialogTitle.textContent = target.kind === "news" ? "News entfernen?" : target.kind === "gallery" ? "Gallery-Bild löschen?" : target.kind === "quote" ? "Gallery-Zitat entfernen?" : target.kind === "world" ? "World Point archivieren?" : target.kind === "video" ? "Video archivieren?" : target.kind === "project" ? "Projekt archivieren?" : "Partner archivieren?";
 	deleteDialogMessage.textContent = target.kind === "news"
 		? "Die News wird aus der öffentlichen Veröffentlichung entfernt."
 		: target.kind === "gallery"
@@ -146,6 +193,8 @@ function requestDeletion(target) {
 				? "Das Zitat wird aus der öffentlichen Gallery entfernt."
 			: target.kind === "video"
 				? "Das Video wird archiviert und ist danach nicht mehr öffentlich sichtbar."
+			: target.kind === "project"
+				? "Das Projekt wird archiviert und ist danach nicht mehr öffentlich sichtbar."
 				: "Der Inhalt wird archiviert und ist danach nicht mehr öffentlich sichtbar.";
 	deleteConfirmation.value = "";
 	confirmDeleteButton.disabled = true;
@@ -183,6 +232,11 @@ async function executeDeletion(target) {
 			await loadVideos();
 			clearVideoForm();
 			showNotice("Video archiviert.");
+		} else if (target.kind === "project") {
+			await api(`/api/v1/admin/projects/${encodeURIComponent(target.id)}`, { method: "DELETE" });
+			await loadProjects();
+			clearProjectForm();
+			showNotice("Projekt archiviert.");
 		}
 	} catch (error) {
 		showNotice(error.message, true);
@@ -212,10 +266,9 @@ async function api(path, options = {}) {
 	return body;
 }
 
-// Stored static image paths are relative to the public site, not /admin/.
-function resolveMediaUrl(value) {
-	return new URL(value || "", `${window.location.origin}/`).href;
-}
+const { fetchAdminMedia, setMediaPreview } = createAdminMediaPreview({
+	origin: window.location.origin, isLocal, getLocalToken, showNotice,
+});
 
 function escapeHtml(value) {
 	return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
@@ -301,6 +354,21 @@ function clearVideoForm() {
 	videoPreview.hidden = true;
 	videoCueEditor.hidden = true;
 	renderVideoSubtitleRows();
+}
+
+function clearProjectForm() {
+	editingProjectId = null;
+	projectForm.reset();
+	document.getElementById("projectId").disabled = false;
+	document.getElementById("projectHeading").textContent = "Neues Projekt";
+	document.getElementById("projectStatus").textContent = "Entwurf";
+	document.getElementById("archiveProject").hidden = true;
+	document.getElementById("projectCategory").value = "creative";
+	document.getElementById("projectAccent").value = "blue";
+	document.getElementById("projectSortOrder").value = "0";
+	const today = new Date().toISOString().slice(0, 10);
+	document.getElementById("projectStartDate").value = today;
+	renderProjects();
 }
 
 function parseVttTime(value) {
@@ -408,7 +476,7 @@ async function populateVideo(item) {
 	await Promise.all(videoSubtitleState.map(async (subtitle, index) => {
 		if (!subtitle.src) return;
 		try {
-			const response = await fetch(resolveMediaUrl(subtitle.src), { cache: "no-store" });
+			const response = await fetchAdminMedia(subtitle.src);
 			if (response.ok) videoSubtitleState[index].content = await response.text();
 		} catch { /* keep subtitle metadata available even when the file is offline */ }
 	}));
@@ -437,17 +505,22 @@ function videoPayload() {
 	};
 }
 
-function setVideoPreview() {
+async function setVideoPreview() {
+	const version = ++videoPreviewVersion;
 	const sourceType = document.getElementById("videoSourceType").value;
 	const source = document.getElementById("videoSourceUrl").value.trim();
 	if (sourceType === "youtube" || !source) {
 		videoPreview.pause();
-		videoPreview.removeAttribute("src");
+		setMediaPreview(videoPreview, "src", "");
+		setMediaPreview(videoPreview, "poster", "");
 		videoPreview.hidden = true;
 		return;
 	}
-	videoPreview.src = resolveMediaUrl(source);
-	videoPreview.poster = resolveMediaUrl(document.getElementById("videoPoster").value.trim());
+	await Promise.all([
+		setMediaPreview(videoPreview, "src", source),
+		setMediaPreview(videoPreview, "poster", document.getElementById("videoPoster").value.trim()),
+	]);
+	if (version !== videoPreviewVersion) return;
 	videoPreview.hidden = false;
 	videoPreview.load();
 }
@@ -472,6 +545,30 @@ function populateWorldPoint(item) {
 	document.getElementById("worldPointStatus").textContent = item.status === "published" ? "Veröffentlicht" : item.status === "archived" ? "Archiviert" : "Entwurf";
 	document.getElementById("archiveWorldPoint").hidden = item.status === "archived";
 	renderWorldPoints();
+}
+
+function populateProject(item) {
+	editingProjectId = item.id;
+	document.getElementById("projectId").value = item.id;
+	document.getElementById("projectId").disabled = true;
+	document.getElementById("projectStartDate").value = item.startDate || "";
+	document.getElementById("projectEndDate").value = item.endDate || "";
+	document.getElementById("projectCategory").value = item.category || "creative";
+	document.getElementById("projectAccent").value = item.accent || "blue";
+	document.getElementById("projectImage").value = item.image || "";
+	document.getElementById("projectLinkUrl").value = item.linkUrl || "";
+	document.getElementById("projectFeatured").checked = Boolean(item.featured);
+	document.getElementById("projectSortOrder").value = item.sortOrder || 0;
+	for (const language of LANGUAGES) {
+		const translation = item.translations?.[language] || {};
+		projectField(language, "title").value = translation.title || "";
+		projectField(language, "alt").value = translation.alt || "";
+		projectField(language, "description").value = translation.description || "";
+	}
+	document.getElementById("projectHeading").textContent = item.id;
+	document.getElementById("projectStatus").textContent = item.status === "published" ? "Veröffentlicht" : item.status === "archived" ? "Archiviert" : "Entwurf";
+	document.getElementById("archiveProject").hidden = item.status === "archived";
+	renderProjects();
 }
 
 function populatePartner(item) {
@@ -524,6 +621,29 @@ function partnerPayload() {
 			name: partnerField(language, "name").value.trim(),
 			alt: partnerField(language, "alt").value.trim(),
 			description: partnerField(language, "description").value.trim(),
+		}])),
+	};
+}
+
+function projectField(language, name) {
+	return projectForm.querySelector(`[data-project-language="${language}"][data-project-field="${name}"]`);
+}
+
+function projectPayload() {
+	return {
+		id: document.getElementById("projectId").value.trim(),
+		startDate: document.getElementById("projectStartDate").value,
+		endDate: document.getElementById("projectEndDate").value || null,
+		category: document.getElementById("projectCategory").value,
+		accent: document.getElementById("projectAccent").value,
+		image: document.getElementById("projectImage").value.trim(),
+		linkUrl: document.getElementById("projectLinkUrl").value.trim(),
+		featured: document.getElementById("projectFeatured").checked,
+		sortOrder: Number(document.getElementById("projectSortOrder").value || 0),
+		translations: Object.fromEntries(LANGUAGES.map((language) => [language, {
+			title: projectField(language, "title").value.trim(),
+			alt: projectField(language, "alt").value.trim(),
+			description: projectField(language, "description").value.trim(),
 		}])),
 	};
 }
@@ -645,6 +765,14 @@ async function loadVideos(selectId = editingVideoId) {
 	if (selected) await populateVideo(selected);
 }
 
+async function loadProjects(selectId = editingProjectId) {
+	const response = await api("/api/v1/admin/projects");
+	projects = response.projects || [];
+	renderProjects();
+	const selected = projects.find((item) => item.id === selectId);
+	if (selected) populateProject(selected);
+}
+
 function formatVideoDuration(value) {
 	if (value === null || value === undefined || !Number.isFinite(Number(value))) return "Dauer unbekannt";
 	const total = Math.max(0, Math.round(Number(value)));
@@ -659,6 +787,18 @@ function renderVideos() {
 	videosList.innerHTML = videos.map((item) => {
 		const translation = item.translations?.de || item.translations?.en || item.translations?.ru || {};
 		return `<article class="news-item${item.id === editingVideoId ? " active" : ""}"><button class="news-item-select" type="button" data-video-id="${escapeHtml(item.id)}"><strong>${escapeHtml(translation.title || item.id)}</strong><span>${escapeHtml(item.sourceType)} · ${formatVideoDuration(item.durationSeconds)} · ${escapeHtml(item.status)}</span></button>${item.status !== "archived" ? `<button class="button button-danger button-remove" type="button" data-video-delete-id="${escapeHtml(item.id)}">Archivieren</button>` : ""}</article>`;
+	}).join("");
+}
+
+function renderProjects() {
+	if (!projects.length) {
+		projectsList.innerHTML = '<p class="muted">Noch keine Projekte vorhanden. Lege zuerst einen Entwurf an.</p>';
+		return;
+	}
+	projectsList.innerHTML = projects.map((item) => {
+		const translation = item.translations?.de || item.translations?.en || item.translations?.ru || {};
+		const phase = item.phase === "past" ? "Past" : item.phase === "upcoming" ? "Upcoming" : "Current";
+		return `<article class="news-item${item.id === editingProjectId ? " active" : ""}"><button class="news-item-select" type="button" data-project-id="${escapeHtml(item.id)}"><strong>${escapeHtml(translation.title || item.id)}</strong><span>${escapeHtml(phase)} · ${escapeHtml(item.status)} · ${escapeHtml(item.startDate)}${item.endDate ? ` – ${escapeHtml(item.endDate)}` : ""}</span></button>${item.status !== "archived" ? `<button class="button button-danger button-remove" type="button" data-project-delete-id="${escapeHtml(item.id)}">Archivieren</button>` : ""}</article>`;
 	}).join("");
 }
 
@@ -685,17 +825,25 @@ function renderPartners() {
 }
 
 function renderGalleryList() {
-	if (!galleryItems.length) {
-		galleryList.innerHTML = '<p class="muted">Noch keine Gallery-Bilder vorhanden.</p>';
+	galleryList.querySelectorAll("img").forEach((element) => setMediaPreview(element, "src", ""));
+	const isOnline = galleryCollection.value === "online-projects";
+	const selectedTopic = galleryTopicFilter.value;
+	const visibleItems = galleryItems.filter((item) => (item.collection || "gallery") === galleryCollection.value)
+		.filter((item) => !isOnline || selectedTopic === "all" || (selectedTopic === "unassigned" ? !isOnlineProjectTopic(item.topic) : item.topic === selectedTopic));
+	if (!visibleItems.length) {
+		galleryList.innerHTML = `<p class="muted">${isOnline ? "In dieser Auswahl gibt es noch keine Bilder. Wähle oben ein Thema und veröffentliche das erste Bild." : "Noch keine Gallery-Bilder vorhanden."}</p>`;
 		return;
 	}
 
-	galleryList.innerHTML = galleryItems.map((item) => {
+	galleryList.innerHTML = visibleItems.map((item, index) => {
 		const title = item.title?.de || item.title?.en || item.title?.ru || item.key;
 		const alt = item.alt?.de || item.alt?.en || item.alt?.ru || "";
 		const subtitle = item.subtitle?.de || item.subtitle?.en || item.subtitle?.ru || "";
-		return `<article class="gallery-admin-item"><img loading="lazy" src="${escapeHtml(resolveMediaUrl(item.image))}" alt="${escapeHtml(alt)}" /><div class="gallery-admin-copy"><strong>${escapeHtml(title)}</strong>${subtitle ? `<span>${escapeHtml(subtitle)}</span>` : ""}<span>${item.collection === "online-projects" ? "Online-Projekte · " : ""}${item.sourceType === "drive" ? "Google Drive · " : ""}${item.featured ? "Hervorgehoben · " : ""}${escapeHtml(item.status)}</span><button class="button button-danger button-remove" type="button" data-gallery-delete-key="${escapeHtml(item.key)}">Bild löschen</button></div></article>`;
+		const topicName = ONLINE_PROJECT_TOPICS.find((topic) => topic.id === item.topic)?.label || "Noch ohne Thema";
+		const topicEditor = isOnline ? `<div class="gallery-topic-edit"><label for="galleryItemTopic${index}">Thema ändern</label><select id="galleryItemTopic${index}" data-gallery-item-topic><option value="">Bitte zuordnen</option>${ONLINE_PROJECT_TOPICS.map((topic) => `<option value="${topic.id}"${topic.id === item.topic ? " selected" : ""}>${escapeHtml(topic.label)}</option>`).join("")}</select><button class="button button-small" type="button" data-gallery-topic-key="${escapeHtml(item.key)}">Thema speichern</button></div>` : "";
+		return `<article class="gallery-admin-item"><img loading="lazy" data-media-url="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" /><div class="gallery-admin-copy"><strong>${escapeHtml(title)}</strong>${subtitle ? `<span>${escapeHtml(subtitle)}</span>` : ""}<span>${isOnline ? `${escapeHtml(topicName)} · ` : ""}${item.sourceType === "drive" ? "Google Drive · " : ""}${item.featured ? "Hervorgehoben · " : ""}${escapeHtml(item.status)}</span>${topicEditor}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${escapeHtml(item.key)}">Bild löschen</button></div></article>`;
 	}).join("");
+	galleryList.querySelectorAll("img[data-media-url]").forEach((element) => setMediaPreview(element, "src", element.dataset.mediaUrl));
 }
 
 function renderQuoteList() {
@@ -730,7 +878,20 @@ newsList.addEventListener("click", (event) => {
 	if (item) { populateForm(item); renderList(); }
 });
 
-galleryList.addEventListener("click", (event) => {
+galleryList.addEventListener("click", async (event) => {
+	const saveTopic = event.target.closest("[data-gallery-topic-key]");
+	if (saveTopic) {
+		const select = saveTopic.closest(".gallery-topic-edit").querySelector("select");
+		if (!isOnlineProjectTopic(select.value)) { showNotice("Bitte am Bild ein Thema auswählen.", true); select.focus(); return; }
+		saveTopic.disabled = true;
+		try {
+			await api(`/api/v1/admin/gallery/${encodeURIComponent(saveTopic.dataset.galleryTopicKey)}`, { method: "PATCH", body: JSON.stringify({ topic: select.value }) });
+			await loadGallery();
+			showNotice("Thema gespeichert. Das Bild ist jetzt der gewählten Bibliothek zugeordnet.");
+		} catch (error) { showNotice(error.message, true); }
+		finally { saveTopic.disabled = false; }
+		return;
+	}
 	const deleteButton = event.target.closest("[data-gallery-delete-key]");
 	if (deleteButton) requestDeletion({ kind: "gallery", key: deleteButton.dataset.galleryDeleteKey });
 });
@@ -773,6 +934,17 @@ videosList.addEventListener("click", (event) => {
 	if (item) populateVideo(item).then(renderVideos);
 });
 
+projectsList.addEventListener("click", (event) => {
+	const deleteButton = event.target.closest("[data-project-delete-id]");
+	if (deleteButton) {
+		requestDeletion({ kind: "project", id: deleteButton.dataset.projectDeleteId });
+		return;
+	}
+	const button = event.target.closest("[data-project-id]");
+	const item = projects.find((candidate) => candidate.id === button?.dataset.projectId);
+	if (item) populateProject(item);
+});
+
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
 	if (!form.reportValidity()) return;
@@ -810,6 +982,7 @@ imageFile.addEventListener("change", async () => {
 
 galleryForm.addEventListener("submit", async (event) => {
 	event.preventDefault();
+	if (galleryPublishButton.disabled) return;
 	if (!galleryForm.reportValidity()) return;
 	const file = galleryFile.files?.[0];
 	const sourceUrl = gallerySourceUrl.value.trim();
@@ -827,7 +1000,10 @@ galleryForm.addEventListener("submit", async (event) => {
 	const body = new FormData();
 	if (file) body.append("file", file);
 	if (sourceUrl) body.append("source_url", sourceUrl);
-	body.append("collection", document.getElementById("galleryCollection").value);
+	const collection = galleryCollection.value;
+	const topic = galleryTopic.value;
+	body.append("collection", collection);
+	if (collection === "online-projects") body.append("topic", topic);
 	for (const language of LANGUAGES) {
 		body.append(`title_${language}`, galleryField(language, "title").value.trim());
 		body.append(`alt_${language}`, galleryField(language, "alt").value.trim());
@@ -836,12 +1012,21 @@ galleryForm.addEventListener("submit", async (event) => {
 	if (document.getElementById("galleryFeatured").checked) body.append("featured", "true");
 
 	try {
-		showNotice("Gallery-Bild wird hochgeladen …");
+		galleryPublishButton.disabled = true;
+		showNotice("Bild wird hochgeladen und veröffentlicht …");
 		await api("/api/v1/admin/gallery", { method: "POST", body });
+		// A completed upload must not undo a library/tab change made while waiting.
+		const currentCollection = galleryCollection.value;
+		const currentTopic = galleryTopic.value;
 		galleryForm.reset();
+		galleryCollection.value = currentCollection;
+		galleryTopic.value = currentTopic;
+		if (currentCollection === collection && currentTopic === topic && collection === "online-projects") galleryTopicFilter.value = topic;
+		updateGalleryDestination();
 		await loadGallery();
-		showNotice("Gallery-Bild veröffentlicht.");
+		showNotice(collection === "online-projects" ? "Bild veröffentlicht. Über „Bibliothek öffnen“ kannst du es im gewählten Thema ansehen." : "Gallery-Bild veröffentlicht.");
 	} catch (error) { showNotice(error.message, true); }
+	finally { galleryPublishButton.disabled = false; }
 });
 
 quoteForm.addEventListener("submit", async (event) => {
@@ -918,6 +1103,34 @@ videoForm.addEventListener("submit", async (event) => {
 		editingVideoId = response.video.id;
 		await loadVideos(editingVideoId);
 		showNotice("Video als Entwurf gespeichert.");
+	} catch (error) { showNotice(error.message, true); }
+});
+
+projectForm.addEventListener("submit", async (event) => {
+	event.preventDefault();
+	if (!projectForm.reportValidity()) return;
+	try {
+		const payload = projectPayload();
+		const response = await api(editingProjectId ? `/api/v1/admin/projects/${encodeURIComponent(editingProjectId)}` : "/api/v1/admin/projects", {
+			method: editingProjectId ? "PUT" : "POST",
+			body: JSON.stringify(payload),
+		});
+		editingProjectId = response.project.id;
+		await loadProjects(editingProjectId);
+		showNotice("Projekt als Entwurf gespeichert.");
+	} catch (error) { showNotice(error.message, true); }
+});
+
+projectFile.addEventListener("change", async () => {
+	const file = projectFile.files?.[0];
+	if (!file) return;
+	const body = new FormData();
+	body.append("file", file);
+	try {
+		showNotice("Projektbild wird nach R2 hochgeladen …");
+		const response = await api("/api/v1/admin/projects/media", { method: "POST", body });
+		document.getElementById("projectImage").value = response.image;
+		showNotice("Projektbild hochgeladen. Jetzt Metadaten speichern.");
 	} catch (error) { showNotice(error.message, true); }
 });
 
@@ -1096,15 +1309,31 @@ document.getElementById("publishVideo").addEventListener("click", async () => {
 	} catch (error) { showNotice(error.message, true); }
 });
 document.getElementById("archiveVideo").addEventListener("click", () => { if (editingVideoId) requestDeletion({ kind: "video", id: editingVideoId }); });
+document.getElementById("newProject").addEventListener("click", clearProjectForm);
+document.getElementById("reloadProjects").addEventListener("click", () => loadProjects().catch((error) => showNotice(error.message, true)));
+document.getElementById("publishProject").addEventListener("click", async () => {
+	try {
+		if (!projectForm.reportValidity()) return;
+		const payload = projectPayload();
+		const response = await api(editingProjectId ? `/api/v1/admin/projects/${encodeURIComponent(editingProjectId)}` : "/api/v1/admin/projects", { method: editingProjectId ? "PUT" : "POST", body: JSON.stringify(payload) });
+		editingProjectId = response.project.id;
+		await api(`/api/v1/admin/projects/${encodeURIComponent(editingProjectId)}/publish`, { method: "POST" });
+		await loadProjects(editingProjectId);
+		showNotice("Projekt veröffentlicht. Das Datum steuert seine Current/Past-Ansicht automatisch.");
+	} catch (error) { showNotice(error.message, true); }
+});
+document.getElementById("archiveProject").addEventListener("click", () => { if (editingProjectId) requestDeletion({ kind: "project", id: editingProjectId }); });
 adminTabs.forEach((tab) => tab.addEventListener("click", () => setAdminView(tab.dataset.adminTab)));
 
 clearForm();
 clearWorldPointForm();
 clearPartnerForm();
 clearVideoForm();
+clearProjectForm();
 setAdminView("news");
 loadNews().catch((error) => showNotice(error.message, true));
 loadGallery().catch((error) => showNotice(error.message, true));
 loadWorldPoints().catch((error) => showNotice(error.message, true));
 loadPartners().catch((error) => showNotice(error.message, true));
 loadVideos().catch((error) => showNotice(error.message, true));
+loadProjects().catch((error) => showNotice(error.message, true));

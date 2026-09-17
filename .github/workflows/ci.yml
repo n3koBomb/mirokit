@@ -1,0 +1,55 @@
+name: MIRoKIT CI
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirokit-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mirokit-ci:
+    name: mirokit-ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WRANGLER_SEND_METRICS: "false"
+      XDG_CONFIG_HOME: /tmp/mirokit-wrangler-config
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: Check JavaScript syntax
+        run: node scripts/check-js.mjs
+      - name: Check changed lines for whitespace errors
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            git diff --check "$BASE_SHA" HEAD
+          else
+            git show --format= --check HEAD
+          fi
+          git diff --check
+      - name: Install locked Worker dependencies
+        working-directory: worker
+        run: npm ci
+      - name: Run tests
+        working-directory: worker
+        run: npm test -- --run
+      - name: Validate Worker bundle locally (no deployment)
+        working-directory: worker
+        run: npx --no-install wrangler deploy --dry-run

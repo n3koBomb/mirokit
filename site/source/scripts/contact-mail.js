@@ -213,6 +213,24 @@
       return true;
    }
 
+   function validateCountry(form) {
+      const country = form.querySelector('input[name="country"]');
+      if (!country) return true;
+
+      const valid = country.value.trim() !== "";
+      country.setCustomValidity(valid ? "" : "Bitte gib ein gültiges Land ein.");
+      return valid;
+   }
+
+   function bindCountryValidation(form) {
+      const country = form.querySelector('input[name="country"]');
+      if (!country) return;
+
+      const validate = () => validateCountry(form);
+      country.addEventListener("change", validate);
+      validate();
+   }
+
    function bindLeagueGroupValidation(form) {
       if (form.id !== "leagueForm") return;
 
@@ -321,6 +339,7 @@
       turnstileState.set(config.type, state);
 
       bindLeagueGroupValidation(form);
+      bindCountryValidation(form);
       setSecurityReady(config, false);
 
       form.addEventListener("reset", () => {
@@ -335,6 +354,7 @@
       form.addEventListener("submit", async (event) => {
          event.preventDefault();
 
+         validateCountry(form);
          if (!form.reportValidity() || !validateLeagueGroups(form)) {
             return;
          }

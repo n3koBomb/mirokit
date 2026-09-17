@@ -36,7 +36,7 @@ Use this folder layout when adding new media:
 - Section-logo variants stay in `logos/sections/`; unused copy exports belong in `archive/`.
 - Browser URLs start with `/public/assets/`. `site/` is the document root, not part of the deployed URL.
 - Favicons live in `../favicon/`; the site manifest is `../site.webmanifest`.
-- Update HTML, deferred `data-src` / `data-deferred-background` attributes and JavaScript data together when moving files.
+- Update HTML, deferred `data-src` attributes and JavaScript data together when moving files.
 - Retain old published image URLs in `site/_redirects`, since content stored outside the repository can still reference them.
 - Admin uploads are served through `/media/v1/` and are managed by the backend; do not move those into this static folder.
 - `archive/`, `uploads/`, interview transcripts and press source material are excluded by `site/.assetsignore`.

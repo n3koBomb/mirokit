@@ -6,7 +6,7 @@ const VIDEO_ASSET_PATTERN = /^\/media\/v1\/(?:videos|video-posters|subtitles)\/(
 
 const VIDEOS_PUBLIC_QUERY = `
 SELECT v.id, v.source_type, v.source_url, v.poster_url, v.duration_seconds,
-  v.width, v.height, v.featured, v.sort_order,
+  v.width, v.height, v.featured, v.sort_order, v.created_at, v.updated_at,
   t.language, t.title, t.alt, t.description,
   s.id AS subtitle_id, s.language AS subtitle_language, s.label AS subtitle_label,
   s.src_lang, s.src_url AS subtitle_url, s.sort_order AS subtitle_sort_order,
@@ -159,6 +159,8 @@ function rowsToVideos(rows) {
       grouped.set(row.id, {
         id: row.id,
         status: row.status,
+        createdAt: row.created_at || "",
+        updatedAt: row.updated_at || "",
         sourceType: row.source_type,
         sourceUrl: row.source_url,
         embedUrl: row.source_type === "youtube" ? row.source_url : "",

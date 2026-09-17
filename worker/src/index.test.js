@@ -13,6 +13,7 @@ import { authorizeAdmin } from "./access.js";
 import { normalizeNewsInput, newsToStatements, rowsToNews } from "./news.js";
 import { normalizePartnerInput, normalizeWorldPointInput, rowsToPublicPartners, rowsToPublicWorldPoints } from "./content.js";
 import { normalizeVideoInput, rowsToPublicVideos } from "./videos.js";
+import { normalizeProjectInput, projectStatements, rowsToPublicProjects } from "./projects.js";
 
 describe("contact form field contracts", () => {
 	it("keeps separate allowlists for both forms", () => {
@@ -37,6 +38,13 @@ describe("contact form field contracts", () => {
 				goals: ["goal_cooperation"],
 			})
 		).not.toThrow();
+	});
+
+	it("accepts free-text countries and rejects invalid country input", () => {
+		expect(() => validateFields("main-contact", { country: "France" })).not.toThrow();
+		expect(() => validateFields("extra-contact", { country: "Deutschland / Germany" })).not.toThrow();
+		expect(() => validateFields("main-contact", { country: "   " })).toThrow("Invalid country");
+		expect(() => validateFields("main-contact", { country: "x".repeat(101) })).toThrow("Country is too long");
 	});
 
 	it("rejects nested or repeated scalar values", () => {
@@ -174,6 +182,76 @@ describe("world points and partners content contract", () => {
 		const partner = rowsToPublicPartners([{ id: "partner", status: "published", category: "public", image_url: "/public/logo.png", website_url: "", featured: 0, sort_order: 1, language: "en", name: "Partner", alt: "Partner logo", description: "" }]);
 		expect(point[0].status).toBeUndefined();
 		expect(partner[0].status).toBeUndefined();
+	});
+});
+
+describe("projects content contract", () => {
+	const translations = {
+		ru: { title: "Проект", alt: "Проект MIRoKIT", description: "" },
+		en: { title: "Project", alt: "MIRoKIT project", description: "" },
+		de: { title: "Projekt", alt: "MIRoKIT Projekt", description: "" },
+	};
+
+	it("validates the project dates and creates one statement per language", () => {
+		const project = normalizeProjectInput({ id: "creative-lab", startDate: "2026-09-01", endDate: "2026-09-30", category: "creative", accent: "blue", image: "/media/v1/projects/lab.webp", translations }, { includeStatus: false });
+		expect(project.endDate).toBe("2026-09-30");
+		expect(projectStatements(project, "draft", "2026-09-17T00:00:00.000Z")).toHaveLength(4);
+		expect(() => normalizeProjectInput({ id: "creative-lab", startDate: "2026-09-30", endDate: "2026-09-01", translations })).toThrow("endDate must be on or after startDate");
+	});
+
+	it("derives the past phase from the end date without mutating the record", () => {
+		const projects = rowsToPublicProjects([
+			{ id: "past-project", start_date: "2026-01-01", end_date: "2026-08-31", category: "creative", accent: "blue", image_url: "", link_url: "", featured: 0, sort_order: 1, language: "en", title: "Past", alt: "Past", description: "" },
+			{ id: "current-project", start_date: "2026-09-01", end_date: null, category: "network", accent: "red", image_url: "", link_url: "", featured: 1, sort_order: 2, language: "en", title: "Current", alt: "Current", description: "" },
+		], "2026-09-17");
+		expect(projects.find((item) => item.id === "past-project").phase).toBe("past");
+		expect(projects.find((item) => item.id === "current-project").phase).toBe("current");
+		expect(projects.every((item) => item.status === undefined)).toBe(true);
+	});
+
+	it("serves published projects through the public API", async () => {
+		const database = { prepare: () => ({ all: async () => ({ results: [{ id: "live-project", start_date: "2026-09-01", end_date: null, category: "creative", accent: "blue", image_url: "", link_url: "", featured: 1, sort_order: 1, language: "en", title: "Live project", alt: "Live project", description: "" }] }) }) };
+		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/projects"), { SITE_DB: database });
+		const body = await response.json();
+		expect(response.status).toBe(200);
+		expect(body.projects[0]).toMatchObject({ id: "live-project", phase: "current" });
+	});
+
+	it("routes authenticated project admin GET and POST requests", async () => {
+		const batches = [];
+		const database = {
+			prepare: () => ({
+				all: async () => ({ results: [] }),
+				bind: (...params) => ({ sql: "project statement", params }),
+			}),
+			batch: async (statements) => batches.push(statements),
+		};
+		const getResponse = await worker.fetch(new Request("http://localhost:8787/api/v1/admin/projects", {
+			headers: { "X-MiroKIT-Admin-Token": "local-token" },
+		}), { SITE_DB: database, ADMIN_DEV_TOKEN: "local-token" });
+		const getBody = await getResponse.json();
+		expect(getResponse.status).toBe(200);
+		expect(getBody.projects).toEqual([]);
+
+		const postResponse = await worker.fetch(new Request("http://localhost:8787/api/v1/admin/projects", {
+			method: "POST",
+			headers: { "X-MiroKIT-Admin-Token": "local-token", "Content-Type": "application/json" },
+			body: JSON.stringify({
+				id: "project-route-test",
+				startDate: "2026-09-17",
+				category: "creative",
+				accent: "blue",
+				translations: {
+					ru: { title: "Проект", alt: "Проект", description: "" },
+					en: { title: "Project", alt: "Project", description: "" },
+					de: { title: "Projekt", alt: "Projekt", description: "" },
+				},
+			}),
+		}), { SITE_DB: database, ADMIN_DEV_TOKEN: "local-token" });
+		const postBody = await postResponse.json();
+		expect(postResponse.status).toBe(201);
+		expect(postBody.project).toMatchObject({ id: "project-route-test", status: "draft" });
+		expect(batches).toHaveLength(1);
 	});
 });
 

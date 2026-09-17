@@ -18,8 +18,7 @@ Daten eingebracht werden.
 Aus dem Repository-Stamm:
 
 ```bash
-node --check site/source/scripts/main.js
-node --check site/admin/admin.js
+node scripts/check-js.mjs
 git diff --check
 ```
 
@@ -29,6 +28,17 @@ Aus `worker/`:
 npm test -- --run
 XDG_CONFIG_HOME=/tmp/mirokit-wrangler-config npx wrangler deploy --dry-run
 ```
+
+Für diese Prüfungen Node.js 24 oder neuer verwenden; die Medientests führen die
+echten SQL-Abfragen mit `node:sqlite` gegen die Repository-Migrationen aus.
+`npm test` verwendet den Node-Thread-Pool. Der alternative `test:workers`-Befehl
+ist kein Ersatz für diese Node-Tests.
+
+`.github/workflows/ci.yml` führt diese Checks auf Pull Requests, auf `master`/`main`
+und in einer Merge Queue als `mirokit-ci` aus. Der Workflow enthält nur einen
+lokalen Wrangler-Dry-Run und keine Deployment-Credentials. Der Repository-Owner
+muss den Check separat im GitHub-Ruleset verpflichtend machen. `CODEOWNERS` und
+Dependabot werden erst nach Aufnahme der Dateien in GitHub wirksam.
 
 Bei Änderungen an HTML/CSS zusätzlich IDs, Asset- und API-Pfade sowie die
 Darstellung in mehreren Viewports manuell prüfen. Ein erfolgreicher Syntaxcheck
@@ -40,4 +50,6 @@ E-Mail-Versand in der Zielumgebung.
 Änderungen gehören auf einen thematischen Zweig. Vor dem Commit den vollständigen
 Status, den staged Diff und die Ziel-Remote prüfen. Commit-Nachrichten sollen
 den tatsächlichen Umfang beschreiben. Push und Deployment sind getrennte Schritte;
-ein Push veröffentlicht keine Worker-Änderung bei Cloudflare.
+vor einem Push muss geprüft werden, ob außerhalb dieses Repositorys eine
+Cloudflare-Build-Integration oder andere Deployment-Automation eingerichtet ist.
+Eine Freigabe zum lokalen Arbeiten ist keine Deployment-Freigabe.

@@ -23,7 +23,6 @@ let newsRotationTimer = 0;
 let revealFrame = 0;
 let revealObserver = null;
 let deferredImageObserver = null;
-let deferredBackgroundObserver = null;
 
 const newsCategoryTranslationKeys = {
    event: "news_category_events",
@@ -40,20 +39,10 @@ function loadDeferredImage(image) {
    delete image.dataset.src;
 }
 
-function loadDeferredBackground(element) {
-   const source = element?.dataset.deferredBackground;
-   if (!source || element.dataset.backgroundLoaded === "true") return;
-   const absoluteSource = new URL(source, document.baseURI).href;
-   const safeSource = absoluteSource.replace(/["\\)]/g, "\\$&");
-   element.style.setProperty("--deferred-background", `url("${safeSource}")`);
-   element.dataset.backgroundLoaded = "true";
-}
-
 function initDeferredMedia() {
    const images = [...document.querySelectorAll("img[data-src]")];
    const heroPartnerImages = images.filter((image) => image.closest("#hero .partner-showcase"));
    const viewportImages = images.filter((image) => !heroPartnerImages.includes(image));
-   const backgrounds = [...document.querySelectorAll("[data-deferred-background]")];
 
    if ("IntersectionObserver" in window) {
       deferredImageObserver = new IntersectionObserver(
@@ -65,26 +54,12 @@ function initDeferredMedia() {
          { rootMargin: "100px 0px", threshold: 0.01 },
       );
       viewportImages.forEach((image) => deferredImageObserver.observe(image));
-
-      deferredBackgroundObserver = new IntersectionObserver(
-         (entries) => entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            loadDeferredBackground(entry.target);
-            deferredBackgroundObserver.unobserve(entry.target);
-         }),
-         { rootMargin: "500px 0px", threshold: 0.01 },
-      );
-      backgrounds.forEach((element) => deferredBackgroundObserver.observe(element));
    } else {
       window.setTimeout(() => {
          const viewportLimit = window.innerHeight + 100;
          viewportImages.forEach((image) => {
             const bounds = image.getBoundingClientRect();
             if (bounds.top <= viewportLimit && bounds.bottom >= -100) loadDeferredImage(image);
-         });
-         backgrounds.forEach((element) => {
-            const bounds = element.getBoundingClientRect();
-            if (bounds.top <= window.innerHeight + 500 && bounds.bottom >= -500) loadDeferredBackground(element);
          });
       }, 1500);
    }
@@ -283,56 +258,6 @@ function escapeHtml(value) {
    return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
 }
 
-function galleryText(item, field) {
-   const values = item[field] || {};
-   return values[currentLang] || values.en || values.ru || "";
-}
-
-function galleryQuoteMarkup(quote) {
-   const text = galleryText(quote, "quote");
-   const byline = galleryText(quote, "byline");
-   return `<article class="photo-story photo-story--quote" data-gallery-quote><i class="fa-solid fa-quote-left" aria-hidden="true"></i><p>${escapeHtml(`«${text}»`)}</p>${byline ? `<small>${escapeHtml(byline)}</small>` : ""}</article>`;
-}
-
-function createGalleryQuoteElement(quote) {
-   if (!quote) return originalStaticQuote?.cloneNode(true) || null;
-   const template = document.createElement("template");
-   template.innerHTML = galleryQuoteMarkup(quote).trim();
-   return template.content.firstElementChild;
-}
-
-function appendGalleryQuote(grid) {
-   const quote = createGalleryQuoteElement(selectedGalleryQuote);
-   if (quote) grid.append(quote);
-}
-
-function renderRemoteGallery() {
-   if (!remoteGalleryGrid || !staticGalleryGrid) return;
-   const items = galleryItems.filter((item) => item?.image);
-   if (!items.length) {
-      const currentQuote = staticGalleryGrid.querySelector(".photo-story--quote");
-      const quote = createGalleryQuoteElement(selectedGalleryQuote);
-      if (currentQuote && quote) currentQuote.replaceWith(quote);
-      staticGalleryGrid.hidden = false;
-      remoteGalleryGrid.hidden = true;
-      galleryCountLabels.forEach((label) => { label.textContent = "180+"; });
-      return;
-   }
-
-   remoteGalleryGrid.innerHTML = items.map((item) => {
-      const title = galleryText(item, "title") || "MIRoKIT Gallery";
-      const alt = galleryText(item, "alt") || title;
-      const subtitle = galleryText(item, "subtitle") || "Gallery";
-      const featureClass = item.featured ? " photo-story--feature" : "";
-      return `<button class="photo-story${featureClass}" type="button" data-gallery-image data-gallery-title="${escapeHtml(title)}" aria-label="${escapeHtml(`Фото открыть: ${title}`)}"><img loading="lazy" src="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" /><span><small>${escapeHtml(subtitle)}</small><strong>${escapeHtml(title)}</strong></span></button>`;
-   }).join("");
-
-   appendGalleryQuote(remoteGalleryGrid);
-   staticGalleryGrid.hidden = true;
-   remoteGalleryGrid.hidden = false;
-   galleryCountLabels.forEach((label) => { label.textContent = String(items.length); });
-}
-
 function partnerCategoryLabel(category) {
    const key = { public: "partner_public", social: "partner_social", education: "partner_education" }[category];
    return (key && (T[currentLang]?.[key] || T.en?.[key])) || category || "Partners";
@@ -354,52 +279,6 @@ function renderRemotePartners() {
    }).join("")}</div></article>`).join("");
    partnersStatic.hidden = true;
    partnersRemote.hidden = false;
-}
-
-function videoText(item, field) {
-   const values = item.translations?.[currentLang] || item.translations?.en || item.translations?.ru || {};
-   return values[field] || "";
-}
-
-function formatVideoDuration(value) {
-   if (value === null || value === undefined || !Number.isFinite(Number(value))) return "";
-   const total = Math.max(0, Math.round(Number(value)));
-   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-}
-
-function videoTriggerAttributes(item, title, poster) {
-   const subtitles = JSON.stringify(item.subtitles || []);
-   const type = item.sourceType || "external";
-   const source = type === "youtube" ? "" : item.sourceUrl || "";
-   const embed = type === "youtube" ? item.embedUrl || item.sourceUrl || "" : "";
-   return `data-gallery-video data-video-type="${escapeHtml(type)}" data-video-src="${escapeHtml(source)}" data-video-embed="${escapeHtml(embed)}" data-video-title="${escapeHtml(title)}" data-video-poster="${escapeHtml(poster)}" data-video-duration="${escapeHtml(item.durationSeconds ?? "")}" data-video-width="${escapeHtml(item.width ?? "")}" data-video-height="${escapeHtml(item.height ?? "")}" data-video-subtitles="${escapeHtml(subtitles)}"`;
-}
-
-function renderRemoteVideos() {
-   if (!videoRemoteLibrary || !videoStaticLibrary) return;
-   const items = videoItems.filter((item) => item?.sourceUrl && item?.translations);
-   if (!items.length) {
-      videoStaticLibrary.hidden = false;
-      videoRemoteLibrary.hidden = true;
-      videosCountLabels.forEach((label) => { label.textContent = "24"; });
-      return;
-   }
-   videosCountLabels.forEach((label) => { label.textContent = String(items.length); });
-   const featured = items.find((item) => item.featured) || items[0];
-   const rest = items.filter((item) => item !== featured);
-   const spotlightTitle = videoText(featured, "title") || featured.id;
-   const spotlightPoster = featured.poster || "";
-   const spotlight = `<article class="video-spotlight fu d1"><button class="video-spotlight-open" type="button" ${videoTriggerAttributes(featured, spotlightTitle, spotlightPoster)} aria-haspopup="dialog" aria-label="Video im Vollbild öffnen: ${escapeHtml(spotlightTitle)}">${spotlightPoster ? `<img loading="lazy" src="${escapeHtml(spotlightPoster)}" alt="${escapeHtml(videoText(featured, "alt") || spotlightTitle)}" />` : ""}<span class="video-play-button"><i class="fa-solid fa-play" aria-hidden="true"></i></span><small>${escapeHtml(formatVideoDuration(featured.durationSeconds))}</small></button><section><span>${escapeHtml(featured.sourceType === "youtube" ? "YouTube" : "MIRoKIT Videothek")}</span><h3>${escapeHtml(spotlightTitle)}</h3><p>${escapeHtml(videoText(featured, "description"))}</p><button class="btn-primary" type="button" ${videoTriggerAttributes(featured, spotlightTitle, spotlightPoster)} aria-haspopup="dialog"><i class="fa-solid fa-play" aria-hidden="true"></i> Video ansehen</button></section></article>`;
-   const cards = rest.map((item, index) => {
-      const title = videoText(item, "title") || item.id;
-      const poster = item.poster || "";
-      const triggerAttributes = videoTriggerAttributes(item, title, poster);
-      return `<article class="video-card fu d${Math.min(index + 2, 4)}" ${triggerAttributes} role="button" tabindex="0" aria-haspopup="dialog" aria-label="Video öffnen: ${escapeHtml(title)}"><span>${poster ? `<img loading="lazy" src="${escapeHtml(poster)}" alt="${escapeHtml(videoText(item, "alt") || title)}" />` : ""}<i class="fa-solid fa-play" aria-hidden="true"></i></span><div><small>${escapeHtml(item.sourceType === "youtube" ? "YouTube" : "Video")} · ${escapeHtml(formatVideoDuration(item.durationSeconds))}</small><strong>${escapeHtml(title)}</strong><button type="button" ${triggerAttributes} aria-haspopup="dialog">Öffnen</button></div></article>`;
-   }).join("");
-   videoRemoteLibrary.innerHTML = `${spotlight}<div class="video-list">${cards}</div>`;
-   registerRevealElements(videoRemoteLibrary);
-   videoStaticLibrary.hidden = true;
-   videoRemoteLibrary.hidden = false;
 }
 
 function formatNewsDate(date) {
@@ -533,7 +412,10 @@ function renderNewsViews() {
    renderHeroNews();
 
    const visibleNews = getVisibleNews();
-   if (newsGridFull) newsGridFull.innerHTML = visibleNews.map((item, index) => newsCardMarkup(item, index)).join("");
+   const newsForGrid = newsGridFull?.hasAttribute("data-news-preview")
+      ? [...new Map([...newsHeroItems, ...visibleNews].map((item) => [item.id, item])).values()].slice(0, 5)
+      : visibleNews;
+   if (newsGridFull) newsGridFull.innerHTML = newsForGrid.map((item, index) => newsCardMarkup(item, index)).join("");
    if (newsEmpty) newsEmpty.hidden = visibleNews.length > 0;
    observeDeferredImages();
 }
@@ -562,9 +444,7 @@ newsFilterBtns.forEach((button) => button.addEventListener("click", () => {
 
 document.addEventListener("mirokit:languagechange", () => {
    renderNewsViews();
-   renderRemoteGallery();
    renderRemotePartners();
-   renderRemoteVideos();
 });
 renderNewsViews();
 
@@ -578,21 +458,6 @@ async function loadRemoteNews() {
       renderNewsViews();
    } catch (error) {
       console.info("[MIRoKIT] Using bundled news fallback:", error.message);
-   }
-}
-
-async function loadRemoteGallery() {
-   try {
-      const response = await fetch("/api/v1/gallery", { headers: { Accept: "application/json" }, cache: "no-store" });
-      if (!response.ok) throw new Error(`Gallery API returned ${response.status}`);
-      const payload = await response.json();
-      if (!Array.isArray(payload.gallery)) throw new Error("Gallery API returned invalid data");
-      galleryItems = payload.gallery;
-      galleryQuotes = Array.isArray(payload.quotes) ? payload.quotes.filter((quote) => quote?.quote) : [];
-      selectedGalleryQuote = galleryQuotes.length ? galleryQuotes[Math.floor(Math.random() * galleryQuotes.length)] : null;
-      renderRemoteGallery();
-   } catch (error) {
-      console.info("[MIRoKIT] Using bundled gallery fallback:", error.message);
    }
 }
 
@@ -610,22 +475,7 @@ async function loadRemotePartners() {
    }
 }
 
-async function loadRemoteVideos() {
-   if (!videoRemoteLibrary || !videoStaticLibrary) return;
-   try {
-      const response = await fetch("/api/v1/videos", { headers: { Accept: "application/json" }, cache: "no-store" });
-      if (!response.ok) throw new Error(`Videos API returned ${response.status}`);
-      const payload = await response.json();
-      if (!Array.isArray(payload.videos)) throw new Error("Videos API returned invalid data");
-      videoItems = payload.videos;
-      renderRemoteVideos();
-   } catch (error) {
-      console.info("[MIRoKIT] Using bundled video fallback:", error.message);
-   }
-}
-
 loadRemoteNews();
-loadRemoteGallery();
 initDeferredMedia();
 initDeferredWorldMap();
 
@@ -823,147 +673,31 @@ function setContactView(viewKey = "main-contact") {
 
 setContactView();
 
-const galleryViews = [...document.querySelectorAll("[data-gallery-view]")];
-const galleryPhotoView = document.querySelector('[data-gallery-view="photos"]');
-const staticGalleryGrid = galleryPhotoView?.querySelector("[data-gallery-static-grid]");
-const remoteGalleryGrid = galleryPhotoView?.querySelector("[data-gallery-remote-grid]");
-const galleryCountLabels = [...document.querySelectorAll("[data-gallery-count]")];
 const partnersCountLabels = [...document.querySelectorAll("[data-partners-count]")];
-const videosCountLabels = [...document.querySelectorAll("[data-video-count]")];
 const partnersStatic = document.getElementById("partnersStatic");
 const partnersRemote = document.getElementById("partnersRemote");
-const videoStaticLibrary = document.getElementById("staticVideoLibrary");
-const videoRemoteLibrary = document.getElementById("remoteVideoLibrary");
-const originalStaticQuote = staticGalleryGrid?.querySelector(".photo-story--quote")?.cloneNode(true);
-let galleryItems = [];
-let galleryQuotes = [];
-let selectedGalleryQuote = null;
 let partnerItems = [];
-let videoItems = [];
-
 loadRemotePartners();
-loadRemoteVideos();
-function setGalleryView(viewKey = "gallery-main") {
-   const selectedKey = galleryViews.some((view) => view.dataset.galleryView === viewKey) ? viewKey : "gallery-main";
 
-   galleryViews.forEach((view) => {
-      view.hidden = view.dataset.galleryView !== selectedKey;
-   });
-   scheduleReveal();
-   document.querySelectorAll("[data-gallery-link]").forEach((link) => {
-      const isCurrent = link.dataset.linkKey === selectedKey;
-      link.classList.toggle("is-current", isCurrent);
-      if (isCurrent) link.setAttribute("aria-current", "page");
-      else link.removeAttribute("aria-current");
-   });
-
-}
-
-setGalleryView();
-
-const onlineProjectsPanel = document.getElementById("onlineProjects");
-const onlineProjectsViews = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-view]") || [])];
-const onlineProjectsLinks = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-link]") || [])];
-const onlineProjectsNavViewport = onlineProjectsPanel?.querySelector("[data-online-projects-nav-viewport]");
-const onlineProjectsScrollButtons = [...(onlineProjectsPanel?.querySelectorAll("[data-online-projects-scroll]") || [])];
-const onlineProjectsReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
-
-function updateOnlineProjectsScrollControls() {
-   if (!onlineProjectsNavViewport || !onlineProjectsScrollButtons.length) return;
-
-   const maxScroll = Math.max(0, onlineProjectsNavViewport.scrollWidth - onlineProjectsNavViewport.clientWidth);
-   const hasOverflow = maxScroll > 2;
-   const atStart = onlineProjectsNavViewport.scrollLeft <= 2;
-   const atEnd = onlineProjectsNavViewport.scrollLeft >= maxScroll - 2;
-
-   onlineProjectsScrollButtons.forEach((button) => {
-      const isPrevious = button.dataset.onlineProjectsScroll === "previous";
-      button.hidden = !hasOverflow;
-      button.disabled = !hasOverflow || (isPrevious ? atStart : atEnd);
-      button.setAttribute("aria-disabled", String(button.disabled));
+// Carry the selected language into the standalone media libraries.
+function updateMediaPageLinks() {
+   document.querySelectorAll('a[href^="/page/onlineProjects/"], a[href^="/page/gallery/"]').forEach((link) => {
+      const url = new URL(link.href);
+      url.searchParams.set("lang", currentLang);
+      link.href = url.pathname + url.search;
    });
 }
-
-function scrollOnlineProjectsNav(direction) {
-   if (!onlineProjectsNavViewport) return;
-   const distance = Math.max(180, onlineProjectsNavViewport.clientWidth * 0.72);
-   onlineProjectsNavViewport.scrollBy({
-      left: direction * distance,
-      behavior: onlineProjectsReducedMotion?.matches ? "auto" : "smooth",
-   });
-}
-
-function setOnlineProjectsView(viewKey = "drawing") {
-   if (!onlineProjectsViews.length) return;
-   const selectedKey = onlineProjectsViews.some((view) => view.dataset.onlineProjectsView === viewKey) ? viewKey : "drawing";
-
-   onlineProjectsViews.forEach((view) => {
-      const isCurrent = view.dataset.onlineProjectsView === selectedKey;
-      view.hidden = !isCurrent;
-      view.classList.toggle("is-current", isCurrent);
-   });
-
-   onlineProjectsLinks.forEach((link) => {
-      const isCurrent = link.dataset.linkKey === selectedKey;
-      link.classList.toggle("is-active", isCurrent);
-      link.classList.toggle("is-current", isCurrent);
-      link.setAttribute("aria-selected", String(isCurrent));
-      link.tabIndex = isCurrent ? 0 : -1;
-   });
-
-   const selectedLink = onlineProjectsLinks.find((link) => link.dataset.linkKey === selectedKey);
-   if (selectedLink && onlineProjectsNavViewport && window.matchMedia?.("(max-width: 760px)").matches) {
-      selectedLink.scrollIntoView({
-         behavior: onlineProjectsReducedMotion?.matches ? "auto" : "smooth",
-         block: "nearest",
-         inline: "nearest",
-      });
-   }
-
-   scheduleReveal();
-   updateOnlineProjectsScrollControls();
-}
-
-onlineProjectsLinks.forEach((link) => {
-   link.addEventListener("click", () => setOnlineProjectsView(link.dataset.linkKey || "drawing"));
-   link.addEventListener("keydown", (event) => {
-      if (!onlineProjectsLinks.length || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      const currentIndex = onlineProjectsLinks.indexOf(link);
-      let nextIndex = currentIndex;
-      if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + onlineProjectsLinks.length) % onlineProjectsLinks.length;
-      if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % onlineProjectsLinks.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = onlineProjectsLinks.length - 1;
-      const nextLink = onlineProjectsLinks[nextIndex];
-      nextLink.focus();
-      setOnlineProjectsView(nextLink.dataset.linkKey || "drawing");
-   });
-});
-
-onlineProjectsScrollButtons.forEach((button) => {
-   button.addEventListener("click", () => scrollOnlineProjectsNav(button.dataset.onlineProjectsScroll === "previous" ? -1 : 1));
-});
-
-onlineProjectsNavViewport?.addEventListener("scroll", updateOnlineProjectsScrollControls, { passive: true });
-onlineProjectsNavViewport?.addEventListener("keydown", (event) => {
-   if (event.target !== onlineProjectsNavViewport) return;
-   if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      scrollOnlineProjectsNav(-1);
-   }
-   if (event.key === "ArrowRight") {
-      event.preventDefault();
-      scrollOnlineProjectsNav(1);
-   }
-});
-window.addEventListener("resize", updateOnlineProjectsScrollControls, { passive: true });
-document.addEventListener("mirokit:languagechange", updateOnlineProjectsScrollControls);
-setOnlineProjectsView();
+document.addEventListener("mirokit:languagechange", updateMediaPageLinks);
+updateMediaPageLinks();
 
 const projectsPanel = document.getElementById("projects");
 const projectsViews = [...document.querySelectorAll("[data-projects-view]")];
 const projectsLogo = projectsPanel?.querySelector(".section-logo img");
+const projectsCurrentGrid = document.getElementById("projectsCurrentGrid");
+const projectsPastGrid = document.getElementById("projectsPastGrid");
+const projectsFeatureTitle = document.getElementById("projectsFeatureTitle");
+const projectsFeatureDescription = document.getElementById("projectsFeatureDescription");
+let remoteProjects = [];
 const projectsLogoByView = {
    current_projects: "public/assets/logos/sections/current_projects_page.png",
    pas_projects: "public/assets/logos/sections/past_projects_page.png",
@@ -995,9 +729,89 @@ function setProjectsView(viewKey = "current_projects") {
 
 setProjectsView();
 
+const projectCategoryLabels = {
+   creative: { ru: "Творчество", en: "Creative practice", de: "Kreativität" },
+   game: { ru: "Игра и соревнование", en: "Games and competition", de: "Spiel und Wettbewerb" },
+   dialogue: { ru: "Диалог и встреча", en: "Dialogue and encounter", de: "Dialog und Begegnung" },
+   media: { ru: "Медиа и истории", en: "Media and stories", de: "Medien und Geschichten" },
+   network: { ru: "Международная сеть", en: "International network", de: "Internationales Netzwerk" },
+   education: { ru: "Образование и методика", en: "Education and method", de: "Bildung und Methodik" },
+};
+const projectIcons = { creative: "fa-paintbrush", game: "fa-chess-board", dialogue: "fa-people-group", media: "fa-photo-film", network: "fa-globe", education: "fa-book-open-reader" };
+
+function projectText(item, field) {
+   const values = item.translations?.[currentLang] || item.translations?.en || item.translations?.ru || {};
+   return values[field] || (field === "title" ? item.id : "");
+}
+
+function projectCategoryLabel(category) {
+   return projectCategoryLabels[category]?.[currentLang] || projectCategoryLabels[category]?.en || category || "MIRoKIT";
+}
+
+function projectDateLabel(value) {
+   if (!value) return "";
+   return new Intl.DateTimeFormat({ ru: "ru-RU", en: "en-GB", de: "de-DE" }[currentLang] || "en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${value}T12:00:00`));
+}
+
+function projectPhaseLabel(phase) {
+   return ({ current: { ru: "Сейчас", en: "Current", de: "Aktuell" }, upcoming: { ru: "Скоро", en: "Upcoming", de: "Demnächst" }, past: { ru: "Архив", en: "Archive", de: "Archiv" } }[phase]?.[currentLang] || phase);
+}
+
+function projectCardMarkup(item, index) {
+   const title = projectText(item, "title");
+   const description = projectText(item, "description");
+   const alt = projectText(item, "alt");
+   const phase = item.phase === "past" ? "past" : item.phase === "upcoming" ? "upcoming" : "current";
+   const image = item.image ? `<img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" />` : `<i class="fa-solid ${projectIcons[item.category] || projectIcons.creative}" aria-hidden="true"></i>`;
+   const link = item.linkUrl || "#contact";
+   const linkAttrs = link.startsWith("/") || link.startsWith("#") ? `data-nav-link${link === "#contact" ? ' data-link-key="main-contact"' : ""}` : 'target="_blank" rel="noopener noreferrer"';
+   const dateRange = `${projectDateLabel(item.startDate)}${item.endDate ? ` – ${projectDateLabel(item.endDate)}` : ""}`;
+   const cardClass = index === 0 && phase !== "past" ? " project-card--wide" : "";
+   return `<article class="project-card project-card--remote${cardClass} fu d${Math.min(index + 1, 4)}"><a class="project-shot ${item.image ? "project-shot--photo" : `project-shot--icon project-shot--${escapeHtml(item.accent || "blue")}`}" href="${escapeHtml(link)}" ${linkAttrs} aria-label="${escapeHtml(title)}">${image}<span class="project-status project-status--${phase}"><i class="fa-solid ${phase === "past" ? "fa-check" : phase === "upcoming" ? "fa-clock" : "fa-satellite-dish"}" aria-hidden="true"></i> ${escapeHtml(projectPhaseLabel(phase))}</span></a><div class="project-body"><span class="project-chip">${escapeHtml(projectCategoryLabel(item.category))}</span><h3>${escapeHtml(title)}</h3>${description ? `<p>${escapeHtml(description)}</p>` : ""}<div class="project-meta"><span>${escapeHtml(dateRange || projectPhaseLabel(phase))}</span><span>MIRoKIT</span></div><div class="project-actions"><a class="mini-btn mini-primary" href="${escapeHtml(link)}" ${linkAttrs}>${escapeHtml(currentLang === "de" ? "Projekt öffnen" : currentLang === "ru" ? "Открыть проект" : "Open project")}</a></div></div></article>`;
+}
+
+function renderRemoteProjects() {
+   if (!projectsCurrentGrid || !projectsPastGrid) return;
+   const current = remoteProjects.filter((item) => item.phase !== "past");
+   const past = remoteProjects.filter((item) => item.phase === "past");
+   projectsCurrentGrid.innerHTML = current.length ? current.map(projectCardMarkup).join("") : `<p class="projects-empty">${escapeHtml(currentLang === "de" ? "Noch keine aktuellen Projekte veröffentlicht." : currentLang === "ru" ? "Актуальных проектов пока нет." : "No current projects have been published yet.")}</p>`;
+   projectsPastGrid.innerHTML = past.length ? past.map(projectCardMarkup).join("") : `<p class="projects-empty">${escapeHtml(currentLang === "de" ? "Noch keine vergangenen Projekte im Archiv." : currentLang === "ru" ? "В архиве пока нет завершённых проектов." : "No past projects are in the archive yet.")}</p>`;
+   if (projectsFeatureTitle && current[0]) projectsFeatureTitle.textContent = projectText(current[0], "title");
+   if (projectsFeatureDescription && current[0]) projectsFeatureDescription.textContent = projectText(current[0], "description");
+   const stats = projectsPanel?.querySelectorAll(".projects-live-stats dt");
+   if (stats?.length) {
+      stats[0].textContent = String(current.length);
+      stats[1].textContent = String(past.length);
+      stats[2].textContent = String(remoteProjects.filter((item) => item.featured).length);
+   }
+   observeDeferredImages(projectsPanel || document);
+   registerRevealElements(projectsCurrentGrid);
+   registerRevealElements(projectsPastGrid);
+}
+
+async function loadRemoteProjects() {
+   if (!projectsCurrentGrid || !projectsPastGrid) return;
+   try {
+      const response = await fetch("/api/v1/projects", { headers: { Accept: "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error(`Projects API returned ${response.status}`);
+      const payload = await response.json();
+      if (!Array.isArray(payload.projects)) throw new Error("Projects API returned invalid data");
+      remoteProjects = payload.projects.filter((item) => item?.id && item?.startDate && item?.translations);
+      renderRemoteProjects();
+   } catch (error) {
+      console.info("[MIRoKIT] Using bundled projects fallback:", error.message);
+   }
+}
+
 document.querySelectorAll("button[data-projects-link]").forEach((button) =>
    button.addEventListener("click", () => setProjectsView(button.dataset.linkKey || "current_projects")),
 );
+
+document.addEventListener("mirokit:languagechange", () => {
+   if (remoteProjects.length) renderRemoteProjects();
+});
+
+loadRemoteProjects();
 
 function getHashTarget(hash) {
    if (!hash || !hash.startsWith("#")) return null;
@@ -1025,7 +839,6 @@ document.querySelectorAll("[data-nav-link]").forEach((a) =>
       if (href && href.startsWith("#")) {
          e.preventDefault();
          if (href === "#contact" && a.dataset.linkKey) setContactView(a.dataset.linkKey);
-         if (href === "#gallery") setGalleryView(a.dataset.linkKey || "gallery-main");
          if (href === "#projects") setProjectsView(a.dataset.linkKey || "current_projects");
          goToHash(href);
          closeDesktopMenus();
@@ -1057,7 +870,7 @@ window.addEventListener("resize", syncReadingProgress, { passive: true });
 requestAnimationFrame(syncFooterTaskbar);
 
 window.addEventListener("keydown", (e) => {
-   if (document.querySelector(".gallery-media-modal.show, .news-modal.show")) return;
+   if (document.querySelector(".news-modal.show")) return;
 
    if (e.key === "Escape") {
       closeMenu();
@@ -1165,372 +978,6 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
    showToast(T[currentLang].toast_sent);
    closeModal();
    location.href = `mailto:info@mirokit.org?subject=${subject}&body=${body}`;
-});
-
-// --- #gallery: zugängliche Foto-Lightbox und Video-Modal ---
-const galleryImageModal = document.getElementById("galleryImageModal");
-const galleryVideoModal = document.getElementById("galleryVideoModal");
-let galleryImageButtons = [];
-const galleryImageModalImg = galleryImageModal.querySelector(".gallery-image-stage img");
-const galleryImageCaption = galleryImageModal.querySelector(".gallery-image-caption");
-const galleryVideoCard = galleryVideoModal.querySelector(".gallery-video-modal-card");
-const galleryVideoPlayerShell = document.getElementById("galleryVideoPlayerShell");
-const galleryVideo = galleryVideoModal.querySelector(".gallery-modal-video");
-const galleryYoutube = galleryVideoModal.querySelector(".gallery-modal-youtube");
-const galleryVideoStageFeedback = document.getElementById("galleryVideoStageFeedback");
-const galleryVideoTitle = document.getElementById("galleryVideoModalTitle");
-const galleryVideoNote = document.getElementById("galleryVideoModalNote");
-const galleryVideoMeta = document.getElementById("galleryVideoModalMeta");
-const galleryVideoControls = document.getElementById("galleryVideoControls");
-const galleryVideoPlay = galleryVideoControls.querySelector('[data-video-control="play"]');
-const galleryVideoSeek = galleryVideoControls.querySelector('[data-video-control="seek"]');
-const galleryVideoSeekWrap = document.getElementById("galleryVideoSeekWrap");
-const galleryVideoTime = galleryVideoControls.querySelector('[data-video-control="time"]');
-const galleryVideoMute = galleryVideoControls.querySelector('[data-video-control="mute"]');
-const galleryVideoVolume = galleryVideoControls.querySelector('[data-video-control="volume"]');
-const galleryVideoVolumePercent = galleryVideoControls.querySelector('[data-video-control="volume-percent"]');
-const galleryVideoCaptions = galleryVideoControls.querySelector('[data-video-control="captions"]');
-const galleryVideoSettingsButton = galleryVideoControls.querySelector('[data-video-control="settings"]');
-const galleryVideoSettings = document.getElementById("galleryVideoSettings");
-const galleryVideoTrack = document.getElementById("galleryVideoTrack");
-const galleryVideoFullscreen = galleryVideoControls.querySelector('[data-video-control="fullscreen"]');
-let galleryImageIndex = 0;
-let galleryModalTrigger = null;
-let galleryVideoFeedbackTimer = 0;
-let galleryVideoSelectedTrack = "";
-
-function getGalleryImageButtons() {
-   const grid = remoteGalleryGrid && !remoteGalleryGrid.hidden ? remoteGalleryGrid : staticGalleryGrid;
-   return grid ? [...grid.querySelectorAll("[data-gallery-image]")] : [];
-}
-
-function galleryFocusable(modalEl) {
-   return [...modalEl.querySelectorAll('button, [href], input, select, textarea, video[controls], iframe, [tabindex]:not([tabindex="-1"])')].filter((el) => !el.disabled && !el.closest("[hidden]"));
-}
-
-function renderGalleryImage(index) {
-   galleryImageButtons = getGalleryImageButtons();
-   if (!galleryImageButtons.length) return;
-   galleryImageIndex = (index + galleryImageButtons.length) % galleryImageButtons.length;
-   const trigger = galleryImageButtons[galleryImageIndex];
-   const image = trigger.querySelector("img");
-   galleryImageModalImg.src = image.currentSrc || image.src;
-   galleryImageModalImg.alt = image.alt;
-   galleryImageCaption.textContent = `${galleryImageIndex + 1} / ${galleryImageButtons.length} — ${trigger.dataset.galleryTitle}`;
-}
-
-function openGalleryImageModal(trigger) {
-   galleryModalTrigger = trigger;
-   renderGalleryImage(getGalleryImageButtons().indexOf(trigger));
-   galleryImageModal.classList.add("show");
-   galleryImageModal.setAttribute("aria-hidden", "false");
-   document.body.classList.add("menu-open");
-   galleryImageModal.querySelector(".gallery-modal-close").focus();
-}
-
-function closeGalleryImageModal() {
-   galleryImageModal.classList.remove("show");
-   galleryImageModal.setAttribute("aria-hidden", "true");
-   document.body.classList.remove("menu-open");
-   galleryModalTrigger?.focus();
-}
-
-function showGalleryVideoFeedback(isPaused) {
-   if (!galleryVideoStageFeedback || !galleryVideoModal.classList.contains("show")) return;
-   window.clearTimeout(galleryVideoFeedbackTimer);
-   galleryVideoStageFeedback.textContent = isPaused ? "❚❚" : "▶";
-   galleryVideoStageFeedback.classList.remove("is-visible");
-   void galleryVideoStageFeedback.offsetWidth;
-   galleryVideoStageFeedback.classList.add("is-visible");
-   galleryVideoFeedbackTimer = window.setTimeout(() => galleryVideoStageFeedback.classList.remove("is-visible"), 700);
-}
-
-function syncGalleryVideoControls() {
-   const duration = Number.isFinite(galleryVideo.duration) ? galleryVideo.duration : 0;
-   const current = Number.isFinite(galleryVideo.currentTime) ? galleryVideo.currentTime : 0;
-   galleryVideoSeek.max = String(duration || 100);
-   galleryVideoSeek.value = String(Math.min(current, duration || 100));
-   galleryVideoTime.textContent = `${formatVideoDuration(current) || "00:00"} / ${formatVideoDuration(duration) || "00:00"}`;
-   galleryVideoPlay.innerHTML = `<i class="fa-solid fa-${galleryVideo.paused ? "play" : "pause"}" aria-hidden="true"></i>`;
-   galleryVideoPlay.setAttribute("aria-label", galleryVideo.paused ? "Video abspielen" : "Video pausieren");
-   galleryVideoMute.innerHTML = `<i class="fa-solid fa-volume-${galleryVideo.muted || galleryVideo.volume === 0 ? "xmark" : "high"}" aria-hidden="true"></i>`;
-   galleryVideoMute.setAttribute("aria-label", galleryVideo.muted || galleryVideo.volume === 0 ? "Ton einschalten" : "Ton ausschalten");
-   const seekPercent = duration ? (current / duration) * 100 : 0;
-   const volumePercent = Math.max(0, Math.min(100, (galleryVideo.muted ? 0 : galleryVideo.volume) * 100));
-   galleryVideoSeek.style.setProperty("--range-fill", `${seekPercent}%`);
-   galleryVideoSeekWrap.style.setProperty("--seek-fill", `${seekPercent}%`);
-   galleryVideoVolume.style.setProperty("--range-fill", `${volumePercent}%`);
-   galleryVideoVolumePercent.textContent = `${Math.round(volumePercent)}%`;
-}
-
-function setGalleryVideoTrack(index) {
-   const tracks = [...galleryVideo.querySelectorAll("track")];
-   const selectedIndex = tracks.some((track, trackIndex) => String(trackIndex) === String(index)) ? String(index) : "";
-   if (selectedIndex !== "") galleryVideoSelectedTrack = selectedIndex;
-   tracks.forEach((track, trackIndex) => {
-      if (track.track) track.track.mode = String(trackIndex) === selectedIndex ? "showing" : "disabled";
-   });
-   galleryVideoTrack.value = selectedIndex;
-   const captionsEnabled = selectedIndex !== "";
-   galleryVideoCaptions.disabled = !tracks.length;
-   galleryVideoSettingsButton.disabled = !tracks.length;
-   galleryVideoCaptions.setAttribute("aria-pressed", String(captionsEnabled));
-   galleryVideoCaptions.setAttribute("aria-label", captionsEnabled ? "Untertitel ausschalten" : "Untertitel einschalten");
-   galleryVideoCaptions.classList.toggle("is-active", captionsEnabled);
-}
-
-function syncGalleryVideoTracks() {
-   const tracks = [...galleryVideo.querySelectorAll("track")];
-   galleryVideoTrack.innerHTML = '<option value="">Untertitel aus</option>';
-   let defaultIndex = "";
-   tracks.forEach((track, index) => {
-      const option = document.createElement("option");
-      option.value = String(index);
-      option.textContent = track.label || track.srclang.toUpperCase();
-      galleryVideoTrack.append(option);
-      if (track.default && defaultIndex === "") defaultIndex = String(index);
-   });
-   setGalleryVideoTrack(galleryVideoSelectedTrack || defaultIndex);
-}
-
-function withVideoAutoplay(url) {
-   try {
-      const parsed = new URL(url, document.baseURI);
-      parsed.searchParams.set("autoplay", "1");
-      return parsed.href;
-   } catch {
-      return url;
-   }
-}
-
-function openGalleryVideoModal(trigger, { autoplay = true } = {}) {
-   galleryModalTrigger = trigger;
-   const poster = trigger.dataset.videoPoster || trigger.querySelector("img")?.currentSrc || trigger.closest(".video-card")?.querySelector("img")?.currentSrc || "";
-   const source = trigger.dataset.videoSrc;
-   const type = trigger.dataset.videoType || "external";
-   const embed = trigger.dataset.videoEmbed || "";
-   const usesYoutube = type === "youtube" && Boolean(embed);
-   const usesHtml5 = Boolean(source);
-   galleryVideoCard.dataset.videoRenderer = usesYoutube ? "youtube" : usesHtml5 ? "html5" : "none";
-   galleryVideoPlayerShell.hidden = !(usesYoutube || usesHtml5);
-   galleryVideo.poster = poster;
-   galleryVideoTitle.textContent = trigger.dataset.videoTitle || T[currentLang].gallery_video_modal;
-   galleryVideoNote.hidden = usesYoutube || usesHtml5;
-   galleryVideoMeta.textContent = [trigger.dataset.videoDuration ? formatVideoDuration(trigger.dataset.videoDuration) : "", trigger.dataset.videoWidth && trigger.dataset.videoHeight ? `${trigger.dataset.videoWidth} × ${trigger.dataset.videoHeight}` : "", type === "youtube" ? "YouTube" : "HTML5"].filter(Boolean).join(" · ");
-   galleryVideoMeta.hidden = !galleryVideoMeta.textContent;
-   galleryVideo.querySelectorAll("track").forEach((track) => track.remove());
-   galleryVideo.removeAttribute("src");
-   galleryYoutube.removeAttribute("src");
-   if (usesYoutube) {
-      galleryVideo.hidden = true;
-      galleryVideo.controls = false;
-      galleryVideoControls.hidden = true;
-      galleryYoutube.hidden = false;
-      galleryYoutube.src = autoplay ? withVideoAutoplay(embed) : embed;
-   } else {
-      galleryYoutube.hidden = true;
-      galleryVideo.hidden = !source;
-      galleryVideo.controls = false;
-      galleryVideoControls.hidden = !source;
-      if (source) galleryVideo.src = source;
-      try {
-         const subtitles = JSON.parse(trigger.dataset.videoSubtitles || "[]");
-         subtitles.forEach((subtitle) => {
-            if (!subtitle.src) return;
-            const track = document.createElement("track");
-            track.kind = "subtitles";
-            track.src = subtitle.src;
-            track.srclang = subtitle.srcLang || subtitle.language || "en";
-            track.label = subtitle.label || track.srclang.toUpperCase();
-            track.default = Boolean(subtitle.isDefault);
-            galleryVideo.append(track);
-         });
-      } catch { /* malformed optional subtitle metadata must not block playback */ }
-      syncGalleryVideoTracks();
-      galleryVideo.load();
-   }
-   galleryVideoModal.classList.add("show");
-   galleryVideoModal.setAttribute("aria-hidden", "false");
-   document.body.classList.add("menu-open");
-   syncGalleryVideoFullscreen();
-   if (usesHtml5 && autoplay) {
-      const playback = galleryVideo.play();
-      playback?.catch(() => { /* browser autoplay policy may require the play button */ });
-   }
-   (usesYoutube ? galleryYoutube : usesHtml5 ? galleryVideo : galleryVideoModal.querySelector(".gallery-modal-close")).focus();
-}
-
-function closeGalleryVideoModal() {
-   if (document.fullscreenElement === galleryVideoPlayerShell) {
-      const exit = document.exitFullscreen?.();
-      exit?.catch(() => { });
-   }
-   galleryVideo.pause();
-   galleryVideoPlayerShell.hidden = true;
-   delete galleryVideoCard.dataset.videoRenderer;
-   galleryVideo.removeAttribute("src");
-   galleryVideo.load();
-   galleryVideo.querySelectorAll("track").forEach((track) => track.remove());
-   galleryYoutube.removeAttribute("src");
-   galleryVideo.hidden = false;
-   galleryVideo.controls = true;
-   galleryVideoControls.hidden = true;
-   galleryYoutube.hidden = true;
-   galleryVideoTrack.innerHTML = '<option value="">Untertitel aus</option>';
-   galleryVideoCaptions.disabled = false;
-   galleryVideoCaptions.setAttribute("aria-pressed", "false");
-   galleryVideoCaptions.setAttribute("aria-label", "Untertitel ein oder aus");
-   galleryVideoCaptions.classList.remove("is-active");
-   galleryVideoSettingsButton.disabled = false;
-   galleryVideoSettings.hidden = true;
-   galleryVideoSettingsButton.setAttribute("aria-expanded", "false");
-   galleryVideoSelectedTrack = "";
-   galleryVideoMeta.textContent = "";
-   galleryVideoMeta.hidden = true;
-   galleryVideoModal.classList.remove("show");
-   galleryVideoModal.setAttribute("aria-hidden", "true");
-   galleryVideoStageFeedback?.classList.remove("is-visible");
-   document.body.classList.remove("menu-open");
-   galleryModalTrigger?.focus();
-}
-
-galleryVideo.addEventListener("loadedmetadata", () => {
-   if (!galleryVideo.duration || !galleryModalTrigger) return;
-   galleryVideoMeta.textContent = [formatVideoDuration(galleryVideo.duration), galleryVideo.videoWidth && galleryVideo.videoHeight ? `${galleryVideo.videoWidth} × ${galleryVideo.videoHeight}` : "", "HTML5"].filter(Boolean).join(" · ");
-   galleryVideoMeta.hidden = false;
-   syncGalleryVideoControls();
-});
-["timeupdate", "volumechange", "ended"].forEach((eventName) => galleryVideo.addEventListener(eventName, syncGalleryVideoControls));
-galleryVideo.addEventListener("play", () => {
-   syncGalleryVideoControls();
-   showGalleryVideoFeedback(false);
-});
-galleryVideo.addEventListener("pause", () => {
-   syncGalleryVideoControls();
-   if (!galleryVideo.ended) showGalleryVideoFeedback(true);
-});
-galleryVideo.addEventListener("click", () => {
-   if (galleryVideo.hidden || galleryVideoCard.dataset.videoRenderer !== "html5") return;
-   if (galleryVideo.paused) {
-      const playback = galleryVideo.play();
-      playback?.catch(() => { });
-   } else {
-      galleryVideo.pause();
-   }
-});
-galleryVideoPlay.addEventListener("click", () => {
-   if (galleryVideo.paused) {
-      const playback = galleryVideo.play();
-      playback?.catch(() => { });
-   } else {
-      galleryVideo.pause();
-   }
-});
-galleryVideoSeek.addEventListener("input", () => { galleryVideo.currentTime = Number(galleryVideoSeek.value); });
-galleryVideoMute.addEventListener("click", () => { galleryVideo.muted = !galleryVideo.muted; syncGalleryVideoControls(); });
-galleryVideoVolume.addEventListener("input", () => { galleryVideo.volume = Number(galleryVideoVolume.value); galleryVideo.muted = galleryVideo.volume === 0; });
-galleryVideoCaptions.addEventListener("click", () => {
-   const tracks = [...galleryVideo.querySelectorAll("track")];
-   if (!tracks.length) return;
-   if (galleryVideoTrack.value === "") {
-      const defaultIndex = tracks.findIndex((track) => track.default);
-      setGalleryVideoTrack(galleryVideoSelectedTrack || (defaultIndex >= 0 ? defaultIndex : 0));
-   } else {
-      galleryVideoSelectedTrack = galleryVideoTrack.value;
-      setGalleryVideoTrack("");
-   }
-});
-galleryVideoSettingsButton.addEventListener("click", () => {
-   if (galleryVideoSettingsButton.disabled) return;
-   const isOpen = !galleryVideoSettings.hidden;
-   galleryVideoSettings.hidden = isOpen;
-   galleryVideoSettingsButton.setAttribute("aria-expanded", String(!isOpen));
-   if (!isOpen) galleryVideoTrack.focus();
-});
-galleryVideoTrack.addEventListener("change", () => {
-   setGalleryVideoTrack(galleryVideoTrack.value);
-});
-function syncGalleryVideoFullscreen() {
-   const isFullscreen = document.fullscreenElement === galleryVideoPlayerShell;
-   galleryVideoFullscreen.innerHTML = `<i class="fa-solid fa-${isFullscreen ? "compress" : "expand"}" aria-hidden="true"></i>`;
-   galleryVideoFullscreen.setAttribute("aria-label", isFullscreen ? "Vollbild verlassen" : "Vollbild öffnen");
-}
-
-galleryVideoFullscreen.addEventListener("click", async () => {
-   try {
-      if (document.fullscreenElement) {
-         await document.exitFullscreen?.();
-      } else {
-         await galleryVideoPlayerShell.requestFullscreen?.();
-      }
-   } catch {
-      /* Fullscreen can be denied by the browser or embedding context. */
-   }
-   syncGalleryVideoFullscreen();
-});
-document.addEventListener("fullscreenchange", syncGalleryVideoFullscreen);
-document.addEventListener("click", (event) => {
-   if (galleryVideoSettings.hidden || galleryVideoSettings.contains(event.target) || event.target === galleryVideoSettingsButton) return;
-   galleryVideoSettings.hidden = true;
-   galleryVideoSettingsButton.setAttribute("aria-expanded", "false");
-});
-
-galleryPhotoView?.addEventListener("click", (event) => {
-   const button = event.target instanceof Element ? event.target.closest("[data-gallery-image]") : null;
-   if (button && galleryPhotoView.contains(button)) openGalleryImageModal(button);
-});
-document.querySelectorAll("[data-gallery-video]").forEach((button) => button.addEventListener("click", () => openGalleryVideoModal(button, { autoplay: true })));
-videoRemoteLibrary?.addEventListener("click", (event) => {
-   const button = event.target instanceof Element ? event.target.closest("[data-gallery-video]") : null;
-   if (button && videoRemoteLibrary.contains(button)) openGalleryVideoModal(button, { autoplay: true });
-});
-videoRemoteLibrary?.addEventListener("keydown", (event) => {
-   if (!(event.target instanceof Element) || !event.target.matches("article.video-card[data-gallery-video]")) return;
-   if (event.key !== "Enter" && event.key !== " ") return;
-   event.preventDefault();
-   openGalleryVideoModal(event.target, { autoplay: true });
-});
-galleryImageModal.querySelector(".gallery-modal-close").addEventListener("click", closeGalleryImageModal);
-galleryImageModal.querySelector(".gallery-modal-prev").addEventListener("click", () => renderGalleryImage(galleryImageIndex - 1));
-galleryImageModal.querySelector(".gallery-modal-next").addEventListener("click", () => renderGalleryImage(galleryImageIndex + 1));
-galleryVideoModal.querySelector(".gallery-modal-close").addEventListener("click", closeGalleryVideoModal);
-galleryImageModal.addEventListener("click", (e) => {
-   if (e.target === galleryImageModal) closeGalleryImageModal();
-});
-galleryVideoModal.addEventListener("click", (e) => {
-   if (e.target === galleryVideoModal) closeGalleryVideoModal();
-});
-document.addEventListener("keydown", (e) => {
-   const activeModal = galleryImageModal.classList.contains("show") ? galleryImageModal : galleryVideoModal.classList.contains("show") ? galleryVideoModal : null;
-   if (!activeModal) return;
-   if (e.key === "Escape") {
-      e.preventDefault();
-      activeModal === galleryImageModal ? closeGalleryImageModal() : closeGalleryVideoModal();
-      return;
-   }
-   if (activeModal === galleryImageModal && e.key === "ArrowRight") {
-      e.preventDefault();
-      renderGalleryImage(galleryImageIndex + 1);
-      return;
-   }
-   if (activeModal === galleryImageModal && e.key === "ArrowLeft") {
-      e.preventDefault();
-      renderGalleryImage(galleryImageIndex - 1);
-      return;
-   }
-   if (e.key === "Tab") {
-      const focusables = galleryFocusable(activeModal);
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-         e.preventDefault();
-         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-         e.preventDefault();
-         first.focus();
-      }
-   }
 });
 
 // --- #news: Modal mit Vor/Zurück-Navigation zwischen den Karten ---

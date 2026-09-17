@@ -2,7 +2,6 @@
 AGENTS*
 .claude/
 .codex/
-.github/
 .vscode/
 .cloudflare/
 claude-philosophy/
@@ -22,8 +21,11 @@ dist
 *.tsbuildinfo
 
 # Wrangler local variables and secrets
-**/.dev.vars
-**/.dev.vars.local
+**/.dev.vars*
+!**/.dev.vars.example
+**/.env*
+!**/.env.example
+**/.wrangler/
 
 # Playwright
 /test-results/

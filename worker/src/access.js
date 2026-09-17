@@ -1,4 +1,6 @@
 const ACCESS_JWKS_CACHE = new Map();
+const ACCESS_JWKS_TTL_MS = 60 * 60 * 1000;
+const ACCESS_JWKS_REFRESH_COOLDOWN_MS = 30 * 1000;
 
 function isLocalHostname(hostname) {
 	const normalized = String(hostname || "").toLowerCase();
@@ -16,21 +18,24 @@ function decodeJsonPart(value) {
 	return JSON.parse(new TextDecoder().decode(decodeBase64Url(value)));
 }
 
-async function getAccessKeys(teamDomain) {
-	if (!ACCESS_JWKS_CACHE.has(teamDomain)) {
-		const promise = fetch(`${teamDomain}/cdn-cgi/access/certs`).then(async (response) => {
+async function getAccessKeys(teamDomain, refresh = false) {
+	const now = Date.now();
+	let entry = ACCESS_JWKS_CACHE.get(teamDomain);
+	if (!entry || entry.expiresAt <= now || (refresh && now - entry.fetchedAt >= ACCESS_JWKS_REFRESH_COOLDOWN_MS)) {
+		entry = { fetchedAt: now, expiresAt: now + ACCESS_JWKS_TTL_MS };
+		entry.promise = fetch(`${teamDomain}/cdn-cgi/access/certs`, { signal: AbortSignal.timeout(5000) }).then(async (response) => {
 			if (!response.ok) throw new Error(`Access certs request failed: ${response.status}`);
 			const body = await response.json();
 			if (!Array.isArray(body.keys)) throw new Error("Invalid Access certs response");
 			return body.keys;
 		});
-		ACCESS_JWKS_CACHE.set(teamDomain, promise);
+		ACCESS_JWKS_CACHE.set(teamDomain, entry);
 	}
 
 	try {
-		return await ACCESS_JWKS_CACHE.get(teamDomain);
+		return await entry.promise;
 	} catch (error) {
-		ACCESS_JWKS_CACHE.delete(teamDomain);
+		if (ACCESS_JWKS_CACHE.get(teamDomain) === entry) ACCESS_JWKS_CACHE.delete(teamDomain);
 		throw error;
 	}
 }
@@ -46,9 +51,10 @@ async function verifyAccessJwt(token, env) {
 	try {
 		const header = decodeJsonPart(parts[0]);
 		const payload = decodeJsonPart(parts[1]);
-		if (header.alg !== "RS256" || !header.kid) return null;
+		if (header.alg !== "RS256" || typeof header.kid !== "string" || !header.kid) return null;
 
-		const keyData = (await getAccessKeys(teamDomain)).find((key) => key.kid === header.kid);
+		let keyData = (await getAccessKeys(teamDomain)).find((key) => key.kid === header.kid);
+		if (!keyData) keyData = (await getAccessKeys(teamDomain, true)).find((key) => key.kid === header.kid);
 		if (!keyData) return null;
 
 		const key = await crypto.subtle.importKey(
@@ -72,7 +78,8 @@ async function verifyAccessJwt(token, env) {
 			payload.iss !== teamDomain ||
 			!audiences.includes(audience) ||
 			!Number.isFinite(payload.exp) ||
-			payload.exp <= now
+			payload.exp <= now ||
+			(payload.nbf !== undefined && (!Number.isFinite(payload.nbf) || payload.nbf > now))
 		) {
 			return null;
 		}

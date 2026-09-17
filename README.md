@@ -20,7 +20,7 @@ Das Repository enthält eine responsive, vertikal aufgebaute Website und einen g
 - News-Karten mit Detaildialogen, Foto-/Videobereiche, Zitate und Partnergruppen.
 - Kontaktformular und Liga-Antrag mit gemeinsamer Worker-API.
 - Russisch, Englisch und Deutsch, Theme-Umschaltung, responsive Navigation und Lesefortschritt.
-- Content Desk unter `/admin/` mit Tabs für News, Gallery, World Points und Partners.
+- Content Desk unter `/admin/` mit Tabs für News, Gallery, Online Projects, Videos, Projects, World Points und Partners.
 - Dynamische Veröffentlichung über Cloudflare D1 und R2 mit statischen Ausgangsinhalten im Frontend.
 
 Temporär deaktivierte Bereiche und redaktionelle Platzhalter sind Teil des Entwicklungsstands. Eine Funktion im Code oder eine konfigurierte Domain ist kein Nachweis ihres aktuellen Produktionsbetriebs.
@@ -44,6 +44,9 @@ Die Website verwendet HTML5, CSS Grid/Flexbox, CSS Custom Properties und Vanilla
 │   │   ├── assets/                # Marke, Hintergründe, Illustrationen, Medien
 │   │   ├── favicon/
 │   │   └── site.webmanifest
+│   ├── page/gallery/             # Eigenständige Foto-/Videogalerie
+│   ├── page/news/                # Eigenständige Neuigkeitenseite
+│   ├── page/onlineProjects/      # Online-Projekt-Bibliothek
 │   ├── page/privacyPolicy/
 │   ├── .assetsignore
 │   ├── _headers
@@ -69,7 +72,7 @@ Im Browser entspricht `site/index.html` der URL `/`. Asset-URLs beginnen mit `/p
 
 ## Lokal starten
 
-Voraussetzungen sind Git, Node.js **ab Version 22** gemäß der eingebundenen Wrangler-Version und npm. Für die vollständige Website mit APIs und Content Desk den Worker verwenden:
+Voraussetzungen sind Git, Node.js **24 oder neuer** (CI verwendet Version 24) und npm. Für die vollständige Website mit APIs und Content Desk den Worker verwenden:
 
 ```bash
 cd worker
@@ -117,12 +120,13 @@ Dieser Server stellt keine Content-APIs bereit. Die statischen Inhalte bleiben a
 | Bereich | Redaktionelle Speicherung | Öffentliche API | Statischer Ausgangsstand |
 | --- | --- | --- | --- |
 | News | D1, Bilder in R2 oder öffentliche Bild-URL | `/api/v1/news` | `site/source/scripts/news-data.js` |
-| Gallery | R2-Bilder mit lokalisierten Metadaten; Zitate in D1 | `/api/v1/gallery` | Galerie-Markup in `site/index.html` |
-| Videos | D1-Metadaten, Videos/Poster/WEBVTT in R2 oder externe Quelle | `/api/v1/videos` | Video-Markup in `site/index.html` |
+| Gallery | R2-Bilder mit lokalisierten Metadaten; Zitate in D1 | `/api/v1/gallery?collection=gallery` | `site/page/gallery/`; Startseiten-Karten verlinken die Fotografie-/Videoansicht |
+| Videos | D1-Metadaten, Videos/Poster/WEBVTT in R2 oder externe Quelle | `/api/v1/videos` | `site/page/gallery/?view=video` |
 | World Points | D1 mit Koordinaten, Status und Übersetzungen | `/api/v1/world-points` | `site/source/scripts/mirokit-world-map.js` |
 | Partners | D1 mit Kategorie, Website, Sortierung und Übersetzungen; Logos in R2 oder öffentliche Bild-URL | `/api/v1/partners` | Partner-Markup in `site/index.html` |
+| Projects | D1 mit Entwurf/Veröffentlichung, RU/EN/DE-Metadaten, Zeitraum und optionalem R2-Bild | `/api/v1/projects` | Current/Past-Ansicht in `site/index.html` |
 
-News, Gallery, Videos, World Points und Partners unterstützen je nach Bereich Entwurf, Veröffentlichung und Archivierung. Die News-API berücksichtigt außerdem das Veröffentlichungsdatum. `featured: 1`, `2` und `3` ordnen die drei neuesten verfügbaren News im Hero; es bleibt jeweils eine Meldung sichtbar.
+News, Gallery, Videos, World Points, Partners und Projects unterstützen je nach Bereich Entwurf, Veröffentlichung und Archivierung. Die News-API berücksichtigt außerdem das Veröffentlichungsdatum. Projects werden anhand von `endDate` automatisch als `past` berechnet, sobald das Datum vor dem heutigen UTC-Datum liegt; die D1-Zeile bleibt dabei unverändert und muss nicht durch einen Cronjob verschoben werden. `featured: 1`, `2` und `3` ordnen die drei neuesten verfügbaren News im Hero; es bleibt jeweils eine Meldung sichtbar.
 
 Gallery-Bilder werden mit RU/EN/DE-Titeln, Alt-Texten, optionalen Untertiteln und Hervorhebung verwaltet. Die Zitatverwaltung ist separat; die öffentliche Galerie wählt pro Seitenaufruf ein Zitat und behält diese Auswahl beim Sprachwechsel bei. Löschaktionen im Content Desk verlangen eine ausdrückliche Bestätigung mit `DELETE` oder `УДАЛИТЬ`.
 
@@ -147,7 +151,7 @@ Die tatsächlich erhaltene Datenbank-ID und Bucket-Zuordnung in die passende Kon
 | --- | --- |
 | `ASSETS` | Statische Dateien aus `../site` |
 | `SITE_DB` | D1-Datenbank für redaktionelle Datensätze |
-| `SITE_MEDIA` | R2-Bucket für hochgeladene Bilder |
+| `SITE_MEDIA` | R2-Bucket für Bilder, Videos, Poster und WebVTT |
 | `CONTACT_FORM_RATE_LIMITER` | Begrenzung der Formularanfragen |
 | `CONTACT_EMAIL`, `MAIL_TO` | E-Mail-Versand und Empfänger |
 | `TURNSTILE_SECRET`, `TURNSTILE_HOSTNAMES` | Serverseitige Bot-Prüfung |
@@ -159,7 +163,7 @@ Produktionswerte für Access separat konfigurieren; `.dev.vars` richtet keine Pr
 
 Cloudflare Access muss auf dem verwendeten Admin-Host sowohl `/admin` und `/admin/*` als auch `/api/v1/admin/*` abdecken. Die Audience muss zur Access-Anwendung passen. Der Worker validiert zusätzlich das Access-JWT und die E-Mail-Allowlist; öffentliche Lese-APIs bleiben öffentlich. Die [Access-Pfadregeln](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/) erläutern die Zuordnung.
 
-Die drei Migrationen legen News, Gallery-Zitate sowie World Points und Partners an. Migration `0003` enthält außerdem Ausgangsdaten für Karte und Partner. Nach Prüfung der Zielumgebung:
+Die fünf Migrationen legen News, Gallery-Zitate, World Points, Partners, Videos/Untertitel sowie Projects an. Migration `0003` enthält außerdem Ausgangsdaten für Karte und Partner. Nach Prüfung der Zielumgebung:
 
 ```bash
 npm run db:migrate:remote
@@ -167,9 +171,11 @@ npm run db:migrate:remote
 
 Eine optionale Erstbefüllung der Produktions-News erfolgt mit `npm run seed:news -- mirokit-database`; zuvor mit `--dry-run` prüfen und den oben beschriebenen überschreibenden Effekt berücksichtigen.
 
-Für verwaiste Uploads im R2-Bucket Ablaufregeln nach einem Tag auf **`news/pending/`**, **`gallery/pending/`** und **`partners/pending/`** einrichten. Keine entsprechende Ablaufregel auf die permanenten Bereiche `news/`, `gallery/` oder `partners/` setzen. Die Regel zum Abbrechen unvollständiger Multipart-Uploads ist davon getrennt. Details: [R2 Object Lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/).
+Für verwaiste Uploads im R2-Bucket Ablaufregeln nach einem Tag auf **`news/pending/`**, **`gallery/pending/`** und **`partners/pending/`**, **`videos/pending/`**, **`video-posters/pending/`** und **`subtitles/pending/`** vorbereiten. Die tatsächliche Einrichtung erfordert eine Freigabe für Änderungen am Bucket. Keine solche Ablaufregel auf permanente Bereiche setzen: Dort liegen auch gespeicherte, weiterhin private Entwürfe. Die Regel zum Abbrechen unvollständiger Multipart-Uploads ist davon getrennt. Details: [R2 Object Lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/).
 
-Vor einer Veröffentlichung die Prüfungen aus [CONTRIBUTING.md](CONTRIBUTING.md) durchführen. Aus `worker/`:
+**Für diesen Hardening-Auftrag besteht keine Deployment-Freigabe.** Alle nachfolgenden Veröffentlichungsbefehle sind ausschließlich Betriebsreferenz und werden nicht automatisch ausgeführt. Den lokalen Umsetzungsstand und offene Account-Prüfungen dokumentiert [SECURITY_PLAN.md](SECURITY_PLAN.md).
+
+Vor einer ausdrücklich freigegebenen Veröffentlichung die Prüfungen aus [CONTRIBUTING.md](CONTRIBUTING.md) durchführen. Aus `worker/`:
 
 ```bash
 npx wrangler deploy --dry-run
@@ -210,3 +216,22 @@ Drittanbieter-Bibliotheken, Fonts, Kartendaten, Logos und Medien behalten ihre e
 - [LICENSE.md](LICENSE.md): Rechte, erlaubte Nutzung und Beiträge.
 
 Copyright © 2026 initiative-erLeben & MIRoKIT. Alle Rechte vorbehalten.
+
+## Medienzugriff und Sicherheitsprüfungen
+
+Pending-Medien sind unter `/media/v1/` gesperrt. Permanente Dateien werden nur bei
+aktueller Veröffentlichung ausgeliefert; News berücksichtigen zusätzlich das
+Datum. Entwürfe und archivierte Dateien sind über den geschützten Endpunkt
+`/api/v1/admin/media/<key>` im Content Desk erreichbar. Access muss auch diesen
+Pfad abdecken; die bestehende Regel `/api/v1/admin/*` schließt ihn ein.
+
+Öffentliche R2-Antworten verlangen Revalidierung; Preview und R2-Schreibmetadaten
+verwenden `private, no-store`. Die Gründe und Grenzen stehen unter
+[R2 und statische Assets](ARCHITECTURE.md#r2-und-statische-assets). Alte öffentliche
+Cache-Kopien sowie externe und statische Medien werden durch diese lokale
+Änderung nicht nachträglich privat.
+
+[CONTRIBUTING.md](CONTRIBUTING.md) beschreibt die lokalen Checks und den vorbereiteten
+GitHub-Check `mirokit-ci`. Der Workflow prüft Syntax, Whitespace, Tests und den
+lokalen Worker-Build ohne Veröffentlichung. Hinweise zum privaten Melden von
+Sicherheitsproblemen stehen in [SECURITY.md](SECURITY.md).

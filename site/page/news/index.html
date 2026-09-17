@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The latest news, events and stories from the international MIRoKIT community." />
+  <title data-key="news_page_title">News — MIRoKIT</title>
+  <link rel="canonical" href="https://mirokit.com/page/news/" />
+  <link rel="icon" href="/public/favicon/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/source/style/style.css" />
+  <link rel="stylesheet" href="news.css" />
+</head>
+<body class="news-page">
+  <a class="nw-skip" href="#newsArchive" data-key="ga_skip">Skip to the news archive</a>
+  <header class="nw-header">
+    <a class="nw-brand" href="/#news" data-i18n-attrs="aria-label:op_library_home">
+      <img src="/public/assets/brand/miroKit_logo_full-1.png" alt="MIRoKIT" width="144" height="48" />
+    </a>
+    <a class="nw-home" href="/#news"><span aria-hidden="true">↖</span><span data-key="op_library_home">Back to home</span></a>
+    <div class="nw-actions">
+      <button class="nw-theme" type="button" data-theme-toggle aria-pressed="false">
+        <span class="nw-theme-icon" aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span>
+      </button>
+      <label class="sr-only" for="newsLanguage" data-key="language_label">Language</label>
+      <select id="newsLanguage" data-lang-select data-i18n-attrs="aria-label:language_selector">
+        <option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option>
+      </select>
+    </div>
+  </header>
+  <main class="nw-main">
+    <section class="nw-archive" id="newsArchive" aria-labelledby="newsArchiveTitle" tabindex="-1">
+      <header class="nw-archive-head">
+        <div><span class="nw-kicker" data-key="news_title">Project news</span><h2 id="newsArchiveTitle" data-key="news_page_title">What’s new at MIRoKIT</h2></div>
+        <span class="nw-archive-mark" aria-hidden="true">N<span>26</span></span>
+      </header>
+      <div class="nw-toolbar">
+        <nav class="nw-filters" role="group" aria-label="Filter news by category" data-i18n-attrs="aria-label:news_filter_label">
+          <button type="button" class="is-active" aria-pressed="true" data-filter="all" data-key="news_all">All</button>
+          <button type="button" aria-pressed="false" data-filter="event" data-key="news_category_events">Events</button>
+          <button type="button" aria-pressed="false" data-filter="interview" data-key="news_category_interview">Interviews</button>
+          <button type="button" aria-pressed="false" data-filter="photo" data-key="news_category_photo">Photo report</button>
+          <button type="button" aria-pressed="false" data-filter="announce" data-key="news_category_announce">Announcements</button>
+        </nav>
+        <div class="nw-search-wrap"><label class="nw-search"><span aria-hidden="true">⌕</span><span class="sr-only" data-key="news_search">Search news</span><input id="newsSearch" type="search" maxlength="200" placeholder="Search news" aria-autocomplete="list" aria-controls="newsSuggestions" aria-expanded="false" data-i18n-attrs="placeholder:news_search" /></label><div class="nw-search-suggestions" id="newsSuggestions" role="listbox" hidden></div></div>
+        <label class="nw-sort"><span class="sr-only" data-key="ga_sort">Sort by</span><select id="newsSort"><option value="newest" data-key="ga_newest">Newest first</option><option value="featured" data-key="ga_featured">Featured first</option><option value="title" data-key="ga_az">Title A–Z</option></select></label>
+      </div>
+      <div class="nw-results"><p id="newsCount" role="status" aria-live="polite"></p><button id="newsClear" type="button" data-key="ga_clear" hidden>Clear search</button></div>
+      <div class="nw-grid" id="newsGrid" aria-busy="true"></div>
+      <p class="nw-empty" id="newsEmpty" hidden data-key="news_empty">There are no stories in this category yet — please check back later.</p>
+    </section>
+    <footer class="nw-footer"><span class="nw-kicker">MIRoKIT / SIGNAL</span><h2 data-key="news_footer">Every new story adds another point to our shared map.</h2><a href="/#contact" data-key="suggest_material">Suggest material ↗</a></footer>
+  </main>
+
+  <dialog class="nw-dialog" id="newsViewer" aria-labelledby="newsViewerTitle">
+    <div class="nw-dialog-top"><span class="nw-dialog-label">MIRoKIT / NEWS</span><button type="button" id="newsClose" aria-label="Close">✕</button></div>
+    <div class="nw-dialog-media"><img id="newsViewerImage" src="" alt="" /></div>
+    <div class="nw-dialog-content"><div class="nw-dialog-meta"><span id="newsViewerCategory"></span><time id="newsViewerDate"></time></div><h2 id="newsViewerTitle"></h2><div id="newsViewerBody"></div></div>
+    <div class="nw-dialog-nav"><button type="button" id="newsPrevious" data-key="news_prev">Previous news item</button><span id="newsViewerCounter" aria-live="polite"></span><button type="button" id="newsNext" data-key="news_next">Next news item</button></div>
+  </dialog>
+
+  <script src="/source/scripts/language.js"></script>
+  <script src="/source/scripts/news-data.js"></script>
+  <script type="module" src="news.js"></script>
+</body>
+</html>
