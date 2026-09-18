@@ -16,15 +16,19 @@
       <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       <link rel="icon" type="image/x-icon" href="../../public/favicon/favicon.ico" />
       <link rel="stylesheet" href="../../source/style/style.css" />
+      <link rel="stylesheet" href="../../source/style/subpage.css" />
    </head>
    <body class="privacy-page">
-      <header class="topbar privacy-topbar">
-         <a class="brand" href="../../index.html" aria-label="Вернуться на главную страницу МИРоКИТ">
+      <header class="subpage-header">
+         <a class="subpage-brand" href="../../index.html" aria-label="Вернуться на главную страницу МИРоКИТ">
             <img class="logo-placeholder" src="../../public/assets/brand/miroKit_logo_full-1.png" alt="МИРоКИТ" />
          </a>
-         <div class="privacy-header-actions">
-            <a class="privacy-header-link" href="../../index.html">На главную</a>
-            <a class="privacy-header-button" href="../../index.html#contact">Контакты</a>
+         <a class="subpage-home" href="../../index.html"><span aria-hidden="true">↖</span><span data-key="op_library_home">На главную</span></a>
+         <div class="subpage-actions">
+            <a class="subpage-contact" href="../../index.html#contact"><span data-key="contact_title">Контакты</span></a>
+            <button class="subpage-theme" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span></button>
+            <label class="sr-only" for="privacyLanguage" data-key="language_label">Language</label>
+            <select class="subpage-lang" id="privacyLanguage" data-lang-select data-i18n-attrs="aria-label:language_selector"><option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option></select>
          </div>
       </header>
 
@@ -310,5 +314,7 @@
             <a href="mailto:mirokit2025@gmail.com">Связаться</a>
          </div>
       </footer>
+      <script src="../../source/scripts/language.js"></script>
+      <script src="../../source/scripts/subpage.js"></script>
    </body>
 </html>

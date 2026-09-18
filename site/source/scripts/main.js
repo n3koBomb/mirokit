@@ -699,8 +699,8 @@ const projectsFeatureTitle = document.getElementById("projectsFeatureTitle");
 const projectsFeatureDescription = document.getElementById("projectsFeatureDescription");
 let remoteProjects = [];
 const projectsLogoByView = {
-   current_projects: "public/assets/logos/sections/current_projects_page.png",
-   pas_projects: "public/assets/logos/sections/past_projects_page.png",
+   current_projects: "/public/assets/logos/sections/current_projects_page.png",
+   pas_projects: "/public/assets/logos/sections/past_projects_page.png",
 };
 
 function setProjectsView(viewKey = "current_projects") {

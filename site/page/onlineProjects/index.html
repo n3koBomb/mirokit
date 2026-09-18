@@ -14,20 +14,21 @@
       <link rel="icon" type="image/x-icon" href="../../public/favicon/favicon.ico" />
       <link rel="stylesheet" href="../../source/style/style.css" />
       <link rel="stylesheet" href="./online-projects.css" />
+      <link rel="stylesheet" href="../../source/style/subpage.css" />
    </head>
    <body class="online-project-page">
-      <header class="online-project-page-header">
-         <a class="online-project-page-brand" href="../../index.html#onlineProjects" data-i18n-attrs="aria-label:op_library_home">
+      <header class="subpage-header">
+         <a class="subpage-brand" href="../../index.html#onlineProjects" data-i18n-attrs="aria-label:op_library_home">
             <img src="../../public/assets/brand/miroKit_logo_full-1.png" alt="MIRoKIT" />
          </a>
-         <a class="online-project-home-link" href="../../index.html#onlineProjects"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span data-key="op_library_home">На главную</span></a>
-         <div class="online-project-page-actions">
-            <a class="online-project-participate" href="../../index.html#contact" data-key="op_participate">Участвовать</a>
-            <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+         <a class="subpage-home" href="../../index.html#onlineProjects"><span aria-hidden="true">↖</span><span data-key="op_library_home">На главную</span></a>
+         <div class="subpage-actions">
+            <a class="subpage-contact" href="../../index.html#contact"><span data-key="contact_title">Контакты</span></a>
+            <button class="subpage-theme" type="button" data-theme-toggle aria-pressed="false">
                <i class="fa-solid fa-moon" aria-hidden="true"></i><span class="theme-toggle-label" data-key="theme_dark">Dark</span>
             </button>
             <label class="sr-only" for="projectLangSelect" data-key="language_label">Language</label>
-            <select class="lang-select" id="projectLangSelect" data-lang-select data-i18n-attrs="aria-label:language_selector">
+            <select class="subpage-lang" id="projectLangSelect" data-lang-select data-i18n-attrs="aria-label:language_selector">
                <option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option>
             </select>
          </div>

@@ -2897,6 +2897,7 @@ body #join {
 
 .section-header .section-head {
 	text-align: center;
+	min-width: 0;
 }
 
 .section-logo {
@@ -2920,7 +2921,8 @@ body #join {
 
 .section-header .subtitle {
 	font-weight: 600 !important;
-
+	max-width: 100%;
+	overflow-wrap: anywhere;
 }
 
 .section-logo img[src=""] {
@@ -4408,6 +4410,16 @@ body #join {
 	position: relative;
 	width: min(230px, 68vw);
 	margin: 0 auto;
+	transform-origin: center;
+	transition: transform 0.24s ease, filter 0.24s ease;
+	will-change: transform;
+	z-index: 1;
+}
+
+#aboutUs .method-book:hover,
+#aboutUs .method-book:focus-visible {
+	transform: scale(1.06);
+	filter: drop-shadow(0 14px 22px rgba(13, 27, 75, 0.16));
 }
 
 #aboutUs .method-book img {
@@ -4583,7 +4595,6 @@ body #join {
 }
 
 #team .team-layout .subtitle {
-	white-space: nowrap !important;
 	font-weight: 500;
 }
 
