@@ -534,7 +534,7 @@
                </div>
             </div>
          </section>
-         <section id="historyOfCreation" class="panel compact-panel" data-temporarily-disabled data-disabled-label="Sorry, it's currently not avaiable!">
+         <section id="historyOfCreation" class="panel compact-panel">
             <div class="panel-inner history-layout">
                <div class="section-header">
                   <div class="section-logo history-logo">
@@ -546,6 +546,86 @@
                      <p class="subtitle" data-key="history_subtitle"></p>
                   </div>
                </div>
+               <div class="history-content">
+                  <div class="history-intro fu d1">
+                     <div class="history-intro-aside">
+                        <svg class="history-intro-art" viewBox="0 0 260 180" aria-hidden="true" focusable="false">
+                           <circle class="history-intro-orbit" cx="130" cy="88" r="66" />
+                           <path d="M18 142C48 36 103 18 137 74s53 58 105-30" pathLength="1" />
+                           <path d="M34 157C74 115 101 117 130 140s61 22 98-21" pathLength="1" />
+                           <path d="M18 142L137 74L242 44" pathLength="1" />
+                           <circle cx="18" cy="142" r="7" />
+                           <circle cx="137" cy="74" r="7" />
+                           <circle cx="242" cy="44" r="7" />
+                        </svg>
+                        <div class="history-intro-signal">
+                           <span data-key="history_intro_kicker"></span>
+                           <strong data-key="history_intro_signal"></strong>
+                        </div>
+                     </div>
+                     <p class="history-program-label" data-key="history_program_title"></p>
+                     <p data-key="history_intro_1"></p>
+                     <p data-key="history_intro_2"></p>
+                  </div>
+
+                  <div class="history-authors fu d2">
+                     <div class="history-block-heading">
+                        <span class="history-heading-mark" aria-hidden="true"></span>
+                        <h3 data-key="history_authors_heading"></h3>
+                     </div>
+                     <p class="history-authors-intro" data-key="history_authors_intro"></p>
+                     <div class="history-author-grid">
+                        <article class="history-author-card history-author-card--blue">
+                           <span class="history-author-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+                           <h4 data-key="history_author_1_name"></h4>
+                           <p data-key="history_author_1_bio"></p>
+                        </article>
+                        <article class="history-author-card history-author-card--red">
+                           <span class="history-author-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+                           <h4 data-key="history_author_2_name"></h4>
+                           <p data-key="history_author_2_bio"></p>
+                        </article>
+                        <article class="history-author-card history-author-card--yellow">
+                           <span class="history-author-icon" aria-hidden="true"><i class="fa-solid fa-pen-nib"></i></span>
+                           <h4 data-key="history_author_3_name"></h4>
+                           <p data-key="history_author_3_bio"></p>
+                        </article>
+                        <article class="history-author-card history-author-card--green">
+                           <span class="history-author-icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                           <h4 data-key="history_author_4_name"></h4>
+                           <p data-key="history_author_4_bio"></p>
+                        </article>
+                     </div>
+                     <p class="history-authors-close" data-key="history_authors_close"></p>
+                  </div>
+
+                  <div class="history-journey fu d3">
+                     <div class="history-journey-card history-journey-card--tunisia">
+                        <span class="history-card-icon" aria-hidden="true"><i class="fa-solid fa-earth-europe"></i></span>
+                        <h3 data-key="history_first_steps_heading"></h3>
+                        <p data-key="history_first_steps_body"></p>
+                     </div>
+                     <div class="history-journey-card history-journey-card--game">
+                        <span class="history-card-icon" aria-hidden="true"><i class="fa-solid fa-people-group"></i></span>
+                        <h3 data-key="history_why_game_heading"></h3>
+                        <p data-key="history_why_game_body"></p>
+                        <p class="history-elements" data-key="history_three_elements"></p>
+                     </div>
+                  </div>
+
+                  <div class="history-finale fu d4">
+                     <svg class="history-finale-art" viewBox="0 0 420 120" aria-hidden="true" focusable="false">
+                        <path d="M12 82C70 20 124 20 182 82s112 62 226-28" pathLength="1" />
+                        <path d="M12 82C70 94 124 94 182 82s112-62 226 28" pathLength="1" />
+                        <circle cx="12" cy="82" r="8" />
+                        <circle cx="182" cy="82" r="8" />
+                        <circle cx="408" cy="54" r="8" />
+                     </svg>
+                     <p class="history-finale-lead" data-key="history_final_lead"></p>
+                     <p class="history-finale-text" data-key="history_final"></p>
+                  </div>
+               </div>
+            </div>
          </section>
          <section id="team" class="panel compact-panel">
             <div class="panel-inner team-layout">
@@ -1051,6 +1131,24 @@
                <div class="projects-view" id="projects-current-view" role="tabpanel" data-projects-view="current_projects">
                   <div class="projects-hero-grid">
                      <article class="projects-feature fu d1">
+                        <div class="projects-feature-art" aria-hidden="true">
+                           <svg class="projects-constellation" viewBox="0 0 520 300" focusable="false">
+                              <defs>
+                                 <linearGradient id="projectsArtLine" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0" stop-color="#8cb7ff" />
+                                    <stop offset="0.52" stop-color="#ffcc48" />
+                                    <stop offset="1" stop-color="#ef3340" />
+                                 </linearGradient>
+                              </defs>
+                              <path d="M36 232C112 160 135 70 228 82s99 113 178 48 48-85 78-104" fill="none" stroke="url(#projectsArtLine)" stroke-width="2" stroke-dasharray="7 10" />
+                              <path d="M54 246 142 188 230 205 318 124 426 151 482 76" fill="none" stroke="#1565ff" stroke-opacity=".25" stroke-width="1" />
+                              <g fill="#fff" stroke="#1565ff" stroke-width="2">
+                                 <circle cx="54" cy="246" r="8" /><circle cx="142" cy="188" r="8" /><circle cx="230" cy="205" r="8" /><circle cx="318" cy="124" r="8" /><circle cx="426" cy="151" r="8" /><circle cx="482" cy="76" r="8" />
+                              </g>
+                              <g fill="#ffcc48"><circle cx="142" cy="188" r="3" /><circle cx="318" cy="124" r="3" /><circle cx="482" cy="76" r="3" /></g>
+                              <path d="M64 56h78M64 68h46M380 232h76M398 244h58" stroke="#1565ff" stroke-opacity=".2" stroke-width="2" stroke-linecap="round" />
+                           </svg>
+                        </div>
                         <div class="projects-feature-copy">
                            <span class="projects-kicker" data-key="current_status" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> Сейчас в работе</span>
                            <h3 id="projectsFeatureTitle" data-key="projects_feature_title">Культурный триатлон 2026: команды, раунды, сцена и общий международный финал</h3>
@@ -1063,6 +1161,11 @@
                            </div>
                         </div>
                         <div class="projects-command-center" aria-label="Статус текущего проекта" data-i18n-attrs="aria-label:current_project_status">
+                           <svg class="projects-command-lines" viewBox="0 0 340 220" aria-hidden="true" focusable="false">
+                              <path d="M18 184 96 112l62 38 72-98 92 54" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="5 7" />
+                              <path d="M18 184h304M96 112V184M158 150V184M230 52V184M322 106V184" stroke="#fff" stroke-opacity=".14" stroke-width="1" />
+                              <circle cx="96" cy="112" r="6" fill="#ffcc48" /><circle cx="158" cy="150" r="6" fill="#46d184" /><circle cx="230" cy="52" r="6" fill="#ff7081" /><circle cx="322" cy="106" r="6" fill="#fff" />
+                           </svg>
                            <div class="projects-command-topline"><span>MIRoKIT / PROJECT OS</span><strong>2026</strong></div>
                            <div class="project-radar"><span></span><span></span><span></span></div>
                            <div class="projects-command-route" aria-hidden="true"><span>IDEA</span><i class="fa-solid fa-arrow-right"></i><span>TEAM</span><i class="fa-solid fa-arrow-right"></i><span>IMPACT</span></div>
@@ -1083,6 +1186,14 @@
                         </div>
                      </article>
                      <aside class="projects-context fu d2">
+                        <div class="projects-context-visual" aria-hidden="true">
+                           <svg viewBox="0 0 260 112" focusable="false">
+                              <path d="M20 82 82 28l52 37 45-43 61 38" fill="none" stroke="#1565ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                              <path d="M20 82 82 28l52 37 45-43 61 38" fill="none" stroke="#ffcc48" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 19" />
+                              <circle cx="20" cy="82" r="9" fill="#ef3340" /><circle cx="82" cy="28" r="9" fill="#1565ff" /><circle cx="134" cy="65" r="9" fill="#ffcc48" /><circle cx="179" cy="22" r="9" fill="#32b968" /><circle cx="240" cy="60" r="9" fill="#7b1fa2" />
+                              <path d="M20 100h220" stroke="#1565ff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round" />
+                           </svg>
+                        </div>
                         <div class="projects-dna-heading"><span class="projects-context-label" data-key="why_works">Почему это работает</span><span class="projects-dna-mark">M·K</span></div>
                         <ul>
                            <li><b>01</b><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span data-key="project_modular">Каждый проект состоит из понятных модулей: игра, творчество, диалог, медиа и рефлексия.</span></li>
@@ -1148,19 +1259,39 @@
                   </div>
 
                   <div class="projects-flow fu d2" aria-label="Путь текущего проекта" data-i18n-attrs="aria-label:current_project_path">
+                     <svg class="projects-flow-visual" viewBox="0 0 1200 180" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                        <defs>
+                           <linearGradient id="projectsFlowLine" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0" stop-color="#1565ff" />
+                              <stop offset="0.34" stop-color="#ffcc48" />
+                              <stop offset="0.68" stop-color="#ef3340" />
+                              <stop offset="1" stop-color="#32b968" />
+                           </linearGradient>
+                        </defs>
+                        <path d="M112 54C270 20 348 92 486 54s224-38 318 0 176 35 284 0" fill="none" stroke="url(#projectsFlowLine)" stroke-width="3" stroke-dasharray="8 12" />
+                        <path d="M112 54v82M400 54v82M800 54v82M1088 54v82" fill="none" stroke="#1565ff" stroke-opacity=".13" stroke-width="2" />
+                        <circle cx="112" cy="54" r="13" fill="#fff" stroke="#1565ff" stroke-width="3" />
+                        <circle cx="400" cy="54" r="13" fill="#fff" stroke="#ffcc48" stroke-width="3" />
+                        <circle cx="800" cy="54" r="13" fill="#fff" stroke="#ef3340" stroke-width="3" />
+                        <circle cx="1088" cy="54" r="13" fill="#fff" stroke="#32b968" stroke-width="3" />
+                     </svg>
                      <div>
+                        <svg class="projects-flow-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20 5 24 15l11 1-8 7 3 11-10-6-10 6 3-11-8-7 11-1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /><circle cx="20" cy="20" r="3" fill="currentColor" /></svg>
                         <span>01</span><strong data-key="idea">Идея</strong>
                         <p data-key="idea_desc">Формулируем тему, аудиторию, партнёров и результат.</p>
                      </div>
                      <div>
+                        <svg class="projects-flow-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><circle cx="20" cy="11" r="5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="10" cy="29" r="5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="30" cy="29" r="5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M17 15 12 25m11-10 5 10M15 29h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
                         <span>02</span><strong data-key="teams">Сбор команд</strong>
                         <p data-key="teams_desc">Подключаем школы, клубы, семьи и культурные площадки.</p>
                      </div>
                      <div>
+                        <svg class="projects-flow-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="m20 4 4 11 12 1-9 7 3 12-10-6-10 6 3-12-9-7 12-1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /><path d="m20 11 1.5 4.5L26 17l-4.5 1.5L20 23l-1.5-4.5L14 17l4.5-1.5Z" fill="currentColor" /></svg>
                         <span>03</span><strong data-key="play">Игра</strong>
                         <p data-key="play_desc">Проводим раунды, творческие задания и командные миссии.</p>
                      </div>
                      <div>
+                        <svg class="projects-flow-icon" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M9 34V7m1 1h20l-5 7 5 7H10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /><path d="M14 28h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
                         <span>04</span><strong data-key="final">Финал</strong>
                         <p data-key="final_desc">Публикуем итоги, медиа, дипломы и партнёрский отчёт.</p>
                      </div>

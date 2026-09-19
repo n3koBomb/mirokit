@@ -33,6 +33,10 @@ const slugStatus = document.getElementById("slugStatus");
 const galleryForm = document.getElementById("galleryForm");
 const galleryFile = document.getElementById("galleryFile");
 const gallerySourceUrl = document.getElementById("gallerySourceUrl");
+const gallerySourceFields = document.getElementById("gallerySourceFields");
+const galleryFolderFields = document.getElementById("galleryFolderFields");
+const galleryFolderName = document.getElementById("galleryFolderName");
+const galleryFolderSubtitle = document.getElementById("galleryFolderSubtitle");
 const galleryList = document.getElementById("galleryList");
 const galleryCollection = document.getElementById("galleryCollection");
 const galleryTopic = document.getElementById("galleryTopic");
@@ -90,6 +94,10 @@ function configureGalleryView(isOnline) {
 	galleryTopic.disabled = !isOnline;
 	for (const id of ["onlineProjectSteps", "onlineProjectDestination", "onlineProjectListControls"]) document.getElementById(id).hidden = !isOnline;
 	document.getElementById("galleryQuotesSection").hidden = isOnline;
+	galleryFolderFields.hidden = isOnline;
+	gallerySourceFields.hidden = !isOnline;
+	galleryFolderName.required = !isOnline;
+	gallerySourceUrl.required = false;
 	document.getElementById("galleryPanelEyebrow").textContent = isOnline ? "10 THEMEN · BILDERBIBLIOTHEKEN" : "MEDIENARCHIV";
 	document.getElementById("galleryPanelTitle").textContent = isOnline ? "Online-Projekte" : "Gallery-Bilder";
 	document.getElementById("galleryIntroTitle").textContent = isOnline ? "So landet dein Bild im richtigen Thema" : "Bilder für die öffentliche Galerie";
@@ -102,7 +110,7 @@ function configureGalleryView(isOnline) {
 function updateGalleryDestination() {
 	const topic = ONLINE_PROJECT_TOPICS.find((item) => item.id === galleryTopic.value);
 	onlineProjectLibraryLink.href = `/page/onlineProjects/index.html?lang=de${topic ? `&topic=${topic.id}` : ""}`;
-	galleryPublishButton.textContent = galleryCollection.value === "online-projects" && topic ? `In „${topic.label}“ veröffentlichen` : "Bild veröffentlichen";
+	galleryPublishButton.textContent = galleryCollection.value === "online-projects" && topic ? `In „${topic.label}“ veröffentlichen` : "Bilder als Entwurf hochladen";
 }
 galleryTopic.addEventListener("change", updateGalleryDestination);
 galleryTopicFilter.addEventListener("change", renderGalleryList);
@@ -835,13 +843,21 @@ function renderGalleryList() {
 		return;
 	}
 
-	galleryList.innerHTML = visibleItems.map((item, index) => {
+	const pendingFolders = new Map();
+	if (!isOnline) visibleItems.filter((item) => item.status === "pending").forEach((item) => {
+		const key = item.folderSlug || "uncategorized";
+		if (!pendingFolders.has(key)) pendingFolders.set(key, { title: item.folderTitle || "Gallery", keys: [] });
+		pendingFolders.get(key).keys.push(item.key);
+	});
+	const publishFolders = [...pendingFolders.values()].map((folder) => `<div class="gallery-publish-batch"><div><strong>Pending: ${escapeHtml(folder.title)}</strong><span>${folder.keys.length} Bild${folder.keys.length === 1 ? "" : "er"} warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${escapeHtml(JSON.stringify(folder.keys))}">Ordner veröffentlichen</button></div>`).join("");
+	galleryList.innerHTML = publishFolders + visibleItems.map((item, index) => {
 		const title = item.title?.de || item.title?.en || item.title?.ru || item.key;
 		const alt = item.alt?.de || item.alt?.en || item.alt?.ru || "";
 		const subtitle = item.subtitle?.de || item.subtitle?.en || item.subtitle?.ru || "";
+		const folderTitle = item.folderTitle || "Gallery";
 		const topicName = ONLINE_PROJECT_TOPICS.find((topic) => topic.id === item.topic)?.label || "Noch ohne Thema";
 		const topicEditor = isOnline ? `<div class="gallery-topic-edit"><label for="galleryItemTopic${index}">Thema ändern</label><select id="galleryItemTopic${index}" data-gallery-item-topic><option value="">Bitte zuordnen</option>${ONLINE_PROJECT_TOPICS.map((topic) => `<option value="${topic.id}"${topic.id === item.topic ? " selected" : ""}>${escapeHtml(topic.label)}</option>`).join("")}</select><button class="button button-small" type="button" data-gallery-topic-key="${escapeHtml(item.key)}">Thema speichern</button></div>` : "";
-		return `<article class="gallery-admin-item"><img loading="lazy" data-media-url="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" /><div class="gallery-admin-copy"><strong>${escapeHtml(title)}</strong>${subtitle ? `<span>${escapeHtml(subtitle)}</span>` : ""}<span>${isOnline ? `${escapeHtml(topicName)} · ` : ""}${item.sourceType === "drive" ? "Google Drive · " : ""}${item.featured ? "Hervorgehoben · " : ""}${escapeHtml(item.status)}</span>${topicEditor}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${escapeHtml(item.key)}">Bild löschen</button></div></article>`;
+		return `<article class="gallery-admin-item"><img loading="lazy" data-media-url="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" /><div class="gallery-admin-copy"><strong>${escapeHtml(title)}</strong><span class="gallery-folder-label">${escapeHtml(folderTitle)}</span>${subtitle ? `<span>${escapeHtml(subtitle)}</span>` : ""}<span>${isOnline ? `${escapeHtml(topicName)} · ` : ""}${item.sourceType === "drive" ? "Google Drive · " : ""}${item.featured ? "Hervorgehoben · " : ""}${escapeHtml(item.status)}</span>${topicEditor}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${escapeHtml(item.key)}">Bild löschen</button></div></article>`;
 	}).join("");
 	galleryList.querySelectorAll("img[data-media-url]").forEach((element) => setMediaPreview(element, "src", element.dataset.mediaUrl));
 }
@@ -879,6 +895,18 @@ newsList.addEventListener("click", (event) => {
 });
 
 galleryList.addEventListener("click", async (event) => {
+	const publishButton = event.target.closest("[data-gallery-publish-keys]");
+	if (publishButton) {
+		publishButton.disabled = true;
+		try {
+			const keys = JSON.parse(publishButton.dataset.galleryPublishKeys);
+			await api("/api/v1/admin/gallery/publish", { method: "POST", body: JSON.stringify({ keys }) });
+			await loadGallery();
+			showNotice(`${keys.length} Bild${keys.length === 1 ? "" : "er"} veröffentlicht und dem R2-Ordner zugeordnet.`);
+		} catch (error) { showNotice(error.message, true); }
+		finally { publishButton.disabled = false; }
+		return;
+	}
 	const saveTopic = event.target.closest("[data-gallery-topic-key]");
 	if (saveTopic) {
 		const select = saveTopic.closest(".gallery-topic-edit").querySelector("select");
@@ -984,26 +1012,30 @@ galleryForm.addEventListener("submit", async (event) => {
 	event.preventDefault();
 	if (galleryPublishButton.disabled) return;
 	if (!galleryForm.reportValidity()) return;
-	const file = galleryFile.files?.[0];
+	const files = [...(galleryFile.files || [])];
 	const sourceUrl = gallerySourceUrl.value.trim();
-	if (!file && !sourceUrl) {
-		showNotice("Bitte eine Datei oder eine Google-Drive-URL angeben.", true);
+	if (!files.length && !sourceUrl) {
+		showNotice("Bitte mindestens ein Bild oder eine Google-Drive-URL angeben.", true);
 		galleryFile.focus();
 		return;
 	}
-	if (file && sourceUrl) {
-		showNotice("Bitte nur eine Quelle auswählen: Datei oder Google-Drive-URL.", true);
+	if (files.length && sourceUrl) {
+		showNotice("Bitte nur eine Quelle auswählen: Bilder oder Google-Drive-URL.", true);
 		gallerySourceUrl.focus();
 		return;
 	}
 
 	const body = new FormData();
-	if (file) body.append("file", file);
+	for (const file of files) body.append("file", file);
 	if (sourceUrl) body.append("source_url", sourceUrl);
 	const collection = galleryCollection.value;
 	const topic = galleryTopic.value;
 	body.append("collection", collection);
 	if (collection === "online-projects") body.append("topic", topic);
+	if (collection === "gallery") {
+		body.append("folder_name", galleryFolderName.value.trim());
+		body.append("folder_subtitle", galleryFolderSubtitle.value.trim());
+	}
 	for (const language of LANGUAGES) {
 		body.append(`title_${language}`, galleryField(language, "title").value.trim());
 		body.append(`alt_${language}`, galleryField(language, "alt").value.trim());
@@ -1013,7 +1045,7 @@ galleryForm.addEventListener("submit", async (event) => {
 
 	try {
 		galleryPublishButton.disabled = true;
-		showNotice("Bild wird hochgeladen und veröffentlicht …");
+		showNotice(collection === "online-projects" ? "Bild wird hochgeladen und veröffentlicht …" : `${files.length} Bild${files.length === 1 ? "" : "er"} werden als Entwurf hochgeladen …`);
 		await api("/api/v1/admin/gallery", { method: "POST", body });
 		// A completed upload must not undo a library/tab change made while waiting.
 		const currentCollection = galleryCollection.value;
@@ -1024,7 +1056,7 @@ galleryForm.addEventListener("submit", async (event) => {
 		if (currentCollection === collection && currentTopic === topic && collection === "online-projects") galleryTopicFilter.value = topic;
 		updateGalleryDestination();
 		await loadGallery();
-		showNotice(collection === "online-projects" ? "Bild veröffentlicht. Über „Bibliothek öffnen“ kannst du es im gewählten Thema ansehen." : "Gallery-Bild veröffentlicht.");
+		showNotice(collection === "online-projects" ? "Bild veröffentlicht. Über „Bibliothek öffnen“ kannst du es im gewählten Thema ansehen." : "Bilder stehen jetzt in Pending. Veröffentliche sie unten gesammelt in den gewählten Ordner.");
 	} catch (error) { showNotice(error.message, true); }
 	finally { galleryPublishButton.disabled = false; }
 });

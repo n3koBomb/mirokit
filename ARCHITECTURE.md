@@ -12,6 +12,7 @@ Der Worker in `worker/` erhält durch `run_worker_first` ausgewählte Requests v
 | --- | --- |
 | `site/index.html` | Seitenstruktur, Formulare, Dialoge und statische Ausgangsinhalte |
 | `site/source/style/style.css` | Öffentliches Layout, Komponenten, Themes und Breakpoints |
+| `site/source/style/subpage.css` | Gemeinsamer responsiver Header für Gallery, News, Online Projects und Privacy Policy |
 | `site/source/scripts/language.js` | RU/EN/DE-Wörterbücher und Text-/Attributübersetzungen |
 | `site/source/scripts/news-data.js` | Gebündelte News einschließlich lokalisierter Modal-Inhalte |
 | `site/source/scripts/main.js` | Navigation, Theme, News-/Projects-/Galerie-/Partnerdarstellung, Dialoge und verzögertes Laden |
@@ -28,6 +29,7 @@ Der Worker in `worker/` erhält durch `run_worker_first` ausgewählte Requests v
 | `worker/src/admin-methods.js` | Erlaubte HTTP-Methoden je Admin-Route |
 | `worker/src/security-headers.js` | Report-Only-CSP für Worker-Antworten |
 | `site/admin/media-preview.js` | Authentifizierte Medienvorschau, lokal mit Blob-URLs |
+| `site/source/scripts/subpage.js` | Theme-Synchronisierung des Privacy-Policy-Headers ohne Landingpage-Bootstrap |
 | `worker/src/news.js` | News-Validierung, Abfragen und Datenabbildung |
 | `worker/src/content.js` | World-/Partner-Validierung, Abfragen und Datenabbildung |
 | `worker/src/*.test.js` | Datenverträge, SQLite-Abfragen, Zugriffsgrenzen, JWTs und Vorschauverhalten |
@@ -48,6 +50,7 @@ Die Redaktion öffnet `/admin/`. Das Admin-Skript sendet authentifizierte Anfrag
 | `GET/HEAD /api/v1/partners` | Veröffentlichte Partner |
 | `/api/v1/admin/news`, `/api/v1/admin/media` | News-Verwaltung und Bild-Uploads |
 | `/api/v1/admin/gallery`, `/api/v1/admin/gallery/quotes` | Gallery-Bilder und Zitate verwalten |
+| `POST /api/v1/admin/gallery/publish` | Bis zu 100 Pending-Gallery-Schlüssel gesammelt in ihre Ordner verschieben und als veröffentlicht markieren |
 | `PATCH /api/v1/admin/gallery/<encoded-key>` | Einem vorhandenen Online-Projekte-Bild ein Thema zuweisen |
 | `/api/v1/admin/world-points` | Kartenpunkte verwalten |
 | `/api/v1/admin/partners`, `/api/v1/admin/partners/media` | Partner und Logos verwalten |
@@ -73,7 +76,9 @@ Das News-Seed-Skript liest die gebündelten News, erzeugt SQL und führt Upserts
 
 `SITE_MEDIA` enthält hochgeladene News-Bilder, Gallery-Bilder, Partnerlogos, Projektbilder, Videos, Poster und WebVTT-Dateien. Gallery-Titel, Alt-Texte, Untertitel und Hervorhebung liegen in den Custom-Metadata der Bildobjekte; Gallery-Zitate sowie Project-Metadaten liegen separat in D1. Projektbilder werden zunächst unter `projects/pending/` gespeichert und beim Entwurf-/Veröffentlichungsspeichern nach `projects/` promoted.
 
-Online-Projekte verwenden `collection=online-projects` und eines der zehn validierten `topic`-Kennzeichen in den R2-Metadaten. Startseiten-Links öffnen `/page/onlineProjects/index.html?topic=<thema>`; die Unterseite lädt die Sammlung und filtert sie im Browser. Bilder erscheinen mit ihren natürlichen Seitenverhältnissen in einem Masonry-Raster. Bilder ohne bisherige Zuordnung bleiben unter „Alle Themen“ sichtbar und können im eigenen Admin-Tab nachträglich zugeordnet werden. Die Themenkennzeichen sind in `site/source/scripts/online-project-topics.js` für Worker, Admin und Galerieseite gemeinsam definiert.
+Normale Gallery-Bilder verwenden optional `folder_slug`, `folder_title` und `folder_subtitle` in R2-Custom-Metadata. Mehrere Admin-Dateien bleiben zunächst unter `gallery/pending/<folder-slug>/`; die explizite Publish-Route setzt `status=published` und verschiebt sie nach `gallery/<folder-slug>/`. Die öffentliche Gallery-API liefert daraus neben `gallery` auch gruppierte `folders` mit Bildlisten. Pending-Schlüssel dürfen nur im authentifizierten Admin-Bereich als Vorschau geladen werden.
+
+Online-Projekte verwenden weiterhin `collection=online-projects` und eines der zehn validierten `topic`-Kennzeichen in den R2-Metadaten. Startseiten-Links öffnen `/page/onlineProjects/index.html?topic=<thema>`; die Unterseite lädt die Sammlung und filtert sie im Browser. Bilder erscheinen mit ihren natürlichen Seitenverhältnissen in einem Masonry-Raster. Bilder ohne bisherige Zuordnung bleiben unter „Alle Themen“ sichtbar und können im eigenen Admin-Tab nachträglich zugeordnet werden. Die Themenkennzeichen sind in `site/source/scripts/online-project-topics.js` für Worker, Admin und Galerieseite gemeinsam definiert.
 
 Neue Uploads durchlaufen den jeweiligen `pending/`-Bereich. Beim Speichern werden sie in den permanenten Bereich übernommen, auch bei Entwürfen. Neue WebVTT-Inhalte erhalten bei jedem Speichern einen neuen UUID-Schlüssel. Ablaufregeln dürfen nur verwaiste Pending-Objekte betreffen, nicht gespeicherte Entwürfe; siehe README.
 
@@ -90,7 +95,7 @@ Dateien in `site/public/assets/` sind dagegen Bestandteil des statischen Deploym
 Die öffentliche Seite kann sofort mit gebündelten Inhalten starten. API-Fehler lassen diese bestehen. Erfolgreiche Antworten werden je Bereich unterschiedlich behandelt:
 
 - News: Eine gültige Liste ersetzt die gebündelten News auch dann, wenn sie leer ist.
-- Gallery: `/page/gallery/` lädt Fotos über `/api/v1/gallery?collection=gallery` und Videos bei Bedarf über `/api/v1/videos`. Die Startseite enthält nur verlinkte Vorschaukarten. Vier gebündelte Archivbilder bleiben bei leerer Fotoliste oder API-Fehler verfügbar und werden als Archiv gekennzeichnet; Fehler zeigen zusätzlich eine Wiederholen-Aktion. Leere Videolisten zeigen einen Leerzustand.
+- Gallery: `/page/gallery/` lädt Ordner und Fotos über `/api/v1/gallery?collection=gallery` und Videos bei Bedarf über `/api/v1/videos`. Die Startseite enthält nur verlinkte Vorschaukarten. Vier gebündelte Archivbilder bleiben bei leerer Fotoliste oder API-Fehler verfügbar und werden als Archiv gekennzeichnet; Fehler zeigen zusätzlich eine Wiederholen-Aktion. Leere Videolisten zeigen einen Leerzustand. Die Ordneransicht unterstützt URL-Status über `folder=<slug>`, Zurück zur Ordnerübersicht, Suche, Sortierung und weiterhin den nativen Medien-Dialog.
 - Partners: Eine leere Partnerliste ersetzt die statischen Partnergruppen nicht.
 - World Points: Eine leere Liste lässt die eingebauten Kartenpunkte bestehen.
 
@@ -98,7 +103,7 @@ Damit ist das Archivieren sämtlicher Backend-Einträge nicht in jedem Bereich g
 
 ## Sprache, Darstellung und Laden
 
-Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; die Verschiebung benötigt keine Datenmigration.
+Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `folder`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; Gallery-Ordner benötigen keine D1-Migration.
 
 `language.js` übersetzt sichtbare Inhalte über `data-key` und Attribute über `data-i18n-attrs`. Der Sprachwechsel löst `mirokit:languagechange` aus, auf das dynamische Ansichten reagieren.
 

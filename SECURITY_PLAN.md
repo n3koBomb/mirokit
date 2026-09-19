@@ -1,6 +1,6 @@
 # MIRoKIT – Sicherheits-, Repository- und Hardening-Plan
 
-## Aktueller lokaler Umsetzungsstand – 17. September 2026
+## Aktueller lokaler Umsetzungsstand – 19. September 2026
 
 **Keine Deployment-Freigabe:** Dieser Auftrag umfasst Prüfung und lokale Änderungen.
 Es wurde nichts zu Cloudflare deployed, keine Remote-Migration ausgeführt, kein
@@ -12,9 +12,10 @@ untenstehenden ursprünglichen Empfehlungen sind keine Erlaubnis für ein
 Deployment.
 
 Die Prüfung erfolgte gegen den lokalen Stand auf `master`, ausgehend von Commit
-`33ddfe9`. Bereits vorhandene Änderungen an `site/index.html` und
-`site/source/scripts/language.js` gehören nicht zu diesem Hardening. Der
-Commit- und Push-Status wird durch die Git-Historie dieses Repositorys belegt.
+`66d8af2`; die aktuelle Gallery-/History-/Dokumentationsänderung war während
+dieser Prüfung noch nicht committed. Ein vorheriger GitHub-Push ist kein
+Cloudflare-Deployment. Der Commit- und Push-Status wird durch die Git-Historie
+dieses Repositorys belegt.
 Diese Bestandsaufnahme ist keine vollständige
 Prüfung aller möglichen Sicherheitslücken, der Git-Historie oder der Produktion.
 
@@ -41,6 +42,7 @@ Prüfung aller möglichen Sicherheitslücken, der Git-Historie oder der Produkti
 | 22 | Audit-Log bleibt die im Plan als spätere Erweiterung bezeichnete Arbeit; keine neue Tabelle oder Remote-Migration. |
 | 23, 24, 25 | Serverseitige Admin-Prüfung erhalten und auf Medienvorschauen angewandt. Admin-Routen prüfen Methoden vor einem Speicherzugriff und liefern `405` mit `Allow`. Medienfehler werden intern geloggt und nach außen generisch beantwortet. |
 | 27 | Technische Vertraulichkeitsgrenze für eigene R2-Medien verbessert. Einwilligungen und redaktionelle Freigaben wurden nicht geprüft; statische und extern gehostete Bilder benötigen weiterhin einen eigenen Veröffentlichungsprozess. |
+| Gallery folder workflow | Lokal umgesetzt: Mehrfachupload in `gallery/pending/<folder-slug>/`, expliziter Status, geschützte Admin-Vorschau, maximal 100 Schlüssel pro Sammelveröffentlichung und öffentliche `folders`-Gruppierung. Keine D1-Migration. Die R2-Sammelveröffentlichung ist nicht transaktional; Teilfehler müssen im Admin geprüft werden. |
 | 28 | Bestehende Lösch-/Archivierungsdialoge beibehalten. Weitere Publish-/Archive-Bestätigungen bleiben eine gesonderte UI-Entscheidung. |
 | 30, 31, 32 | Kein CD-Workflow und keine Deployment-Secrets eingerichtet. GitHub Environments und spätere Freigabeschritte bleiben eine separate Betriebsentscheidung. |
 | 33, 34, 35, 40 | README, Architektur und Contribution-Regeln aktualisiert; `SECURITY.md` mit privatem Meldeweg ergänzt. Git-, Review- und Deployment-Schritte bleiben getrennt. Cloudflare-Deployment, Account-Änderungen und Secrets bleiben außerhalb dieses Commit-/Push-Auftrags. |
@@ -109,17 +111,21 @@ Betriebsauftrag. Es wurde keine Freigabe vom Manager vorausgesetzt.
 ### Lokale Validierung
 
 - Ausgangsstand: 29 bestehende Tests bestanden.
-- Nach Umsetzung: 145 Tests in sieben Dateien bestanden, darunter echte
+- Nach Umsetzung: 146 Tests in sieben Dateien bestanden, darunter echte
   SQLite-Abfragen mit allen fünf Repository-Migrationen, signierte RSA-JWTs,
-  Methoden-/Redirect-Prüfungen und authentifizierte Admin-Medienvorschauen.
-- `node scripts/check-js.mjs`: 31 JavaScript-Dateien/Inline-Skripte geprüft.
-- `git diff --check`: bestanden. Neue GitHub-Konfigurationen als YAML geparst.
-- Wrangler `deploy --dry-run`: lokales Bundle erfolgreich erstellt, keine
-  Veröffentlichung. Ein isolierter Test des Bundles mit lokalem `workerd`, D1
-  und R2 prüfte Draft-Sperre, Preview, Publish, Byte-Range, HEAD und Archive.
-- Keine browserbasierte visuelle Abnahme und keine Prüfung gegen Produktions-
-  Access, echte Account-Regeln, bestehende öffentliche Caches oder eine laufende
-  GitHub Action. Report-Only-CSP muss vor Erzwingung im Browser geprüft werden.
+  Methoden-/Redirect-Prüfungen, authentifizierte Admin-Medienvorschauen und den
+  Gallery-Ordner-Upload mit anschließender Sammelveröffentlichung.
+- `node scripts/check-js.mjs`: 32 JavaScript-Dateien/Inline-Skripte geprüft.
+- `git diff --check`: bestanden.
+- Wrangler `deploy --dry-run`: lokales Bundle erfolgreich erstellt, 198 Assets
+  gelesen, keine Veröffentlichung.
+- Die responsive Firefox-Prüfung deckt die aktuellen Second-Page-Header,
+  Gallery-Fallbacks und die 390 × 844-Darstellung ab; sie nutzt einen lokalen
+  statischen Server und beweist daher weder Worker-API, Access, D1 noch R2 in
+  Produktion.
+- Keine Prüfung gegen Produktions-Access, echte Account-Regeln, bestehende
+  öffentliche Caches oder eine laufende GitHub Action. Report-Only-CSP muss vor
+  Erzwingung im Browser geprüft werden.
 
 Technische Referenzen: [Access-JWT-Verifikation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/),
 [R2 Worker API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/),

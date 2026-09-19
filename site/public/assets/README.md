@@ -4,7 +4,10 @@ Use this folder layout when adding new media:
 
 - `brand/` - MIRoKIT logos and core identity images.
 - `backgrounds/` - decorative and section background images, including photo/video thumbnails.
-- `logos/sections/` - section header logos.
+- `logos/sections/` - active section header logos (`history_of_the_game_page`,
+  `our_team`, `our_partners`, `principle_of_the_game`, `how_to_participate`,
+  `age_groups`, `current_projects`, `news`, `gallery` and the two contact
+  variants).
 - `images/news/` - images used by news cards.
 - `images/partners/` - partner organization logos.
 - `images/illustrations/` - explanatory artwork for World, game principles and age groups.
@@ -33,7 +36,8 @@ Use this folder layout when adding new media:
 - Keep image files out of the `assets/` root. Sort by purpose, not file format.
 - `brand/mirokit-wordmark.png` is the formerly UUID-named brand image.
 - Static gallery photos belong in `media/photos/`; explanatory graphics belong in `images/illustrations/`.
-- Section-logo variants stay in `logos/sections/`; unused copy exports belong in `archive/`.
+- Section-logo variants stay in `logos/sections/`; unused copy exports belong in
+  `archive/old_section_logos/` and must not be referenced by active headers.
 - Browser URLs start with `/public/assets/`. `site/` is the document root, not part of the deployed URL.
 - Favicons live in `../favicon/`; the site manifest is `../site.webmanifest`.
 - Update HTML, deferred `data-src` attributes and JavaScript data together when moving files.

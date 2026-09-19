@@ -1,5 +1,20 @@
 # Aufbauplan: Privacy-Policy-Seite
 
+## Aktueller Implementierungsstand – 19. September 2026
+
+Die eigenständige Seite `/page/privacyPolicy/` ist umgesetzt. Sie enthält den
+vollständigen russischen Rechtstext mit Kapiteln 1–14, Inhaltsübersicht,
+normalem vertikalem Dokument-Scroll und den im Plan festgelegten Links. Sie
+verwendet den gemeinsamen `subpage-header` zusammen mit Gallery, News und
+Online Projects sowie `subpage.css` und `subpage.js` für Header, Theme und
+Sprachauswahl. Der Rechtstext selbst bleibt russisch und wird nicht durch die
+allgemeine Übersetzung ersetzt.
+
+Dieser Plan dokumentiert weiterhin die verbindliche Inhaltsquelle und die
+rechtlich neutralen Strukturgrenzen. Die verbleibende Prüfung ist ein
+regelmäßiger Vergleich des HTML-Textes mit der freigegebenen PDF sowie die
+responsive Browserprüfung; daraus folgt keine juristische Prüfung.
+
 ## 1. Verbindliche Inhaltsquelle
 
 Die Datei `/home/nikas/Downloads/ПОЛИТИКА обработки персональных данных 2026.pdf` ist die alleinige Quelle für den Inhalt der Richtlinie.
@@ -56,7 +71,8 @@ PDF-Seitenprüfung:
 
 ## 3. Ziel der Seite und Einordnung in das Projekt
 
-Die bestehende Datei `page/privacyPolicy/index.html` ist derzeit nur ein leerer Platzhalter. Daraus wird eine eigenständige, direkt aufrufbare Richtlinienseite unter `/page/privacyPolicy/`.
+Die Datei `page/privacyPolicy/index.html` ist als eigenständige, direkt
+aufrufbare Richtlinienseite unter `/page/privacyPolicy/` umgesetzt.
 
 Die Seite übernimmt die visuelle Sprache der Startseite aus `index.html` und `source/style/style.css`, aber nicht deren horizontales Panel-Verhalten. Ein sieben Seiten langer Rechtstext benötigt einen normalen vertikalen Dokument-Scroll auf allen Bildschirmgrößen.
 
@@ -64,7 +80,7 @@ Empfohlene DOM-Hierarchie:
 
 ```text
 body.privacy-page
-├── header.topbar
+├── header.subpage-header
 │   ├── brand → zurück zur Startseite
 │   └── kompakte Seitennavigation / Zurück-Link
 ├── main.privacy-main
@@ -114,7 +130,7 @@ Technische CSS-Regel:
 
 - Die bestehende globale Regel für den Desktop-Panel-Modus setzt `body` ab `721px` Breite und `480px` Höhe auf `overflow: hidden`. Für die Richtlinienseite muss deshalb ein klar gescopter Override wie `body.privacy-page` den normalen vertikalen Scroll wieder aktivieren.
 - Keine `.h-scroll`-Leinwand und keine `.panel`-Sections für den Rechtstext verwenden.
-- Gemeinsame Klassen wie `.topbar`, `.brand`, `.fixed-footer`, Buttons und Fokuszustände können wiederverwendet werden; Privacy-spezifische Regeln werden unter `.privacy-page` bzw. `.privacy-document` gekapselt.
+- Gemeinsame Klassen wie `.subpage-header`, `.subpage-brand`, Buttons und Fokuszustände werden wiederverwendet; Privacy-spezifische Regeln sind unter `.privacy-page` bzw. `.privacy-document` gekapselt.
 - Bestehende Breakpoints aus der Startseite bleiben die Orientierung: mobile Basis, 600px, 721px, 900px, 1081px, 1200px und 1440px. Sie werden für Lesbarkeit angepasst, nicht für horizontales Snapping.
 - `prefers-reduced-motion` respektieren; für eine statische Richtlinienseite sind Animationen nicht erforderlich.
 
@@ -128,15 +144,20 @@ Die Seite muss von der Website aus erreichbar sein und zurückführen können.
 - Ein Footer-Link zur Richtlinie kann ergänzt werden, sofern er nur Navigation ist und keinen neuen Rechtstext einführt.
 - Die PDF ist russisch. Eine automatische Übersetzung über den vorhandenen Sprachumschalter darf den Rechtstext nicht ersetzen, solange keine geprüften und ausdrücklich freigegebenen Übersetzungen vorliegen.
 
-## 6. Umsetzungs- und Prüfplan für den nächsten Schritt
+## 6. Erfüllte Umsetzung und verbleibende Prüfungen
 
-1. Den exakten russischen Text aus allen 7 PDF-Seiten in die HTML-Struktur übertragen.
-2. Gegen die Gliederung oben prüfen: Kapitel 1–14, Unterpunkte 1.1–14.4, Listen, URLs und E-Mail vollständig vorhanden.
-3. `page/privacyPolicy/index.html` als eigenständige Seite mit korrektem `lang="ru"`, Seitentitel und verknüpftem Stylesheet aufbauen.
-4. Privacy-spezifische CSS-Regeln in `source/style/style.css` ergänzen, ohne bestehende Startseiten-Regeln oder uncommittete Nutzeränderungen zu überschreiben.
-5. Formular- und Footer-Links auf die neue Seite verbinden.
-6. Auf Mobilgerät, Tablet, Desktop und niedriger Bildschirmhöhe testen; insbesondere sicherstellen, dass der komplette Text erreichbar ist und nicht durch Topbar/Footer verdeckt wird.
-7. Textvergleich gegen die vollständige PDF durchführen. Bei Abweichungen gilt die PDF; keine redaktionelle Korrektur oder juristische Verbesserung wird eigenmächtig vorgenommen.
+1. Der russische Text aus allen 7 PDF-Seiten wurde in die HTML-Struktur
+   übertragen; Kapitel 1–14, Listen, URLs und E-Mail bleiben Bestandteil der
+   Seite.
+2. `page/privacyPolicy/index.html` ist eigenständig, hat `lang="ru"`, Seitentitel
+   und die gemeinsamen Styles/Skripte.
+3. Der gemeinsame `subpage-header` mit Startseiten-, Kontakt-, Theme- und
+   Sprachauswahl ist eingebunden.
+4. Der `privacy-page`-Override erlaubt normalen vertikalen Scroll und kapselt
+   die Dokumentregeln in `subpage.css`.
+5. Noch regelmäßig prüfen: Textvergleich gegen die freigegebene PDF und
+   Browserdarstellung bei Mobilgerät, Tablet, Desktop und niedriger Höhe.
+   Inhaltliche oder juristische Änderungen werden nicht eigenmächtig ergänzt.
 
 ## 7. Abgrenzung
 

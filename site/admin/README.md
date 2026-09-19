@@ -58,3 +58,22 @@ online-project uploads and stores it in R2 custom metadata. An authenticated
 `PATCH /api/v1/admin/gallery/<encoded-key>` with `{ "topic": "drawing" }` changes
 only the topic of an existing online-project image, preserving its bytes, other
 metadata and publication status. No D1 migration is required.
+
+## Gallery folder workflow
+
+The normal **Gallery** tab accepts multiple files together with a folder name
+and optional subtitle. Each file is first stored privately under
+`gallery/pending/<folder-slug>/`; it is not included in the public Gallery
+response. The admin list groups these pending items and provides authenticated
+previews through `/api/v1/admin/media/...`.
+
+Use **Ordner veröffentlichen** only after reviewing the complete group. The
+button calls `POST /api/v1/admin/gallery/publish` with up to 100 pending keys.
+The Worker moves the objects to `gallery/<folder-slug>/`, marks them
+`published`, and exposes the folder through the public `folders` response. A
+batch is deliberately not a D1 transaction, so a partial storage failure must
+be reviewed in the admin list before retrying or deleting items.
+
+The public Gallery opens folders with `?folder=<slug>` and provides a back
+control to the folder list. Online Projects remain a separate immediate-
+publication workflow and do not use this pending folder path.

@@ -21,6 +21,19 @@ function uploadForm(topic, collection = "online-projects") {
  }
  return form;
 }
+function folderUploadForm() {
+ const form = new FormData();
+ form.append("file", new File(["image-one"], "one.webp", { type: "image/webp" }));
+ form.append("file", new File(["image-two"], "two.webp", { type: "image/webp" }));
+ form.append("collection", "gallery");
+ form.append("folder_name", "Sommer & Freunde");
+ form.append("folder_subtitle", "Gemeinsame Momente");
+ for (const language of ["ru", "en", "de"]) {
+  form.append(`title_${language}`, `${language} title`);
+  form.append(`alt_${language}`, `${language} description`);
+ }
+ return form;
+}
 beforeEach(() => {
  objects = new Map();
  media = {
@@ -98,5 +111,32 @@ describe("Online Projects libraries", () => {
  it("does not add PATCH to gallery quotes", async () => {
   expect((await patch("drawing", "quotes/example")).status).toBe(405);
   expect(media.get).not.toHaveBeenCalled();
+ });
+});
+
+describe("Gallery folder workflow", () => {
+ it("keeps multi-image folder uploads pending until explicit publication", async () => {
+  const upload = await request("", { method: "POST", body: folderUploadForm() });
+  expect(upload.status).toBe(202);
+  const pending = (await upload.json()).gallery;
+  expect(pending).toHaveLength(2);
+  expect(pending.every((item) => item.status === "pending" && item.key.startsWith("gallery/pending/sommer-freunde/"))).toBe(true);
+
+  const publicBefore = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
+  expect((await publicBefore.json()).gallery).toEqual([]);
+
+  const publish = await request("/publish", { method: "POST", body: JSON.stringify({ keys: pending.map((item) => item.key) }) });
+  expect(publish.status).toBe(200);
+  const published = (await publish.json()).gallery;
+  expect(published).toHaveLength(2);
+  expect(published.every((item) => item.status === "published" && item.key.startsWith("gallery/sommer-freunde/"))).toBe(true);
+  expect([...objects.values()].filter((item) => item.key.startsWith("gallery/sommer-freunde/")).every((item) => item.customMetadata.status === "published" && item.customMetadata.folder_slug === "sommer-freunde")).toBe(true);
+
+  const publicAfter = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
+  const data = await publicAfter.json();
+  expect(data.gallery).toHaveLength(2);
+  expect(data.folders).toHaveLength(1);
+  expect(data.folders[0]).toMatchObject({ slug: "sommer-freunde", count: 2, title: { en: "Sommer & Freunde" }, subtitle: { de: "Gemeinsame Momente" } });
+  expect(data.folders[0].images).toHaveLength(2);
  });
 });

@@ -45,6 +45,13 @@ Darstellung in mehreren Viewports manuell prüfen. Ein erfolgreicher Syntaxcheck
 oder Wrangler-Dry-Run ersetzt keinen Test mit Access, D1, R2, Turnstile und
 E-Mail-Versand in der Zielumgebung.
 
+Bei Änderungen an Gallery oder den eigenständigen Unterseiten zusätzlich mit
+Firefox bei mindestens 390 × 844 und einem Desktop-Viewport prüfen: Gallery-
+Ordner, Mehrfachupload, Slug-Validierung, Admin-Vorschau, Sammelveröffentlichung,
+öffentliche `folders`-Antwort, Rücknavigation und leere/API-Fehlerzustände. Die
+statische Browserprüfung belegt nur Layout und Fallback-Verhalten; sie ersetzt
+keinen Test gegen Worker, Access, D1 oder R2.
+
 ## Git-Workflow
 
 Änderungen gehören auf einen thematischen Zweig. Vor dem Commit den vollständigen
@@ -53,3 +60,8 @@ den tatsächlichen Umfang beschreiben. Push und Deployment sind getrennte Schrit
 vor einem Push muss geprüft werden, ob außerhalb dieses Repositorys eine
 Cloudflare-Build-Integration oder andere Deployment-Automation eingerichtet ist.
 Eine Freigabe zum lokalen Arbeiten ist keine Deployment-Freigabe.
+
+Vor einem Release müssen außerdem die betroffenen Markdown-Verträge, der
+vollständige staged Diff und der Ziel-Remote gemeinsam geprüft werden. Ein
+GitHub-Push und ein Cloudflare-Deployment bleiben getrennte, ausdrücklich zu
+bestätigende Schritte.

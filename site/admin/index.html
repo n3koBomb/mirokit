@@ -316,15 +316,20 @@
                      </div>
                   </div>
 
+                  <div class="gallery-folder-fields" id="galleryFolderFields">
+                     <label><span>Ordnername / Slogan</span><input id="galleryFolderName" maxlength="120" placeholder="z. B. Gemeinsam unterwegs" required /></label>
+                     <label><span>Ordner-Untertitel</span><input id="galleryFolderSubtitle" maxlength="500" placeholder="Kurze Beschreibung des Albums" /></label>
+                     <p class="muted">Dieser Name wird zum sicheren R2-Ordner-Slug und erscheint als Titel der Folder-Karte.</p>
+                  </div>
                   <div class="upload-row">
                      <div class="upload-icon" aria-hidden="true">↥</div>
                      <label class="file-label">
-                        <span>Bild auswählen</span>
-                        <input id="galleryFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
+                        <span>Mehrere Bilder auswählen</span>
+                        <input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" />
                      </label>
                      <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
                   </div>
-                  <div class="gallery-source-fields">
+                  <div class="gallery-source-fields" id="gallerySourceFields">
                      <label><span>Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" /></label>
                   </div>
                </section>
@@ -364,7 +369,7 @@
 
                <div class="gallery-form-actions">
                   <label class="feature-toggle"><input id="galleryFeatured" type="checkbox" /><span>Als hervorgehobenes Bild anzeigen</span></label>
-                  <button class="button button-primary" id="galleryPublishButton" type="submit">Bild veröffentlichen</button>
+                  <button class="button button-primary" id="galleryPublishButton" type="submit">Bilder als Entwurf hochladen</button>
                </div>
             </form>
 

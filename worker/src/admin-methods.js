@@ -7,6 +7,7 @@ const ADMIN_ROUTES = [
 	[/^\/(?:news|videos|projects)\/[^/]+$/, ["PUT", "DELETE"]],
 	[/^\/(?:partners|world-points)\/[^/]+$/, ["POST", "PUT", "DELETE"]],
 	[/^\/gallery(?:\/quotes)?$/, ["GET", "POST"]],
+	[/^\/gallery\/publish$/, ["POST"]],
 	[/^\/gallery\/quotes\/[^/]+$/, ["DELETE"]],
 	[/^\/gallery\/(?!quotes(?:\/|$)).+$/, ["PATCH", "DELETE"]],
 ];

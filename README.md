@@ -16,11 +16,15 @@ Das Repository enthält eine responsive, vertikal aufgebaute Website und einen g
 
 - Landing-Hero mit einer rotierenden News-Meldung und drei Auswahlpunkten.
 - Projektbeschreibung, Team, Spielprinzip, Altersgruppen, Programme sowie aktuelle, vergangene und Online-Projekte.
+- Aktivierte History-Seite mit lokalisierten Entstehungs-, Autoren- und internationalen Spielstationen.
+- Projektansicht mit dem visualisierten Projektpfad von Idee über Team und Spiel bis zum Finale.
 - Interaktive Weltkarte mit Länderübersicht und Standortstatus.
-- News-Karten mit Detaildialogen, Foto-/Videobereiche, Zitate und Partnergruppen.
+- News-Karten mit Detaildialogen, eine ordnerbasierte Foto-/Videogalerie, Zitate und Partnergruppen.
 - Kontaktformular und Liga-Antrag mit gemeinsamer Worker-API.
 - Russisch, Englisch und Deutsch, Theme-Umschaltung, responsive Navigation und Lesefortschritt.
 - Content Desk unter `/admin/` mit Tabs für News, Gallery, Online Projects, Videos, Projects, World Points und Partners.
+- Gallery-Uploads können als mehrere Bilder in einem benannten Ordner als Pending-Gruppe vorbereitet und anschließend gesammelt veröffentlicht werden; Online Projects bleiben ein getrenntes Topic-System.
+- Gallery, News, Online Projects und Privacy Policy verwenden einen gemeinsamen responsiven Second-Page-Header.
 - Dynamische Veröffentlichung über Cloudflare D1 und R2 mit statischen Ausgangsinhalten im Frontend.
 
 Temporär deaktivierte Bereiche und redaktionelle Platzhalter sind Teil des Entwicklungsstands. Eine Funktion im Code oder eine konfigurierte Domain ist kein Nachweis ihres aktuellen Produktionsbetriebs.
@@ -39,12 +43,13 @@ Die Website verwendet HTML5, CSS Grid/Flexbox, CSS Custom Properties und Vanilla
 │   │   └── admin.js
 │   ├── source/
 │   │   ├── scripts/               # Sprache, News, Interaktionen, Karte, Formulare
-│   │   └── style/style.css
+│   │   ├── style/style.css
+│   │   └── style/subpage.css       # gemeinsamer Header für Second Pages
 │   ├── public/
 │   │   ├── assets/                # Marke, Hintergründe, Illustrationen, Medien
 │   │   ├── favicon/
 │   │   └── site.webmanifest
-│   ├── page/gallery/             # Eigenständige Foto-/Videogalerie
+│   ├── page/gallery/             # Ordnerbasierte Foto-/Videogalerie
 │   ├── page/news/                # Eigenständige Neuigkeitenseite
 │   ├── page/onlineProjects/      # Online-Projekt-Bibliothek
 │   ├── page/privacyPolicy/
@@ -120,7 +125,7 @@ Dieser Server stellt keine Content-APIs bereit. Die statischen Inhalte bleiben a
 | Bereich | Redaktionelle Speicherung | Öffentliche API | Statischer Ausgangsstand |
 | --- | --- | --- | --- |
 | News | D1, Bilder in R2 oder öffentliche Bild-URL | `/api/v1/news` | `site/source/scripts/news-data.js` |
-| Gallery | R2-Bilder mit lokalisierten Metadaten; Zitate in D1 | `/api/v1/gallery?collection=gallery` | `site/page/gallery/`; Startseiten-Karten verlinken die Fotografie-/Videoansicht |
+| Gallery | R2-Bilder mit lokalisierten Metadaten und Ordner-Metadaten; Zitate in D1 | `/api/v1/gallery?collection=gallery` | `site/page/gallery/`; Ordnerkarten öffnen die Bildsammlung, `view=video` öffnet die Videos |
 | Videos | D1-Metadaten, Videos/Poster/WEBVTT in R2 oder externe Quelle | `/api/v1/videos` | `site/page/gallery/?view=video` |
 | World Points | D1 mit Koordinaten, Status und Übersetzungen | `/api/v1/world-points` | `site/source/scripts/mirokit-world-map.js` |
 | Partners | D1 mit Kategorie, Website, Sortierung und Übersetzungen; Logos in R2 oder öffentliche Bild-URL | `/api/v1/partners` | Partner-Markup in `site/index.html` |
@@ -129,6 +134,8 @@ Dieser Server stellt keine Content-APIs bereit. Die statischen Inhalte bleiben a
 News, Gallery, Videos, World Points, Partners und Projects unterstützen je nach Bereich Entwurf, Veröffentlichung und Archivierung. Die News-API berücksichtigt außerdem das Veröffentlichungsdatum. Projects werden anhand von `endDate` automatisch als `past` berechnet, sobald das Datum vor dem heutigen UTC-Datum liegt; die D1-Zeile bleibt dabei unverändert und muss nicht durch einen Cronjob verschoben werden. `featured: 1`, `2` und `3` ordnen die drei neuesten verfügbaren News im Hero; es bleibt jeweils eine Meldung sichtbar.
 
 Gallery-Bilder werden mit RU/EN/DE-Titeln, Alt-Texten, optionalen Untertiteln und Hervorhebung verwaltet. Die Zitatverwaltung ist separat; die öffentliche Galerie wählt pro Seitenaufruf ein Zitat und behält diese Auswahl beim Sprachwechsel bei. Löschaktionen im Content Desk verlangen eine ausdrückliche Bestätigung mit `DELETE` oder `УДАЛИТЬ`.
+
+Normale Gallery-Uploads können mehrere Dateien mit `folder_name` und optionalem `folder_subtitle` als Pending-Gruppe speichern. Der Worker erzeugt einen validierten ASCII-Slug, legt die Dateien unter `gallery/pending/<folder-slug>/` ab und veröffentlicht sie erst über `POST /api/v1/admin/gallery/publish` mit einer begrenzten Schlüsselliste. Die öffentliche Antwort liefert zusätzlich `folders`; Online Projects verwenden weiterhin `collection=online-projects` und ihre validierten Topics.
 
 Die gebündelten Inhalte ermöglichen einen sofortigen Seitenaufbau und Rückfall bei API-Fehlern. Die genaue Behandlung erfolgreicher leerer Antworten unterscheidet sich je Bereich; siehe [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -183,6 +190,8 @@ npm run deploy
 ```
 
 Der erste Befehl prüft die Zusammenstellung ohne Veröffentlichung; der zweite veröffentlicht. Migrationen, Secrets, Access-Policies und R2-Lifecycle-Regeln werden dadurch nicht automatisch eingerichtet.
+
+Der lokale Release-Check umfasst außerdem `node scripts/check-js.mjs`, `git diff --check` und `npm test -- --run` im Verzeichnis `worker/`. Ein Firefox-Check bei 390×844 deckt die vier Second Pages ab; API- und Produktionsnachweise bleiben davon getrennt. Ein Commit beziehungsweise Push nach GitHub ist kein Cloudflare-Deployment.
 
 ## Gestaltung und Barrierefreiheit
 

@@ -23,3 +23,11 @@ the Worker with `--dry-run`; it does not publish a Worker.
 Implementation status and outstanding operational work are tracked in
 [SECURITY_PLAN.md](SECURITY_PLAN.md). This policy is not a claim that the project
 or its production configuration has undergone a complete security audit.
+
+The current Gallery folder workflow keeps newly uploaded normal-Gallery objects
+under private `gallery/pending/<folder-slug>/` keys until an authenticated admin
+batch publish. Public listings include only objects marked `published`; admin
+previews use the protected media route. The batch has a bounded key count and is
+not a transactional database operation, so operators must review partial
+failures before retrying. This behavior is covered by local Worker tests, but
+production Access and R2 behavior still require a separate release check.

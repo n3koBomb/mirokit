@@ -108,10 +108,13 @@ const ADMIN_PANEL_PREFIX = "/admin";
 const ADMIN_PANEL_API_PREFIX = `${SITE_API_PREFIX}/admin`;
 const SITE_MEDIA_PREFIX = "/media/v1/";
 const GALLERY_PREFIX = "gallery/";
-const GALLERY_KEY_PATTERN = /^gallery\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/;
-const GALLERY_PERMANENT_KEY_PATTERN = /^gallery\/[a-f0-9-]+\.(?:jpg|png|webp|avif)$/;
+const GALLERY_FOLDER_SLUG_SOURCE = "[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?";
+const GALLERY_FOLDER_SLUG_PATTERN = new RegExp(`^${GALLERY_FOLDER_SLUG_SOURCE}$`);
+const GALLERY_KEY_PATTERN = new RegExp(`^gallery\/(?!pending\/)(?:${GALLERY_FOLDER_SLUG_SOURCE}\/)?[a-f0-9-]+\\.(?:jpg|png|webp|avif)$`);
+const GALLERY_PENDING_KEY_PATTERN = new RegExp(`^gallery\/pending\/(?:${GALLERY_FOLDER_SLUG_SOURCE}\/)?[a-f0-9-]+\\.(?:jpg|png|webp|avif)$`);
+const GALLERY_PERMANENT_KEY_PATTERN = GALLERY_KEY_PATTERN;
 const GALLERY_LANGUAGES = Object.freeze(["ru", "en", "de"]);
-const GALLERY_STATUSES = new Set(["published", "archived"]);
+const GALLERY_STATUSES = new Set(["pending", "published", "archived"]);
 const GALLERY_COLLECTIONS = new Set(["gallery", "online-projects"]);
 const GALLERY_QUOTE_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const GALLERY_IMAGE_TYPES = Object.freeze({
@@ -1290,6 +1293,30 @@ function normalizeGallerySourceUrl(value) {
 	return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
 }
 
+function normalizeGalleryFolderName(value) {
+	if (typeof value !== "string") throw newsError("Invalid gallery folder name");
+	const normalized = value.trim();
+	if (!normalized || normalized.length > 120) throw newsError("Invalid gallery folder name");
+	return normalized;
+}
+
+function galleryFolderSlug(value) {
+	let slug = value
+		.normalize("NFKD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+		.replace(/^-+|-+$/g, "")
+		.slice(0, 80)
+		.replace(/-+$/g, "");
+	if (!/^[a-z0-9]/.test(slug)) {
+		const codeSlug = [...value].map((character) => character.codePointAt(0).toString(36)).join("-").slice(0, 74).replace(/-+$/g, "");
+		slug = `folder-${codeSlug}`;
+	}
+	if (!slug || !GALLERY_FOLDER_SLUG_PATTERN.test(slug)) throw newsError("Gallery folder name must contain letters or numbers");
+	return slug;
+}
+
 function normalizeGalleryMetadata(formData) {
 	const metadata = {
 		asset_type: "gallery-image",
@@ -1301,6 +1328,11 @@ function normalizeGalleryMetadata(formData) {
 
 	if (!GALLERY_STATUSES.has(metadata.status)) throw newsError("Invalid gallery status");
 	if (!GALLERY_COLLECTIONS.has(metadata.collection)) throw newsError("Invalid gallery collection");
+	if (metadata.collection === "gallery") {
+		metadata.folder_title = normalizeGalleryFolderName(formData.get("folder_name") || "Gallery");
+		metadata.folder_subtitle = galleryOptionalTextValue(formData.get("folder_subtitle"), "folder_subtitle", 500);
+		metadata.folder_slug = galleryFolderSlug(metadata.folder_title);
+	}
 	if (metadata.collection === "online-projects") {
 		metadata.topic = String(formData.get("topic") || "").trim();
 		if (!isOnlineProjectTopic(metadata.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
@@ -1416,14 +1448,19 @@ async function saveGalleryQuoteRecord(env, quote, status = "published") {
 	};
 }
 
-function galleryItemFromObject(object) {
+function galleryItemFromObject(object, preview = false) {
 	const metadata = object.customMetadata || {};
 	return {
 		key: object.key,
-		image: `${SITE_MEDIA_PREFIX}${object.key}`,
+		image: preview && object.key.includes("/pending/")
+			? `/api/v1/admin/media/${encodeURIComponent(object.key)}`
+			: `${SITE_MEDIA_PREFIX}${object.key}`,
 		status: metadata.status || "archived",
 		collection: metadata.collection || "gallery",
 		topic: metadata.collection === "online-projects" && isOnlineProjectTopic(metadata.topic) ? metadata.topic : "",
+		folderSlug: metadata.folder_slug || (object.key.match(/^gallery\/(?:pending\/)?([^/]+)\//)?.[1] || ""),
+		folderTitle: metadata.folder_title || "",
+		folderSubtitle: metadata.folder_subtitle || "",
 		sourceType: metadata.source_type || "r2",
 		featured: metadata.featured === "true" || metadata.featured === "1",
 		uploadedAt: metadata.uploaded_at || (object.uploaded instanceof Date ? object.uploaded.toISOString() : String(object.uploaded || "")),
@@ -1434,7 +1471,7 @@ function galleryItemFromObject(object) {
 	};
 }
 
-async function listGallery(env, includeArchived = false, collection = "") {
+async function listGallery(env, includeArchived = false, collection = "", includePending = false) {
 	if (!env.SITE_MEDIA) throw newsError("News media storage is not configured", 503);
 
 	const objects = [];
@@ -1448,17 +1485,19 @@ async function listGallery(env, includeArchived = false, collection = "") {
 	} while (cursor);
 
 	return objects
-		.filter((object) => GALLERY_PERMANENT_KEY_PATTERN.test(object.key))
-		.map(galleryItemFromObject)
+		.filter((object) => GALLERY_PERMANENT_KEY_PATTERN.test(object.key) || (includePending && GALLERY_PENDING_KEY_PATTERN.test(object.key)))
+		.map((object) => galleryItemFromObject(object, includePending))
 		.filter((item) => includeArchived || item.status === "published")
 		.filter((item) => !collection || item.collection === collection)
 		.sort((a, b) => String(b.uploadedAt).localeCompare(String(a.uploadedAt)));
 }
 
 async function promotePendingGalleryImage(env, sourceKey) {
+	if (!GALLERY_PENDING_KEY_PATTERN.test(sourceKey)) throw newsError("Invalid pending gallery key");
 	const destinationKey = sourceKey.replace("gallery/pending/", "gallery/");
 	const object = await env.SITE_MEDIA.get(sourceKey);
 	if (!object) throw newsError("Uploaded gallery image no longer exists", 409);
+	const customMetadata = { ...(object.customMetadata || {}), status: "published" };
 
 	const metadataHeaders = new Headers();
 	object.writeHttpMetadata?.(metadataHeaders);
@@ -1467,10 +1506,31 @@ async function promotePendingGalleryImage(env, sourceKey) {
 			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
 			cacheControl: PRIVATE_MEDIA_CACHE,
 		},
-		customMetadata: object.customMetadata || {},
+		customMetadata,
 	});
 	await env.SITE_MEDIA.delete(sourceKey);
-	return destinationKey;
+	return { key: destinationKey, customMetadata };
+}
+
+function galleryFolders(items) {
+	const folders = new Map();
+	for (const item of items) {
+		const slug = item.folderSlug || "uncategorized";
+		if (!folders.has(slug)) {
+			folders.set(slug, {
+				slug,
+				title: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderTitle || item.title[language] || "Gallery"])),
+				subtitle: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderSubtitle || ""])),
+				cover: item.image,
+				count: 0,
+				images: [],
+			});
+		}
+		const folder = folders.get(slug);
+		folder.count += 1;
+		folder.images.push(item);
+	}
+	return [...folders.values()];
 }
 
 async function handlePublicNews(request, env, origin) {
@@ -1518,7 +1578,7 @@ async function handlePublicGallery(request, env, origin) {
 		const gallery = env.SITE_MEDIA ? await listGallery(env, false, collection) : [];
 		const quotes = await listGalleryQuotes(env);
 		return newsJsonResponse(
-			{ success: true, gallery, quotes },
+			{ success: true, gallery, folders: galleryFolders(gallery), quotes },
 			200,
 			origin,
 			env
@@ -2028,46 +2088,74 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 		}
 
 		if (isGalleryPath && request.method === "GET") {
-			return newsJsonResponse({ success: true, gallery: await listGallery(env, true) }, 200, origin, env);
+			const gallery = await listGallery(env, true, "", true);
+			return newsJsonResponse({ success: true, gallery, folders: galleryFolders(gallery.filter((item) => item.status === "published")) }, 200, origin, env);
+		}
+
+		if (relativePath === "/gallery/publish" && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const payload = await readJsonRequest(request);
+			const keys = Array.isArray(payload?.keys) ? [...new Set(payload.keys)] : [];
+			if (!keys.length || keys.length > 100 || keys.some((key) => typeof key !== "string" || !GALLERY_PENDING_KEY_PATTERN.test(key))) {
+				throw newsError("Invalid pending gallery keys");
+			}
+			const published = [];
+			for (const key of keys) {
+				const promoted = await promotePendingGalleryImage(env, key);
+				published.push(galleryItemFromObject(promoted));
+			}
+			return newsJsonResponse({ success: true, gallery: published, folders: galleryFolders(published) }, 200, origin, env);
 		}
 
 		if (isGalleryPath && request.method === "POST") {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			const formData = await request.formData();
-			const file = formData.get("file");
+			const usesFolderWorkflow = formData.has("folder_name");
 			const metadata = normalizeGalleryMetadata(formData);
+			const files = formData.getAll("file").filter((file) => file instanceof File);
 			const sourceUrl = normalizeGallerySourceUrl(formData.get("source_url"));
-			if (file instanceof File && sourceUrl) throw newsError("Choose a file or a Google Drive URL, not both");
-			if (!(file instanceof File) && !sourceUrl) throw newsError("Choose an image file or provide a Google Drive URL");
+			if (files.length && sourceUrl) throw newsError("Choose files or a Google Drive URL, not both");
+			if (!files.length && !sourceUrl) throw newsError("Choose at least one image file or provide a Google Drive URL");
+			if (sourceUrl && metadata.collection === "gallery") throw newsError("Gallery folders require image files");
+			if (sourceUrl && files.length) throw newsError("Choose files or a Google Drive URL, not both");
+			if (sourceUrl && metadata.collection === "online-projects") files.push(null);
+			if (metadata.collection === "gallery") metadata.status = usesFolderWorkflow ? "pending" : "published";
 
-			let body;
-			let contentType;
-			let extension;
-			if (file instanceof File) {
-				if (!GALLERY_IMAGE_TYPES[file.type] || file.size === 0 || file.size > GALLERY_IMAGE_MAX_BYTES) {
-					return newsJsonResponse({ success: false, message: "Unsupported image or image too large" }, 400, origin, env);
+			const uploaded = [];
+			for (const file of files) {
+				let body;
+				let contentType;
+				let extension;
+				if (file instanceof File) {
+					if (!GALLERY_IMAGE_TYPES[file.type] || file.size === 0 || file.size > GALLERY_IMAGE_MAX_BYTES) {
+						return newsJsonResponse({ success: false, message: "Unsupported image or image too large" }, 400, origin, env);
+					}
+					body = file.stream();
+					contentType = file.type;
+					extension = GALLERY_IMAGE_TYPES[file.type];
+				} else {
+					const remoteImage = await readRemoteGalleryImage(sourceUrl);
+					body = remoteImage.body;
+					contentType = remoteImage.contentType;
+					extension = remoteImage.extension;
 				}
-				body = file.stream();
-				contentType = file.type;
-				extension = GALLERY_IMAGE_TYPES[file.type];
-			} else {
-				const remoteImage = await readRemoteGalleryImage(sourceUrl);
-				body = remoteImage.body;
-				contentType = remoteImage.contentType;
-				extension = remoteImage.extension;
-			}
 
-			metadata.source_type = sourceUrl ? "drive" : "r2";
-			const pendingKey = `gallery/pending/${crypto.randomUUID()}.${extension}`;
-			await env.SITE_MEDIA.put(pendingKey, body, {
-				httpMetadata: {
-					contentType,
-					cacheControl: PRIVATE_MEDIA_CACHE,
-				},
-				customMetadata: metadata,
-			});
-			const key = await promotePendingGalleryImage(env, pendingKey);
-			return newsJsonResponse({ success: true, gallery: galleryItemFromObject({ key, customMetadata: metadata }) }, 201, origin, env);
+				metadata.source_type = sourceUrl ? "drive" : "r2";
+				const folderPrefix = metadata.collection === "gallery" && usesFolderWorkflow ? `${metadata.folder_slug}/` : "";
+				const pendingKey = `gallery/pending/${folderPrefix}${crypto.randomUUID()}.${extension}`;
+				await env.SITE_MEDIA.put(pendingKey, body, {
+					httpMetadata: { contentType, cacheControl: PRIVATE_MEDIA_CACHE },
+					customMetadata: { ...metadata },
+				});
+				if (metadata.collection === "online-projects" || (metadata.collection === "gallery" && !usesFolderWorkflow)) {
+					const promoted = await promotePendingGalleryImage(env, pendingKey);
+					uploaded.push(galleryItemFromObject(promoted));
+				} else {
+					uploaded.push(galleryItemFromObject({ key: pendingKey, customMetadata: metadata }, true));
+				}
+			}
+			const responseGallery = !usesFolderWorkflow && uploaded.length === 1 ? uploaded[0] : uploaded;
+			return newsJsonResponse({ success: true, pending: metadata.collection === "gallery" && usesFolderWorkflow, gallery: responseGallery, folders: galleryFolders(uploaded) }, metadata.collection === "gallery" && usesFolderWorkflow ? 202 : 201, origin, env);
 		}
 
 		const galleryItemMatch = relativePath.match(/^\/gallery\/(.+)$/);
@@ -2100,7 +2188,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 			} catch {
 				throw newsError("Invalid gallery key");
 			}
-			if (!GALLERY_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
+			if (!GALLERY_KEY_PATTERN.test(key) && !GALLERY_PENDING_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
 			await env.SITE_MEDIA.delete(key);
 			return newsJsonResponse({ success: true, key }, 200, origin, env);
 		}

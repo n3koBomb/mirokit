@@ -1101,6 +1101,31 @@ input[type="file"]::file-selector-button {
     padding-top: 22px;
 }
 
+.gallery-folder-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 13px;
+    margin: 0 27px;
+    padding: 18px;
+    border: 1px solid rgba(21, 101, 255, 0.12);
+    border-radius: 17px;
+    background: linear-gradient(135deg, #f7faff, #fffdf3);
+}
+
+.gallery-folder-fields label {
+    display: grid;
+    gap: 6px;
+    color: var(--blue-ink);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.gallery-folder-fields p {
+    grid-column: 1 / -1;
+    margin: -3px 0 0;
+    font-size: 0.72rem;
+}
+
 .gallery-source-fields {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(190px, 0.35fr);
@@ -1179,6 +1204,35 @@ input[type="file"]::file-selector-button {
     font-weight: 700;
 }
 
+.gallery-publish-batch {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 13px 15px;
+    border: 1px solid rgba(124, 53, 233, 0.2);
+    border-radius: 15px;
+    background: linear-gradient(110deg, #f7f1ff, #fff9e7);
+}
+
+.gallery-publish-batch strong,
+.gallery-publish-batch span {
+    display: block;
+}
+
+.gallery-publish-batch strong {
+    color: var(--blue-ink);
+    font-size: 0.8rem;
+}
+
+.gallery-publish-batch span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
 .gallery-admin-item {
     display: grid;
     grid-template-columns: 86px minmax(0, 1fr);
@@ -1211,6 +1265,12 @@ input[type="file"]::file-selector-button {
 .gallery-admin-item span {
     display: block;
     overflow-wrap: anywhere;
+}
+
+.gallery-admin-item .gallery-folder-label {
+    color: var(--blue);
+    font-size: 0.72rem;
+    font-weight: 900;
 }
 
 .gallery-admin-item strong {
@@ -1453,6 +1513,11 @@ input[type="file"]::file-selector-button {
         grid-template-columns: 1fr;
     }
 
+    .gallery-folder-fields {
+        grid-template-columns: 1fr;
+        margin-inline: 18px;
+    }
+
     .upload-meta {
         grid-column: 1 / -1;
         max-width: none;
@@ -1491,6 +1556,11 @@ input[type="file"]::file-selector-button {
 
     .gallery-admin-list {
         padding: 18px;
+    }
+
+    .gallery-publish-batch {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .admin-footer {
