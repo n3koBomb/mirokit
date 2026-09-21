@@ -69,6 +69,18 @@ describe("Online Projects libraries", () => {
   expect(response.status).toBe(201);
   expect((await response.json()).gallery.topic).toBe("");
  });
+ it("accepts online-project uploads without image translations", async () => {
+  const form = uploadForm("photo");
+  for (const language of ["ru", "en", "de"]) {
+   form.delete(`title_${language}`);
+   form.delete(`alt_${language}`);
+  }
+  const response = await request("", { method: "POST", body: form });
+  const body = await response.json();
+  expect(response.status).toBe(201);
+  expect(body.gallery.title.de).toBe("photo");
+  expect(body.gallery.alt.en).toBe("photo");
+ });
  it("lists legacy images without guessing a topic and excludes other collections and archived items", async () => {
   addImage();
   objects.set(key.replace("550", "660"), { key: key.replace("550", "660"), customMetadata: { collection: "gallery", status: "published" } });

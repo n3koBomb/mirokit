@@ -35,7 +35,7 @@ const galleryFile = document.getElementById("galleryFile");
 const gallerySourceUrl = document.getElementById("gallerySourceUrl");
 const gallerySourceFields = document.getElementById("gallerySourceFields");
 const galleryFolderTranslations = document.getElementById("galleryFolderTranslations");
-const galleryImageTranslations = document.getElementById("galleryImageTranslations");
+const galleryTranslationsSection = document.getElementById("galleryTranslationsSection");
 const galleryLanguagesHeading = document.getElementById("galleryLanguagesHeading");
 const galleryLanguagesHelp = document.getElementById("galleryLanguagesHelp");
 const galleryThumbnailFile = document.getElementById("galleryThumbnailFile");
@@ -98,14 +98,9 @@ function configureGalleryView(isOnline) {
 	for (const id of ["onlineProjectSteps", "onlineProjectDestination", "onlineProjectListControls"]) document.getElementById(id).hidden = !isOnline;
 	document.getElementById("galleryQuotesSection").hidden = isOnline;
 	gallerySourceFields.hidden = !isOnline;
+	galleryTranslationsSection.hidden = isOnline;
 	galleryFolderTranslations.hidden = isOnline;
-	galleryImageTranslations.hidden = !isOnline;
 	galleryFolderTranslations.querySelectorAll("[data-gallery-folder-field=title]").forEach((field) => { field.required = !isOnline; });
-	galleryImageTranslations.querySelectorAll("[data-gallery-field=title], [data-gallery-field=alt]").forEach((field) => { field.required = isOnline; });
-	galleryLanguagesHeading.textContent = isOnline ? "Bild-Metadaten" : "Ordner-Übersetzungen";
-	galleryLanguagesHelp.textContent = isOnline
-		? "Titel, Alt-Text und optionale Untertitel gehören zu den Bildern dieser Themenbibliothek."
-		: "Die Überschrift und der Titel werden für den Ordner in RU, EN und DE gespeichert. Die einzelnen Bilder erhalten hier keine sichtbaren Überschriften.";
 	gallerySourceUrl.required = false;
 	document.getElementById("galleryPanelEyebrow").textContent = isOnline ? "10 THEMEN · BILDERBIBLIOTHEKEN" : "MEDIENARCHIV";
 	document.getElementById("galleryPanelTitle").textContent = isOnline ? "Online-Projekte" : "Gallery-Bilder";
@@ -319,10 +314,6 @@ function escapeHtml(value) {
 
 function field(language, name) {
 	return form.querySelector(`[data-language="${language}"][data-field="${name}"]`);
-}
-
-function galleryField(language, name) {
-	return galleryForm.querySelector(`[data-gallery-language="${language}"][data-gallery-field="${name}"]`);
 }
 
 function galleryFolderField(language, name) {
@@ -1181,12 +1172,6 @@ galleryForm.addEventListener("submit", async (event) => {
 		for (const language of LANGUAGES) {
 			body.append(`folder_title_${language}`, galleryFolderField(language, "title").value.trim());
 			body.append(`folder_subtitle_${language}`, galleryFolderField(language, "subtitle").value.trim());
-		}
-	} else {
-		for (const language of LANGUAGES) {
-			body.append(`title_${language}`, galleryField(language, "title").value.trim());
-			body.append(`alt_${language}`, galleryField(language, "alt").value.trim());
-			body.append(`subtitle_${language}`, galleryField(language, "subtitle").value.trim());
 		}
 	}
 	if (document.getElementById("galleryFeatured").checked) body.append("featured", "true");

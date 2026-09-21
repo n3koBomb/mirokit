@@ -1348,13 +1348,11 @@ function normalizeGalleryMetadata(formData) {
 	}
 
 	for (const language of GALLERY_LANGUAGES) {
-		const fallbackImageText = metadata.collection === "gallery" ? metadata[`folder_title_${language}`] || metadata.folder_title : "";
-		metadata[`title_${language}`] = metadata.collection === "gallery"
-			? galleryOptionalTextValue(formData.get(`title_${language}`) || fallbackImageText, `title_${language}`)
-			: galleryTextValue(formData.get(`title_${language}`), `title_${language}`);
-		metadata[`alt_${language}`] = metadata.collection === "gallery"
-			? galleryOptionalTextValue(formData.get(`alt_${language}`) || fallbackImageText, `alt_${language}`)
-			: galleryTextValue(formData.get(`alt_${language}`), `alt_${language}`);
+		const fallbackImageText = metadata.collection === "gallery"
+			? metadata[`folder_title_${language}`] || metadata.folder_title
+			: metadata.topic || "MIRoKIT";
+		metadata[`title_${language}`] = galleryOptionalTextValue(formData.get(`title_${language}`) || fallbackImageText, `title_${language}`);
+		metadata[`alt_${language}`] = galleryOptionalTextValue(formData.get(`alt_${language}`) || fallbackImageText, `alt_${language}`);
 		metadata[`subtitle_${language}`] = galleryOptionalTextValue(formData.get(`subtitle_${language}`), `subtitle_${language}`);
 		metadata[`quote_${language}`] = galleryOptionalTextValue(formData.get(`quote_${language}`), `quote_${language}`);
 	}
