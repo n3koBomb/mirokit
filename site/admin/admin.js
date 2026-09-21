@@ -34,9 +34,11 @@ const galleryForm = document.getElementById("galleryForm");
 const galleryFile = document.getElementById("galleryFile");
 const gallerySourceUrl = document.getElementById("gallerySourceUrl");
 const gallerySourceFields = document.getElementById("gallerySourceFields");
-const galleryFolderFields = document.getElementById("galleryFolderFields");
-const galleryFolderName = document.getElementById("galleryFolderName");
-const galleryFolderSubtitle = document.getElementById("galleryFolderSubtitle");
+const galleryFolderTranslations = document.getElementById("galleryFolderTranslations");
+const galleryImageTranslations = document.getElementById("galleryImageTranslations");
+const galleryLanguagesHeading = document.getElementById("galleryLanguagesHeading");
+const galleryLanguagesHelp = document.getElementById("galleryLanguagesHelp");
+const galleryThumbnailFile = document.getElementById("galleryThumbnailFile");
 const galleryList = document.getElementById("galleryList");
 const galleryCollection = document.getElementById("galleryCollection");
 const galleryTopic = document.getElementById("galleryTopic");
@@ -48,6 +50,7 @@ for (const topic of ONLINE_PROJECT_TOPICS) {
 	galleryTopicFilter.add(new Option(topic.label, topic.id));
 }
 const quoteForm = document.getElementById("quoteForm");
+const quoteFolder = document.getElementById("quoteFolder");
 const galleryQuoteList = document.getElementById("galleryQuoteList");
 const worldPointForm = document.getElementById("worldPointForm");
 const worldPointsList = document.getElementById("worldPointsList");
@@ -94,9 +97,15 @@ function configureGalleryView(isOnline) {
 	galleryTopic.disabled = !isOnline;
 	for (const id of ["onlineProjectSteps", "onlineProjectDestination", "onlineProjectListControls"]) document.getElementById(id).hidden = !isOnline;
 	document.getElementById("galleryQuotesSection").hidden = isOnline;
-	galleryFolderFields.hidden = isOnline;
 	gallerySourceFields.hidden = !isOnline;
-	galleryFolderName.required = !isOnline;
+	galleryFolderTranslations.hidden = isOnline;
+	galleryImageTranslations.hidden = !isOnline;
+	galleryFolderTranslations.querySelectorAll("[data-gallery-folder-field=title]").forEach((field) => { field.required = !isOnline; });
+	galleryImageTranslations.querySelectorAll("[data-gallery-field=title], [data-gallery-field=alt]").forEach((field) => { field.required = isOnline; });
+	galleryLanguagesHeading.textContent = isOnline ? "Bild-Metadaten" : "Ordner-Übersetzungen";
+	galleryLanguagesHelp.textContent = isOnline
+		? "Titel, Alt-Text und optionale Untertitel gehören zu den Bildern dieser Themenbibliothek."
+		: "Die Überschrift und der Titel werden für den Ordner in RU, EN und DE gespeichert. Die einzelnen Bilder erhalten hier keine sichtbaren Überschriften.";
 	gallerySourceUrl.required = false;
 	document.getElementById("galleryPanelEyebrow").textContent = isOnline ? "10 THEMEN · BILDERBIBLIOTHEKEN" : "MEDIENARCHIV";
 	document.getElementById("galleryPanelTitle").textContent = isOnline ? "Online-Projekte" : "Gallery-Bilder";
@@ -115,9 +124,35 @@ function updateGalleryDestination() {
 galleryTopic.addEventListener("change", updateGalleryDestination);
 galleryTopicFilter.addEventListener("change", renderGalleryList);
 
-function showNotice(message, error = false) {
-	notice.textContent = message;
-	notice.classList.toggle("error", error);
+function showNotice(message, error = false, type = "") {
+	if (!message) {
+		notice.replaceChildren();
+		return;
+	}
+	const kind = error ? "error" : type || (String(message).includes("…") ? "info" : "success");
+	const toast = document.createElement("article");
+	toast.className = `admin-toast admin-toast-${kind}`;
+	toast.setAttribute("role", kind === "error" ? "alert" : "status");
+	const icon = document.createElement("span");
+	icon.className = "admin-toast-icon";
+	icon.setAttribute("aria-hidden", "true");
+	icon.textContent = kind === "error" ? "!" : kind === "info" ? "i" : "✓";
+	const text = document.createElement("p");
+	text.textContent = message;
+	const close = document.createElement("button");
+	close.className = "admin-toast-close";
+	close.type = "button";
+	close.setAttribute("aria-label", "Meldung schließen");
+	close.textContent = "×";
+	const dismiss = () => {
+		toast.classList.add("is-leaving");
+		window.setTimeout(() => toast.remove(), 220);
+	};
+	close.addEventListener("click", dismiss);
+	toast.append(icon, text, close);
+	notice.append(toast);
+	window.requestAnimationFrame(() => toast.classList.add("is-visible"));
+	window.setTimeout(dismiss, kind === "error" ? 9000 : kind === "info" ? 6500 : 5000);
 	if (error) focusAdminErrorField(message);
 }
 
@@ -288,6 +323,10 @@ function field(language, name) {
 
 function galleryField(language, name) {
 	return galleryForm.querySelector(`[data-gallery-language="${language}"][data-gallery-field="${name}"]`);
+}
+
+function galleryFolderField(language, name) {
+	return galleryForm.querySelector(`[data-gallery-folder-language="${language}"][data-gallery-folder-field="${name}"]`);
 }
 
 function quoteField(language, name) {
@@ -738,6 +777,7 @@ async function loadNews(selectId = editingId) {
 async function loadGallery() {
 	const response = await api("/api/v1/admin/gallery");
 	galleryItems = response.gallery || [];
+	renderQuoteFolderOptions();
 	renderGalleryList();
 	try {
 		const quoteResponse = await api("/api/v1/admin/gallery/quotes");
@@ -747,6 +787,17 @@ async function loadGallery() {
 		console.info("[MIRoKIT] Gallery quotes are unavailable:", error.message);
 	}
 	renderQuoteList();
+}
+
+function renderQuoteFolderOptions() {
+	const selected = quoteFolder.value;
+	const folders = new Map();
+	galleryItems.filter((item) => (item.collection || "gallery") === "gallery").forEach((item) => {
+		const slug = item.folderSlug || "uncategorized";
+		if (!folders.has(slug)) folders.set(slug, item.folderTitle || "Gallery");
+	});
+	quoteFolder.innerHTML = '<option value="">Ordner auswählen</option>' + [...folders.entries()].map(([slug, title]) => `<option value="${escapeHtml(slug)}">${escapeHtml(title)}</option>`).join("");
+	if (folders.has(selected)) quoteFolder.value = selected;
 }
 
 async function loadWorldPoints(selectId = editingWorldPointId) {
@@ -842,6 +893,45 @@ function renderGalleryList() {
 		galleryList.innerHTML = `<p class="muted">${isOnline ? "In dieser Auswahl gibt es noch keine Bilder. Wähle oben ein Thema und veröffentliche das erste Bild." : "Noch keine Gallery-Bilder vorhanden."}</p>`;
 		return;
 	}
+	if (!isOnline) {
+		const folders = new Map();
+		visibleItems.forEach((item) => {
+			const slug = item.folderSlug || "uncategorized";
+			if (!folders.has(slug)) folders.set(slug, {
+				slug,
+				title: item.folderTitleTranslations || { ru: item.folderTitle || "Gallery", en: item.folderTitle || "Gallery", de: item.folderTitle || "Gallery" },
+				subtitle: item.folderSubtitleTranslations || { ru: item.folderSubtitle || "", en: item.folderSubtitle || "", de: item.folderSubtitle || "" },
+				items: [],
+			});
+			folders.get(slug).items.push(item);
+		});
+		const pendingFolders = new Map();
+		visibleItems.filter((item) => item.status === "pending").forEach((item) => {
+			const key = item.folderSlug || "uncategorized";
+			if (!pendingFolders.has(key)) pendingFolders.set(key, []);
+			pendingFolders.get(key).push(item.key);
+		});
+		const publishFolders = [...pendingFolders.entries()].map(([slug, keys]) => {
+			const folder = folders.get(slug);
+			const title = folder?.title?.de || folder?.title?.en || folder?.title?.ru || "Gallery";
+			return `<div class="gallery-publish-batch"><div><strong>Pending: ${escapeHtml(title)}</strong><span>${keys.length} Bild${keys.length === 1 ? "" : "er"} warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${escapeHtml(JSON.stringify(keys))}">Ordner veröffentlichen</button></div>`;
+		}).join("");
+		const folderPackages = [...folders.values()].map((folder) => {
+			const thumbnail = folder.items.find((item) => item.folderThumbnail) || folder.items[0];
+			const folderKeys = JSON.stringify(folder.items.map((item) => item.key));
+			const folderEditor = `<details class="gallery-folder-editor"><summary>Ordner-Übersetzungen bearbeiten</summary><div class="gallery-folder-edit-grid">${LANGUAGES.map((language) => `<label>${language.toUpperCase()} Überschrift<input data-gallery-folder-edit-field="title" data-gallery-folder-edit-language="${language}" value="${escapeHtml(folder.title?.[language] || "")}" maxlength="120" /></label><label>${language.toUpperCase()} Titel<input data-gallery-folder-edit-field="subtitle" data-gallery-folder-edit-language="${language}" value="${escapeHtml(folder.subtitle?.[language] || "")}" maxlength="500" /></label>`).join("")}<button class="button button-primary button-small" type="button" data-gallery-save-folder-keys="${escapeHtml(folderKeys)}">Ordner speichern</button></div></details>`;
+			const items = folder.items.map((item) => {
+				const alt = item.alt?.de || item.alt?.en || item.alt?.ru || "";
+				return `<article class="gallery-admin-item" data-gallery-item-card="${escapeHtml(item.key)}"><img loading="lazy" data-media-url="${escapeHtml(item.image)}" alt="${escapeHtml(alt)}" /><div class="gallery-admin-copy"><strong>Bild</strong><span>${item.status === "pending" ? "Entwurf · " : ""}${item.featured ? "Hervorgehoben · " : ""}${escapeHtml(item.status)}</span><details class="gallery-item-editor"><summary>Bildoptionen</summary><div class="gallery-item-edit-grid"><label class="feature-toggle"><input type="checkbox" data-gallery-edit-featured ${item.featured ? "checked" : ""} /><span>Hervorgehoben</span></label><button class="button button-primary button-small" type="button" data-gallery-save-key="${escapeHtml(item.key)}">Änderungen speichern</button></div></details><div class="gallery-item-actions">${item.folderThumbnail ? "<span class=\"gallery-thumbnail-badge\">Ordner-Thumbnail</span>" : `<button class="button button-small" type="button" data-gallery-thumbnail-key="${escapeHtml(item.key)}">Als Thumbnail verwenden</button>`}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${escapeHtml(item.key)}">Bild löschen</button></div></div></article>`;
+			}).join("");
+			const folderTitle = folder.title?.de || folder.title?.en || folder.title?.ru || "Gallery";
+			const folderSubtitle = folder.subtitle?.de || folder.subtitle?.en || folder.subtitle?.ru || "";
+			return `<details class="gallery-admin-folder" open><summary><span class="gallery-folder-preview"><img loading="lazy" data-media-url="${escapeHtml(thumbnail?.image || "")}" alt="" /></span><span><strong>${escapeHtml(folderTitle)}</strong><small>${escapeHtml(folderSubtitle || "Ordner ohne Kurzbeschreibung")}</small><small>${folder.items.length} Bild${folder.items.length === 1 ? "" : "er"} · Paket öffnen</small></span></summary>${folderEditor}<div class="gallery-folder-package">${items}</div></details>`;
+		}).join("");
+		galleryList.innerHTML = publishFolders + folderPackages;
+		galleryList.querySelectorAll("img[data-media-url]").forEach((element) => setMediaPreview(element, "src", element.dataset.mediaUrl));
+		return;
+	}
 
 	const pendingFolders = new Map();
 	if (!isOnline) visibleItems.filter((item) => item.status === "pending").forEach((item) => {
@@ -871,7 +961,8 @@ function renderQuoteList() {
 	galleryQuoteList.innerHTML = galleryQuotes.map((item) => {
 		const quote = item.quote?.de || item.quote?.en || item.quote?.ru || "";
 		const byline = item.byline?.de || item.byline?.en || item.byline?.ru || "";
-		return `<article class="gallery-quote-admin-item"><div><strong>„${escapeHtml(quote)}“</strong>${byline ? `<span>${escapeHtml(byline)}</span>` : ""}<span>${escapeHtml(item.status)}</span></div><button class="button button-danger button-remove" type="button" data-quote-delete-id="${escapeHtml(item.id)}">Zitat entfernen</button></article>`;
+		const folder = galleryItems.find((galleryItem) => (galleryItem.folderSlug || "uncategorized") === item.folderSlug)?.folderTitle || item.folderSlug || "Nicht zugewiesen";
+		return `<article class="gallery-quote-admin-item"><div><strong>„${escapeHtml(quote)}“</strong><span class="gallery-folder-label">${escapeHtml(folder)}</span>${byline ? `<span>${escapeHtml(byline)}</span>` : ""}<span>${escapeHtml(item.status)}</span></div><button class="button button-danger button-remove" type="button" data-quote-delete-id="${escapeHtml(item.id)}">Zitat entfernen</button></article>`;
 	}).join("");
 }
 
@@ -905,6 +996,53 @@ galleryList.addEventListener("click", async (event) => {
 			showNotice(`${keys.length} Bild${keys.length === 1 ? "" : "er"} veröffentlicht und dem R2-Ordner zugeordnet.`);
 		} catch (error) { showNotice(error.message, true); }
 		finally { publishButton.disabled = false; }
+		return;
+	}
+	const saveFolder = event.target.closest("[data-gallery-save-folder-keys]");
+	if (saveFolder) {
+		const editor = saveFolder.closest(".gallery-folder-editor");
+		const folderTitle = {};
+		const folderSubtitle = {};
+		editor.querySelectorAll("[data-gallery-folder-edit-field]").forEach((field) => {
+			const target = field.dataset.galleryFolderEditField === "title" ? folderTitle : folderSubtitle;
+			target[field.dataset.galleryFolderEditLanguage] = field.value.trim();
+		});
+		let keys;
+		try { keys = JSON.parse(saveFolder.dataset.gallerySaveFolderKeys); } catch { showNotice("Der Ordner konnte nicht gelesen werden.", true); return; }
+		saveFolder.disabled = true;
+		try {
+			await Promise.all(keys.map((key) => api(`/api/v1/admin/gallery/${encodeURIComponent(key)}`, {
+				method: "PATCH",
+				body: JSON.stringify({ folderTitle, folderSubtitle }),
+			})));
+			await loadGallery();
+			showNotice("Ordner-Übersetzungen gespeichert.");
+		} catch (error) { showNotice(error.message, true); }
+		finally { saveFolder.disabled = false; }
+		return;
+	}
+	const saveImage = event.target.closest("[data-gallery-save-key]");
+	if (saveImage) {
+		const card = saveImage.closest("[data-gallery-item-card]");
+		const payload = { featured: Boolean(card.querySelector("[data-gallery-edit-featured]")?.checked) };
+		saveImage.disabled = true;
+		try {
+			await api(`/api/v1/admin/gallery/${encodeURIComponent(saveImage.dataset.gallerySaveKey)}`, { method: "PATCH", body: JSON.stringify(payload) });
+			await loadGallery();
+			showNotice("Bildoptionen gespeichert.");
+		} catch (error) { showNotice(error.message, true); }
+		finally { saveImage.disabled = false; }
+		return;
+	}
+	const thumbnailButton = event.target.closest("[data-gallery-thumbnail-key]");
+	if (thumbnailButton) {
+		thumbnailButton.disabled = true;
+		try {
+			await api(`/api/v1/admin/gallery/${encodeURIComponent(thumbnailButton.dataset.galleryThumbnailKey)}`, { method: "PATCH", body: JSON.stringify({ folderThumbnail: true }) });
+			await loadGallery();
+			showNotice("Ordner-Thumbnail gespeichert.");
+		} catch (error) { showNotice(error.message, true); }
+		finally { thumbnailButton.disabled = false; }
 		return;
 	}
 	const saveTopic = event.target.closest("[data-gallery-topic-key]");
@@ -1013,6 +1151,7 @@ galleryForm.addEventListener("submit", async (event) => {
 	if (galleryPublishButton.disabled) return;
 	if (!galleryForm.reportValidity()) return;
 	const files = [...(galleryFile.files || [])];
+	const thumbnail = galleryThumbnailFile.files?.[0];
 	const sourceUrl = gallerySourceUrl.value.trim();
 	if (!files.length && !sourceUrl) {
 		showNotice("Bitte mindestens ein Bild oder eine Google-Drive-URL angeben.", true);
@@ -1024,22 +1163,31 @@ galleryForm.addEventListener("submit", async (event) => {
 		gallerySourceUrl.focus();
 		return;
 	}
+	if (thumbnail && !files.some((file) => file === thumbnail || (file.name === thumbnail.name && file.size === thumbnail.size && file.type === thumbnail.type))) {
+		showNotice("Das Thumbnail muss eines der ausgewählten Bilder sein.", true);
+		galleryThumbnailFile.focus();
+		return;
+	}
 
 	const body = new FormData();
 	for (const file of files) body.append("file", file);
+	if (thumbnail) body.append("thumbnail_file", thumbnail);
 	if (sourceUrl) body.append("source_url", sourceUrl);
 	const collection = galleryCollection.value;
 	const topic = galleryTopic.value;
 	body.append("collection", collection);
 	if (collection === "online-projects") body.append("topic", topic);
 	if (collection === "gallery") {
-		body.append("folder_name", galleryFolderName.value.trim());
-		body.append("folder_subtitle", galleryFolderSubtitle.value.trim());
-	}
-	for (const language of LANGUAGES) {
-		body.append(`title_${language}`, galleryField(language, "title").value.trim());
-		body.append(`alt_${language}`, galleryField(language, "alt").value.trim());
-		body.append(`subtitle_${language}`, galleryField(language, "subtitle").value.trim());
+		for (const language of LANGUAGES) {
+			body.append(`folder_title_${language}`, galleryFolderField(language, "title").value.trim());
+			body.append(`folder_subtitle_${language}`, galleryFolderField(language, "subtitle").value.trim());
+		}
+	} else {
+		for (const language of LANGUAGES) {
+			body.append(`title_${language}`, galleryField(language, "title").value.trim());
+			body.append(`alt_${language}`, galleryField(language, "alt").value.trim());
+			body.append(`subtitle_${language}`, galleryField(language, "subtitle").value.trim());
+		}
 	}
 	if (document.getElementById("galleryFeatured").checked) body.append("featured", "true");
 
@@ -1065,17 +1213,17 @@ quoteForm.addEventListener("submit", async (event) => {
 	event.preventDefault();
 	if (!quoteForm.reportValidity()) return;
 
-	const translations = {};
+		const translations = {};
 	for (const language of LANGUAGES) {
 		translations[language] = {
 			quote: quoteField(language, "quote").value.trim(),
 			byline: quoteField(language, "byline").value.trim(),
 		};
-	}
+		}
 
-	try {
-		showNotice("Gallery-Zitat wird veröffentlicht …");
-		await api("/api/v1/admin/gallery/quotes", { method: "POST", body: JSON.stringify({ translations }) });
+		try {
+			showNotice("Gallery-Zitat wird veröffentlicht …");
+			await api("/api/v1/admin/gallery/quotes", { method: "POST", body: JSON.stringify({ folderSlug: quoteFolder.value, translations }) });
 		quoteForm.reset();
 		await loadGallery();
 		showNotice("Gallery-Zitat veröffentlicht.");

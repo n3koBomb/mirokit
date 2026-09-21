@@ -306,6 +306,8 @@ body.gallery-page.theme-dark { --ga-bg: #0b1427; --ga-paper: #14223b; --ga-ink: 
    The gallery is a companion page, so it uses the same visual grammar as the
    landing page without importing the landing page navigation.
    -------------------------------------------------------------------------- */
+html:has(body.gallery-page) { background: #edf3fc; }
+html:has(body.gallery-page.theme-dark) { background: #08152d; }
 body.gallery-page {
   --ga-bg: #edf3fc;
   --ga-paper: rgba(255, 255, 255, .94);
@@ -571,3 +573,34 @@ body.gallery-page.theme-dark {
 
 @media (max-width: 900px) { .ga-search-wrap { flex: 1 1 200px; margin-left: 0; } }
 @media (max-width: 600px) { .ga-search-wrap { width: 50%; min-width: 0; } }
+
+.ga-heading-subtitle { max-width: 58ch; margin: 9px 0 0; color: var(--ga-muted); font-size: 13px; line-height: 1.6; }
+.ga-folder-card { border-color: rgba(21, 101, 255, .26); background: linear-gradient(145deg, rgba(255, 255, 255, .9), rgba(231, 240, 255, .8)); box-shadow: 0 16px 34px rgba(13, 44, 105, .1); }
+.theme-dark .ga-folder-card { background: linear-gradient(145deg, rgba(25, 52, 94, .95), rgba(18, 39, 73, .88)); }
+.ga-folder-card .ga-folder-art { filter: drop-shadow(0 16px 20px rgba(13, 44, 105, .13)); }
+.ga-folder-card .ga-folder-photo { opacity: .68; filter: saturate(.82); transition: opacity .3s ease, filter .3s ease, transform .56s cubic-bezier(.18,.78,.18,1); }
+.ga-folder-card:hover .ga-folder-photo, .ga-folder-card:focus-within .ga-folder-photo { opacity: .9; filter: saturate(1); }
+.ga-folder-card .ga-card-copy { gap: 5px; padding: 16px 8px 9px; }
+.ga-folder-card .ga-card-copy strong { font-size: clamp(16px, 1.5vw, 20px); line-height: 1.25; }
+.ga-folder-card .ga-folder-label-text { color: var(--ga-accent); font: 800 9px/1.2 Montserrat, sans-serif; letter-spacing: .14em; }
+.ga-folder-card .ga-card-copy small:last-child { font-size: 11px; }
+.ga-library.is-folder-view .ga-heading h2 { max-width: 26ch; }
+
+.ga-dialog--photo { overflow: hidden; background: #050b17; border-color: #ffffff2b; }
+.ga-dialog--photo .ga-viewer-top { position: absolute; top: 0; right: 0; left: 0; z-index: 4; color: #fff; pointer-events: none; }
+.ga-dialog--photo .ga-viewer-top button { pointer-events: auto; border-color: #ffffff55; background: #07132fcc; color: #fff; }
+.ga-dialog--photo .ga-stage { min-height: min(80dvh, 780px); height: min(80dvh, 780px); }
+.ga-dialog--photo .ga-stage > img { max-height: min(80dvh, 780px); }
+.ga-dialog--photo .ga-viewer-footer { position: absolute; inset: 0; display: block; padding: 0; pointer-events: none; }
+.ga-dialog--photo .ga-viewer-copy, .ga-dialog--photo #galleryOriginal { display: none; }
+.ga-dialog--photo .ga-viewer-controls { position: absolute; top: 50%; right: 0; left: 0; justify-content: space-between; padding: 0 14px; transform: translateY(-50%); pointer-events: none; }
+.ga-dialog--photo .ga-viewer-controls button { width: 54px; height: 54px; padding: 0; border-color: #ffffff66; background: #07132fcc; color: #fff; font-size: 24px; pointer-events: auto; }
+.ga-dialog--photo .ga-viewer-controls button:hover, .ga-dialog--photo .ga-viewer-controls button:focus-visible { border-color: #ffd34e; background: #1565ff; }
+
+@media (max-width: 600px) {
+  .ga-heading-subtitle { font-size: 12px; }
+  .ga-dialog--photo { width: calc(100% - 8px); max-height: calc(100dvh - 8px); }
+  .ga-dialog--photo .ga-stage, .ga-dialog--photo .ga-stage > img { min-height: calc(100dvh - 8px); height: calc(100dvh - 8px); max-height: calc(100dvh - 8px); }
+  .ga-dialog--photo .ga-viewer-controls { padding-inline: 8px; }
+  .ga-dialog--photo .ga-viewer-controls button { width: 46px; height: 46px; }
+}

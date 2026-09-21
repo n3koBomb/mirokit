@@ -7853,7 +7853,7 @@ body.theme-dark #projects .project-card--remote .project-body :where(h3, p, .pro
 #projects .projects-flow p,
 #projects .timeline-row p,
 #projects .projects-context li {
-	color: var(--muted);
+	color: var(--miro-mid-blue);
 }
 
 /* Projects: keep the command centre and archive timeline as primary content,
@@ -8012,11 +8012,6 @@ body.theme-dark #projects .project-card--remote .project-body :where(h3, p, .pro
 	text-transform: uppercase;
 }
 
-#projects .projects-dna-heading {
-	position: relative;
-	z-index: 1;
-}
-
 #projects .projects-context li b {
 	color: var(--theme-danger-text, var(--rd));
 }
@@ -8118,7 +8113,6 @@ body.theme-dark #projects .projects-context {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: clamp(20px, 3.4vw, 34px);
 	width: min(1220px, 100%);
 }
 
@@ -8181,8 +8175,9 @@ body.theme-dark #projects .projects-context {
 	display: flex;
 	min-height: 230px;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
+	gap: clamp(8px, 1.5vw, 16px);
 	padding: 4px 0 2px;
 }
 
@@ -8251,7 +8246,6 @@ body.theme-dark #projects .projects-context {
 }
 
 #historyOfCreation .history-program-label {
-	grid-column: 2;
 	margin: 0 0 -8px;
 	font-family: "Montserrat", sans-serif;
 	font-size: clamp(1.1rem, 2.2vw, 1.55rem);
@@ -8264,13 +8258,12 @@ body.theme-dark #projects .projects-context {
 	display: none;
 }
 
-#historyOfCreation .history-intro p+p {
+#historyOfCreation .history-intro-copy {
 	grid-column: 2;
-	margin-top: -12px;
-}
-
-#historyOfCreation .history-intro>p {
-	grid-column: 2;
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: clamp(6px, 1vw, 12px);
 }
 
 #historyOfCreation .history-authors {
@@ -8574,9 +8567,7 @@ body.theme-dark #historyOfCreation .history-intro-signal strong {
 		min-height: 210px;
 	}
 
-	#historyOfCreation .history-intro p+p,
-	#historyOfCreation .history-intro>p,
-	#historyOfCreation .history-program-label,
+	#historyOfCreation .history-intro-copy,
 	#historyOfCreation .history-finale-lead,
 	#historyOfCreation .history-finale-text {
 		grid-column: 1;
@@ -15134,26 +15125,6 @@ body.theme-dark #news .news-preview-footer {
 #projects .projects-context {
 	border-radius: 26px;
 	background: rgba(255, 255, 255, 0.78);
-}
-
-#projects .projects-dna-heading {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-}
-
-#projects .projects-dna-mark {
-	display: grid;
-	width: 40px;
-	height: 40px;
-	place-items: center;
-	border-radius: 13px;
-	background: linear-gradient(135deg, var(--bl), var(--rd));
-	color: #fff;
-	font-family: "Montserrat", sans-serif;
-	font-size: 12px;
-	font-weight: 900;
 }
 
 #projects .projects-context li {

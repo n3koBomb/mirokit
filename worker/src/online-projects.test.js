@@ -26,11 +26,9 @@ function folderUploadForm() {
  form.append("file", new File(["image-one"], "one.webp", { type: "image/webp" }));
  form.append("file", new File(["image-two"], "two.webp", { type: "image/webp" }));
  form.append("collection", "gallery");
- form.append("folder_name", "Sommer & Freunde");
- form.append("folder_subtitle", "Gemeinsame Momente");
  for (const language of ["ru", "en", "de"]) {
-  form.append(`title_${language}`, `${language} title`);
-  form.append(`alt_${language}`, `${language} description`);
+  form.append(`folder_title_${language}`, language === "de" ? "Sommer & Freunde" : language === "en" ? "Summer & Friends" : "Лето и друзья");
+  form.append(`folder_subtitle_${language}`, language === "de" ? "Gemeinsame Momente" : language === "en" ? "Shared moments" : "Общие моменты");
  }
  return form;
 }
@@ -136,7 +134,15 @@ describe("Gallery folder workflow", () => {
   const data = await publicAfter.json();
   expect(data.gallery).toHaveLength(2);
   expect(data.folders).toHaveLength(1);
-  expect(data.folders[0]).toMatchObject({ slug: "sommer-freunde", count: 2, title: { en: "Sommer & Freunde" }, subtitle: { de: "Gemeinsame Momente" } });
+  expect(data.folders[0]).toMatchObject({ slug: "sommer-freunde", count: 2, title: { en: "Summer & Friends", de: "Sommer & Freunde" }, subtitle: { de: "Gemeinsame Momente" } });
   expect(data.folders[0].images).toHaveLength(2);
- });
+
+  const editFolder = await request(`/${encodeURIComponent(published[0].key)}`, {
+   method: "PATCH",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ folderTitle: { ru: "Лето и друзья", en: "Summer Together", de: "Gemeinsam im Sommer" }, folderSubtitle: { ru: "Общие моменты", en: "Shared moments", de: "Gemeinsame Momente" } }),
+  });
+  expect(editFolder.status).toBe(200);
+  expect(objects.get(published[0].key).customMetadata).toMatchObject({ folder_slug: "sommer-freunde", folder_title_de: "Gemeinsam im Sommer", folder_subtitle_en: "Shared moments" });
+});
 });

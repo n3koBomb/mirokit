@@ -10,7 +10,7 @@ const viewerMeta = $('galleryViewerMeta');
 const search = $('gallerySearch');
 const suggestions = $('gallerySuggestions');
 const sort = $('gallerySort');
-const resources = { photos: { state: 'idle', items: [], folders: [] }, video: { state: 'idle', items: [] } };
+const resources = { photos: { state: 'idle', items: [], folders: [], quotes: [] }, video: { state: 'idle', items: [] } };
 let view = 'photos';
 let visible = [];
 let visibleFolders = [];
@@ -18,6 +18,7 @@ let activeFolder = '';
 let limit = 24;
 let selected = null;
 let selectedQuote = null;
+let selectedQuoteId = '';
 let returnFocus = null;
 let previousOverflow = '';
 let activePlayer = null;
@@ -123,7 +124,7 @@ function urlFor(nextView = view) {
   url.searchParams.set('view', nextView);
   url.searchParams.set('lang', currentLang);
 
-  const query = search.value.trim();
+  const query = !activeFolder && search.value.trim();
 
   if (query) {
     url.searchParams.set('q', query);
@@ -131,7 +132,7 @@ function urlFor(nextView = view) {
     url.searchParams.delete('q');
   }
 
-  if (sort.value !== 'featured') {
+  if (!activeFolder && sort.value !== 'featured') {
     url.searchParams.set('sort', sort.value);
   } else {
     url.searchParams.delete('sort');
@@ -174,7 +175,9 @@ function readLocation() {
     ? 'video'
     : 'photos';
 
-  search.value = (params.get('q') || '').slice(0, 200);
+  search.value = view === 'photos' && params.get('folder')
+    ? ''
+    : (params.get('q') || '').slice(0, 200);
 
   sort.value = ['featured', 'newest', 'title'].includes(params.get('sort'))
     ? params.get('sort')
@@ -195,6 +198,8 @@ function readLocation() {
 }
 
 function renderQuote() {
+  const showQuote = view === 'photos' && Boolean(activeFolder) && Boolean(selectedQuote);
+  $('galleryQuote').hidden = !showQuote;
   $('galleryQuoteText').textContent = selectedQuote
     ? local(selectedQuote, 'quote')
     : t('gallery_quote');
@@ -202,6 +207,14 @@ function renderQuote() {
   $('galleryQuoteBy').textContent = selectedQuote
     ? local(selectedQuote, 'byline')
     : t('gallery_quote_by');
+}
+
+function syncFolderControls() {
+  const inFolder = view === 'photos' && Boolean(activeFolder);
+  $('gallerySearch').closest('.ga-search-wrap').hidden = inFolder;
+  $('gallerySort').closest('.ga-sort').hidden = inFolder;
+  $('galleryClear').hidden = inFolder || !search.value.trim();
+  document.querySelector('.ga-library').classList.toggle('is-folder-view', inFolder);
 }
 
 function renderSuggestions() {
@@ -249,16 +262,17 @@ function renderSuggestions() {
 
 function render() {
   syncLinks();
-  renderQuote();
 
   const resource = resources[view];
   const loading = ['idle', 'loading'].includes(resource.state);
   const bundled = view === 'photos' && !resource.items.length && !loading;
   const items = bundled ? archive : resource.items;
 
-  const query = search.value
+  const query = !activeFolder
+    ? search.value
     .trim()
-    .toLocaleLowerCase(currentLang);
+    .toLocaleLowerCase(currentLang)
+    : '';
 
   const folders = view === 'photos'
     ? (
@@ -321,11 +335,9 @@ function render() {
         ? []
         : items
   )
-    .filter((item) =>
-      `${title(item)} ${subtitle(item)}`
-        .toLocaleLowerCase(currentLang)
-        .includes(query)
-    )
+    .filter((item) => activeFolder || `${title(item)} ${subtitle(item)}`
+      .toLocaleLowerCase(currentLang)
+      .includes(query))
     .sort((a, b) => {
       if (sort.value === 'title') {
         return title(a).localeCompare(title(b), currentLang);
@@ -356,6 +368,20 @@ function render() {
     });
 
   renderSuggestions();
+  syncFolderControls();
+
+  const folderQuotes = activeFolder
+    ? (resource.quotes || []).filter((quote) => quote.folderSlug === activeFolder)
+    : [];
+  if (!folderQuotes.some((quote) => quote.id === selectedQuoteId)) {
+    selectedQuote = folderQuotes.length
+      ? folderQuotes[Math.floor(Math.random() * folderQuotes.length)]
+      : null;
+    selectedQuoteId = selectedQuote?.id || '';
+  } else {
+    selectedQuote = folderQuotes.find((quote) => quote.id === selectedQuoteId) || null;
+  }
+  renderQuote();
 
   const count =
     view === 'photos' && !activeFolder
@@ -368,6 +394,10 @@ function render() {
       : t('ga_discover');
 
   $('galleryCollectionTitle').removeAttribute('data-key');
+  $('galleryCollectionSubtitle').textContent = view === 'photos' && activeFolder
+    ? folderSubtitle(folder)
+    : t('ga_library_intro');
+  $('galleryCollectionSubtitle').hidden = !$('galleryCollectionSubtitle').textContent;
 
   $('galleryBack').hidden =
     view !== 'photos' || !activeFolder;
@@ -485,16 +515,9 @@ function render() {
               </span>
 
               <span class="ga-card-copy">
-                <small>
-                  ${escape(
-            folderSubtitle(folderItem) ||
-            `${folderItem.count} ${t('ga_folder_count')}`
-          )}
-                </small>
-
-                <strong>
-                  ${escape(folderTitle(folderItem))}
-                </strong>
+                <small class="ga-folder-label-text">${escape(t('ga_folder_label'))}</small>
+                <strong>${escape(folderTitle(folderItem))}</strong>
+                <small>${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_folder_count')}`)}</small>
               </span>
             </button>
           </article>
@@ -531,6 +554,7 @@ function render() {
           `
           : '';
 
+      const inFolder = view === 'photos' && activeFolder;
       return `
         <article class="ga-card">
           <button
@@ -539,7 +563,7 @@ function render() {
             data-index="${index}"
             aria-haspopup="dialog"
             aria-label="${escape(
-        `${t('gallery_open')}: ${title(item)}`
+        inFolder ? `${t('gallery_open')}: ${t('ga_photos')} ${index + 1}` : `${t('gallery_open')}: ${title(item)}`
       )}"
           >
             <span class="ga-card-media">
@@ -555,7 +579,7 @@ function render() {
           : fallback
         }
 
-              ${item.featured
+              ${!inFolder && item.featured
           ? `
                     <span class="ga-featured">
                       ${escape(t('ga_selected'))}
@@ -577,7 +601,8 @@ function render() {
               </span>
             </span>
 
-            <span class="ga-card-copy">
+            ${inFolder ? '' : '<span class="ga-card-copy">'}
+              ${inFolder ? '' : `
               <small>
                 ${escape(
           subtitle(item) ||
@@ -590,7 +615,7 @@ function render() {
               </small>
 
               <strong>${escape(title(item))}</strong>
-            </span>
+            </span>`}
           </button>
         </article>
       `;
@@ -737,12 +762,9 @@ async function load(kind, retry = false) {
       const quotes = Array.isArray(data.quotes)
         ? data.quotes.filter((quote) => quote?.quote)
         : [];
-
-      selectedQuote = quotes.length
-        ? quotes[
-        Math.floor(Math.random() * quotes.length)
-        ]
-        : null;
+      resource.quotes = quotes;
+      selectedQuote = null;
+      selectedQuoteId = '';
     } else {
       resource.items = items
         .filter((item) =>
@@ -1431,6 +1453,7 @@ function openMedia(index, trigger) {
   };
 
   if (view === 'photos') {
+    dialog.classList.add('ga-dialog--photo');
     const img = document.createElement('img');
 
     img.alt = alt(selected);
@@ -1442,9 +1465,8 @@ function openMedia(index, trigger) {
 
     img.src = selected.image;
     stage.append(img);
-  } else if (
-    selected.sourceType === 'youtube'
-  ) {
+  } else if (selected.sourceType === 'youtube') {
+    dialog.classList.remove('ga-dialog--photo');
     const iframe = document.createElement('iframe');
 
     iframe.title = title(selected);
@@ -1457,6 +1479,7 @@ function openMedia(index, trigger) {
 
     stage.append(iframe);
   } else {
+    dialog.classList.remove('ga-dialog--photo');
     activePlayer =
       createHtml5Player(selected);
   }
@@ -1498,6 +1521,7 @@ $('galleryNext').addEventListener(
 dialog.addEventListener(
   'close',
   () => {
+    dialog.classList.remove('ga-dialog--photo');
     clearStage();
     selected = null;
     document.body.style.overflow =

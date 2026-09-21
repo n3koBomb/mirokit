@@ -58,7 +58,7 @@
             </div>
          </header>
 
-         <div class="notice" id="notice" role="status" aria-live="polite"></div>
+         <div class="admin-toast-region" id="notice" role="status" aria-live="polite" aria-atomic="false"></div>
 
          <nav class="admin-tabs" aria-label="Content-Bereiche" role="tablist">
             <button class="admin-tab is-active" id="newsTab" type="button" role="tab" aria-selected="true" aria-controls="adminViewNews" data-admin-tab="news">
@@ -316,19 +316,18 @@
                      </div>
                   </div>
 
-                  <div class="gallery-folder-fields" id="galleryFolderFields">
-                     <label><span>Ordnername / Slogan</span><input id="galleryFolderName" maxlength="120" placeholder="z. B. Gemeinsam unterwegs" required /></label>
-                     <label><span>Ordner-Untertitel</span><input id="galleryFolderSubtitle" maxlength="500" placeholder="Kurze Beschreibung des Albums" /></label>
-                     <p class="muted">Dieser Name wird zum sicheren R2-Ordner-Slug und erscheint als Titel der Folder-Karte.</p>
-                  </div>
-                  <div class="upload-row">
+                     <div class="upload-row">
                      <div class="upload-icon" aria-hidden="true">↥</div>
                      <label class="file-label">
                         <span>Mehrere Bilder auswählen</span>
                         <input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" />
                      </label>
-                     <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
-                  </div>
+                        <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                     </div>
+                     <div class="gallery-thumbnail-field">
+                        <label><span>Ordner-Thumbnail auswählen</span><input id="galleryThumbnailFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label>
+                        <p class="muted">Optional: Wähle eines der oben ausgewählten Bilder als Vorschaubild für den Ordner.</p>
+                     </div>
                   <div class="gallery-source-fields" id="gallerySourceFields">
                      <label><span>Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" /></label>
                   </div>
@@ -338,26 +337,44 @@
                   <div class="section-caption">
                      <span class="section-index">02</span>
                      <div>
-                        <h3 id="galleryLanguagesHeading">Bildtexte</h3>
-                        <p>Titel, Alt-Text und optionalen Untertitel für alle drei Sprachversionen eintragen.</p>
+                        <h3 id="galleryLanguagesHeading">Ordner-Übersetzungen</h3>
+                        <p id="galleryLanguagesHelp">Die Überschrift und der Titel werden für den Ordner in RU, EN und DE gespeichert.</p>
                      </div>
                   </div>
 
-                  <div class="translations gallery-translations">
+                  <div class="translations gallery-translations" id="galleryFolderTranslations">
+                     <fieldset class="language-card language-ru">
+                        <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
+                        <label><span>Ordner-Überschrift</span><input data-gallery-folder-language="ru" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Вместе в пути" /></label>
+                        <label><span>Ordner-Titel</span><input data-gallery-folder-language="ru" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-en">
+                        <legend><span class="language-dot"></span> English <small>EN</small></legend>
+                        <label><span>Folder heading</span><input data-gallery-folder-language="en" data-gallery-folder-field="title" required maxlength="120" placeholder="e.g. Together on the road" /></label>
+                        <label><span>Folder title</span><input data-gallery-folder-language="en" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Short description of the folder" /></label>
+                     </fieldset>
+
+                     <fieldset class="language-card language-de">
+                        <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
+                        <label><span>Ordner-Überschrift</span><input data-gallery-folder-language="de" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Gemeinsam unterwegs" /></label>
+                        <label><span>Ordner-Titel</span><input data-gallery-folder-language="de" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" /></label>
+                     </fieldset>
+                  </div>
+
+                  <div class="translations gallery-translations" id="galleryImageTranslations" hidden>
                      <fieldset class="language-card language-ru">
                         <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
                         <label><span>Titel</span><input data-gallery-language="ru" data-gallery-field="title" required maxlength="500" /></label>
                         <label><span>Bildbeschreibung (Alt-Text)</span><input data-gallery-language="ru" data-gallery-field="alt" required maxlength="500" /></label>
                         <label><span>Untertitel</span><input data-gallery-language="ru" data-gallery-field="subtitle" maxlength="500" /></label>
                      </fieldset>
-
                      <fieldset class="language-card language-en">
                         <legend><span class="language-dot"></span> English <small>EN</small></legend>
                         <label><span>Title</span><input data-gallery-language="en" data-gallery-field="title" required maxlength="500" /></label>
                         <label><span>Image description (alt text)</span><input data-gallery-language="en" data-gallery-field="alt" required maxlength="500" /></label>
                         <label><span>Subtitle</span><input data-gallery-language="en" data-gallery-field="subtitle" maxlength="500" /></label>
                      </fieldset>
-
                      <fieldset class="language-card language-de">
                         <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
                         <label><span>Titel</span><input data-gallery-language="de" data-gallery-field="title" required maxlength="500" /></label>
@@ -391,10 +408,12 @@
                   <div class="section-caption">
                      <span class="section-index">03</span>
                      <div>
-                        <h3 id="quoteHeading">Zitat hinzufügen</h3>
-                        <p>Aktive Zitate werden separat von den Bildern gespeichert und zufällig im Gallery-Grid angezeigt.</p>
+                        <h3 id="quoteHeading">Zitat einem Ordner zuweisen</h3>
+                        <p>Ein zugewiesenes Zitat erscheint nach allen Bildern dieses Ordners. Ordner ohne Zitat bleiben ohne Quote.</p>
                      </div>
                   </div>
+
+                  <label class="quote-folder-field" for="quoteFolder"><span>Ordner</span><select id="quoteFolder" required><option value="">Ordner auswählen</option></select></label>
 
                   <div class="translations gallery-translations">
                      <fieldset class="language-card language-ru">

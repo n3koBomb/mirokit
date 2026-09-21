@@ -140,11 +140,12 @@ describe("news content contract", () => {
 describe("gallery quote contract", () => {
 	it("groups localized quote rows", () => {
 		const [quote] = rowsToGalleryQuotes([
-			{ id: "quote-1", status: "published", created_at: "2026-09-06T10:00:00.000Z", updated_at: "2026-09-06T10:00:00.000Z", language: "en", quote: "Together", byline: "MIRoKIT" },
-			{ id: "quote-1", status: "published", created_at: "2026-09-06T10:00:00.000Z", updated_at: "2026-09-06T10:00:00.000Z", language: "de", quote: "Zusammen", byline: "MIRoKIT" },
+			{ id: "quote-1", status: "published", folder_slug: "summer-friends", created_at: "2026-09-06T10:00:00.000Z", updated_at: "2026-09-06T10:00:00.000Z", language: "en", quote: "Together", byline: "MIRoKIT" },
+			{ id: "quote-1", status: "published", folder_slug: "summer-friends", created_at: "2026-09-06T10:00:00.000Z", updated_at: "2026-09-06T10:00:00.000Z", language: "de", quote: "Zusammen", byline: "MIRoKIT" },
 		]);
 		expect(quote.quote.de).toBe("Zusammen");
 		expect(quote.byline.en).toBe("MIRoKIT");
+		expect(quote.folderSlug).toBe("summer-friends");
 	});
 });
 
@@ -559,6 +560,7 @@ describe("news API and admin access", () => {
 				method: "POST",
 				headers: { "X-MiroKIT-Admin-Token": "local-token", "Content-Type": "application/json" },
 				body: JSON.stringify({
+					folderSlug: "summer-friends",
 					translations: {
 						ru: { quote: "Вместе", byline: "МИРоКИТ" },
 						en: { quote: "Together", byline: "MIRoKIT" },
@@ -572,6 +574,7 @@ describe("news API and admin access", () => {
 
 		expect(response.status).toBe(201);
 		expect(body.quote.quote.en).toBe("Together");
+		expect(body.quote.folderSlug).toBe("summer-friends");
 		expect(statements).toHaveLength(5);
 	});
 });

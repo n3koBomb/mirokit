@@ -133,7 +133,7 @@ const VIDEO_UPLOAD_MAX_BYTES = 95 * 1024 * 1024;
 const VIDEO_POSTER_MAX_BYTES = 8 * 1024 * 1024;
 
 const GALLERY_QUOTES_PUBLIC_QUERY = `
-SELECT q.id, q.status, q.created_at, q.updated_at,
+SELECT q.id, q.status, q.folder_slug, q.created_at, q.updated_at,
   t.language, t.quote, t.byline
 FROM gallery_quotes q
 JOIN gallery_quote_translations t ON t.quote_id = q.id
@@ -142,7 +142,7 @@ ORDER BY q.created_at DESC, q.id ASC, t.language ASC
 `;
 
 const GALLERY_QUOTES_ADMIN_QUERY = `
-SELECT q.id, q.status, q.created_at, q.updated_at,
+SELECT q.id, q.status, q.folder_slug, q.created_at, q.updated_at,
   t.language, t.quote, t.byline
 FROM gallery_quotes q
 JOIN gallery_quote_translations t ON t.quote_id = q.id
@@ -1329,8 +1329,17 @@ function normalizeGalleryMetadata(formData) {
 	if (!GALLERY_STATUSES.has(metadata.status)) throw newsError("Invalid gallery status");
 	if (!GALLERY_COLLECTIONS.has(metadata.collection)) throw newsError("Invalid gallery collection");
 	if (metadata.collection === "gallery") {
-		metadata.folder_title = normalizeGalleryFolderName(formData.get("folder_name") || "Gallery");
-		metadata.folder_subtitle = galleryOptionalTextValue(formData.get("folder_subtitle"), "folder_subtitle", 500);
+		const legacyFolderTitle = formData.get("folder_name") || "Gallery";
+		const translatedFolderTitles = Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, formData.get(`folder_title_${language}`)]));
+		const canonicalFolderTitle = translatedFolderTitles.de || translatedFolderTitles.en || translatedFolderTitles.ru || legacyFolderTitle;
+		metadata.folder_title = normalizeGalleryFolderName(canonicalFolderTitle);
+		const legacyFolderSubtitle = formData.get("folder_subtitle");
+		const translatedFolderSubtitles = Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, formData.get(`folder_subtitle_${language}`)]));
+		metadata.folder_subtitle = galleryOptionalTextValue(translatedFolderSubtitles.de || translatedFolderSubtitles.en || translatedFolderSubtitles.ru || legacyFolderSubtitle, "folder_subtitle", 500);
+		for (const language of GALLERY_LANGUAGES) {
+			metadata[`folder_title_${language}`] = normalizeGalleryFolderName(translatedFolderTitles[language] || metadata.folder_title);
+			metadata[`folder_subtitle_${language}`] = galleryOptionalTextValue(translatedFolderSubtitles[language] ?? metadata.folder_subtitle, `folder_subtitle_${language}`, 500);
+		}
 		metadata.folder_slug = galleryFolderSlug(metadata.folder_title);
 	}
 	if (metadata.collection === "online-projects") {
@@ -1339,8 +1348,13 @@ function normalizeGalleryMetadata(formData) {
 	}
 
 	for (const language of GALLERY_LANGUAGES) {
-		metadata[`title_${language}`] = galleryTextValue(formData.get(`title_${language}`), `title_${language}`);
-		metadata[`alt_${language}`] = galleryTextValue(formData.get(`alt_${language}`), `alt_${language}`);
+		const fallbackImageText = metadata.collection === "gallery" ? metadata[`folder_title_${language}`] || metadata.folder_title : "";
+		metadata[`title_${language}`] = metadata.collection === "gallery"
+			? galleryOptionalTextValue(formData.get(`title_${language}`) || fallbackImageText, `title_${language}`)
+			: galleryTextValue(formData.get(`title_${language}`), `title_${language}`);
+		metadata[`alt_${language}`] = metadata.collection === "gallery"
+			? galleryOptionalTextValue(formData.get(`alt_${language}`) || fallbackImageText, `alt_${language}`)
+			: galleryTextValue(formData.get(`alt_${language}`), `alt_${language}`);
 		metadata[`subtitle_${language}`] = galleryOptionalTextValue(formData.get(`subtitle_${language}`), `subtitle_${language}`);
 		metadata[`quote_${language}`] = galleryOptionalTextValue(formData.get(`quote_${language}`), `quote_${language}`);
 	}
@@ -1392,7 +1406,10 @@ function normalizeGalleryQuoteInput(input) {
 		};
 	}
 
-	return { translations };
+	const folderSlug = galleryOptionalTextValue(input.folderSlug ?? input.folder_slug, "folder_slug", 80);
+	if (folderSlug && !GALLERY_FOLDER_SLUG_PATTERN.test(folderSlug)) throw newsError("Invalid gallery quote folder");
+
+	return { folderSlug, translations };
 }
 
 function rowsToGalleryQuotes(rows) {
@@ -1402,6 +1419,7 @@ function rowsToGalleryQuotes(rows) {
 			grouped.set(row.id, {
 				id: row.id,
 				status: row.status,
+				folderSlug: row.folder_slug || "",
 				createdAt: row.created_at,
 				updatedAt: row.updated_at,
 				quote: {},
@@ -1426,10 +1444,10 @@ async function saveGalleryQuoteRecord(env, quote, status = "published") {
 	const timestamp = new Date().toISOString();
 	const statements = [
 		env.SITE_DB.prepare(
-			`INSERT INTO gallery_quotes (id, status, created_at, updated_at)
-			 VALUES (?, ?, ?, ?)
-			 ON CONFLICT(id) DO UPDATE SET status = excluded.status, updated_at = excluded.updated_at`
-		).bind(quote.id, status, timestamp, timestamp),
+		`INSERT INTO gallery_quotes (id, status, folder_slug, created_at, updated_at)
+			 VALUES (?, ?, ?, ?, ?)
+			 ON CONFLICT(id) DO UPDATE SET status = excluded.status, folder_slug = excluded.folder_slug, updated_at = excluded.updated_at`
+		).bind(quote.id, status, quote.folderSlug || null, timestamp, timestamp),
 		env.SITE_DB.prepare("DELETE FROM gallery_quote_translations WHERE quote_id = ?").bind(quote.id),
 		...GALLERY_QUOTE_LANGUAGES.map((language) =>
 			env.SITE_DB.prepare(
@@ -1441,6 +1459,7 @@ async function saveGalleryQuoteRecord(env, quote, status = "published") {
 	return {
 		id: quote.id,
 		status,
+		folderSlug: quote.folderSlug || "",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 		quote: Object.fromEntries(GALLERY_QUOTE_LANGUAGES.map((language) => [language, quote.translations[language].quote])),
@@ -1461,6 +1480,9 @@ function galleryItemFromObject(object, preview = false) {
 		folderSlug: metadata.folder_slug || (object.key.match(/^gallery\/(?:pending\/)?([^/]+)\//)?.[1] || ""),
 		folderTitle: metadata.folder_title || "",
 		folderSubtitle: metadata.folder_subtitle || "",
+		folderTitleTranslations: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`folder_title_${language}`] || metadata.folder_title || ""])),
+		folderSubtitleTranslations: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, metadata[`folder_subtitle_${language}`] || metadata.folder_subtitle || ""])),
+		folderThumbnail: metadata.folder_thumbnail === "true" || metadata.folder_thumbnail === "1",
 		sourceType: metadata.source_type || "r2",
 		featured: metadata.featured === "true" || metadata.featured === "1",
 		uploadedAt: metadata.uploaded_at || (object.uploaded instanceof Date ? object.uploaded.toISOString() : String(object.uploaded || "")),
@@ -1519,14 +1541,15 @@ function galleryFolders(items) {
 		if (!folders.has(slug)) {
 			folders.set(slug, {
 				slug,
-				title: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderTitle || item.title[language] || "Gallery"])),
-				subtitle: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderSubtitle || ""])),
+				title: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderTitleTranslations?.[language] || item.folderTitle || item.title[language] || "Gallery"])),
+				subtitle: Object.fromEntries(GALLERY_LANGUAGES.map((language) => [language, item.folderSubtitleTranslations?.[language] || item.folderSubtitle || ""])),
 				cover: item.image,
 				count: 0,
 				images: [],
 			});
 		}
 		const folder = folders.get(slug);
+		if (item.folderThumbnail || !folder.cover) folder.cover = item.image;
 		folder.count += 1;
 		folder.images.push(item);
 	}
@@ -2110,9 +2133,14 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 		if (isGalleryPath && request.method === "POST") {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			const formData = await request.formData();
-			const usesFolderWorkflow = formData.has("folder_name");
+			const usesFolderWorkflow = formData.has("folder_name") || GALLERY_LANGUAGES.some((language) => formData.has(`folder_title_${language}`));
 			const metadata = normalizeGalleryMetadata(formData);
 			const files = formData.getAll("file").filter((file) => file instanceof File);
+			const thumbnailFile = formData.get("thumbnail_file");
+			const hasThumbnail = thumbnailFile instanceof File && thumbnailFile.size > 0;
+			if (hasThumbnail && !files.some((file) => file === thumbnailFile || (file.name === thumbnailFile.name && file.size === thumbnailFile.size && file.type === thumbnailFile.type))) {
+				throw newsError("The folder thumbnail must be one of the selected images");
+			}
 			const sourceUrl = normalizeGallerySourceUrl(formData.get("source_url"));
 			if (files.length && sourceUrl) throw newsError("Choose files or a Google Drive URL, not both");
 			if (!files.length && !sourceUrl) throw newsError("Choose at least one image file or provide a Google Drive URL");
@@ -2141,17 +2169,21 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 				}
 
 				metadata.source_type = sourceUrl ? "drive" : "r2";
+				const itemMetadata = {
+					...metadata,
+					folder_thumbnail: hasThumbnail && (file === thumbnailFile || (file?.name === thumbnailFile?.name && file?.size === thumbnailFile?.size && file?.type === thumbnailFile?.type)) ? "true" : "false",
+				};
 				const folderPrefix = metadata.collection === "gallery" && usesFolderWorkflow ? `${metadata.folder_slug}/` : "";
 				const pendingKey = `gallery/pending/${folderPrefix}${crypto.randomUUID()}.${extension}`;
 				await env.SITE_MEDIA.put(pendingKey, body, {
 					httpMetadata: { contentType, cacheControl: PRIVATE_MEDIA_CACHE },
-					customMetadata: { ...metadata },
+					customMetadata: itemMetadata,
 				});
 				if (metadata.collection === "online-projects" || (metadata.collection === "gallery" && !usesFolderWorkflow)) {
 					const promoted = await promotePendingGalleryImage(env, pendingKey);
 					uploaded.push(galleryItemFromObject(promoted));
 				} else {
-					uploaded.push(galleryItemFromObject({ key: pendingKey, customMetadata: metadata }, true));
+					uploaded.push(galleryItemFromObject({ key: pendingKey, customMetadata: itemMetadata }, true));
 				}
 			}
 			const responseGallery = !usesFolderWorkflow && uploaded.length === 1 ? uploaded[0] : uploaded;
@@ -2163,13 +2195,75 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			let key;
 			try { key = decodeURIComponent(galleryItemMatch[1]); } catch { throw newsError("Invalid gallery key"); }
-			if (!GALLERY_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
+			if (!GALLERY_KEY_PATTERN.test(key) && !GALLERY_PENDING_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
 			const payload = await readJsonRequest(request);
-			if (!isOnlineProjectTopic(payload?.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
+			if (payload?.topic !== undefined) {
+				if (!isOnlineProjectTopic(payload.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
+				if (!GALLERY_KEY_PATTERN.test(key)) throw newsError("Invalid gallery key");
+			}
 			const object = await env.SITE_MEDIA.get(key);
 			if (!object) throw newsError("Gallery image not found", 404);
-			if (object.customMetadata?.collection !== "online-projects") throw newsError("Only online-project images have a topic");
-			const metadata = { ...object.customMetadata, topic: payload.topic };
+			const metadata = { ...object.customMetadata };
+			const stableFolderSlug = metadata.folder_slug || key.match(/^gallery\/(?:pending\/)?([^/]+)\//)?.[1] || galleryFolderSlug(metadata.folder_title || "Gallery");
+			const collection = metadata.collection || "gallery";
+			let changed = false;
+			if (collection === "online-projects" && payload?.topic !== undefined) {
+				if (!isOnlineProjectTopic(payload.topic)) throw newsError("Bitte ein gültiges Online-Projekte-Thema auswählen (topic).");
+				metadata.topic = payload.topic;
+				changed = true;
+			}
+			if (collection === "gallery") {
+				for (const field of ["title", "alt", "subtitle"]) {
+					if (payload?.[field] === undefined) continue;
+					if (!payload[field] || typeof payload[field] !== "object" || Array.isArray(payload[field])) throw newsError(`Invalid gallery ${field}`);
+					for (const language of GALLERY_LANGUAGES) {
+						const value = payload[field][language];
+						if (value === undefined) continue;
+						metadata[`${field}_${language}`] = field === "title" || field === "alt"
+							? galleryTextValue(value, `${field}_${language}`)
+							: galleryOptionalTextValue(value, `${field}_${language}`);
+					}
+					changed = true;
+				}
+				if (payload?.folderTitle !== undefined) {
+					if (payload.folderTitle && typeof payload.folderTitle === "object" && !Array.isArray(payload.folderTitle)) {
+						for (const language of GALLERY_LANGUAGES) {
+							if (payload.folderTitle[language] === undefined) continue;
+							metadata[`folder_title_${language}`] = normalizeGalleryFolderName(payload.folderTitle[language]);
+						}
+						metadata.folder_title = normalizeGalleryFolderName(metadata.folder_title_de || metadata.folder_title_en || metadata.folder_title_ru || metadata.folder_title || "Gallery");
+					} else {
+						metadata.folder_title = normalizeGalleryFolderName(payload.folderTitle);
+						for (const language of GALLERY_LANGUAGES) metadata[`folder_title_${language}`] = metadata.folder_title;
+					}
+					metadata.folder_slug = stableFolderSlug;
+					changed = true;
+				}
+				if (payload?.folderSubtitle !== undefined) {
+					if (payload.folderSubtitle && typeof payload.folderSubtitle === "object" && !Array.isArray(payload.folderSubtitle)) {
+						for (const language of GALLERY_LANGUAGES) {
+							if (payload.folderSubtitle[language] === undefined) continue;
+							metadata[`folder_subtitle_${language}`] = galleryOptionalTextValue(payload.folderSubtitle[language], `folder_subtitle_${language}`, 500);
+						}
+						metadata.folder_subtitle = galleryOptionalTextValue(metadata.folder_subtitle_de || metadata.folder_subtitle_en || metadata.folder_subtitle_ru || metadata.folder_subtitle, "folder_subtitle", 500);
+					} else {
+						metadata.folder_subtitle = galleryOptionalTextValue(payload.folderSubtitle, "folder_subtitle", 500);
+						for (const language of GALLERY_LANGUAGES) metadata[`folder_subtitle_${language}`] = metadata.folder_subtitle;
+					}
+					changed = true;
+				}
+				if (payload?.featured !== undefined) {
+					if (typeof payload.featured !== "boolean") throw newsError("Invalid gallery featured value");
+					metadata.featured = payload.featured ? "true" : "false";
+					changed = true;
+				}
+				if (payload?.folderThumbnail !== undefined) {
+					if (typeof payload.folderThumbnail !== "boolean") throw newsError("Invalid gallery thumbnail value");
+					metadata.folder_thumbnail = payload.folderThumbnail ? "true" : "false";
+					changed = true;
+				}
+			}
+			if (!changed) throw newsError("No editable gallery fields provided");
 			// Preserve the original gallery ordering when assigning older images.
 			if (!metadata.uploaded_at && object.uploaded) metadata.uploaded_at = new Date(object.uploaded).toISOString();
 			const saved = await env.SITE_MEDIA.put(key, object.body, {
@@ -2178,7 +2272,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 				onlyIf: { etagMatches: object.etag },
 			});
 			if (!saved) throw newsError("Das Bild wurde zwischenzeitlich geändert. Bitte neu laden.", 409);
-			return newsJsonResponse({ success: true, gallery: galleryItemFromObject({ key, customMetadata: metadata }) }, 200, origin, env);
+			return newsJsonResponse({ success: true, gallery: galleryItemFromObject({ key, customMetadata: metadata }, key.includes("/pending/")) }, 200, origin, env);
 		}
 		if (galleryItemMatch && request.method === "DELETE") {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
