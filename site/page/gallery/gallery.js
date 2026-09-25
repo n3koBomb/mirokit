@@ -504,7 +504,7 @@ function render() {
                 >
                   <span class="ga-folder-edge"></span>
 
-                  <span class="ga-folder-label">
+                  <span class="ga-folder-sticker" aria-hidden="true">
                     <i></i>
                     <i></i>
                     <i></i>
@@ -514,10 +514,10 @@ function render() {
                 </span>
               </span>
 
-              <span class="ga-card-copy">
+              <span class="ga-folder-label">
                 <small class="ga-folder-label-text">${escape(t('ga_folder_label'))}</small>
                 <strong>${escape(folderTitle(folderItem))}</strong>
-                <small>${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_folder_count')}`)}</small>
+                <small class="ga-folder-count">${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_folder_count')}`)}</small>
               </span>
             </button>
           </article>

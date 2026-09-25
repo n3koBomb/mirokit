@@ -185,7 +185,7 @@ body.gallery-page.theme-dark { --ga-bg: #0b1427; --ga-paper: #14223b; --ga-ink: 
   background: linear-gradient(#ffe999, #d97719);
   box-shadow: 0 3px 7px rgba(126, 51, 3, .2);
 }
-.ga-folder-label {
+.ga-folder-sticker {
   position: absolute;
   top: 31%;
   left: 9%;
@@ -199,9 +199,9 @@ body.gallery-page.theme-dark { --ga-bg: #0b1427; --ga-paper: #14223b; --ga-ink: 
   box-shadow: inset 0 1px rgba(255,255,255,.6);
   transform: translateZ(2px) rotate(-1deg);
 }
-.ga-folder-label i { display: block; height: 3px; border-radius: 3px; background: rgba(123, 65, 12, .18); }
-.ga-folder-label i:nth-child(2) { width: 78%; }
-.ga-folder-label i:nth-child(3) { width: 56%; }
+.ga-folder-sticker i { display: block; height: 3px; border-radius: 3px; background: rgba(123, 65, 12, .18); }
+.ga-folder-sticker i:nth-child(2) { width: 78%; }
+.ga-folder-sticker i:nth-child(3) { width: 56%; }
 .ga-folder-gloss {
   position: absolute;
   top: -28%;
@@ -577,13 +577,13 @@ body.gallery-page.theme-dark {
 .ga-heading-subtitle { max-width: 58ch; margin: 9px 0 0; color: var(--ga-muted); font-size: 13px; line-height: 1.6; }
 .ga-folder-card { border-color: rgba(21, 101, 255, .26); background: linear-gradient(145deg, rgba(255, 255, 255, .9), rgba(231, 240, 255, .8)); box-shadow: 0 16px 34px rgba(13, 44, 105, .1); }
 .theme-dark .ga-folder-card { background: linear-gradient(145deg, rgba(25, 52, 94, .95), rgba(18, 39, 73, .88)); }
-.ga-folder-card .ga-folder-art { filter: drop-shadow(0 16px 20px rgba(13, 44, 105, .13)); }
+.ga-folder-card .ga-folder-art { width: min(94%, 330px); margin-inline: auto; aspect-ratio: 1.3; filter: drop-shadow(0 14px 18px rgba(13, 44, 105, .13)); }
 .ga-folder-card .ga-folder-photo { opacity: .68; filter: saturate(.82); transition: opacity .3s ease, filter .3s ease, transform .56s cubic-bezier(.18,.78,.18,1); }
 .ga-folder-card:hover .ga-folder-photo, .ga-folder-card:focus-within .ga-folder-photo { opacity: .9; filter: saturate(1); }
-.ga-folder-card .ga-card-copy { gap: 5px; padding: 16px 8px 9px; }
-.ga-folder-card .ga-card-copy strong { font-size: clamp(16px, 1.5vw, 20px); line-height: 1.25; }
+.ga-folder-card .ga-folder-label { display: grid; gap: 3px; padding: 8px 8px 0; overflow-wrap: anywhere; }
+.ga-folder-card .ga-folder-label strong { color: var(--ga-ink); font: 800 clamp(16px, 1.5vw, 20px)/1.25 Montserrat, sans-serif; }
 .ga-folder-card .ga-folder-label-text { color: var(--ga-accent); font: 800 9px/1.2 Montserrat, sans-serif; letter-spacing: .14em; }
-.ga-folder-card .ga-card-copy small:last-child { font-size: 11px; }
+.ga-folder-card .ga-folder-count { color: var(--ga-muted); font-size: 11px; line-height: 1.35; }
 .ga-library.is-folder-view .ga-heading h2 { max-width: 26ch; }
 
 .ga-dialog--photo { overflow: hidden; background: #050b17; border-color: #ffffff2b; }
