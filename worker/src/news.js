@@ -12,6 +12,7 @@ SELECT
   n.category,
   n.accent,
   n.image_url,
+  n.link_url,
   n.featured,
   t.language,
   t.alt,
@@ -33,6 +34,7 @@ SELECT
   n.category,
   n.accent,
   n.image_url,
+  n.link_url,
   n.featured,
   n.created_at,
   n.updated_at,
@@ -78,7 +80,7 @@ function validateDate(value) {
 }
 
 function validateImage(value) {
-	const image = requireString(value, "image", 2_000);
+	const image = normalizeLocalPath(requireString(value, "image", 2_000));
 	if (image.startsWith("/media/v1/") || image.startsWith("/public/")) {
 		if (image.includes("..") || /[\r\n]/.test(image)) throw newsError("Invalid image");
 		return image;
@@ -89,7 +91,42 @@ function validateImage(value) {
 		if (url.protocol !== "https:") throw new Error("protocol");
 		return url.href;
 	} catch {
-		throw newsError("Image must be an HTTPS URL or a /media/v1/ path");
+		throw newsError("Image must be an HTTPS URL or a /media/v1/ or /public/assets/ path");
+	}
+}
+
+function normalizeLocalPath(value) {
+	const path = String(value || "").trim();
+	const localPrefix = path.match(/^(?:\.\/|\/?)((?:public|media\/v1)\/.*)$/);
+	if (localPrefix) return `/${localPrefix[1]}`;
+	if (path.startsWith("/site/public/") || path.startsWith("site/public/")) return path.replace(/^\/?site/, "");
+
+	try {
+		const url = new URL(path);
+		if (url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1")) {
+			return `${url.pathname}${url.search}${url.hash}`;
+		}
+	} catch {
+		// The caller will return the regular validation error for non-URL input.
+	}
+
+	return path;
+}
+
+function validateLink(value) {
+	if (value === undefined || value === null || (typeof value === "string" && !value.trim())) return "";
+	const link = requireString(value, "linkUrl", 2_000);
+	if (link.startsWith("/") && !link.startsWith("//")) {
+		if (link.includes("..") || /[\r\n]/.test(link)) throw newsError("Invalid linkUrl");
+		return link;
+	}
+
+	try {
+		const url = new URL(link);
+		if (url.protocol !== "https:") throw new Error("protocol");
+		return url.href;
+	} catch {
+		throw newsError("linkUrl must be a local path or HTTPS URL");
 	}
 }
 
@@ -155,6 +192,7 @@ function normalizeNewsInput(input, { includeStatus = false } = {}) {
 		category,
 		accent,
 		image: validateImage(input.image),
+		linkUrl: validateLink(input.linkUrl),
 		featured,
 		translations,
 	};
@@ -180,6 +218,7 @@ function rowsToNews(rows) {
 				category: row.category,
 				accent: row.accent,
 				image: row.image_url,
+				linkUrl: row.link_url || "",
 				featured: row.featured === null ? false : Number(row.featured),
 				title: {},
 				summary: {},
@@ -215,6 +254,7 @@ function rowsToAdminNews(rows) {
 				category: row.category,
 				accent: row.accent,
 				image: row.image_url,
+				linkUrl: row.link_url || "",
 				featured: row.featured === null ? false : Number(row.featured),
 				createdAt: row.created_at,
 				updatedAt: row.updated_at,
@@ -237,14 +277,15 @@ function rowsToAdminNews(rows) {
 function newsToStatements(news, status, now) {
 	const statements = [
 		{
-			sql: `INSERT INTO news (id, status, published_at, category, accent, image_url, featured, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT created_at FROM news WHERE id = ?), ?), ?)
+			sql: `INSERT INTO news (id, status, published_at, category, accent, image_url, link_url, featured, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT created_at FROM news WHERE id = ?), ?), ?)
 ON CONFLICT(id) DO UPDATE SET
   status = excluded.status,
   published_at = excluded.published_at,
   category = excluded.category,
   accent = excluded.accent,
   image_url = excluded.image_url,
+  link_url = excluded.link_url,
   featured = excluded.featured,
   updated_at = excluded.updated_at`,
 			params: [
@@ -254,6 +295,7 @@ ON CONFLICT(id) DO UPDATE SET
 				news.category,
 				news.accent,
 				news.image,
+				news.linkUrl,
 				news.featured === false ? null : news.featured,
 				news.id,
 				now,

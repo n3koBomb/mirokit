@@ -168,6 +168,7 @@ const adminFieldIds = {
 	accent: ["accent", "projectAccent"],
 	topic: ["galleryTopic"],
 	website: ["partnerWebsite"],
+	linkUrl: ["linkUrl", "projectLinkUrl"],
 	latitude: ["worldLatitude"],
 	longitude: ["worldLongitude"],
 	pointStatus: ["worldPointKind"],
@@ -196,7 +197,7 @@ function focusAdminErrorField(message) {
 		}
 	}
 	if (!field) {
-		const fieldMatch = text.match(/\b(sourceUrl|sourceType|poster|durationSeconds|width|height|sortOrder|image|category|website|latitude|longitude|pointStatus|flag|id)\b/i);
+		const fieldMatch = text.match(/\b(sourceUrl|sourceType|poster|durationSeconds|width|height|sortOrder|image|category|website|linkUrl|latitude|longitude|pointStatus|flag|id)\b/i);
 		const ids = fieldMatch ? adminFieldIds[fieldMatch[1]] || adminFieldIds[fieldMatch[1].toLowerCase()] : [];
 		field = visibleAdminField((ids || []).map((id) => document.getElementById(id)).filter(Boolean));
 	}
@@ -697,6 +698,7 @@ function populateForm(item) {
 	setFormValue("accent", item.accent);
 	setFormValue("featured", item.featured || "");
 	setFormValue("image", item.image);
+	setFormValue("linkUrl", item.linkUrl);
 	for (const language of LANGUAGES) {
 		const translation = item.translations?.[language] || {};
 		field(language, "alt").value = translation.alt || "";
@@ -743,6 +745,7 @@ function formPayload() {
 		accent: document.getElementById("accent").value,
 		featured: featured ? Number(featured) : false,
 		image: document.getElementById("image").value.trim(),
+		linkUrl: document.getElementById("linkUrl").value.trim(),
 		translations,
 	};
 }

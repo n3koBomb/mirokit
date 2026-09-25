@@ -27,7 +27,7 @@ function video(key, status = "published", field = "source_url") {
 
 beforeEach(() => {
 	db = new DatabaseSync(":memory:");
-	for (const file of ["0001_news.sql", "0002_gallery_quotes.sql", "0003_world_points_partners.sql", "0004_videos.sql", "0005_projects.sql", "0006_gallery_quote_folders.sql"]) db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
+	for (const file of ["0001_news.sql", "0002_gallery_quotes.sql", "0003_world_points_partners.sql", "0004_videos.sql", "0005_projects.sql", "0006_gallery_quote_folders.sql", "0007_news_links.sql"]) db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
 	objects = new Map();
 	const statement = (sql, params = []) => ({
 		bind: (...values) => statement(sql, values),

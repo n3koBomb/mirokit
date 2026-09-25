@@ -258,6 +258,35 @@ function escapeHtml(value) {
    return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
 }
 
+function parseNewsSummary(value) {
+   const source = String(value ?? "").trim();
+   const match = source.match(/^(.*?)\s*\{([\s\S]*)\}\s*$/);
+   if (!match) return { summary: source, sectionExtra: "" };
+
+   const summary = match[1].trim();
+   const sectionExtra = match[2].replace(/\\n/g, "\n").trim();
+   return { summary: summary || source, sectionExtra };
+}
+
+function newsSectionSummaryMarkup(item) {
+   const { summary, sectionExtra } = parseNewsSummary(newsText(item, "summary"));
+   const extraMarkup = sectionExtra
+      ? `<span class="news-full-excerpt-extra">${escapeHtml(sectionExtra)}</span>`
+      : "";
+   return `<span class="news-full-excerpt-main">${escapeHtml(summary)}</span>${extraMarkup}`;
+}
+
+function newsMoreInfoMarkup(item) {
+   const link = String(item.linkUrl || "").trim();
+   if (!link) return "";
+
+   const label = T[currentLang]?.news_more_info || "More information";
+   const isInternal = link.startsWith("/") || link.startsWith("#");
+   if (!isInternal && !/^https:\/\//i.test(link)) return "";
+   const target = isInternal ? "" : ' target="_blank" rel="noopener noreferrer"';
+   return `<a class="news-more-info-link" href="${escapeHtml(link)}"${target}><i class="fa-solid fa-file-lines" aria-hidden="true"></i><span>${escapeHtml(label)}</span></a>`;
+}
+
 function partnerCategoryLabel(category) {
    const key = { public: "partner_public", social: "partner_social", education: "partner_education" }[category];
    return (key && (T[currentLang]?.[key] || T.en?.[key])) || category || "Partners";
@@ -350,7 +379,7 @@ function showNewsSlide(index) {
 
 function newsHeroSlideMarkup(item, index) {
    const title = newsText(item, "title");
-   const summary = newsText(item, "summary");
+   const { summary } = parseNewsSummary(newsText(item, "summary"));
    const category = newsText(item, "categoryLabel");
    const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
    const position = String(index + 1).padStart(2, "0");
@@ -361,7 +390,7 @@ function newsHeroSlideMarkup(item, index) {
             <a class="news-slide-media" href="#news" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
                <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span>
             </a>
-            <div class="news-slide-content"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+            <div class="news-slide-content"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-slide-actions"><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>${newsMoreInfoMarkup(item)}</div></div>
          </article>`;
 }
 
@@ -383,7 +412,7 @@ function renderHeroNews() {
 
 function newsCardMarkup(item, index, isHero = false) {
    const title = newsText(item, "title");
-   const summary = newsText(item, "summary");
+   const { summary } = parseNewsSummary(newsText(item, "summary"));
    const category = newsText(item, "categoryLabel");
    const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
    const cardClass = isHero ? (item.featured === 1 ? "news-card--featured" : "news-card--compact") : "";
@@ -391,11 +420,12 @@ function newsCardMarkup(item, index, isHero = false) {
    const readableLabel = T[currentLang]?.news_full || "Read in full";
 
    if (!isHero) {
-      return `<div class="news-card-full-wrap${item.featured === 1 ? " featured" : ""}" data-category="${escapeHtml(item.category)}" data-news-id="${escapeHtml(item.id)}">
+      const infoLink = newsMoreInfoMarkup(item);
+      return `<div class="news-card-full-wrap${item.featured === 1 ? " featured" : ""}${infoLink ? " has-news-link" : ""}" data-category="${escapeHtml(item.category)}" data-news-id="${escapeHtml(item.id)}">
                <button type="button" class="news-card-full" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
                   <span class="news-full-img-wrap"><img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span></span>
-                  <span class="news-full-body"><span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}</span><span class="news-full-title">${escapeHtml(title)}</span><span class="news-full-excerpt">${escapeHtml(summary)}</span><span class="news-full-readmore">${escapeHtml(readableLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></span>
-               </button>
+                  <span class="news-full-body"><span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}</span><span class="news-full-title">${escapeHtml(title)}</span><span class="news-full-excerpt">${newsSectionSummaryMarkup(item)}</span><span class="news-full-readmore">${escapeHtml(readableLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></span>
+               </button>${infoLink}
             </div>`;
    }
 

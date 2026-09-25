@@ -8067,6 +8067,109 @@ body.theme-dark #projects .projects-context {
 	}
 }
 
+/* Optional News information link: stays separate from the card's modal action. */
+.news-more-info-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	padding: 0.58rem 0.78rem;
+	font-family: "Montserrat", sans-serif;
+	font-size: 0.66rem;
+	font-weight: 900;
+	line-height: 1.15;
+	text-align: center;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.news-more-info-link:hover,
+.news-more-info-link:focus-visible {
+	transform: translateY(-2px);
+}
+
+#news .news-card-full-wrap.has-news-link {
+	position: relative;
+}
+
+#news .news-card-full-wrap.has-news-link .news-full-readmore {
+	padding-right: 10.8rem;
+}
+
+#news .news-more-info-link {
+	position: absolute;
+	right: 1.1rem;
+	bottom: 1.15rem;
+	z-index: 2;
+	max-width: 10.2rem;
+	color: var(--bld);
+	background: rgba(255, 255, 255, 0.94);
+}
+
+#news .news-more-info-link:hover,
+#news .news-more-info-link:focus-visible {
+	background: var(--bld);
+	color: #fff;
+}
+
+#hero .news-slide-content {
+	position: relative;
+}
+
+#hero .news-slide-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1.5rem;
+	margin-top: 20px;
+	min-width: 0;
+}
+
+#hero .news-slide-actions .news-read-link {
+	margin-top: 0;
+	white-space: nowrap;
+}
+
+#hero .news-more-info-link {
+	max-width: 100%;
+	padding: 0.52rem 0.72rem;
+	font-size: 0.6rem;
+	color: var(--miro-blue);
+	background: rgba(255, 255, 255, 0.76);
+}
+
+#hero .news-more-info-link:hover,
+#hero .news-more-info-link:focus-visible {
+	background: var(--miro-blue);
+	color: #fff;
+}
+
+@media (max-width: 720px) {
+	#news .news-card-full-wrap.has-news-link .news-full-readmore {
+		padding-right: 8.8rem;
+	}
+
+	#news .news-more-info-link {
+		right: 0.8rem;
+		bottom: 0.85rem;
+		max-width: 8.2rem;
+		font-size: 0.58rem;
+	}
+
+	#hero .news-slide-actions {
+		align-items: flex-start;
+		gap: 0.65rem;
+	}
+
+	#hero .news-more-info-link {
+		margin-left: 0;
+		font-size: 0.58rem;
+	}
+}
+
 /* Narrow Samsung Chrome can report a wider CSS viewport than the physical
    device screenshot. Keep section headers and the Projects hero single-column
    before their contents become squeezed into a thin side column. */
@@ -8944,11 +9047,54 @@ body.theme-dark #projects .projects-flow>div {
 		font-size: clamp(1.15rem, 2.2vw, 1.5rem);
 	}
 
-	#news .news-card-full-wrap.featured .news-full-excerpt {
+#news .news-card-full-wrap.featured .news-full-excerpt {
 		font-size: 0.92rem;
 		line-clamp: 3;
 		-webkit-line-clamp: 3;
 	}
+}
+
+#news .news-full-excerpt {
+	display: block;
+	line-clamp: unset;
+	-webkit-line-clamp: unset;
+	overflow: visible;
+}
+
+#news .news-full-excerpt-main {
+	display: -webkit-box;
+	line-clamp: 3;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	overflow: hidden;
+}
+
+#news .news-full-excerpt-extra {
+	position: relative;
+	display: block;
+	margin-top: 0.8rem;
+	padding: 0.78rem 0.9rem 0.78rem 2.25rem;
+	border: 1px solid rgba(21, 101, 255, 0.2);
+	border-left: 5px solid var(--miro-blue);
+	border-radius: 0.75rem;
+	background: linear-gradient(135deg, rgba(21, 101, 255, 0.1), rgba(142, 197, 255, 0.2));
+	color: var(--bld);
+	font-size: 0.82rem;
+	font-weight: 700;
+	box-shadow: 0 0.45rem 1rem rgba(8, 22, 83, 0.08);
+	white-space: pre-line;
+}
+
+#news .news-full-excerpt-extra::before {
+	content: "“";
+	position: absolute;
+	top: 0.38rem;
+	left: 0.72rem;
+	color: var(--miro-blue);
+	font-family: Georgia, serif;
+	font-size: 2rem;
+	font-weight: 900;
+	line-height: 1;
 }
 
 /* --- Kompakte Höhen-Stufen (siehe Abschnitt 5) --- */
@@ -14792,6 +14938,18 @@ body.theme-dark #news :where(.news-empty, .news-full-excerpt),
 body.theme-dark #locations .location-copy,
 body.theme-dark #benefits .benefit-desc {
 	color: var(--theme-text-secondary) !important;
+}
+
+body.theme-dark #news .news-full-excerpt-extra {
+	border-color: var(--theme-border);
+	border-left-color: var(--theme-link);
+	background: linear-gradient(135deg, rgba(65, 137, 255, 0.2), rgba(19, 52, 103, 0.8));
+	color: var(--theme-text-primary);
+	box-shadow: var(--theme-shadow-sm);
+}
+
+body.theme-dark #news .news-full-excerpt-extra::before {
+	color: var(--theme-link);
 }
 
 body.theme-dark #hero :where(.section-title .icon-box, .partner-network-number) {

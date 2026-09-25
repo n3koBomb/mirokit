@@ -110,6 +110,7 @@ describe("news content contract", () => {
 		category: "event",
 		accent: "blue",
 		image: "/media/v1/news/test.webp",
+		linkUrl: "",
 		featured: 1,
 		translations: {
 			ru: { alt: "Тест", title: "Тест", summary: "Тест", content: ["Текст"] },
@@ -121,6 +122,10 @@ describe("news content contract", () => {
 	it("requires all three translations before saving", () => {
 		expect(normalizeNewsInput(validNews).id).toBe("test-news");
 		expect(normalizeNewsInput({ ...validNews, image: "/public/assets/gallery/example.png" }).image).toBe("/public/assets/gallery/example.png");
+		expect(normalizeNewsInput({ ...validNews, image: "./public/assets/gallery/example.png" }).image).toBe("/public/assets/gallery/example.png");
+		expect(normalizeNewsInput({ ...validNews, image: "http://localhost:8787/public/assets/gallery/example.png" }).image).toBe("/public/assets/gallery/example.png");
+		expect(normalizeNewsInput({ ...validNews, linkUrl: "https://example.org/info" }).linkUrl).toBe("https://example.org/info");
+		expect(() => normalizeNewsInput({ ...validNews, linkUrl: "javascript:alert(1)" })).toThrow("linkUrl");
 		expect(() => normalizeNewsInput({ ...validNews, translations: { ru: validNews.translations.ru } })).toThrow("Invalid translation for en");
 	});
 
@@ -130,10 +135,11 @@ describe("news content contract", () => {
 
 	it("groups database rows into the public news shape", () => {
 		const [item] = rowsToNews([
-			{ id: "test-news", published_at: "2026-08-31", category: "event", accent: "blue", image_url: "/media/v1/news/test.webp", featured: 1, language: "en", alt: "Test", title: "Test", summary: "Test", content_json: '["Text"]' },
+			{ id: "test-news", published_at: "2026-08-31", category: "event", accent: "blue", image_url: "/media/v1/news/test.webp", link_url: "https://example.org/info", featured: 1, language: "en", alt: "Test", title: "Test", summary: "Test", content_json: '["Text"]' },
 		]);
 		expect(item.title.en).toBe("Test");
 		expect(item.content.en).toEqual(["Text"]);
+		expect(item.linkUrl).toBe("https://example.org/info");
 	});
 });
 

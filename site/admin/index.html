@@ -167,7 +167,12 @@
 
                         <label>
                            <span>Bild-URL</span>
-                           <input id="image" name="image" type="text" required maxlength="2000" placeholder="/media/v1/news/... oder https://..." />
+                           <input id="image" name="image" type="text" required maxlength="2000" placeholder="/public/assets/... · /media/v1/news/... oder https://..." />
+                        </label>
+
+                        <label>
+                           <span>Informations-Link <small class="field-hint">Optional · ein gemeinsamer Link für alle Sprachversionen</small></span>
+                           <input id="linkUrl" name="linkUrl" type="text" maxlength="2000" placeholder="https://... oder /interner-pfad" />
                         </label>
                      </div>
                   </section>
@@ -212,7 +217,7 @@
                               <input data-language="ru" data-field="title" required maxlength="500" />
                            </label>
                            <label>
-                              <span>Zusammenfassung</span>
+                              <span>Zusammenfassung <small class="field-hint">Optional: Zusatz nur in Section News mit {Text\nmit Zeilenumbruch}</small></span>
                               <textarea data-language="ru" data-field="summary" required maxlength="2000"></textarea>
                            </label>
                            <label>
@@ -232,7 +237,7 @@
                               <input data-language="en" data-field="title" required maxlength="500" />
                            </label>
                            <label>
-                              <span>Summary</span>
+                              <span>Summary <small class="field-hint">Optional: Section-News-Zusatz mit {Text\nmit Zeilenumbruch}</small></span>
                               <textarea data-language="en" data-field="summary" required maxlength="2000"></textarea>
                            </label>
                            <label>
@@ -252,7 +257,7 @@
                               <input data-language="de" data-field="title" required maxlength="500" />
                            </label>
                            <label>
-                              <span>Zusammenfassung</span>
+                              <span>Zusammenfassung <small class="field-hint">Optional: Zusatz nur in Section News mit {Text\nmit Zeilenumbruch}</small></span>
                               <textarea data-language="de" data-field="summary" required maxlength="2000"></textarea>
                            </label>
                            <label>
