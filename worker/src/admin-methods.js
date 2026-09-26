@@ -1,5 +1,13 @@
 const ADMIN_ROUTES = [
 	[/^\/(?:news|videos|partners|world-points)$/, ["GET", "POST"]],
+	[/^\/interviews\/videos$/, ["GET", "POST"]],
+	[/^\/interviews\/videos\/media$/, ["POST"]],
+	[/^\/interviews\/videos\/[^/]+\/publish$/, ["POST"]],
+	[/^\/interviews\/videos\/[^/]+$/, ["PUT", "DELETE"]],
+	[/^\/interviews\/materials$/, ["GET", "POST"]],
+	[/^\/interviews\/materials\/media$/, ["POST"]],
+	[/^\/interviews\/materials\/[^/]+\/publish$/, ["POST"]],
+	[/^\/interviews\/materials\/[^/]+$/, ["PUT", "DELETE"]],
 	[/^\/projects$/, ["GET", "POST"]],
 	[/^\/news\/availability$/, ["GET"]],
 	[/^\/(?:media|videos\/media|partners\/media|projects\/media)$/, ["POST"]],

@@ -33,12 +33,24 @@ import {
 import {
 	VIDEOS_ADMIN_QUERY,
 	VIDEOS_PUBLIC_QUERY,
+	INTERVIEWS_ADMIN_QUERY,
+	INTERVIEWS_PUBLIC_QUERY,
 	normalizeVideoInput,
 	rowsToPublicVideos,
 	rowsToVideos,
 	videoError,
 	videoStatements,
 } from "./videos.js";
+import {
+	INTERVIEW_MATERIAL_ADMIN_QUERY,
+	INTERVIEW_MATERIAL_ASSET_PATTERN,
+	INTERVIEW_MATERIAL_PUBLIC_QUERY,
+	interviewMaterialError,
+	interviewMaterialStatements,
+	normalizeInterviewMaterialInput,
+	rowsToInterviewMaterials,
+	rowsToPublicInterviewMaterials,
+} from "./interviews.js";
 import {
 	PROJECTS_ADMIN_QUERY,
 	PROJECTS_PUBLIC_QUERY,
@@ -102,6 +114,7 @@ const GALLERY_API_PATH = `${SITE_API_PREFIX}/gallery`;
 const WORLD_POINTS_API_PATH = `${SITE_API_PREFIX}/world-points`;
 const PARTNERS_API_PATH = `${SITE_API_PREFIX}/partners`;
 const VIDEOS_API_PATH = `${SITE_API_PREFIX}/videos`;
+const INTERVIEWS_API_PATH = `${SITE_API_PREFIX}/interviews`;
 const PROJECTS_API_PATH = `${SITE_API_PREFIX}/projects`;
 const CONTACT_API_PATH = `${SITE_API_PREFIX}/contact`;
 const ADMIN_PANEL_PREFIX = "/admin";
@@ -131,6 +144,18 @@ const GALLERY_REMOTE_IMAGE_HOSTS = new Set([
 const GALLERY_IMAGE_MAX_BYTES = 8 * 1024 * 1024;
 const VIDEO_UPLOAD_MAX_BYTES = 95 * 1024 * 1024;
 const VIDEO_POSTER_MAX_BYTES = 8 * 1024 * 1024;
+const INTERVIEW_MATERIAL_MAX_BYTES = 25 * 1024 * 1024;
+const INTERVIEW_MATERIAL_TYPES = Object.freeze({
+	"application/pdf": "pdf",
+	"text/plain": "txt",
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/webp": "webp",
+	"application/msword": "doc",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+	"application/vnd.ms-powerpoint": "ppt",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+});
 
 const GALLERY_QUOTES_PUBLIC_QUERY = `
 SELECT q.id, q.status, q.folder_slug, q.created_at, q.updated_at,
@@ -1673,6 +1698,34 @@ async function handlePublicVideos(request, env, origin) {
 	}
 }
 
+async function handlePublicInterviews(request, env, origin) {
+	if (request.method !== "GET" && request.method !== "HEAD") {
+		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	try {
+		const [videoResult, materialResult] = await Promise.all([
+			env.SITE_DB.prepare(INTERVIEWS_PUBLIC_QUERY).all(),
+			env.SITE_DB.prepare(INTERVIEW_MATERIAL_PUBLIC_QUERY).all(),
+		]);
+		return newsJsonResponse(
+			{
+				success: true,
+				interviews: rowsToPublicVideos(videoResult.results || []),
+				materials: rowsToPublicInterviewMaterials(materialResult.results || []),
+			},
+			200,
+			origin,
+			env,
+			"public, max-age=60, stale-while-revalidate=300"
+		);
+	} catch (error) {
+		console.error("Public interviews query failed", error);
+		return newsJsonResponse({ success: false, message: "Interview service unavailable" }, 503, origin, env);
+	}
+}
+
 async function handlePublicProjects(request, env, origin) {
 	if (request.method !== "GET" && request.method !== "HEAD") {
 		return newsJsonResponse({ success: false, message: "Method not allowed" }, 405, origin, env);
@@ -1738,8 +1791,8 @@ async function prepareVideoForStorage(env, video) {
 	return savedVideo;
 }
 
-async function getAdminVideos(env) {
-	const result = await env.SITE_DB.prepare(VIDEOS_ADMIN_QUERY).all();
+async function getAdminVideos(env, query = VIDEOS_ADMIN_QUERY) {
+	const result = await env.SITE_DB.prepare(query).all();
 	return rowsToVideos(result.results || []);
 }
 
@@ -1750,7 +1803,7 @@ async function saveVideoRecord(env, video, status) {
 	return { ...savedVideo, status };
 }
 
-async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
+async function handleVideoAdminApi(request, env, url, origin, apiPrefix, collection = "general") {
 	const identity = await authorizeAdmin(request, env);
 	if (!identity) return newsAdminUnauthorized(origin, env);
 	const methodResponse = adminMethodResponse(request, url.pathname);
@@ -1761,12 +1814,19 @@ async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
 
 	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	const resourcePrefix = collection === "interviews" ? "/interviews/videos" : "/videos";
+	const routePath = relativePath === resourcePrefix
+		? "/videos"
+		: relativePath.startsWith(`${resourcePrefix}/`)
+			? `/videos${relativePath.slice(resourcePrefix.length)}`
+			: relativePath;
+	const videoQuery = collection === "interviews" ? INTERVIEWS_ADMIN_QUERY : VIDEOS_ADMIN_QUERY;
 	try {
-		if (relativePath === "/videos" && request.method === "GET") {
-			return newsJsonResponse({ success: true, videos: await getAdminVideos(env) }, 200, origin, env);
+		if (routePath === "/videos" && request.method === "GET") {
+			return newsJsonResponse({ success: true, videos: await getAdminVideos(env, videoQuery) }, 200, origin, env);
 		}
 
-		if (relativePath === "/videos/media" && request.method === "POST") {
+		if (routePath === "/videos/media" && request.method === "POST") {
 			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
 			const formData = await request.formData();
 			const file = formData.get("file");
@@ -1787,44 +1847,158 @@ async function handleVideoAdminApi(request, env, url, origin, apiPrefix) {
 			return newsJsonResponse({ success: true, url: `${SITE_MEDIA_PREFIX}${key}`, kind }, 201, origin, env);
 		}
 
-		const publishMatch = relativePath.match(/^\/videos\/([^/]+)\/publish$/);
+		const publishMatch = routePath.match(/^\/videos\/([^/]+)\/publish$/);
 		if (publishMatch && request.method === "POST") {
 			const id = decodeURIComponent(publishMatch[1]);
-			const existing = (await getAdminVideos(env)).find((item) => item.id === id);
+			const existing = (await getAdminVideos(env, videoQuery)).find((item) => item.id === id);
 			if (!existing) return newsJsonResponse({ success: false, message: "Video not found" }, 404, origin, env);
-			const saved = await saveVideoRecord(env, normalizeVideoInput(existing, { includeStatus: false }), "published");
+			const saved = await saveVideoRecord(env, normalizeVideoInput({ ...existing, collection }, { includeStatus: false }), "published");
 			return newsJsonResponse({ success: true, video: saved }, 200, origin, env);
 		}
 
-		if (relativePath === "/videos" && request.method === "POST") {
-			const video = normalizeVideoInput(await readJsonRequest(request), { includeStatus: false });
-			if ((await getAdminVideos(env)).some((item) => item.id === video.id)) return newsJsonResponse({ success: false, message: "Video ID already exists" }, 409, origin, env);
+		if (routePath === "/videos" && request.method === "POST") {
+			const video = normalizeVideoInput({ ...(await readJsonRequest(request)), collection }, { includeStatus: false });
+			const existing = await env.SITE_DB.prepare("SELECT id FROM videos WHERE id = ? LIMIT 1").bind(video.id).all();
+			if (existing.results?.length) return newsJsonResponse({ success: false, message: "Video ID already exists" }, 409, origin, env);
 			const saved = await saveVideoRecord(env, video, "draft");
 			return newsJsonResponse({ success: true, video: saved }, 201, origin, env);
 		}
 
-		const itemMatch = relativePath.match(/^\/videos\/([^/]+)$/);
+		const itemMatch = routePath.match(/^\/videos\/([^/]+)$/);
 		if (itemMatch) {
 			const id = decodeURIComponent(itemMatch[1]);
 			if (request.method === "PUT") {
-				const video = normalizeVideoInput({ ...(await readJsonRequest(request)), id }, { includeStatus: false });
+				const existing = (await getAdminVideos(env, videoQuery)).find((item) => item.id === id);
+				if (!existing) return newsJsonResponse({ success: false, message: "Video not found" }, 404, origin, env);
+				const video = normalizeVideoInput({ ...(await readJsonRequest(request)), id, collection }, { includeStatus: false });
 				const saved = await saveVideoRecord(env, video, "draft");
 				return newsJsonResponse({ success: true, video: saved }, 200, origin, env);
 			}
 			if (request.method === "DELETE") {
-				const result = await env.SITE_DB.prepare("UPDATE videos SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'").bind(new Date().toISOString(), id).run();
+				const result = await env.SITE_DB.prepare("UPDATE videos SET status = 'archived', updated_at = ? WHERE id = ? AND collection = ? AND status <> 'archived'").bind(new Date().toISOString(), id, collection).run();
 				if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "Video not found" }, 404, origin, env);
 				return newsJsonResponse({ success: true, id }, 200, origin, env);
 			}
 		}
 
-		if (relativePath !== "/videos" && relativePath.startsWith("/videos/")) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+		if (routePath !== "/videos" && routePath.startsWith("/videos/")) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
 		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
 	} catch (error) {
 		const status = Number.isInteger(error?.status) ? error.status : 500;
 		if (status < 500) return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
 		console.error("Video admin request failed", error);
 		return newsJsonResponse({ success: false, message: "Video service unavailable" }, 503, origin, env);
+	}
+}
+
+async function promotePendingInterviewMaterial(env, value) {
+	if (!value || !value.startsWith(SITE_MEDIA_PREFIX)) return value;
+	const sourceKey = value.slice(SITE_MEDIA_PREFIX.length);
+	if (!sourceKey.startsWith("interview-materials/pending/")) return value;
+	if (!env.SITE_MEDIA) throw interviewMaterialError("Interview material storage is not configured", 503);
+	const destinationKey = sourceKey.replace("interview-materials/pending/", "interview-materials/");
+	const object = await env.SITE_MEDIA.get(sourceKey);
+	if (!object) throw interviewMaterialError("Uploaded interview material no longer exists", 409);
+	const metadataHeaders = new Headers();
+	object.writeHttpMetadata?.(metadataHeaders);
+	await env.SITE_MEDIA.put(destinationKey, object.body, {
+		httpMetadata: {
+			contentType: metadataHeaders.get("content-type") || "application/octet-stream",
+			cacheControl: PRIVATE_MEDIA_CACHE,
+		},
+	});
+	await env.SITE_MEDIA.delete(sourceKey);
+	return `${SITE_MEDIA_PREFIX}${destinationKey}`;
+}
+
+async function getAdminInterviewMaterials(env) {
+	const result = await env.SITE_DB.prepare(INTERVIEW_MATERIAL_ADMIN_QUERY).all();
+	return rowsToInterviewMaterials(result.results || []);
+}
+
+async function saveInterviewMaterialRecord(env, material, status) {
+	const savedMaterial = {
+		...material,
+		sourceUrl: material.sourceType === "r2" ? await promotePendingInterviewMaterial(env, material.sourceUrl) : material.sourceUrl,
+	};
+	const statements = interviewMaterialStatements(savedMaterial, status, new Date().toISOString());
+	await env.SITE_DB.batch(statements.map((statement) => env.SITE_DB.prepare(statement.sql).bind(...statement.params)));
+	return { ...savedMaterial, status };
+}
+
+async function handleInterviewMaterialsAdminApi(request, env, url, origin, apiPrefix) {
+	const identity = await authorizeAdmin(request, env);
+	if (!identity) return newsAdminUnauthorized(origin, env);
+	const methodResponse = adminMethodResponse(request, url.pathname);
+	if (methodResponse) return methodResponse;
+	if (request.method !== "GET" && origin && origin !== url.origin) {
+		return newsJsonResponse({ success: false, message: "Cross-origin admin request denied" }, 403, origin, env);
+	}
+	if (!env.SITE_DB) return newsDatabaseUnavailable(origin, env);
+
+	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
+	const routePath = relativePath === "/interviews/materials"
+		? "/materials"
+		: relativePath.startsWith("/interviews/materials/")
+			? `/materials${relativePath.slice("/interviews/materials".length)}`
+			: relativePath;
+	try {
+		if (routePath === "/materials" && request.method === "GET") {
+			return newsJsonResponse({ success: true, materials: await getAdminInterviewMaterials(env) }, 200, origin, env);
+		}
+
+		if (routePath === "/materials/media" && request.method === "POST") {
+			if (!env.SITE_MEDIA) return newsMediaUnavailable(origin, env);
+			const formData = await request.formData();
+			const file = formData.get("file");
+			if (!(file instanceof File) || !INTERVIEW_MATERIAL_TYPES[file.type] || file.size === 0 || file.size > INTERVIEW_MATERIAL_MAX_BYTES) {
+				return newsJsonResponse({ success: false, message: "Unsupported interview material or material exceeds 25 MB" }, 400, origin, env);
+			}
+			const key = `interview-materials/pending/${crypto.randomUUID()}.${INTERVIEW_MATERIAL_TYPES[file.type]}`;
+			await env.SITE_MEDIA.put(key, file.stream(), {
+				httpMetadata: { contentType: file.type, cacheControl: PRIVATE_MEDIA_CACHE },
+			});
+			return newsJsonResponse({ success: true, url: `${SITE_MEDIA_PREFIX}${key}`, fileName: file.name.slice(0, 255), mimeType: file.type, sizeBytes: file.size }, 201, origin, env);
+		}
+
+		const publishMatch = routePath.match(/^\/materials\/([^/]+)\/publish$/);
+		if (publishMatch && request.method === "POST") {
+			const id = decodeURIComponent(publishMatch[1]);
+			const existing = (await getAdminInterviewMaterials(env)).find((item) => item.id === id);
+			if (!existing) return newsJsonResponse({ success: false, message: "Interview material not found" }, 404, origin, env);
+			const saved = await saveInterviewMaterialRecord(env, normalizeInterviewMaterialInput(existing, { includeStatus: false }), "published");
+			return newsJsonResponse({ success: true, material: saved }, 200, origin, env);
+		}
+
+		if (routePath === "/materials" && request.method === "POST") {
+			const material = normalizeInterviewMaterialInput(await readJsonRequest(request), { includeStatus: false });
+			if ((await getAdminInterviewMaterials(env)).some((item) => item.id === material.id)) return newsJsonResponse({ success: false, message: "Interview material ID already exists" }, 409, origin, env);
+			const saved = await saveInterviewMaterialRecord(env, material, "draft");
+			return newsJsonResponse({ success: true, material: saved }, 201, origin, env);
+		}
+
+		const itemMatch = routePath.match(/^\/materials\/([^/]+)$/);
+		if (itemMatch) {
+			const id = decodeURIComponent(itemMatch[1]);
+			if (request.method === "PUT") {
+				const material = normalizeInterviewMaterialInput({ ...(await readJsonRequest(request)), id }, { includeStatus: false });
+				const saved = await saveInterviewMaterialRecord(env, material, "draft");
+				return newsJsonResponse({ success: true, material: saved }, 200, origin, env);
+			}
+			if (request.method === "DELETE") {
+				const result = await env.SITE_DB.prepare("UPDATE interview_materials SET status = 'archived', updated_at = ? WHERE id = ? AND status <> 'archived'").bind(new Date().toISOString(), id).run();
+				if (!result.meta?.changes) return newsJsonResponse({ success: false, message: "Interview material not found" }, 404, origin, env);
+				return newsJsonResponse({ success: true, id }, 200, origin, env);
+			}
+		}
+
+		if (routePath !== "/materials" && routePath.startsWith("/materials/")) return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+		return newsJsonResponse({ success: false, message: "Not found" }, 404, origin, env);
+	} catch (error) {
+		const status = Number.isInteger(error?.status) ? error.status : 500;
+		if (status < 500) return newsJsonResponse({ success: false, message: error.message }, status, origin, env);
+		console.error("Interview material admin request failed", error);
+		return newsJsonResponse({ success: false, message: "Interview material service unavailable" }, 503, origin, env);
 	}
 }
 
@@ -2415,6 +2589,10 @@ export default {
 			return handlePublicVideos(request, env, origin);
 		}
 
+		if (url.pathname === INTERVIEWS_API_PATH) {
+			return handlePublicInterviews(request, env, origin);
+		}
+
 		if (url.pathname === PROJECTS_API_PATH) {
 			return handlePublicProjects(request, env, origin);
 		}
@@ -2425,6 +2603,12 @@ export default {
 
 		const adminApiPrefix = getAdminApiPrefix(url.pathname);
 		if (adminApiPrefix) {
+			if (url.pathname.startsWith(`${adminApiPrefix}/interviews/videos`)) {
+				return handleVideoAdminApi(request, env, url, origin, adminApiPrefix, "interviews");
+			}
+			if (url.pathname.startsWith(`${adminApiPrefix}/interviews/materials`)) {
+				return handleInterviewMaterialsAdminApi(request, env, url, origin, adminApiPrefix);
+			}
 			if (url.pathname.startsWith(`${adminApiPrefix}/projects`)) {
 				return handleProjectsAdminApi(request, env, url, origin, adminApiPrefix);
 			}

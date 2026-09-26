@@ -45,6 +45,7 @@ Die Redaktion öffnet `/admin/`. Das Admin-Skript sendet authentifizierte Anfrag
 | `GET/HEAD /api/v1/news` | Veröffentlichte und zeitlich freigegebene News |
 | `GET/HEAD /api/v1/gallery` | Veröffentlichte Gallery-Bilder und Zitate |
 | `GET/HEAD /api/v1/videos` | Veröffentlichte Videos mit Postern und Untertiteln |
+| `GET/HEAD /api/v1/interviews` | Veröffentlichte Interview-Videos und Materialien aus getrennten Beständen |
 | `GET/HEAD /api/v1/projects` | Veröffentlichte Projekte mit berechneter Current/Upcoming/Past-Phase |
 | `GET/HEAD /api/v1/world-points` | Veröffentlichte Kartenpunkte |
 | `GET/HEAD /api/v1/partners` | Veröffentlichte Partner |
@@ -52,6 +53,8 @@ Die Redaktion öffnet `/admin/`. Das Admin-Skript sendet authentifizierte Anfrag
 | `/api/v1/admin/gallery`, `/api/v1/admin/gallery/quotes` | Gallery-Bilder und Zitate verwalten |
 | `POST /api/v1/admin/gallery/publish` | Bis zu 100 Pending-Gallery-Schlüssel gesammelt in ihre Ordner verschieben und als veröffentlicht markieren |
 | `PATCH /api/v1/admin/gallery/<encoded-key>` | Einem vorhandenen Online-Projekte-Bild ein Thema zuweisen |
+| `/api/v1/admin/interviews/videos` | Interview-Videos unabhängig vom normalen Video-/Gallery-Bestand verwalten und veröffentlichen |
+| `/api/v1/admin/interviews/materials` | Dokumente, Prospekte, Formulare und Anfragen mit R2-/HTTPS-Quelle verwalten und veröffentlichen |
 | `/api/v1/admin/world-points` | Kartenpunkte verwalten |
 | `/api/v1/admin/partners`, `/api/v1/admin/partners/media` | Partner und Logos verwalten |
 | `GET/HEAD /media/v1/...` | Nur aktuell veröffentlichte R2-Medien ausliefern |
@@ -67,6 +70,8 @@ Die Verwaltungsrouten besitzen je nach Bereich zusätzliche ID-, Veröffentlichu
 - `0003_world_points_partners.sql`: World Points, Partner, Übersetzungen und Ausgangsdaten.
 - `0004_videos.sql`: Videos, lokalisierte Metadaten und WebVTT-Untertitel.
 - `0005_projects.sql`: Projekte, Zeiträume, lokalisierte Metadaten und optionale Bild-/Link-Verweise.
+- `0006_gallery_quote_folders.sql` und `0007_news_links.sql`: spätere Gallery-/News-Erweiterungen.
+- `0008_interviews.sql`: Video-Collection `interviews` sowie Materialien und RU/EN/DE-Übersetzungen für Dokumente, Prospekte, Formulare und Anfragen.
 
 News, World Points, Partner und Projects haben den Veröffentlichungsstatus `draft`, `published` oder `archived`. Bei World Points ist `hq`, `done` oder `planned` ein davon unabhängiger Kartenstatus. News speichern zusätzlich das Veröffentlichungsdatum; die öffentliche Abfrage vergleicht es mit dem aktuellen UTC-Datum. Projects speichern `startDate` und optional `endDate`; `endDate < heute` wird in der API als `phase: "past"` ausgegeben. Die Redaktion kann ein Projekt zuerst als Entwurf anlegen und vor der Veröffentlichung alle drei Sprachversionen, Zeitraum und Bild prüfen.
 
@@ -74,7 +79,7 @@ Das News-Seed-Skript liest die gebündelten News, erzeugt SQL und führt Upserts
 
 ### R2 und statische Assets
 
-`SITE_MEDIA` enthält hochgeladene News-Bilder, Gallery-Bilder, Partnerlogos, Projektbilder, Videos, Poster und WebVTT-Dateien. Gallery-Titel, Alt-Texte, Untertitel und Hervorhebung liegen in den Custom-Metadata der Bildobjekte; Gallery-Zitate sowie Project-Metadaten liegen separat in D1. Projektbilder werden zunächst unter `projects/pending/` gespeichert und beim Entwurf-/Veröffentlichungsspeichern nach `projects/` promoted.
+`SITE_MEDIA` enthält hochgeladene News-Bilder, Gallery-Bilder, Partnerlogos, Projektbilder, Videos, Poster, WebVTT-Dateien und Interview-Materialien. Gallery-Titel, Alt-Texte, Untertitel und Hervorhebung liegen in den Custom-Metadata der Bildobjekte; Gallery-Zitate, Project-Metadaten und Interview-Metadaten liegen separat in D1. Interview-Videos nutzen die `videos`-Tabelle mit `collection = 'interviews'`; Dokumente, Prospekte, Formulare und Anfragen liegen in `interview_materials` mit eigener Übersetzungstabelle. Projektbilder werden zunächst unter `projects/pending/` gespeichert und beim Entwurf-/Veröffentlichungsspeichern nach `projects/` promoted.
 
 Normale Gallery-Bilder verwenden optional `folder_slug`, `folder_title` und `folder_subtitle` in R2-Custom-Metadata. Mehrere Admin-Dateien bleiben zunächst unter `gallery/pending/<folder-slug>/`; die explizite Publish-Route setzt `status=published` und verschiebt sie nach `gallery/<folder-slug>/`. Die öffentliche Gallery-API liefert daraus neben `gallery` auch gruppierte `folders` mit Bildlisten. Pending-Schlüssel dürfen nur im authentifizierten Admin-Bereich als Vorschau geladen werden.
 
@@ -82,7 +87,7 @@ Online-Projekte verwenden weiterhin `collection=online-projects` und eines der z
 
 Neue Uploads durchlaufen den jeweiligen `pending/`-Bereich. Beim Speichern werden sie in den permanenten Bereich übernommen, auch bei Entwürfen. Neue WebVTT-Inhalte erhalten bei jedem Speichern einen neuen UUID-Schlüssel. Ablaufregeln dürfen nur verwaiste Pending-Objekte betreffen, nicht gespeicherte Entwürfe; siehe README.
 
-`/media/v1/` blockiert Pending-Pfade grundsätzlich. Permanente Gallery-Objekte benötigen ausdrücklich `status=published` in den R2-Metadaten. Andere unterstützte Objekte benötigen eine aktuell veröffentlichte Referenz in D1 (News-Bild, Partnerlogo, Video, Poster oder Untertitel); bei News muss außerdem das UTC-Veröffentlichungsdatum erreicht sein. Relative Medienpfade und absolute HTTPS-Pfade auf den acht bekannten Site-Hostnamen werden berücksichtigt. Solange ein Objekt von einem anderen veröffentlichten Datensatz verwendet wird, bleibt es öffentlich. Unbekannter Status und Speicherfehler geben keine Datei frei.
+`/media/v1/` blockiert Pending-Pfade grundsätzlich. Permanente Gallery-Objekte benötigen ausdrücklich `status=published` in den R2-Metadaten. Andere unterstützte Objekte benötigen eine aktuell veröffentlichte Referenz in D1 (News-Bild, Partnerlogo, Video, Poster, Untertitel oder Interview-Material); bei News muss außerdem das UTC-Veröffentlichungsdatum erreicht sein. Relative Medienpfade und absolute HTTPS-Pfade auf den acht bekannten Site-Hostnamen werden berücksichtigt. Solange ein Objekt von einem anderen veröffentlichten Datensatz verwendet wird, bleibt es öffentlich. Unbekannter Status und Speicherfehler geben keine Datei frei.
 
 Vorschauen laufen separat über `/api/v1/admin/media/<key>` mit derselben JWT-/E-Mail-Prüfung wie die übrigen Admin-APIs. Lokal fordert das Admin-Skript die Bytes mit dem lokalen Token an und erzeugt Blob-URLs für Bilder und Videos; das Token steht nie in der URL. Produktiv laden Medienelemente direkt vom Access-geschützten Preview-Endpunkt und behalten die Range-Unterstützung. Externe HTTPS-Medien und statische Assets werden dadurch nicht privat.
 
@@ -104,6 +109,8 @@ Damit ist das Archivieren sämtlicher Backend-Einträge nicht in jedem Bereich g
 ## Sprache, Darstellung und Laden
 
 Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `folder`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; Gallery-Ordner benötigen keine D1-Migration.
+
+Die eigenständige Interview-Seite liegt in `site/page/interviews/` (`index.html`, `interviews.css`, `interviews.js`). Gespräche verwenden bewusst einen getrennten Endpunkt `/api/v1/interviews` und greifen nicht auf den normalen Video-Bestand `/api/v1/videos` zu. Der Materialbereich hat eigene Tabs für Dokumente, Prospekte, Formulare und Anfragen und ersetzt die statischen Platzhalter, sobald veröffentlichte Admin-Materialien vorhanden sind. Der Content Desk hat dafür den Interview-Tab mit getrennten Untertabs für Videos und Materialien; noch nicht veröffentlichte Dateien werden nicht als öffentliche Inhalte vorgetäuscht.
 
 `language.js` übersetzt sichtbare Inhalte über `data-key` und Attribute über `data-i18n-attrs`. Der Sprachwechsel löst `mirokit:languagechange` aus, auf das dynamische Ansichten reagieren.
 

@@ -1917,6 +1917,39 @@ input[type="file"]::file-selector-button {
     font-weight: 800;
 }
 
+.admin-subtabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #dce7f8;
+}
+
+.admin-subtab {
+    border: 1px solid #c7d7ef;
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: #f7faff;
+    color: #31527e;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.admin-subtab.is-active {
+    border-color: #1565ff;
+    background: #1565ff;
+    color: #fff;
+}
+
+.field-span-two { grid-column: span 2; }
+
+@media (max-width: 760px) {
+    .field-span-two { grid-column: 1 / -1; }
+}
+
 @media (max-width: 760px) {
     .video-cue-row {
         grid-template-columns: 1fr 1fr;

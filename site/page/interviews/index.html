@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Interviews, conversations and materials from the MIRoKIT community." />
+  <title>Interviews — MIRoKIT</title>
+  <link rel="canonical" href="https://mirokit.com/page/interviews/" />
+  <link rel="icon" href="/public/favicon/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/source/style/style.css" />
+  <link rel="stylesheet" href="interviews.css" />
+  <link rel="stylesheet" href="/source/style/subpage.css" />
+</head>
+<body class="interviews-page">
+  <a class="iv-skip" href="#interviewConversations" data-iv-key="skip">Skip to the interviews</a>
+  <header class="subpage-header">
+    <a class="subpage-brand" href="/#news" data-i18n-attrs="aria-label:op_library_home"><img src="/public/assets/brand/miroKit_logo_full-1.png" alt="MIRoKIT" width="144" height="48" /></a>
+    <a class="subpage-home" href="/#news"><span aria-hidden="true">↖</span> <span data-key="op_library_home">Back to home</span></a>
+    <div class="subpage-actions">
+      <a class="subpage-contact" href="/#contact"><span data-key="contact_title">Contact</span></a>
+      <button class="subpage-theme" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span></button>
+      <label class="sr-only" for="interviewLanguage" data-key="language_label">Language</label>
+      <select class="subpage-lang" id="interviewLanguage" data-lang-select data-i18n-attrs="aria-label:language_selector"><option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option></select>
+    </div>
+  </header>
+
+  <main class="iv-main">
+    <nav class="iv-jump-nav" role="tablist" aria-label="Interview page sections" data-iv-aria="jump_label">
+      <button class="is-active" id="interviewConversationsTab" type="button" role="tab" aria-selected="true" aria-controls="interviewConversations" data-interview-tab="conversations"><span aria-hidden="true">▷</span><span data-iv-key="nav_videos">Conversations</span></button>
+      <button id="interviewMaterialsTab" type="button" role="tab" aria-selected="false" aria-controls="interviewMaterials" data-interview-tab="materials"><span aria-hidden="true">▤</span><span data-iv-key="nav_materials">Materials</span></button>
+    </nav>
+
+    <section class="iv-tab-panel iv-section is-active" id="interviewConversations" role="tabpanel" aria-labelledby="interviewConversationsTab" data-interview-panel="conversations" tabindex="-1">
+      <div class="iv-section-heading">
+        <div><span class="iv-kicker" data-iv-key="videos_kicker">THE INTERVIEW ARCHIVE</span><h2 id="interviewVideosTitle" data-iv-key="videos_title">Listen to the people behind MIRoKIT</h2><p data-iv-key="videos_text">Stories from participants, partners and the people who help the project grow.</p></div>
+        <span class="iv-section-mark" aria-hidden="true">01</span>
+      </div>
+      <div class="iv-status" id="interviewStatus" role="status" aria-live="polite"><span data-iv-key="no_interviews">The interview archive is ready for its first published conversation.</span></div>
+      <div class="iv-video-grid" id="interviewVideoGrid" aria-busy="true"></div>
+      <noscript><p class="iv-empty" data-iv-key="no_script">Please enable JavaScript to watch the interviews.</p></noscript>
+    </section>
+
+    <section class="iv-tab-panel iv-section iv-materials" id="interviewMaterials" role="tabpanel" aria-labelledby="interviewMaterialsTab" data-interview-panel="materials" hidden tabindex="-1">
+      <div class="iv-section-heading">
+        <div><span class="iv-kicker" data-iv-key="materials_kicker">READ · DOWNLOAD · SHARE</span><h2 id="interviewMaterialsTitle" data-iv-key="materials_title">Materials around the conversation</h2><p data-iv-key="materials_text">Useful documents for participants, partners and media. More interview materials can be added here as the archive grows.</p></div>
+        <span class="iv-section-mark" aria-hidden="true">02</span>
+      </div>
+      <nav class="iv-material-tabs" role="tablist" aria-label="Interview material sections" data-iv-aria="materials_label">
+        <button class="is-active" id="interviewDocumentsTab" type="button" role="tab" aria-selected="true" aria-controls="interviewDocuments" data-material-tab="documents"><span aria-hidden="true">▤</span><span data-iv-key="material_tab_documents">Documents</span></button>
+        <button id="interviewBrochuresTab" type="button" role="tab" aria-selected="false" aria-controls="interviewBrochures" data-material-tab="brochures"><span aria-hidden="true">▥</span><span data-iv-key="material_tab_brochures">Brochures</span></button>
+        <button id="interviewFormsTab" type="button" role="tab" aria-selected="false" aria-controls="interviewForms" data-material-tab="forms"><span aria-hidden="true">✎</span><span data-iv-key="material_tab_forms">Forms</span></button>
+        <button id="interviewRequestsTab" type="button" role="tab" aria-selected="false" aria-controls="interviewRequests" data-material-tab="requests"><span aria-hidden="true">↗</span><span data-iv-key="material_tab_requests">Requests</span></button>
+      </nav>
+      <div class="iv-material-panel is-active" id="interviewDocuments" role="tabpanel" aria-labelledby="interviewDocumentsTab" data-material-panel="documents">
+        <article class="iv-material-card iv-material-card--blue">
+          <span class="iv-material-icon" aria-hidden="true">▤</span><span class="iv-card-label" data-iv-key="material_document_label">DOCUMENT</span>
+          <h3 data-iv-key="material_document_title">MIRoKIT regulations</h3><p data-iv-key="material_document_text">The current project document for orientation and participation.</p>
+          <a href="/public/assets/downloads/documents/mirokit-horovod-uzorov-mira-2026-regulations-ru.pdf" target="_blank" rel="noopener" data-iv-key="material_open">Open document ↗</a>
+        </article>
+      </div>
+      <div class="iv-material-panel" id="interviewBrochures" role="tabpanel" aria-labelledby="interviewBrochuresTab" data-material-panel="brochures" hidden>
+        <div class="iv-material-empty"><span class="iv-material-icon" aria-hidden="true">▥</span><h3 data-iv-key="brochures_title">Brochures will appear here</h3><p data-iv-key="brochures_text">This area is prepared for interview brochures and press sheets.</p></div>
+      </div>
+      <div class="iv-material-panel" id="interviewForms" role="tabpanel" aria-labelledby="interviewFormsTab" data-material-panel="forms" hidden>
+        <div class="iv-material-empty"><span class="iv-material-icon" aria-hidden="true">✎</span><h3 data-iv-key="forms_title">Forms will appear here</h3><p data-iv-key="forms_text">Registration and participation forms for interview projects can be added here.</p></div>
+      </div>
+      <div class="iv-material-panel" id="interviewRequests" role="tabpanel" aria-labelledby="interviewRequestsTab" data-material-panel="requests" hidden>
+        <article class="iv-material-card iv-material-card--yellow">
+          <span class="iv-material-icon" aria-hidden="true">✎</span><span class="iv-card-label" data-iv-key="material_request_label">REQUEST</span>
+          <h3 data-iv-key="material_request_title">Interview request</h3><p data-iv-key="material_request_text">Would you like to suggest a guest, topic or conversation?</p>
+          <a href="/#contact" data-iv-key="material_request_cta">Contact the team ↗</a>
+        </article>
+      </div>
+    </section>
+
+    <footer class="iv-footer"><div><span class="iv-kicker" data-iv-key="footer_kicker">MIRoKIT / DIALOGUE</span><h2 data-iv-key="footer_title">Every voice can open a new door.</h2></div><a class="iv-footer-link" href="/#contact" data-iv-key="footer_cta">Share a story ↗</a></footer>
+  </main>
+  <script src="/source/scripts/language.js"></script>
+  <script type="module" src="interviews.js"></script>
+</body>
+</html>

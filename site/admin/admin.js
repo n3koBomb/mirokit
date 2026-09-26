@@ -10,16 +10,19 @@ let galleryQuotes = [];
 let worldPoints = [];
 let partners = [];
 let videos = [];
+let interviewMaterials = [];
 let projects = [];
 let editingId = null;
 let editingWorldPointId = null;
 let editingPartnerId = null;
 let editingVideoId = null;
+let editingInterviewMaterialId = null;
 let editingProjectId = null;
 let videoSubtitleState = [];
 let activeVideoSubtitleIndex = -1;
 let videoCueState = [];
 let videoPreviewVersion = 0;
+let videoScope = "general";
 
 const form = document.getElementById("newsForm");
 const notice = document.getElementById("notice");
@@ -64,6 +67,11 @@ const videoSubtitleRows = document.getElementById("videoSubtitleRows");
 const videoCueEditor = document.getElementById("videoCueEditor");
 const videoFile = document.getElementById("videoFile");
 const videoPosterFile = document.getElementById("videoPosterFile");
+const interviewVideoEditorMount = document.getElementById("interviewVideoEditorMount");
+const interviewVideosList = document.getElementById("interviewVideosList");
+const interviewMaterialsList = document.getElementById("interviewMaterialsList");
+const interviewMaterialForm = document.getElementById("interviewMaterialForm");
+const interviewMaterialFile = document.getElementById("interviewMaterialFile");
 const projectForm = document.getElementById("projectForm");
 const projectsList = document.getElementById("projectsList");
 const projectFile = document.getElementById("projectFile");
@@ -81,6 +89,15 @@ let pendingDeletion = null;
 function setAdminView(viewKey) {
 	const selectedView = viewKey === "online-projects" || adminViews.some((view) => view.dataset.adminView === viewKey) ? viewKey : "news";
 	const panelKey = selectedView === "online-projects" ? "gallery" : selectedView;
+	if (selectedView === "interviews") {
+		videoScope = "interviews";
+		interviewVideoEditorMount.append(videoForm);
+		updateVideoEditorContext();
+	} else if (selectedView === "videos") {
+		videoScope = "general";
+		document.getElementById("videoEditorMount").append(videoForm);
+		updateVideoEditorContext();
+	}
 	adminViews.forEach((view) => { view.hidden = view.dataset.adminView !== panelKey; });
 	adminTabs.forEach((tab) => {
 		const isActive = tab.dataset.adminTab === selectedView;
@@ -89,6 +106,28 @@ function setAdminView(viewKey) {
 	});
 	newNewsButton.hidden = selectedView !== "news";
 	if (panelKey === "gallery") configureGalleryView(selectedView === "online-projects");
+	if (selectedView === "videos") loadVideos().catch((error) => showNotice(error.message, true));
+	if (selectedView === "interviews") {
+		loadVideos().catch((error) => showNotice(error.message, true));
+		loadInterviewMaterials().catch((error) => showNotice(error.message, true));
+	}
+}
+
+function updateVideoEditorContext() {
+	const interviews = videoScope === "interviews";
+	document.getElementById("videoHeading").textContent = interviews ? "Neues Interview" : "Neues Video";
+	document.querySelector("#videoForm .eyebrow").textContent = interviews ? "INTERVIEW VIDEO EDITOR" : "VIDEO EDITOR";
+	document.querySelector("#videoForm .action-copy strong").textContent = interviews ? "Interview fertig?" : "Video fertig?";
+	document.querySelector("#videoForm .action-copy span").textContent = interviews ? "Als Interview-Entwurf speichern oder veröffentlichen." : "Als Entwurf speichern oder veröffentlichen.";
+}
+
+function videoApiPath(id = "") {
+	const base = videoScope === "interviews" ? "/api/v1/admin/interviews/videos" : "/api/v1/admin/videos";
+	return id ? `${base}/${encodeURIComponent(id)}` : base;
+}
+
+function videoMediaApiPath() {
+	return videoScope === "interviews" ? "/api/v1/admin/interviews/videos/media" : "/api/v1/admin/videos/media";
 }
 
 function configureGalleryView(isOnline) {
@@ -153,14 +192,14 @@ function showNotice(message, error = false, type = "") {
 
 const localizedAdminFields = new Set(["title", "alt", "summary", "content", "description", "name", "city", "country"]);
 const adminFieldIds = {
-	id: ["newsId", "videoId", "worldPointId", "partnerId", "projectId"],
-	sourceUrl: ["videoSourceUrl"],
-	sourceType: ["videoSourceType"],
+	id: ["newsId", "videoId", "worldPointId", "partnerId", "projectId", "interviewMaterialId"],
+	sourceUrl: ["videoSourceUrl", "interviewMaterialSourceUrl"],
+	sourceType: ["videoSourceType", "interviewMaterialSourceType"],
 	poster: ["videoPoster"],
 	durationSeconds: ["videoDuration"],
 	width: ["videoWidth"],
 	height: ["videoHeight"],
-	sortOrder: ["videoSortOrder", "worldSortOrder", "partnerSortOrder"],
+	sortOrder: ["videoSortOrder", "worldSortOrder", "partnerSortOrder", "interviewMaterialSortOrder"],
 	image: ["image", "galleryImage", "partnerImage", "projectImage"],
 	category: ["category", "partnerCategory"],
 	startDate: ["projectStartDate"],
@@ -186,14 +225,14 @@ function focusAdminErrorField(message) {
 	if (localizedMatch && localizedAdminFields.has(localizedMatch[1].toLowerCase())) {
 		const name = localizedMatch[1].toLowerCase();
 		const language = localizedMatch[2].toLowerCase();
-		const selector = `[data-language="${language}"][data-field="${name}"], [data-video-language="${language}"][data-video-field="${name}"], [data-world-language="${language}"][data-world-field="${name}"], [data-partner-language="${language}"][data-partner-field="${name}"], [data-project-language="${language}"][data-project-field="${name}"]`;
+			const selector = `[data-language="${language}"][data-field="${name}"], [data-video-language="${language}"][data-video-field="${name}"], [data-world-language="${language}"][data-world-field="${name}"], [data-partner-language="${language}"][data-partner-field="${name}"], [data-project-language="${language}"][data-project-field="${name}"], [data-interview-material-language="${language}"][data-interview-material-field="${name}"]`;
 		field = visibleAdminField([...document.querySelectorAll(selector)]);
 	}
 	if (!field) {
 		const languageMatch = text.match(/\b(?:translation|translations)\s+for\s+(ru|en|de)\b/i);
 		if (languageMatch) {
 			const language = languageMatch[1].toLowerCase();
-			field = visibleAdminField([...document.querySelectorAll(`[data-language="${language}"], [data-video-language="${language}"], [data-world-language="${language}"], [data-partner-language="${language}"], [data-project-language="${language}"]`)]);
+				field = visibleAdminField([...document.querySelectorAll(`[data-language="${language}"], [data-video-language="${language}"], [data-world-language="${language}"], [data-partner-language="${language}"], [data-project-language="${language}"], [data-interview-material-language="${language}"]`)]);
 		}
 	}
 	if (!field) {
@@ -223,15 +262,17 @@ function isDeleteConfirmation(value) {
 
 function requestDeletion(target) {
 	pendingDeletion = target;
-	deleteDialogTitle.textContent = target.kind === "news" ? "News entfernen?" : target.kind === "gallery" ? "Gallery-Bild löschen?" : target.kind === "quote" ? "Gallery-Zitat entfernen?" : target.kind === "world" ? "World Point archivieren?" : target.kind === "video" ? "Video archivieren?" : target.kind === "project" ? "Projekt archivieren?" : "Partner archivieren?";
+	deleteDialogTitle.textContent = target.kind === "news" ? "News entfernen?" : target.kind === "gallery" ? "Gallery-Bild löschen?" : target.kind === "quote" ? "Gallery-Zitat entfernen?" : target.kind === "world" ? "World Point archivieren?" : target.kind === "video" ? "Video archivieren?" : target.kind === "interview-video" ? "Interview archivieren?" : target.kind === "interview-material" ? "Interview-Material archivieren?" : target.kind === "project" ? "Projekt archivieren?" : "Partner archivieren?";
 	deleteDialogMessage.textContent = target.kind === "news"
 		? "Die News wird aus der öffentlichen Veröffentlichung entfernt."
 		: target.kind === "gallery"
 			? "Das Bild und seine R2-Metadaten werden endgültig gelöscht."
 			: target.kind === "quote"
 				? "Das Zitat wird aus der öffentlichen Gallery entfernt."
-			: target.kind === "video"
+			: target.kind === "video" || target.kind === "interview-video"
 				? "Das Video wird archiviert und ist danach nicht mehr öffentlich sichtbar."
+			: target.kind === "interview-material"
+				? "Das Material wird archiviert und ist danach nicht mehr öffentlich sichtbar."
 			: target.kind === "project"
 				? "Das Projekt wird archiviert und ist danach nicht mehr öffentlich sichtbar."
 				: "Der Inhalt wird archiviert und ist danach nicht mehr öffentlich sichtbar.";
@@ -271,6 +312,16 @@ async function executeDeletion(target) {
 			await loadVideos();
 			clearVideoForm();
 			showNotice("Video archiviert.");
+		} else if (target.kind === "interview-video") {
+			await api(`/api/v1/admin/interviews/videos/${encodeURIComponent(target.id)}`, { method: "DELETE" });
+			await loadVideos();
+			clearVideoForm();
+			showNotice("Interview archiviert.");
+		} else if (target.kind === "interview-material") {
+			await api(`/api/v1/admin/interviews/materials/${encodeURIComponent(target.id)}`, { method: "DELETE" });
+			await loadInterviewMaterials();
+			clearInterviewMaterialForm();
+			showNotice("Interview-Material archiviert.");
 		} else if (target.kind === "project") {
 			await api(`/api/v1/admin/projects/${encodeURIComponent(target.id)}`, { method: "DELETE" });
 			await loadProjects();
@@ -393,6 +444,19 @@ function clearVideoForm() {
 	videoPreview.hidden = true;
 	videoCueEditor.hidden = true;
 	renderVideoSubtitleRows();
+	updateVideoEditorContext();
+}
+
+function clearInterviewMaterialForm() {
+	editingInterviewMaterialId = null;
+	interviewMaterialForm.reset();
+	document.getElementById("interviewMaterialId").disabled = false;
+	document.getElementById("interviewMaterialHeading").textContent = "Neues Material";
+	document.getElementById("interviewMaterialStatus").textContent = "Entwurf";
+	document.getElementById("archiveInterviewMaterial").hidden = true;
+	document.getElementById("interviewMaterialKind").value = "documents";
+	document.getElementById("interviewMaterialSourceType").value = "r2";
+	document.getElementById("interviewMaterialSortOrder").value = "0";
 }
 
 function clearProjectForm() {
@@ -542,6 +606,54 @@ function videoPayload() {
 		}])),
 		subtitles: videoSubtitleState.map(({ file, ...subtitle }) => subtitle),
 	};
+}
+
+function interviewMaterialField(language, name) {
+	return interviewMaterialForm.querySelector(`[data-interview-material-language="${language}"][data-interview-material-field="${name}"]`);
+}
+
+function interviewMaterialPayload() {
+	return {
+		id: document.getElementById("interviewMaterialId").value.trim(),
+		kind: document.getElementById("interviewMaterialKind").value,
+		sourceType: document.getElementById("interviewMaterialSourceType").value,
+		sourceUrl: document.getElementById("interviewMaterialSourceUrl").value.trim(),
+		fileName: document.getElementById("interviewMaterialFileName").value.trim(),
+		mimeType: document.getElementById("interviewMaterialFile").dataset.mimeType || "",
+		sizeBytes: document.getElementById("interviewMaterialFile").dataset.sizeBytes || null,
+		featured: document.getElementById("interviewMaterialFeatured").checked,
+		sortOrder: Number(document.getElementById("interviewMaterialSortOrder").value || 0),
+		translations: Object.fromEntries(LANGUAGES.map((language) => [language, {
+			title: interviewMaterialField(language, "title").value.trim(),
+			description: interviewMaterialField(language, "description").value.trim(),
+			alt: interviewMaterialField(language, "alt").value.trim(),
+		}])),
+	};
+}
+
+function populateInterviewMaterial(item) {
+	editingInterviewMaterialId = item.id;
+	document.getElementById("interviewMaterialId").value = item.id;
+	document.getElementById("interviewMaterialId").disabled = true;
+	document.getElementById("interviewMaterialKind").value = item.kind || "documents";
+	document.getElementById("interviewMaterialSourceType").value = item.sourceType || "external";
+	document.getElementById("interviewMaterialSourceUrl").value = item.sourceUrl || "";
+	document.getElementById("interviewMaterialFileName").value = item.fileName || "";
+	document.getElementById("interviewMaterialSortOrder").value = item.sortOrder || 0;
+	document.getElementById("interviewMaterialFeatured").checked = Boolean(item.featured);
+	const fileInput = document.getElementById("interviewMaterialFile");
+	delete fileInput.dataset.mimeType;
+	delete fileInput.dataset.sizeBytes;
+	for (const language of LANGUAGES) {
+		const translation = item.translations?.[language] || {};
+		interviewMaterialField(language, "title").value = translation.title || "";
+		interviewMaterialField(language, "description").value = translation.description || "";
+		interviewMaterialField(language, "alt").value = translation.alt || "";
+	}
+	document.getElementById("interviewMaterialHeading").textContent = item.id;
+	document.getElementById("interviewMaterialStatus").textContent = item.status === "published" ? "Veröffentlicht" : item.status === "archived" ? "Archiviert" : "Entwurf";
+	document.getElementById("archiveInterviewMaterial").hidden = item.status === "archived";
+	renderInterviewMaterials();
 }
 
 async function setVideoPreview() {
@@ -811,11 +923,19 @@ async function loadPartners(selectId = editingPartnerId) {
 }
 
 async function loadVideos(selectId = editingVideoId) {
-	const response = await api("/api/v1/admin/videos");
+	const response = await api(videoApiPath());
 	videos = response.videos || [];
 	renderVideos();
 	const selected = videos.find((item) => item.id === selectId);
 	if (selected) await populateVideo(selected);
+}
+
+async function loadInterviewMaterials(selectId = editingInterviewMaterialId) {
+	const response = await api("/api/v1/admin/interviews/materials");
+	interviewMaterials = response.materials || [];
+	renderInterviewMaterials();
+	const selected = interviewMaterials.find((item) => item.id === selectId);
+	if (selected) populateInterviewMaterial(selected);
 }
 
 async function loadProjects(selectId = editingProjectId) {
@@ -833,13 +953,26 @@ function formatVideoDuration(value) {
 }
 
 function renderVideos() {
+	const list = videoScope === "interviews" ? interviewVideosList : videosList;
 	if (!videos.length) {
-		videosList.innerHTML = '<p class="muted">Noch keine Videos vorhanden.</p>';
+		list.innerHTML = videoScope === "interviews" ? '<p class="muted">Noch keine Interview-Videos vorhanden. Lege zuerst ein Gespräch an.</p>' : '<p class="muted">Noch keine Videos vorhanden.</p>';
 		return;
 	}
-	videosList.innerHTML = videos.map((item) => {
+	list.innerHTML = videos.map((item) => {
 		const translation = item.translations?.de || item.translations?.en || item.translations?.ru || {};
-		return `<article class="news-item${item.id === editingVideoId ? " active" : ""}"><button class="news-item-select" type="button" data-video-id="${escapeHtml(item.id)}"><strong>${escapeHtml(translation.title || item.id)}</strong><span>${escapeHtml(item.sourceType)} · ${formatVideoDuration(item.durationSeconds)} · ${escapeHtml(item.status)}</span></button>${item.status !== "archived" ? `<button class="button button-danger button-remove" type="button" data-video-delete-id="${escapeHtml(item.id)}">Archivieren</button>` : ""}</article>`;
+		const deleteAttribute = videoScope === "interviews" ? "data-interview-video-delete-id" : "data-video-delete-id";
+		return `<article class="news-item${item.id === editingVideoId ? " active" : ""}"><button class="news-item-select" type="button" data-video-id="${escapeHtml(item.id)}"><strong>${escapeHtml(translation.title || item.id)}</strong><span>${escapeHtml(item.sourceType)} · ${formatVideoDuration(item.durationSeconds)} · ${escapeHtml(item.status)}</span></button>${item.status !== "archived" ? `<button class="button button-danger button-remove" type="button" ${deleteAttribute}="${escapeHtml(item.id)}">Archivieren</button>` : ""}</article>`;
+	}).join("");
+}
+
+function renderInterviewMaterials() {
+	if (!interviewMaterials.length) {
+		interviewMaterialsList.innerHTML = '<p class="muted">Noch keine Interview-Materialien vorhanden. Lege zuerst ein Dokument, einen Prospekt, ein Formular oder eine Anfrage an.</p>';
+		return;
+	}
+	interviewMaterialsList.innerHTML = interviewMaterials.map((item) => {
+		const translation = item.translations?.de || item.translations?.en || item.translations?.ru || {};
+		return `<article class="news-item${item.id === editingInterviewMaterialId ? " active" : ""}"><button class="news-item-select" type="button" data-interview-material-id="${escapeHtml(item.id)}"><strong>${escapeHtml(translation.title || item.id)}</strong><span>${escapeHtml(item.kind)} · ${escapeHtml(item.status)}${item.fileName ? ` · ${escapeHtml(item.fileName)}` : ""}</span></button>${item.status !== "archived" ? `<button class="button button-danger button-remove" type="button" data-interview-material-delete-id="${escapeHtml(item.id)}">Archivieren</button>` : ""}</article>`;
 	}).join("");
 }
 
@@ -1094,6 +1227,28 @@ videosList.addEventListener("click", (event) => {
 	if (item) populateVideo(item).then(renderVideos);
 });
 
+interviewVideosList.addEventListener("click", (event) => {
+	const deleteButton = event.target.closest("[data-interview-video-delete-id]");
+	if (deleteButton) {
+		requestDeletion({ kind: "interview-video", id: deleteButton.dataset.interviewVideoDeleteId });
+		return;
+	}
+	const button = event.target.closest("[data-video-id]");
+	const item = videos.find((candidate) => candidate.id === button?.dataset.videoId);
+	if (item) populateVideo(item).then(renderVideos);
+});
+
+interviewMaterialsList.addEventListener("click", (event) => {
+	const deleteButton = event.target.closest("[data-interview-material-delete-id]");
+	if (deleteButton) {
+		requestDeletion({ kind: "interview-material", id: deleteButton.dataset.interviewMaterialDeleteId });
+		return;
+	}
+	const button = event.target.closest("[data-interview-material-id]");
+	const item = interviewMaterials.find((candidate) => candidate.id === button?.dataset.interviewMaterialId);
+	if (item) populateInterviewMaterial(item);
+});
+
 projectsList.addEventListener("click", (event) => {
 	const deleteButton = event.target.closest("[data-project-delete-id]");
 	if (deleteButton) {
@@ -1264,13 +1419,27 @@ videoForm.addEventListener("submit", async (event) => {
 	if (!videoForm.reportValidity()) return;
 	try {
 		const payload = videoPayload();
-		const response = await api(editingVideoId ? `/api/v1/admin/videos/${encodeURIComponent(editingVideoId)}` : "/api/v1/admin/videos", {
+		const response = await api(videoApiPath(editingVideoId), {
 			method: editingVideoId ? "PUT" : "POST",
 			body: JSON.stringify(payload),
 		});
 		editingVideoId = response.video.id;
 		await loadVideos(editingVideoId);
 		showNotice("Video als Entwurf gespeichert.");
+	} catch (error) { showNotice(error.message, true); }
+});
+
+interviewMaterialForm.addEventListener("submit", async (event) => {
+	event.preventDefault();
+	if (!interviewMaterialForm.reportValidity()) return;
+	try {
+		const response = await api(editingInterviewMaterialId ? `/api/v1/admin/interviews/materials/${encodeURIComponent(editingInterviewMaterialId)}` : "/api/v1/admin/interviews/materials", {
+			method: editingInterviewMaterialId ? "PUT" : "POST",
+			body: JSON.stringify(interviewMaterialPayload()),
+		});
+		editingInterviewMaterialId = response.material.id;
+		await loadInterviewMaterials(editingInterviewMaterialId);
+		showNotice("Interview-Material als Entwurf gespeichert.");
 	} catch (error) { showNotice(error.message, true); }
 });
 
@@ -1310,7 +1479,7 @@ videoFile.addEventListener("change", async () => {
 	body.append("kind", "video");
 	try {
 		showNotice("Video wird nach R2 hochgeladen …");
-		const response = await api("/api/v1/admin/videos/media", { method: "POST", body });
+		const response = await api(videoMediaApiPath(), { method: "POST", body });
 		document.getElementById("videoSourceType").value = "r2";
 		document.getElementById("videoSourceUrl").value = response.url;
 		setVideoPreview();
@@ -1326,10 +1495,27 @@ videoPosterFile.addEventListener("change", async () => {
 	body.append("kind", "poster");
 	try {
 		showNotice("Poster wird nach R2 hochgeladen …");
-		const response = await api("/api/v1/admin/videos/media", { method: "POST", body });
+		const response = await api(videoMediaApiPath(), { method: "POST", body });
 		document.getElementById("videoPoster").value = response.url;
 		setVideoPreview();
 		showNotice("Poster hochgeladen. Jetzt Metadaten speichern.");
+	} catch (error) { showNotice(error.message, true); }
+});
+
+interviewMaterialFile.addEventListener("change", async () => {
+	const file = interviewMaterialFile.files?.[0];
+	if (!file) return;
+	const body = new FormData();
+	body.append("file", file);
+	try {
+		showNotice("Interview-Material wird nach R2 hochgeladen …");
+		const response = await api("/api/v1/admin/interviews/materials/media", { method: "POST", body });
+		document.getElementById("interviewMaterialSourceType").value = "r2";
+		document.getElementById("interviewMaterialSourceUrl").value = response.url;
+		document.getElementById("interviewMaterialFileName").value = response.fileName || file.name;
+		interviewMaterialFile.dataset.mimeType = response.mimeType || file.type;
+		interviewMaterialFile.dataset.sizeBytes = String(response.sizeBytes || file.size);
+		showNotice("Material hochgeladen. Jetzt Metadaten speichern oder veröffentlichen.");
 	} catch (error) { showNotice(error.message, true); }
 });
 
@@ -1469,14 +1655,39 @@ document.getElementById("publishVideo").addEventListener("click", async () => {
 	try {
 		if (!videoForm.reportValidity()) return;
 		const payload = videoPayload();
-		const response = await api(editingVideoId ? `/api/v1/admin/videos/${encodeURIComponent(editingVideoId)}` : "/api/v1/admin/videos", { method: editingVideoId ? "PUT" : "POST", body: JSON.stringify(payload) });
+		const response = await api(videoApiPath(editingVideoId), { method: editingVideoId ? "PUT" : "POST", body: JSON.stringify(payload) });
 		editingVideoId = response.video.id;
-		await api(`/api/v1/admin/videos/${encodeURIComponent(editingVideoId)}/publish`, { method: "POST" });
+		await api(`${videoApiPath(editingVideoId)}/publish`, { method: "POST" });
 		await loadVideos(editingVideoId);
-		showNotice("Video veröffentlicht.");
+		showNotice(videoScope === "interviews" ? "Interview veröffentlicht." : "Video veröffentlicht.");
 	} catch (error) { showNotice(error.message, true); }
 });
-document.getElementById("archiveVideo").addEventListener("click", () => { if (editingVideoId) requestDeletion({ kind: "video", id: editingVideoId }); });
+document.getElementById("archiveVideo").addEventListener("click", () => { if (editingVideoId) requestDeletion({ kind: videoScope === "interviews" ? "interview-video" : "video", id: editingVideoId }); });
+document.getElementById("newInterviewMaterial").addEventListener("click", clearInterviewMaterialForm);
+document.getElementById("publishInterviewMaterial").addEventListener("click", async () => {
+	try {
+		if (!interviewMaterialForm.reportValidity()) return;
+		const payload = interviewMaterialPayload();
+		const response = await api(editingInterviewMaterialId ? `/api/v1/admin/interviews/materials/${encodeURIComponent(editingInterviewMaterialId)}` : "/api/v1/admin/interviews/materials", { method: editingInterviewMaterialId ? "PUT" : "POST", body: JSON.stringify(payload) });
+		editingInterviewMaterialId = response.material.id;
+		await api(`/api/v1/admin/interviews/materials/${encodeURIComponent(editingInterviewMaterialId)}/publish`, { method: "POST" });
+		await loadInterviewMaterials(editingInterviewMaterialId);
+		showNotice("Interview-Material veröffentlicht.");
+	} catch (error) { showNotice(error.message, true); }
+});
+document.getElementById("archiveInterviewMaterial").addEventListener("click", () => { if (editingInterviewMaterialId) requestDeletion({ kind: "interview-material", id: editingInterviewMaterialId }); });
+document.getElementById("reloadInterviewContent").addEventListener("click", () => Promise.all([loadVideos(), loadInterviewMaterials()]).catch((error) => showNotice(error.message, true)));
+document.querySelectorAll("[data-interview-content-tab]").forEach((tab) => tab.addEventListener("click", () => {
+	const selected = tab.dataset.interviewContentTab;
+	document.querySelectorAll("[data-interview-content-tab]").forEach((item) => {
+		const active = item === tab;
+		item.classList.toggle("is-active", active);
+		item.setAttribute("aria-selected", String(active));
+	});
+	document.querySelectorAll("[data-interview-content-pane]").forEach((pane) => {
+		pane.hidden = pane.dataset.interviewContentPane !== selected;
+	});
+}));
 document.getElementById("newProject").addEventListener("click", clearProjectForm);
 document.getElementById("reloadProjects").addEventListener("click", () => loadProjects().catch((error) => showNotice(error.message, true)));
 document.getElementById("publishProject").addEventListener("click", async () => {
@@ -1497,11 +1708,11 @@ clearForm();
 clearWorldPointForm();
 clearPartnerForm();
 clearVideoForm();
+clearInterviewMaterialForm();
 clearProjectForm();
 setAdminView("news");
 loadNews().catch((error) => showNotice(error.message, true));
 loadGallery().catch((error) => showNotice(error.message, true));
 loadWorldPoints().catch((error) => showNotice(error.message, true));
 loadPartners().catch((error) => showNotice(error.message, true));
-loadVideos().catch((error) => showNotice(error.message, true));
 loadProjects().catch((error) => showNotice(error.message, true));

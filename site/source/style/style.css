@@ -2980,23 +2980,33 @@ body #join {
 	overflow: hidden;
 }
 
-.section-logo img {
+.section-logo-object {
 	display: block;
 	width: 100%;
 	height: 100%;
-	object-fit: contain;
-	object-position: center;
-	mix-blend-mode: multiply;
+	border: 0;
+}
+
+.section-logo-source {
+	position: fixed;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.section-logo-sprite {
+	position: absolute;
+	width: 0;
+	height: 0;
+	overflow: hidden;
 }
 
 .section-header .subtitle {
 	font-weight: 600 !important;
 	max-width: 100%;
 	overflow-wrap: anywhere;
-}
-
-.section-logo img[src=""] {
-	display: none;
 }
 
 #aboutUs .section-header .section-head {
@@ -14490,11 +14500,6 @@ body.theme-dark :where(.btn-secondary,
 }
 
 /* Transparent section artwork must not use multiply over a dark canvas. */
-body.theme-dark .section-logo img {
-	mix-blend-mode: var(--theme-logo-blend) !important;
-	filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.22));
-}
-
 /* Photographic media is slightly subdued in dark mode to avoid white-flash cards. */
 body.theme-dark :where(#hero .hero-image-frame img,
 	#team .team-visual img,

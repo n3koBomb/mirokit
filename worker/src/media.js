@@ -6,7 +6,7 @@ const ADMIN_MEDIA_PREFIX = "/api/v1/admin/media/";
 const PRIVATE_MEDIA_CACHE = "private, no-store";
 // Publication can be revoked without changing the URL. Recheck it on every use.
 const PUBLIC_MEDIA_CACHE = "public, max-age=0, must-revalidate";
-const MEDIA_KEY_PATTERN = /^(?:(?:news|partners|projects|video-posters)\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|gallery\/(?:pending\/[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/|[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|videos\/(?:pending\/)?[a-f0-9-]+\.(?:mp4|webm|ogv)|subtitles\/(?:pending\/)?[a-z0-9-]+\.vtt)$/;
+const MEDIA_KEY_PATTERN = /^(?:(?:news|partners|projects|video-posters)\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|gallery\/(?:pending\/[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/|[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|videos\/(?:pending\/)?[a-f0-9-]+\.(?:mp4|webm|ogv)|subtitles\/(?:pending\/)?[a-z0-9-]+\.vtt|interview-materials\/(?:pending\/)?[a-f0-9-]+\.(?:pdf|txt|jpg|png|webp|doc|docx|ppt|pptx))$/;
 
 async function isPublishedMedia(env, key, object) {
 	if (key.includes("/pending/")) return false;
@@ -24,6 +24,7 @@ SELECT 1 AS published WHERE
   OR EXISTS (SELECT 1 FROM videos WHERE status = 'published' AND (source_url IN (SELECT url FROM media_urls) OR poster_url IN (SELECT url FROM media_urls)))
   OR EXISTS (SELECT 1 FROM projects WHERE status = 'published' AND image_url IN (SELECT url FROM media_urls))
   OR EXISTS (SELECT 1 FROM video_subtitles s JOIN videos v ON v.id = s.video_id WHERE v.status = 'published' AND s.src_url IN (SELECT url FROM media_urls))
+  OR EXISTS (SELECT 1 FROM interview_materials m WHERE m.status = 'published' AND m.source_url IN (SELECT url FROM media_urls))
 `).bind(...urls, new Date().toISOString().slice(0, 10)).first();
 	return result?.published === 1;
 }

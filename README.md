@@ -22,7 +22,7 @@ Das Repository enthält eine responsive, vertikal aufgebaute Website und einen g
 - News-Karten mit Detaildialogen, eine ordnerbasierte Foto-/Videogalerie, Zitate und Partnergruppen.
 - Kontaktformular und Liga-Antrag mit gemeinsamer Worker-API.
 - Russisch, Englisch und Deutsch, Theme-Umschaltung, responsive Navigation und Lesefortschritt.
-- Content Desk unter `/admin/` mit Tabs für News, Gallery, Online Projects, Videos, Projects, World Points und Partners.
+- Content Desk unter `/admin/` mit Tabs für News, Gallery, Online Projects, Videos, Interviews, Projects, World Points und Partners. Im Interview-Tab werden Gespräche und Materialien getrennt verwaltet.
 - Gallery-Uploads können als mehrere Bilder in einem benannten Ordner als Pending-Gruppe vorbereitet und anschließend gesammelt veröffentlicht werden; Online Projects bleiben ein getrenntes Topic-System.
 - Gallery, News, Online Projects und Privacy Policy verwenden einen gemeinsamen responsiven Second-Page-Header.
 - Dynamische Veröffentlichung über Cloudflare D1 und R2 mit statischen Ausgangsinhalten im Frontend.
@@ -50,6 +50,7 @@ Die Website verwendet HTML5, CSS Grid/Flexbox, CSS Custom Properties und Vanilla
 │   │   ├── favicon/
 │   │   └── site.webmanifest
 │   ├── page/gallery/             # Ordnerbasierte Foto-/Videogalerie
+│   ├── page/interviews/          # Interview-Archiv, Videoplayer und Materialien
 │   ├── page/news/                # Eigenständige Neuigkeitenseite
 │   ├── page/onlineProjects/      # Online-Projekt-Bibliothek
 │   ├── page/privacyPolicy/
@@ -127,11 +128,12 @@ Dieser Server stellt keine Content-APIs bereit. Die statischen Inhalte bleiben a
 | News | D1, Bilder in R2 oder öffentliche Bild-URL | `/api/v1/news` | `site/source/scripts/news-data.js` |
 | Gallery | R2-Bilder mit lokalisierten Metadaten und Ordner-Metadaten; Zitate in D1 | `/api/v1/gallery?collection=gallery` | `site/page/gallery/`; Ordnerkarten öffnen die Bildsammlung, `view=video` öffnet die Videos |
 | Videos | D1-Metadaten, Videos/Poster/WEBVTT in R2 oder externe Quelle | `/api/v1/videos` | `site/page/gallery/?view=video` |
+| Interviews | Eigener D1-Bestand: Videos in der Collection `interviews`, Materialien mit RU/EN/DE-Metadaten; Dateien in R2 | `/api/v1/interviews` | `site/page/interviews/` |
 | World Points | D1 mit Koordinaten, Status und Übersetzungen | `/api/v1/world-points` | `site/source/scripts/mirokit-world-map.js` |
 | Partners | D1 mit Kategorie, Website, Sortierung und Übersetzungen; Logos in R2 oder öffentliche Bild-URL | `/api/v1/partners` | Partner-Markup in `site/index.html` |
 | Projects | D1 mit Entwurf/Veröffentlichung, RU/EN/DE-Metadaten, Zeitraum und optionalem R2-Bild | `/api/v1/projects` | Current/Past-Ansicht in `site/index.html` |
 
-News, Gallery, Videos, World Points, Partners und Projects unterstützen je nach Bereich Entwurf, Veröffentlichung und Archivierung. Die News-API berücksichtigt außerdem das Veröffentlichungsdatum. Projects werden anhand von `endDate` automatisch als `past` berechnet, sobald das Datum vor dem heutigen UTC-Datum liegt; die D1-Zeile bleibt dabei unverändert und muss nicht durch einen Cronjob verschoben werden. `featured: 1`, `2` und `3` ordnen die drei neuesten verfügbaren News im Hero; es bleibt jeweils eine Meldung sichtbar.
+News, Gallery, Videos, Interviews, World Points, Partners und Projects unterstützen je nach Bereich Entwurf, Veröffentlichung und Archivierung. Interview-Videos laufen über eigene Admin-Routen (`/api/v1/admin/interviews/videos`), Materialien über `/api/v1/admin/interviews/materials`; beide Bestände bleiben von den normalen Gallery-Videos getrennt. Die News-API berücksichtigt außerdem das Veröffentlichungsdatum. Projects werden anhand von `endDate` automatisch als `past` berechnet, sobald das Datum vor dem heutigen UTC-Datum liegt; die D1-Zeile bleibt dabei unverändert und muss nicht durch einen Cronjob verschoben werden. `featured: 1`, `2` und `3` ordnen die drei neuesten verfügbaren News im Hero; es bleibt jeweils eine Meldung sichtbar.
 
 Gallery-Bilder werden mit RU/EN/DE-Titeln, Alt-Texten, optionalen Untertiteln und Hervorhebung verwaltet. Die Zitatverwaltung ist separat; die öffentliche Galerie wählt pro Seitenaufruf ein Zitat und behält diese Auswahl beim Sprachwechsel bei. Löschaktionen im Content Desk verlangen eine ausdrückliche Bestätigung mit `DELETE` oder `УДАЛИТЬ`.
 
@@ -170,7 +172,7 @@ Produktionswerte für Access separat konfigurieren; `.dev.vars` richtet keine Pr
 
 Cloudflare Access muss auf dem verwendeten Admin-Host sowohl `/admin` und `/admin/*` als auch `/api/v1/admin/*` abdecken. Die Audience muss zur Access-Anwendung passen. Der Worker validiert zusätzlich das Access-JWT und die E-Mail-Allowlist; öffentliche Lese-APIs bleiben öffentlich. Die [Access-Pfadregeln](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/) erläutern die Zuordnung.
 
-Die fünf Migrationen legen News, Gallery-Zitate, World Points, Partners, Videos/Untertitel sowie Projects an. Migration `0003` enthält außerdem Ausgangsdaten für Karte und Partner. Nach Prüfung der Zielumgebung:
+Die Migrationen legen News, Gallery-Zitate, World Points, Partners, Videos/Untertitel, Projects und ab `0008_interviews.sql` die Interview-Collection sowie Interview-Materialien an. Migration `0003` enthält außerdem Ausgangsdaten für Karte und Partner. Nach Prüfung der Zielumgebung:
 
 ```bash
 npm run db:migrate:remote
@@ -178,7 +180,7 @@ npm run db:migrate:remote
 
 Eine optionale Erstbefüllung der Produktions-News erfolgt mit `npm run seed:news -- mirokit-database`; zuvor mit `--dry-run` prüfen und den oben beschriebenen überschreibenden Effekt berücksichtigen.
 
-Für verwaiste Uploads im R2-Bucket Ablaufregeln nach einem Tag auf **`news/pending/`**, **`gallery/pending/`** und **`partners/pending/`**, **`videos/pending/`**, **`video-posters/pending/`** und **`subtitles/pending/`** vorbereiten. Die tatsächliche Einrichtung erfordert eine Freigabe für Änderungen am Bucket. Keine solche Ablaufregel auf permanente Bereiche setzen: Dort liegen auch gespeicherte, weiterhin private Entwürfe. Die Regel zum Abbrechen unvollständiger Multipart-Uploads ist davon getrennt. Details: [R2 Object Lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/).
+Für verwaiste Uploads im R2-Bucket Ablaufregeln nach einem Tag auf **`news/pending/`**, **`gallery/pending/`**, **`partners/pending/`**, **`videos/pending/`**, **`video-posters/pending/`**, **`subtitles/pending/`** und **`interview-materials/pending/`** vorbereiten. Die tatsächliche Einrichtung erfordert eine Freigabe für Änderungen am Bucket. Keine solche Ablaufregel auf permanente Bereiche setzen: Dort liegen auch gespeicherte, weiterhin private Entwürfe. Die Regel zum Abbrechen unvollständiger Multipart-Uploads ist davon getrennt. Details: [R2 Object Lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/).
 
 **Für diesen Hardening-Auftrag besteht keine Deployment-Freigabe.** Alle nachfolgenden Veröffentlichungsbefehle sind ausschließlich Betriebsreferenz und werden nicht automatisch ausgeführt. Den lokalen Umsetzungsstand und offene Account-Prüfungen dokumentiert [SECURITY_PLAN.md](SECURITY_PLAN.md).
 

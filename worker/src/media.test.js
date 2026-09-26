@@ -27,7 +27,7 @@ function video(key, status = "published", field = "source_url") {
 
 beforeEach(() => {
 	db = new DatabaseSync(":memory:");
-	for (const file of ["0001_news.sql", "0002_gallery_quotes.sql", "0003_world_points_partners.sql", "0004_videos.sql", "0005_projects.sql", "0006_gallery_quote_folders.sql", "0007_news_links.sql"]) db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
+	for (const file of ["0001_news.sql", "0002_gallery_quotes.sql", "0003_world_points_partners.sql", "0004_videos.sql", "0005_projects.sql", "0006_gallery_quote_folders.sql", "0007_news_links.sql", "0008_interviews.sql"]) db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
 	objects = new Map();
 	const statement = (sql, params = []) => ({
 		bind: (...values) => statement(sql, values),
@@ -54,8 +54,8 @@ beforeEach(() => {
 afterEach(() => { db.close(); vi.restoreAllMocks(); });
 
 describe("media publication boundary", () => {
-	it.each(["news", "gallery", "partners", "videos", "video-posters", "subtitles"])("blocks anonymous pending %s before reading storage", async (folder) => {
-		const key = `${folder}/pending/${UUID}.${folder === "videos" ? "mp4" : folder === "subtitles" ? "vtt" : "webp"}`;
+	it.each(["news", "gallery", "partners", "videos", "video-posters", "subtitles", "interview-materials"])("blocks anonymous pending %s before reading storage", async (folder) => {
+		const key = `${folder}/pending/${UUID}.${folder === "videos" ? "mp4" : folder === "subtitles" ? "vtt" : folder === "interview-materials" ? "pdf" : "webp"}`;
 		addObject(key, { status: "published" });
 		for (const method of ["GET", "HEAD"]) {
 			const response = await request(key, { method, headers: { Range: "bytes=0-1" } });
@@ -83,6 +83,16 @@ describe("media publication boundary", () => {
 		db.exec(`UPDATE ${table} SET status = 'published' WHERE id = 'item'`);
 		expect((await request(key)).status).toBe(200);
 		db.exec(`UPDATE ${table} SET status = 'archived' WHERE id = 'item'`);
+		expect((await request(key)).status).toBe(404);
+	});
+	it("checks current D1 publication for interview materials", async () => {
+		const key = `interview-materials/${UUID}.pdf`;
+		addObject(key);
+		db.prepare("INSERT INTO interview_materials (id,kind,status,source_type,source_url,created_at,updated_at) VALUES ('guide','documents','draft','r2',?,'now','now')").run(`/media/v1/${key}`);
+		expect((await request(key)).status).toBe(404);
+		db.exec("UPDATE interview_materials SET status = 'published' WHERE id = 'guide'");
+		expect((await request(key)).status).toBe(200);
+		db.exec("UPDATE interview_materials SET status = 'archived' WHERE id = 'guide'");
 		expect((await request(key)).status).toBe(404);
 	});
 	it.each([undefined, "archived", "published"])("requires explicit published gallery metadata: %s", async (status) => {

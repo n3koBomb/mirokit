@@ -77,6 +77,10 @@
                <span class="tab-icon" aria-hidden="true">▶</span>
                <span>Videos</span>
             </button>
+            <button class="admin-tab" id="interviewsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewInterviews" data-admin-tab="interviews">
+               <span class="tab-icon" aria-hidden="true">◉</span>
+               <span>Interviews</span>
+            </button>
             <button class="admin-tab" id="projectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewProjects" data-admin-tab="projects">
                <span class="tab-icon" aria-hidden="true">⌁</span>
                <span>Projects</span>
@@ -436,6 +440,7 @@
                <div id="videosList" class="news-list" aria-live="polite"></div>
             </aside>
             <section class="panel panel-editor">
+               <div id="videoEditorMount">
                <form id="videoForm">
                   <div class="panel-heading editor-heading"><div><p class="eyebrow">VIDEO EDITOR</p><h2 id="videoHeading">Neues Video</h2></div><span class="status-badge" id="videoStatus">Entwurf</span></div>
                   <section class="editor-section">
@@ -471,6 +476,54 @@
                   </section>
                   <div class="form-actions"><div class="action-copy"><strong>Video fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newVideo" type="button">Neues Video</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishVideo" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveVideo" type="button">Archivieren</button></div></div>
                </form>
+               </div>
+            </section>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewInterviews" data-admin-view="interviews" hidden>
+            <aside class="panel panel-list">
+               <div class="panel-heading"><div><p class="panel-kicker">INTERVIEW CONTENT</p><h2>Interviews</h2></div><button class="button button-small" id="reloadInterviewContent" type="button">↻ Neu laden</button></div>
+               <p class="panel-helper">Separate Videos und Materialien für die Interview-Seite verwalten.</p>
+               <div class="admin-subtabs" role="tablist" aria-label="Interview-Inhalt">
+                  <button class="admin-subtab is-active" id="interviewVideosContentTab" type="button" role="tab" aria-selected="true" aria-controls="interviewVideosContentPane" data-interview-content-tab="videos">Videos</button>
+                  <button class="admin-subtab" id="interviewMaterialsContentTab" type="button" role="tab" aria-selected="false" aria-controls="interviewMaterialsContentPane" data-interview-content-tab="materials">Materialien</button>
+               </div>
+               <div id="interviewVideosContentPane" data-interview-content-pane="videos">
+                  <div id="interviewVideosList" class="news-list" aria-live="polite"></div>
+               </div>
+               <div id="interviewMaterialsContentPane" data-interview-content-pane="materials" hidden>
+                  <div id="interviewMaterialsList" class="news-list" aria-live="polite"></div>
+               </div>
+            </aside>
+            <section class="panel panel-editor">
+               <div id="interviewVideoEditorPane" data-interview-content-pane="videos"><div id="interviewVideoEditorMount"></div></div>
+               <div id="interviewMaterialEditorPane" data-interview-content-pane="materials" hidden>
+                  <form id="interviewMaterialForm">
+                     <div class="panel-heading editor-heading"><div><p class="eyebrow">INTERVIEW MATERIAL EDITOR</p><h2 id="interviewMaterialHeading">Neues Material</h2></div><span class="status-badge" id="interviewMaterialStatus">Entwurf</span></div>
+                     <section class="editor-section">
+                        <div class="section-caption"><span class="section-index">01</span><div><h3>Material und Datei</h3><p>Dokumente, Prospekte, Formulare und Anfragen getrennt für die Interview-Seite verwalten.</p></div></div>
+                        <div class="field-grid field-grid-three">
+                           <label><span>ID / Slug</span><input id="interviewMaterialId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="interview-anfrage-2026" /></label>
+                           <label><span>Bereich</span><select id="interviewMaterialKind"><option value="documents">Dokumente</option><option value="brochures">Prospekte</option><option value="forms">Formulare</option><option value="requests">Anfragen</option></select></label>
+                           <label><span>Quelle</span><select id="interviewMaterialSourceType"><option value="r2">R2 / eigene Datei</option><option value="external">HTTPS-Link</option></select></label>
+                           <label class="field-span-two"><span>Datei- oder Link-URL</span><input id="interviewMaterialSourceUrl" type="text" required maxlength="2000" placeholder="/media/v1/interview-materials/... oder https://..." /></label>
+                           <label><span>Dateiname</span><input id="interviewMaterialFileName" maxlength="255" /></label>
+                           <label><span>Sortierung</span><input id="interviewMaterialSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                           <label class="feature-toggle"><input id="interviewMaterialFeatured" type="checkbox" /><span>Als hervorgehoben anzeigen</span></label>
+                        </div>
+                        <div class="upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Materialdatei hochladen</span><input id="interviewMaterialFile" type="file" accept="application/pdf,text/plain,image/jpeg,image/png,image/webp,.doc,.docx,.ppt,.pptx" /></label><span class="muted upload-meta">PDF, DOCX, PPTX, Bilder oder TXT · maximal 25 MB</span></div>
+                     </section>
+                     <section class="editor-section translations-section">
+                        <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel, Beschreibung und Alternativtext für alle drei Sprachversionen.</p></div></div>
+                        <div class="translations content-translations">
+                           <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-interview-material-language="ru" data-interview-material-field="title" required maxlength="500" /></label><label><span>Описание</span><textarea data-interview-material-language="ru" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt-текст</span><input data-interview-material-language="ru" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
+                           <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-interview-material-language="en" data-interview-material-field="title" required maxlength="500" /></label><label><span>Description</span><textarea data-interview-material-language="en" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt text</span><input data-interview-material-language="en" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
+                           <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-interview-material-language="de" data-interview-material-field="title" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-interview-material-language="de" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt-Text</span><input data-interview-material-language="de" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
+                        </div>
+                     </section>
+                     <div class="form-actions"><div class="action-copy"><strong>Material fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newInterviewMaterial" type="button">Neues Material</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishInterviewMaterial" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveInterviewMaterial" type="button">Archivieren</button></div></div>
+                  </form>
+               </div>
             </section>
          </section>
 

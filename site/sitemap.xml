@@ -21,4 +21,14 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://mirokit.ru/page/privacyPolicy/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://mirokit.com/page/privacyPolicy/" />
   </url>
+  <url>
+    <loc>https://mirokit.com/page/interviews/</loc>
+    <lastmod>2026-09-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mirokit.com/page/interviews/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://mirokit.com/page/interviews/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://mirokit.ru/page/interviews/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mirokit.com/page/interviews/" />
+  </url>
 </urlset>

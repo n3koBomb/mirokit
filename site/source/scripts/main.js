@@ -711,7 +711,7 @@ loadRemotePartners();
 
 // Carry the selected language into the standalone media libraries.
 function updateMediaPageLinks() {
-   document.querySelectorAll('a[href^="/page/onlineProjects/"], a[href^="/page/gallery/"]').forEach((link) => {
+   document.querySelectorAll('a[href^="/page/onlineProjects/"], a[href^="/page/gallery/"], a[href^="/page/interviews/"]').forEach((link) => {
       const url = new URL(link.href);
       url.searchParams.set("lang", currentLang);
       link.href = url.pathname + url.search;
@@ -722,16 +722,11 @@ updateMediaPageLinks();
 
 const projectsPanel = document.getElementById("projects");
 const projectsViews = [...document.querySelectorAll("[data-projects-view]")];
-const projectsLogo = projectsPanel?.querySelector(".section-logo img");
 const projectsCurrentGrid = document.getElementById("projectsCurrentGrid");
 const projectsPastGrid = document.getElementById("projectsPastGrid");
 const projectsFeatureTitle = document.getElementById("projectsFeatureTitle");
 const projectsFeatureDescription = document.getElementById("projectsFeatureDescription");
 let remoteProjects = [];
-const projectsLogoByView = {
-   current_projects: "/public/assets/logos/sections/current_projects_page.png",
-   pas_projects: "/public/assets/logos/sections/past_projects_page.png",
-};
 
 function setProjectsView(viewKey = "current_projects") {
    const selectedKey = projectsViews.some((view) => view.dataset.projectsView === viewKey) ? viewKey : "current_projects";
@@ -751,10 +746,7 @@ function setProjectsView(viewKey = "current_projects") {
       else link.removeAttribute("aria-current");
    });
 
-   if (projectsLogo) {
-      projectsLogo.src = projectsLogoByView[selectedKey] || projectsLogoByView.current_projects;
-      projectsLogo.alt = selectedKey === "pas_projects" ? "Logo vergangene Projekte MIRoKIT" : "Logo aktuelle Projekte MIRoKIT";
-   }
+   document.dispatchEvent(new CustomEvent("mirokit:projectviewchange", { detail: { viewKey: selectedKey } }));
 }
 
 setProjectsView();

@@ -13,6 +13,7 @@ import { authorizeAdmin } from "./access.js";
 import { normalizeNewsInput, newsToStatements, rowsToNews } from "./news.js";
 import { normalizePartnerInput, normalizeWorldPointInput, rowsToPublicPartners, rowsToPublicWorldPoints } from "./content.js";
 import { normalizeVideoInput, rowsToPublicVideos } from "./videos.js";
+import { normalizeInterviewMaterialInput, rowsToPublicInterviewMaterials } from "./interviews.js";
 import { normalizeProjectInput, projectStatements, rowsToPublicProjects } from "./projects.js";
 
 describe("contact form field contracts", () => {
@@ -335,12 +336,41 @@ describe("news API and admin access", () => {
 		expect(body.videos[0].sourceType).toBe("external");
 	});
 
+	it("serves interview videos and materials from their separate collections", async () => {
+		const database = {
+			prepare: (sql) => ({
+				all: async () => ({ results: sql.includes("interview_materials")
+					? [{ id: "guide", kind: "documents", source_type: "external", source_url: "https://example.org/guide.pdf", file_name: "guide.pdf", mime_type: "application/pdf", size_bytes: 10, featured: 0, sort_order: 0, updated_at: "now", language: "en", title: "Guide", description: "", alt: "Guide" }]
+					: [{ id: "conversation-1", collection: "interviews", source_type: "external", source_url: "https://cdn.example.org/interview.mp4", poster_url: "", duration_seconds: 12, width: 1280, height: 720, featured: 0, sort_order: 1, language: "en", title: "Conversation", alt: "Conversation", description: "", subtitle_id: null }] }),
+			}),
+		};
+		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/interviews"), { SITE_DB: database });
+		const body = await response.json();
+		expect(response.status).toBe(200);
+		expect(body.interviews[0].id).toBe("conversation-1");
+		expect(body.materials[0].id).toBe("guide");
+		expect(body.videos).toBeUndefined();
+	});
+
+	it("validates the interview material contract", () => {
+		const material = normalizeInterviewMaterialInput({
+			id: "interview-guide",
+			kind: "documents",
+			sourceType: "external",
+			sourceUrl: "https://example.org/guide.pdf",
+			translations: Object.fromEntries(["ru", "en", "de"].map((language) => [language, { title: "Guide", description: "", alt: "Guide" }])),
+		});
+		expect(material.kind).toBe("documents");
+		expect(() => normalizeInterviewMaterialInput({ ...material, kind: "gallery" })).toThrow("Invalid interview material kind");
+		expect(rowsToPublicInterviewMaterials([{ id: "guide", kind: "documents", source_type: "external", source_url: "https://example.org/guide.pdf", language: "en", title: "Guide", description: "", alt: "Guide", status: "published" }])[0].status).toBeUndefined();
+	});
+
 	it("creates a video draft through the protected admin API", async () => {
 		const batches = [];
 		const database = {
 			prepare: () => ({
 				all: async () => ({ results: [] }),
-				bind: (...params) => ({ sql: "video statement", params }),
+				bind: (...params) => ({ sql: "video statement", params, all: async () => ({ results: [] }) }),
 			}),
 			batch: async (statements) => batches.push(statements),
 		};

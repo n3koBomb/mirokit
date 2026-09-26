@@ -1,11 +1,12 @@
 const VIDEO_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const VIDEO_SOURCE_TYPES = new Set(["youtube", "external", "r2"]);
 const VIDEO_STATUSES = new Set(["draft", "published", "archived"]);
+const VIDEO_COLLECTIONS = new Set(["general", "interviews"]);
 const VIDEO_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const VIDEO_ASSET_PATTERN = /^\/media\/v1\/(?:videos|video-posters|subtitles)\/(?:pending\/)?[a-f0-9-]+\.[a-z0-9]+$/;
 
 const VIDEOS_PUBLIC_QUERY = `
-SELECT v.id, v.source_type, v.source_url, v.poster_url, v.duration_seconds,
+SELECT v.id, v.collection, v.source_type, v.source_url, v.poster_url, v.duration_seconds,
   v.width, v.height, v.featured, v.sort_order, v.created_at, v.updated_at,
   t.language, t.title, t.alt, t.description,
   s.id AS subtitle_id, s.language AS subtitle_language, s.label AS subtitle_label,
@@ -14,15 +15,18 @@ SELECT v.id, v.source_type, v.source_url, v.poster_url, v.duration_seconds,
 FROM videos v
 JOIN video_translations t ON t.video_id = v.id
 LEFT JOIN video_subtitles s ON s.video_id = v.id
-WHERE v.status = 'published'
+WHERE v.status = 'published' AND v.collection = 'general'
 ORDER BY v.featured DESC, v.sort_order ASC, v.updated_at DESC, v.id ASC,
   t.language ASC, s.sort_order ASC, s.id ASC
 `;
 
 const VIDEOS_ADMIN_QUERY = VIDEOS_PUBLIC_QUERY.replace(
-  "WHERE v.status = 'published'",
-  ""
+  "WHERE v.status = 'published' AND v.collection = 'general'",
+  "WHERE v.collection = 'general'"
 );
+
+const INTERVIEWS_PUBLIC_QUERY = VIDEOS_PUBLIC_QUERY.replace("v.collection = 'general'", "v.collection = 'interviews'");
+const INTERVIEWS_ADMIN_QUERY = VIDEOS_ADMIN_QUERY.replace("v.collection = 'general'", "v.collection = 'interviews'");
 
 function videoError(message, status = 400) {
   const error = new Error(message);
@@ -133,6 +137,7 @@ function normalizeVideoInput(input, { includeStatus = true } = {}) {
   }
   const result = {
     id,
+    collection: textValue(input.collection || "general", "collection", 20),
     sourceType,
     sourceUrl,
     poster: optionalUrl(input.poster, "poster"),
@@ -144,6 +149,7 @@ function normalizeVideoInput(input, { includeStatus = true } = {}) {
     translations: translationsFor(input.translations),
     subtitles: Array.isArray(input.subtitles) ? input.subtitles.slice(0, 8).map(normalizeSubtitle) : [],
   };
+  if (!VIDEO_COLLECTIONS.has(result.collection)) throw videoError("Invalid video collection");
   if (result.durationSeconds !== null && (!Number.isFinite(result.durationSeconds) || result.durationSeconds < 0 || result.durationSeconds > 86_400)) throw videoError("Invalid durationSeconds");
   if (includeStatus) {
     result.status = textValue(input.status || "draft", "status", 20);
@@ -158,6 +164,7 @@ function rowsToVideos(rows) {
     if (!grouped.has(row.id)) {
       grouped.set(row.id, {
         id: row.id,
+        collection: row.collection || "general",
         status: row.status,
         createdAt: row.created_at || "",
         updatedAt: row.updated_at || "",
@@ -200,12 +207,12 @@ function rowsToPublicVideos(rows) {
 
 function videoStatements(video, status, timestamp) {
   return [
-    { sql: `INSERT INTO videos (id, status, source_type, source_url, poster_url, duration_seconds, width, height, featured, sort_order, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET status = excluded.status, source_type = excluded.source_type, source_url = excluded.source_url,
+    { sql: `INSERT INTO videos (id, collection, status, source_type, source_url, poster_url, duration_seconds, width, height, featured, sort_order, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET collection = excluded.collection, status = excluded.status, source_type = excluded.source_type, source_url = excluded.source_url,
       poster_url = excluded.poster_url, duration_seconds = excluded.duration_seconds, width = excluded.width, height = excluded.height,
       featured = excluded.featured, sort_order = excluded.sort_order, updated_at = excluded.updated_at`,
-      params: [video.id, status, video.sourceType, video.sourceUrl, video.poster, video.durationSeconds, video.width, video.height, video.featured, video.sortOrder, timestamp, timestamp] },
+      params: [video.id, video.collection, status, video.sourceType, video.sourceUrl, video.poster, video.durationSeconds, video.width, video.height, video.featured, video.sortOrder, timestamp, timestamp] },
     { sql: "DELETE FROM video_translations WHERE video_id = ?", params: [video.id] },
     ...VIDEO_LANGUAGES.map((language) => ({
       sql: "INSERT INTO video_translations (video_id, language, title, alt, description) VALUES (?, ?, ?, ?, ?)",
@@ -222,6 +229,9 @@ function videoStatements(video, status, timestamp) {
 export {
   VIDEO_LANGUAGES,
   VIDEO_ASSET_PATTERN,
+  VIDEO_COLLECTIONS,
+  INTERVIEWS_ADMIN_QUERY,
+  INTERVIEWS_PUBLIC_QUERY,
   VIDEOS_ADMIN_QUERY,
   VIDEOS_PUBLIC_QUERY,
   normalizeVideoInput,
