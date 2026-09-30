@@ -28,6 +28,8 @@ The current Gallery folder workflow keeps newly uploaded normal-Gallery objects
 under private `gallery/pending/<folder-slug>/` keys until an authenticated admin
 batch publish. Public listings include only objects marked `published`; admin
 previews use the protected media route. The batch has a bounded key count and is
-not a transactional database operation, so operators must review partial
-failures before retrying. This behavior is covered by local Worker tests, but
-production Access and R2 behavior still require a separate release check.
+not a transactional database operation. Folder reordering is limited to one
+normal Gallery folder per request and uses conditional R2 writes, so operators
+must review partial failures before retrying. This behavior is covered by local
+Worker tests, but production Access and R2 behavior still require a separate
+release check.

@@ -13,7 +13,7 @@ Der Worker in `worker/` erhält durch `run_worker_first` ausgewählte Requests v
 | `site/index.html` | Seitenstruktur, Formulare, Dialoge und statische Ausgangsinhalte |
 | `site/source/style/style.css` | Öffentliches Layout, Komponenten, Themes und Breakpoints |
 | `site/source/style/subpage.css` | Gemeinsamer responsiver Header für Gallery, News, Online Projects und Privacy Policy |
-| `site/source/scripts/language.js` | RU/EN/DE-Wörterbücher und Text-/Attributübersetzungen |
+| `site/source/scripts/language.js` | RU/EN/DE-Wörterbücher einschließlich Programme- und Three-Bears-Inhalten sowie Text-/Attributübersetzungen |
 | `site/source/scripts/news-data.js` | Gebündelte News einschließlich lokalisierter Modal-Inhalte |
 | `site/source/scripts/main.js` | Navigation, Theme, News-/Projects-/Galerie-/Partnerdarstellung, Dialoge und verzögertes Laden |
 | `site/source/scripts/mirokit-world-map.js` | Canvas-Karte, Standortdaten und Länderübersicht |
@@ -52,6 +52,7 @@ Die Redaktion öffnet `/admin/`. Das Admin-Skript sendet authentifizierte Anfrag
 | `/api/v1/admin/news`, `/api/v1/admin/media` | News-Verwaltung und Bild-Uploads |
 | `/api/v1/admin/gallery`, `/api/v1/admin/gallery/quotes` | Gallery-Bilder und Zitate verwalten |
 | `POST /api/v1/admin/gallery/publish` | Bis zu 100 Pending-Gallery-Schlüssel gesammelt in ihre Ordner verschieben und als veröffentlicht markieren |
+| `POST /api/v1/admin/gallery/reorder` | Die Reihenfolge veröffentlichter oder noch ausstehender Bilder innerhalb genau eines normalen Gallery-Ordners speichern |
 | `PATCH /api/v1/admin/gallery/<encoded-key>` | Einem vorhandenen Online-Projekte-Bild ein Thema zuweisen |
 | `/api/v1/admin/interviews/videos` | Interview-Videos unabhängig vom normalen Video-/Gallery-Bestand verwalten und veröffentlichen |
 | `/api/v1/admin/interviews/materials` | Dokumente, Prospekte, Formulare und Anfragen mit R2-/HTTPS-Quelle verwalten und veröffentlichen |
@@ -81,7 +82,7 @@ Das News-Seed-Skript liest die gebündelten News, erzeugt SQL und führt Upserts
 
 `SITE_MEDIA` enthält hochgeladene News-Bilder, Gallery-Bilder, Partnerlogos, Projektbilder, Videos, Poster, WebVTT-Dateien und Interview-Materialien. Gallery-Titel, Alt-Texte, Untertitel und Hervorhebung liegen in den Custom-Metadata der Bildobjekte; Gallery-Zitate, Project-Metadaten und Interview-Metadaten liegen separat in D1. Interview-Videos nutzen die `videos`-Tabelle mit `collection = 'interviews'`; Dokumente, Prospekte, Formulare und Anfragen liegen in `interview_materials` mit eigener Übersetzungstabelle. Projektbilder werden zunächst unter `projects/pending/` gespeichert und beim Entwurf-/Veröffentlichungsspeichern nach `projects/` promoted.
 
-Normale Gallery-Bilder verwenden optional `folder_slug`, `folder_title` und `folder_subtitle` in R2-Custom-Metadata. Mehrere Admin-Dateien bleiben zunächst unter `gallery/pending/<folder-slug>/`; die explizite Publish-Route setzt `status=published` und verschiebt sie nach `gallery/<folder-slug>/`. Die öffentliche Gallery-API liefert daraus neben `gallery` auch gruppierte `folders` mit Bildlisten. Pending-Schlüssel dürfen nur im authentifizierten Admin-Bereich als Vorschau geladen werden.
+Normale Gallery-Bilder verwenden `folder_slug`, lokalisierte `folder_title`-/`folder_subtitle`-Werte, `file_name` und `sort_order` in den R2-Custom-Metadaten. Mehrere Admin-Dateien bleiben zunächst unter `gallery/pending/<folder-slug>/`; die explizite Publish-Route setzt `status=published` und verschiebt sie nach `gallery/<folder-slug>/`. Ein vorhandener Ordner kann über seinen validierten Slug ausgewählt werden; neue Ordner mit bereits belegtem Slug werden abgelehnt. Die Reorder-Route prüft, dass alle Schlüssel zum selben normalen Gallery-Ordner gehören, und schreibt die Reihenfolge mit ETag-Schutz zurück. Die öffentliche Gallery-API liefert daraus neben `gallery` auch gruppierte `folders` mit Bildlisten. Pending-Schlüssel dürfen nur im authentifizierten Admin-Bereich als Vorschau geladen werden.
 
 Online-Projekte verwenden weiterhin `collection=online-projects` und eines der zehn validierten `topic`-Kennzeichen in den R2-Metadaten. Startseiten-Links öffnen `/page/onlineProjects/index.html?topic=<thema>`; die Unterseite lädt die Sammlung und filtert sie im Browser. Bilder erscheinen mit ihren natürlichen Seitenverhältnissen in einem Masonry-Raster. Bilder ohne bisherige Zuordnung bleiben unter „Alle Themen“ sichtbar und können im eigenen Admin-Tab nachträglich zugeordnet werden. Die Themenkennzeichen sind in `site/source/scripts/online-project-topics.js` für Worker, Admin und Galerieseite gemeinsam definiert.
 
@@ -104,11 +105,13 @@ Die öffentliche Seite kann sofort mit gebündelten Inhalten starten. API-Fehler
 - Partners: Eine leere Partnerliste ersetzt die statischen Partnergruppen nicht.
 - World Points: Eine leere Liste lässt die eingebauten Kartenpunkte bestehen.
 
+Die Landingpage enthält außerdem redaktionell gebündelte Programme und das Projekt „Drei Bären“. `#programs` ist ein mehrsprachiger, informativer Abschnitt mit fünf statischen Illustrationen, Zielgruppen- und Teilnahmehinweisen; die Karten besitzen bewusst noch keine eigenen Aktionen. Die Bilddateien liegen in `site/public/assets/images/illustrations/`. `#threeBears` ist ebenfalls ein statischer, lokalisierter Projektabschnitt und nutzt seine eigene Section-Logo-Zuordnung im gemeinsamen SVG.
+
 Damit ist das Archivieren sämtlicher Backend-Einträge nicht in jedem Bereich gleichbedeutend mit einer leeren öffentlichen Sektion. Änderungen an diesem Verhalten gehören gemeinsam in Backend- und Frontend-Review.
 
 ## Sprache, Darstellung und Laden
 
-Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `folder`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; Gallery-Ordner benötigen keine D1-Migration.
+Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `folder`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Die Ordnerübersicht zeigt bei fehlendem Untertitel die lokalisierte Fotoanzahl. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; Gallery-Ordner benötigen keine D1-Migration.
 
 Die eigenständige Interview-Seite liegt in `site/page/interviews/` (`index.html`, `interviews.css`, `interviews.js`). Gespräche verwenden bewusst einen getrennten Endpunkt `/api/v1/interviews` und greifen nicht auf den normalen Video-Bestand `/api/v1/videos` zu. Der Materialbereich hat eigene Tabs für Dokumente, Prospekte, Formulare und Anfragen und ersetzt die statischen Platzhalter, sobald veröffentlichte Admin-Materialien vorhanden sind. Der Content Desk hat dafür den Interview-Tab mit getrennten Untertabs für Videos und Materialien; noch nicht veröffentlichte Dateien werden nicht als öffentliche Inhalte vorgetäuscht.
 

@@ -48,7 +48,8 @@ E-Mail-Versand in der Zielumgebung.
 Bei Änderungen an Gallery oder den eigenständigen Unterseiten zusätzlich mit
 Firefox bei mindestens 390 × 844 und einem Desktop-Viewport prüfen: Gallery-
 Ordner, Mehrfachupload, Slug-Validierung, Admin-Vorschau, Sammelveröffentlichung,
-öffentliche `folders`-Antwort, Rücknavigation und leere/API-Fehlerzustände. Die
+Ordner-Anhängen, Neuordnung, öffentliche `folders`-Antwort, Rücknavigation und
+leere/API-Fehlerzustände. Die
 statische Browserprüfung belegt nur Layout und Fallback-Verhalten; sie ersetzt
 keinen Test gegen Worker, Access, D1 oder R2.
 

@@ -15,7 +15,8 @@ Vorgesehene Einsatzorte sind Schulen, Kulturzentren, Ferienlager, Festivals und 
 Das Repository enthält eine responsive, vertikal aufgebaute Website und einen geschützten Content Desk. HTML, CSS und JavaScript liegen in getrennten Dateien; für das Frontend ist kein Framework oder Build-Schritt erforderlich.
 
 - Landing-Hero mit einer rotierenden News-Meldung und drei Auswahlpunkten.
-- Projektbeschreibung, Team, Spielprinzip, Altersgruppen, Programme sowie aktuelle, vergangene und Online-Projekte.
+- Projektbeschreibung, Team, Spielprinzip, Altersgruppen, aktuelle Programme sowie aktuelle, vergangene und Online-Projekte.
+- Die Programme-Sektion zeigt fünf mehrsprachige, zunächst informative Karten mit statischen Illustrationen, Zielgruppen, Teilnahmewegen und dem MIRoKIT-Schlussslogan. Die Karten sind derzeit nicht interaktiv.
 - Aktivierte History-Seite mit lokalisierten Entstehungs-, Autoren- und internationalen Spielstationen.
 - Projektansicht mit dem visualisierten Projektpfad von Idee über Team und Spiel bis zum Finale.
 - Interaktive Weltkarte mit Länderübersicht und Standortstatus.
@@ -23,7 +24,7 @@ Das Repository enthält eine responsive, vertikal aufgebaute Website und einen g
 - Kontaktformular und Liga-Antrag mit gemeinsamer Worker-API.
 - Russisch, Englisch und Deutsch, Theme-Umschaltung, responsive Navigation und Lesefortschritt.
 - Content Desk unter `/admin/` mit Tabs für News, Gallery, Online Projects, Videos, Interviews, Projects, World Points und Partners. Im Interview-Tab werden Gespräche und Materialien getrennt verwaltet.
-- Gallery-Uploads können als mehrere Bilder in einem benannten Ordner als Pending-Gruppe vorbereitet und anschließend gesammelt veröffentlicht werden; Online Projects bleiben ein getrenntes Topic-System.
+- Gallery-Uploads können als mehrere Bilder in einem benannten Ordner als Pending-Gruppe vorbereitet, an einen vorhandenen Ordner angehängt, manuell sortiert und anschließend gesammelt veröffentlicht werden; Online Projects bleiben ein getrenntes Topic-System.
 - Gallery, News, Online Projects und Privacy Policy verwenden einen gemeinsamen responsiven Second-Page-Header.
 - Dynamische Veröffentlichung über Cloudflare D1 und R2 mit statischen Ausgangsinhalten im Frontend.
 
@@ -142,6 +143,8 @@ Normale Gallery-Uploads können mehrere Dateien mit `folder_name` und optionalem
 Die gebündelten Inhalte ermöglichen einen sofortigen Seitenaufbau und Rückfall bei API-Fehlern. Die genaue Behandlung erfolgreicher leerer Antworten unterscheidet sich je Bereich; siehe [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Statische Dateien werden nach Verwendungszweck unter `site/public/assets/` eingeordnet. Einzelheiten stehen in der [Asset-Dokumentation](site/public/assets/README.md). Nach Verschiebungen müssen HTML, JavaScript und verzögerte Medienverweise zusammen aktualisiert werden; Weiterleitungen in `site/_redirects` erhalten bereits veröffentlichte Bild-URLs.
+
+Die fünf statischen Programme-Illustrationen liegen unter `site/public/assets/images/illustrations/programs-01.png` bis `programs-05.png` und werden in `site/index.html` über verzögerte `/public/assets/`-Pfade geladen. Der Abschnitt verwendet RU/EN/DE-Schlüssel in `site/source/scripts/language.js`; später können die rein informativen Karten um ausdrücklich freigegebene Links oder Aktionen ergänzt werden.
 
 ## Cloudflare einrichten und veröffentlichen
 

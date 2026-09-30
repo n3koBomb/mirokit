@@ -407,7 +407,7 @@ function render() {
       ? t('op_library_loading')
       : `${count} ${t(
         view === 'photos' && !activeFolder
-          ? 'ga_folder_count'
+          ? 'ga_folder'
           : view === 'photos'
             ? 'ga_photos'
             : 'ga_videos'
@@ -517,7 +517,7 @@ function render() {
               <span class="ga-folder-label">
                 <small class="ga-folder-label-text">${escape(t('ga_folder_label'))}</small>
                 <strong>${escape(folderTitle(folderItem))}</strong>
-                <small class="ga-folder-count">${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_folder_count')}`)}</small>
+                <small class="ga-folder-count">${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_photos')}`)}</small>
               </span>
             </button>
           </article>

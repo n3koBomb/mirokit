@@ -325,14 +325,12 @@
                      </div>
                   </div>
 
-                     <div class="upload-row">
-                     <div class="upload-icon" aria-hidden="true">↥</div>
-                     <label class="file-label">
-                        <span>Mehrere Bilder auswählen</span>
-                        <input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" />
-                     </label>
-                        <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                     <div class="gallery-dropzone" id="galleryDropzone" tabindex="0" role="button" aria-describedby="galleryUploadHelp">
+                        <div class="upload-icon" aria-hidden="true">↥</div>
+                        <div><strong>Bilder hierher ziehen oder auswählen</strong><span class="muted" id="galleryUploadHelp">Mehrere Dateien bleiben ausgewählt, bis sie erfolgreich hochgeladen wurden.</span></div>
+                        <label class="button button-secondary file-label"><span>Bilder auswählen</span><input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" /></label>
                      </div>
+                     <div class="gallery-selected-files" id="gallerySelectedFiles" aria-live="polite"></div>
                      <div class="gallery-thumbnail-field">
                         <label><span>Ordner-Thumbnail auswählen</span><input id="galleryThumbnailFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label>
                         <p class="muted">Optional: Wähle eines der oben ausgewählten Bilder als Vorschaubild für den Ordner.</p>
@@ -352,6 +350,11 @@
                   </div>
 
                   <div class="translations gallery-translations" id="galleryFolderTranslations">
+                     <div class="gallery-folder-target">
+                        <label><span>Ordner-Ziel</span><select id="galleryFolderTarget"><option value="new">Neuen Ordner anlegen</option></select></label>
+                        <label><span>Slug / Ordner-ID</span><input id="galleryFolderSlug" required pattern="[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?" maxlength="80" placeholder="z. B. gemeinsam-unterwegs" /></label>
+                        <p class="muted" id="galleryFolderSlugStatus">Nur Kleinbuchstaben, Zahlen und Bindestriche. Der Slug muss eindeutig sein.</p>
+                     </div>
                      <fieldset class="language-card language-ru">
                         <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
                         <label><span>Ordner-Überschrift</span><input data-gallery-folder-language="ru" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Вместе в пути" /></label>

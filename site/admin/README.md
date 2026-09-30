@@ -61,8 +61,9 @@ metadata and publication status. No D1 migration is required.
 
 ## Gallery folder workflow
 
-The normal **Gallery** tab accepts multiple files together with a folder name
-and optional subtitle. Each file is first stored privately under
+The normal **Gallery** tab accepts multiple files together with a folder name,
+an optional validated slug and optional subtitles. Choose **Neuen Ordner anlegen**
+for a new folder or select an existing folder to append files. Each file is first stored privately under
 `gallery/pending/<folder-slug>/`; it is not included in the public Gallery
 response. The admin list groups these pending items and provides authenticated
 previews through `/api/v1/admin/media/...`.
@@ -76,4 +77,7 @@ be reviewed in the admin list before retrying or deleting items.
 
 The public Gallery opens folders with `?folder=<slug>` and provides a back
 control to the folder list. Online Projects remain a separate immediate-
-publication workflow and do not use this pending folder path.
+publication workflow and do not use this pending folder path. Folder images can
+be reordered in the editor; the order is persisted through
+`POST /api/v1/admin/gallery/reorder` and is limited to one normal Gallery folder
+per request.

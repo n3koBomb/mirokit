@@ -156,5 +156,42 @@ describe("Gallery folder workflow", () => {
   });
   expect(editFolder.status).toBe(200);
   expect(objects.get(published[0].key).customMetadata).toMatchObject({ folder_slug: "sommer-freunde", folder_title_de: "Gemeinsam im Sommer", folder_subtitle_en: "Shared moments" });
-});
+	});
+
+	it("rejects a second new folder with a used manual slug and appends when the folder is selected", async () => {
+		const first = await request("", { method: "POST", body: folderUploadForm() });
+		const firstKeys = (await first.json()).gallery.map((item) => item.key);
+		await request("/publish", { method: "POST", body: JSON.stringify({ keys: firstKeys }) });
+
+		const duplicate = folderUploadForm();
+		duplicate.delete("file");
+		duplicate.append("file", new File(["duplicate"], "duplicate.webp", { type: "image/webp" }));
+		duplicate.set("folder_slug", "sommer-freunde");
+		duplicate.set("folder_mode", "new");
+		expect((await request("", { method: "POST", body: duplicate })).status).toBe(409);
+
+		const append = new FormData();
+		append.append("file", new File(["third"], "third.webp", { type: "image/webp" }));
+		append.append("collection", "gallery");
+		append.append("folder_mode", "append");
+		append.append("folder_slug", "sommer-freunde");
+		for (const language of ["ru", "en", "de"]) {
+			append.append(`folder_title_${language}`, language === "de" ? "Sommer & Freunde" : language === "en" ? "Summer & Friends" : "Лето и друзья");
+			append.append(`folder_subtitle_${language}`, "Shared moments");
+		}
+		const appended = await request("", { method: "POST", body: append });
+		expect(appended.status).toBe(202);
+		expect((await appended.json()).gallery[0]).toMatchObject({ fileName: "third.webp", sortOrder: 2, folderSlug: "sommer-freunde" });
+	});
+
+	it("persists a changed order for published folder images", async () => {
+		const upload = await request("", { method: "POST", body: folderUploadForm() });
+		const keys = (await upload.json()).gallery.map((item) => item.key);
+		const published = (await (await request("/publish", { method: "POST", body: JSON.stringify({ keys }) })).json()).gallery.map((item) => item.key);
+
+		const reorder = await request("/reorder", { method: "POST", body: JSON.stringify({ keys: [...published].reverse() }) });
+		expect(reorder.status).toBe(200);
+		const publicResponse = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
+		expect((await publicResponse.json()).folders[0].images.map((item) => item.key)).toEqual([...published].reverse());
+	});
 });

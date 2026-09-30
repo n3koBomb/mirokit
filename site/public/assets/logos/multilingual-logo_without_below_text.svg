@@ -159,6 +159,7 @@
         how_to_participate_page: { ru: "Как участвовать", en: "How to Participate", de: "So funktioniert's" },
         age_groups_page: { ru: "Возрастные группы", en: "Age Groups", de: "Altersgruppen" },
         current_projects_page: { ru: "Текущие проекты", en: "Current Projects", de: "Aktuelle Projekte" },
+        threeBears_page: { ru: "Три медведя", en: "Three Bears", de: "Drei Bären" },
         news_page: { ru: "Новости", en: "News", de: "News" },
         gallery_page: { ru: "Галерея", en: "Gallery", de: "Galerie" },
         contact_form_page: { ru: "Контактная форма", en: "Contact Form", de: "Kontaktformular" },

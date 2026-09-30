@@ -10,7 +10,7 @@ Use this folder layout when adding new media:
   variants).
 - `images/news/` - images used by news cards.
 - `images/partners/` - partner organization logos.
-- `images/illustrations/` - explanatory artwork for World, game principles and age groups.
+- `images/illustrations/` - explanatory artwork for World, game principles, age groups, the Programs cards (`programs-01.png` through `programs-05.png`) and the Three Bears project.
 - `media/photos/events/` - event photo sets.
 - `media/photos/projects/` - project-specific photo sets.
 - `media/photos/team/` - team and backstage photos.
