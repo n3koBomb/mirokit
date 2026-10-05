@@ -4,8 +4,8 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="robots" content="noindex, nofollow" />
-      <meta name="theme-color" content="#1565ff" />
-      <title>MIRoKIT · Content Desk</title>
+      <meta name="theme-color" content="#173b68" />
+      <title>MIRoKIT · Redaktion</title>
 
       <!-- Shared site icons; absolute paths also work below /admin/. -->
       <link rel="icon" type="image/x-icon" href="/public/favicon/favicon.ico" />
@@ -13,98 +13,136 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon/favicon-32x32.png" />
       <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png" />
 
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
       <link rel="stylesheet" href="admin.css" />
    </head>
    <body>
-      <div class="page-decoration page-decoration-left" aria-hidden="true"></div>
-      <div class="page-decoration page-decoration-right" aria-hidden="true"></div>
-
-      <main class="admin-shell">
-         <header class="admin-header">
-            <div class="brand-lockup">
-               <div class="brand-mark" aria-hidden="true">
-                  <span class="brand-globe"></span>
-                  <span class="brand-orbit brand-orbit-a"></span>
-                  <span class="brand-orbit brand-orbit-b"></span>
-                  <span class="brand-plane">➤</span>
-               </div>
-
-               <div class="brand-copy">
-                  <p class="eyebrow">МИРоКИТ · CONTENT DESK</p>
-                  <h1>Content <span>verwalten</span></h1>
-                  <p class="intro">News, Gallery, Online-Projekte, Videos, World Points und Partners übersichtlich bearbeiten und in RU, EN und DE veröffentlichen.</p>
-                  <div class="header-tags" aria-label="Bereiche des Content Desk">
-                     <span>News</span>
-                     <span>Gallery</span>
-                     <span>Videos</span>
-                     <span>World · Partners</span>
-                     <span>RU · EN · DE</span>
-                  </div>
-               </div>
-            </div>
-
-            <div class="header-actions">
-               <div class="header-note">
-                  <strong>Redaktionsbereich</strong>
-                  <span>Inhalte prüfen, speichern und veröffentlichen.</span>
-               </div>
-               <button class="button button-secondary button-new" id="newNews" type="button">
-                  <span aria-hidden="true">＋</span>
-                  Neue News
+      <a class="skip-link" href="#mainContent">Zum Arbeitsbereich springen</a>
+      <aside class="admin-rail" aria-label="Redaktionsnavigation">
+         <div class="rail-brand">
+            <span class="brand-symbol"
+               ><svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <ellipse cx="12" cy="12" rx="4" ry="9"></ellipse>
+                  <path d="M3 12h18"></path></svg
+            ></span>
+            <div><strong lang="ru">МИРоКИТ</strong><span>Redaktion</span></div>
+         </div>
+         <p class="rail-label">INHALTE VERWALTEN</p>
+         <div class="rail-navigation">
+            <nav class="admin-tabs" aria-label="Inhaltsbereiche" role="tablist" aria-orientation="vertical">
+               <button class="admin-tab is-active" id="newsTab" type="button" role="tab" aria-selected="true" aria-controls="adminViewNews" data-admin-tab="news" tabindex="0">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                     <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                     <path d="M8 8h8M8 12h8M8 16h5"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Meldungen</span><small>Aktuelles &amp; Berichte</small></span>
                </button>
+               <button class="admin-tab" id="galleryTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="gallery" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                     <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                     <circle cx="8" cy="9" r="1.5"></circle>
+                     <path d="m3 17 5-5 4 4 4-6 5 7"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Galerie</span><small>Bilder &amp; Ordner</small></span>
+               </button>
+               <button class="admin-tab" id="onlineProjectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="online-projects" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Online-Projekte</span><small>Fotos, Videos &amp; Dokumente</small></span>
+               </button>
+               <button class="admin-tab" id="videosTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewVideos" data-admin-tab="videos" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                     <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                     <path d="m10 8 6 4-6 4Z"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Videos</span><small>Filme &amp; Untertitel</small></span>
+               </button>
+               <button class="admin-tab" id="interviewsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewInterviews" data-admin-tab="interviews" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                     <rect x="9" y="3" width="6" height="12" rx="3"></rect>
+                     <path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3M9 21h6"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Interviews</span><small>Gespräche &amp; Materialien</small></span>
+               </button>
+               <button class="admin-tab" id="projectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewProjects" data-admin-tab="projects" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9H3Z"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Projekte</span><small>Zeiträume &amp; Inhalte</small></span>
+               </button>
+               <button class="admin-tab" id="worldTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewWorld" data-admin-tab="world" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                     <circle cx="12" cy="12" r="9"></circle>
+                     <ellipse cx="12" cy="12" rx="4" ry="9"></ellipse>
+                     <path d="M3 12h18"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Weltkarte</span><small>Standorte &amp; Länder</small></span>
+               </button>
+               <button class="admin-tab" id="partnersTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewPartners" data-admin-tab="partners" tabindex="-1">
+                  <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 4-4 5 2 5-2 4 4-6 9-3 2-3-2Zm4-4 5 7 3-3M3 9l6 9M21 9l-6 9"></path></svg
+                  ><span class="nav-copy"><span class="nav-title">Partner</span><small>Organisationen &amp; Logos</small></span>
+               </button>
+            </nav>
+         </div>
+         <div class="rail-note">
+            <span class="rail-note-icon" aria-hidden="true">i</span><strong>Alles an einem Ort</strong>
+            <p>Inhalte für die russische, englische und deutsche Website pflegen.</p>
+            <span class="rail-languages">RU <span aria-hidden="true">/</span> EN <span aria-hidden="true">/</span> DE</span>
+         </div>
+      </aside>
+      <main class="admin-shell" id="mainContent" tabindex="-1">
+         <header class="admin-header">
+            <div class="brand-copy">
+               <p class="eyebrow">MIRoKIT · REDAKTIONSBEREICH</p>
+               <h1>Inhalte verwalten</h1>
+               <p class="intro">Verständlich bearbeiten. In drei Sprachen veröffentlichen.</p>
             </div>
+            <a class="button button-secondary" href="#quickGuide" id="openGuide"><span aria-hidden="true">?</span> Anleitung</a>
          </header>
+         <section class="workspace-intro" aria-labelledby="workspaceTitle">
+            <div>
+               <p class="workspace-path">Redaktion <span aria-hidden="true">/</span> <span id="workspaceCategory">Meldungen</span></p>
+               <h2 id="workspaceTitle">Meldungen</h2>
+               <p id="workspaceDescription">Neuigkeiten, Veranstaltungen und Berichte für die Website erstellen.</p>
+            </div>
+            <button class="button button-primary button-new" id="newNews" type="button"><span aria-hidden="true">＋</span> Neue Meldung</button>
+         </section>
+         <details class="quick-guide" id="quickGuide">
+            <summary>
+               <span class="guide-symbol" aria-hidden="true">i</span><span><strong id="guideTitle">So veröffentlichst du eine Meldung</strong><small>Schritt für Schritt erklärt</small></span
+               ><span class="guide-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="guide-body">
+               <ol class="workflow-steps">
+                  <li>
+                     <span aria-hidden="true">1</span>
+                     <div>
+                        <strong id="guideStep1Title">Inhalt vorbereiten</strong>
+                        <p id="guideStep1">Grunddaten und Titelbild angeben. Texte in RU, EN und DE ausfüllen.</p>
+                     </div>
+                  </li>
+                  <li>
+                     <span aria-hidden="true">2</span>
+                     <div>
+                        <strong id="guideStep2Title">Entwurf speichern &amp; prüfen</strong>
+                        <p id="guideStep2">Texte, Bild und Datum prüfen. Der Entwurf ist noch nicht öffentlich.</p>
+                     </div>
+                  </li>
+                  <li>
+                     <span aria-hidden="true">3</span>
+                     <div>
+                        <strong id="guideStep3Title">Veröffentlichen</strong>
+                        <p id="guideStep3">Mit „Veröffentlichen“ wird der Inhalt auf der Website sichtbar.</p>
+                     </div>
+                  </li>
+               </ol>
+               <p class="workflow-note" id="workflowNote"><strong>Gut zu wissen:</strong> Hochladen allein veröffentlicht noch keine Meldung.</p>
+            </div>
+         </details>
+         <div class="admin-toast-region" id="notice" role="region" aria-label="Rückmeldungen"></div>
 
-         <div class="admin-toast-region" id="notice" role="status" aria-live="polite" aria-atomic="false"></div>
-
-         <nav class="admin-tabs" aria-label="Content-Bereiche" role="tablist">
-            <button class="admin-tab is-active" id="newsTab" type="button" role="tab" aria-selected="true" aria-controls="adminViewNews" data-admin-tab="news">
-               <span class="tab-icon" aria-hidden="true">▤</span>
-               <span>News Panel</span>
-            </button>
-            <button class="admin-tab" id="galleryTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="gallery">
-               <span class="tab-icon" aria-hidden="true">▧</span>
-               <span>Gallery Panel</span>
-            </button>
-            <button class="admin-tab" id="onlineProjectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewGallery" data-admin-tab="online-projects">
-               <span class="tab-icon" aria-hidden="true">✦</span>
-               <span>Online-Projekte</span>
-            </button>
-            <button class="admin-tab" id="videosTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewVideos" data-admin-tab="videos">
-               <span class="tab-icon" aria-hidden="true">▶</span>
-               <span>Videos</span>
-            </button>
-            <button class="admin-tab" id="interviewsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewInterviews" data-admin-tab="interviews">
-               <span class="tab-icon" aria-hidden="true">◉</span>
-               <span>Interviews</span>
-            </button>
-            <button class="admin-tab" id="projectsTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewProjects" data-admin-tab="projects">
-               <span class="tab-icon" aria-hidden="true">⌁</span>
-               <span>Projects</span>
-            </button>
-            <button class="admin-tab" id="worldTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewWorld" data-admin-tab="world">
-               <span class="tab-icon" aria-hidden="true">◎</span>
-               <span>World Points</span>
-            </button>
-            <button class="admin-tab" id="partnersTab" type="button" role="tab" aria-selected="false" aria-controls="adminViewPartners" data-admin-tab="partners">
-               <span class="tab-icon" aria-hidden="true">♧</span>
-               <span>Partners</span>
-            </button>
-         </nav>
-
-         <section class="admin-grid admin-view" id="adminViewNews" data-admin-view="news">
+         <section class="admin-grid admin-view" id="adminViewNews" data-admin-view="news" role="tabpanel" aria-labelledby="newsTab" tabindex="0">
             <aside class="panel panel-list">
                <div class="panel-heading">
                   <div>
                      <p class="panel-kicker">ÜBERSICHT</p>
                      <h2>Meldungen</h2>
                   </div>
-                  <button class="button button-small" id="reloadNews" type="button">↻ Neu laden</button>
+                  <button class="button button-small" id="reloadNews" type="button">Aktualisieren</button>
                </div>
-               <p class="panel-helper">Eine Meldung auswählen, um sie rechts zu bearbeiten.</p>
+               <p class="panel-helper">Meldung auswählen oder oben „Neue Meldung“ anlegen.</p>
                <div id="newsList" class="news-list" aria-live="polite"></div>
             </aside>
 
@@ -112,7 +150,7 @@
                <form id="newsForm">
                   <div class="panel-heading editor-heading">
                      <div>
-                        <p class="eyebrow">NEWS EDITOR</p>
+                        <p class="eyebrow">MELDUNG BEARBEITEN</p>
                         <h2 id="formHeading">Neue Meldung</h2>
                      </div>
                      <span class="status-badge" id="currentStatus">Entwurf</span>
@@ -123,62 +161,65 @@
                         <span class="section-index">01</span>
                         <div>
                            <h3 id="baseDataHeading">Grunddaten</h3>
-                           <p>Technische Angaben, Kategorie und Platzierung der Meldung.</p>
+                           <p>Adresse, Datum und Kategorie bestimmen, wo die Meldung erscheint.</p>
                         </div>
                      </div>
 
                      <div class="field-grid field-grid-three">
                         <div class="field-slug">
-                           <label for="newsId">ID / Slug</label>
+                           <label for="newsId" id="newsId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></label>
                            <span class="slug-control">
-                              <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="summer-camp-report" aria-describedby="slugStatus" />
+                              <input id="newsId" name="id" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="sommerfest-2026" aria-describedby="slugStatus newsId-help" aria-labelledby="newsId-label" />
                               <button class="slug-check-button" id="checkSlug" type="button">Slug prüfen</button>
                            </span>
                            <span class="muted slug-status" id="slugStatus" aria-live="polite"></span>
+                           <small class="field-hint" id="newsId-help">Die eindeutige Adresse der Meldung, z. B. sommerfest-2026. Nur Kleinbuchstaben, Zahlen und Bindestriche. Nach dem Speichern bleibt sie fest.</small>
                         </div>
 
-                        <label>
-                           <span>Veröffentlichungsdatum</span>
-                           <input id="publishedAt" name="publishedAt" type="date" required />
-                        </label>
+                        <label for="publishedAt">
+                           <span id="publishedAt-label">Veröffentlichungsdatum<small class="required-mark">Pflichtfeld</small></span>
+                           <input id="publishedAt" name="publishedAt" type="date" required aria-describedby="publishedAt-help" aria-labelledby="publishedAt-label" />
+                           <small class="field-hint" id="publishedAt-help">Das Datum, das bei der Meldung auf der Website angezeigt wird. Veröffentlicht wird erst über den Button unten.</small></label
+                        >
 
-                        <label>
-                           <span>Kategorie</span>
-                           <select id="category" name="category">
+                        <label for="category">
+                           <span id="category-label">Kategorie</span>
+                           <select id="category" name="category" aria-describedby="category-help" aria-labelledby="category-label">
                               <option value="event">Event</option>
                               <option value="interview">Interview</option>
                               <option value="photo">Foto</option>
                               <option value="announce">Ankündigung</option>
                            </select>
-                        </label>
-
-                        <label>
-                           <span>Akzent</span>
-                           <select id="accent" name="accent">
-                              <option value="blue">Blau</option>
-                              <option value="red">Rot</option>
-                              <option value="green">Grün</option>
-                              <option value="amber">Amber</option>
-                              <option value="violet">Violett</option>
-                           </select>
-                        </label>
-
-                        <label>
-                           <span>Feature-/Hero-Rang</span>
-                           <input id="featured" name="featured" type="number" min="1" max="10" placeholder="optional" />
-                           <span class="field-hint">Rang 1 macht die Karte hervorgehoben; 1–3 ordnen den Hero.</span>
-                        </label>
-
-                        <label>
-                           <span>Bild-URL</span>
-                           <input id="image" name="image" type="text" required maxlength="2000" placeholder="/public/assets/... · /media/v1/news/... oder https://..." />
-                        </label>
-
-                        <label>
-                           <span>Informations-Link <small class="field-hint">Optional · ein gemeinsamer Link für alle Sprachversionen</small></span>
-                           <input id="linkUrl" name="linkUrl" type="text" maxlength="2000" placeholder="https://... oder /interner-pfad" />
-                        </label>
+                           <small class="field-hint" id="category-help">Wähle den Inhaltstyp, unter dem die Meldung erscheint.</small></label
+                        >
                      </div>
+                     <details class="advanced-options">
+                        <summary>Darstellung und weiterführender Link <span class="optional-label">optional</span></summary>
+                        <div class="field-grid field-grid-three">
+                           <label for="accent">
+                              <span id="accent-label">Akzentfarbe</span>
+                              <select id="accent" name="accent" aria-describedby="accent-help" aria-labelledby="accent-label">
+                                 <option value="blue">Blau</option>
+                                 <option value="red">Rot</option>
+                                 <option value="green">Grün</option>
+                                 <option value="amber">Amber</option>
+                                 <option value="violet">Violett</option>
+                              </select>
+                              <small class="field-hint" id="accent-help">Bestimmt die Farbe der Meldung auf der Website.</small></label
+                           >
+
+                           <label for="featured">
+                              <span id="featured-label">Hervorhebung auf der Startseite</span>
+                              <input id="featured" name="featured" type="number" min="1" max="10" placeholder="optional" aria-describedby="featured-help" aria-labelledby="featured-label" />
+                              <small class="field-hint" id="featured-help">Leer lassen für eine normale Meldung. Rang 1 hebt die Karte hervor; 1–3 bestimmen die Reihenfolge im großen Startseitenbereich.</small></label
+                           >
+
+                           <label for="linkUrl">
+                              <span id="linkUrl-label">Informations-Link <small class="field-hint">Optional · ein gemeinsamer Link für alle Sprachversionen</small></span>
+                              <input id="linkUrl" name="linkUrl" type="text" maxlength="2000" placeholder="https://... oder /interner-pfad" aria-labelledby="linkUrl-label" />
+                           </label>
+                        </div>
+                     </details>
                   </section>
 
                   <section class="editor-section media-section" aria-labelledby="mediaHeading">
@@ -192,12 +233,23 @@
 
                      <div class="upload-row">
                         <div class="upload-icon" aria-hidden="true">↥</div>
-                        <label class="file-label">
-                           <span>Bild hochladen</span>
-                           <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" />
-                        </label>
+                        <label class="file-label" for="imageFile">
+                           <span id="imageFile-label">Bild hochladen</span>
+                           <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="imageFile-help" aria-labelledby="imageFile-label" />
+                           <small class="field-hint" id="imageFile-help">Nach der Dateiauswahl beginnt der Upload. Anschließend die Meldung speichern.</small></label
+                        >
                         <span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
                      </div>
+                     <label for="image">
+                        <span id="image-label">Bildadresse (URL)<small class="required-mark">Pflichtfeld</small></span>
+                        <input id="image" name="image" type="text" required maxlength="2000" placeholder="/public/assets/... · /media/v1/news/... oder https://..." aria-describedby="image-help" aria-labelledby="image-label" />
+                        <small class="field-hint" id="image-help">Nach einem Upload wird diese Adresse automatisch eingetragen. Alternativ eine vorhandene Bildadresse einfügen.</small></label
+                     >
+
+                     <figure class="news-image-preview" id="newsImagePreview" hidden>
+                        <img id="newsPreviewImage" alt="Vorschau des gewählten Titelbildes" />
+                        <figcaption>Vorschau des Titelbildes</figcaption>
+                     </figure>
                   </section>
 
                   <section class="editor-section translations-section" aria-labelledby="translationsHeading">
@@ -209,73 +261,102 @@
                         </div>
                      </div>
 
+                     <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                      <div class="translations">
-                        <fieldset class="language-card language-ru">
-                           <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
-                           <label>
-                              <span>Alt-Text</span>
-                              <input data-language="ru" data-field="alt" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Titel</span>
-                              <input data-language="ru" data-field="title" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Zusammenfassung <small class="field-hint">Optional: Zusatz nur in Section News mit {Text\nmit Zeilenumbruch}</small></span>
-                              <textarea data-language="ru" data-field="summary" required maxlength="2000"></textarea>
-                           </label>
-                           <label>
-                              <span>Inhalt <small class="field-hint">Ein Absatz pro Zeile</small></span>
-                              <textarea class="content-textarea" data-language="ru" data-field="content" required></textarea>
-                           </label>
-                        </fieldset>
+                        <details class="language-details" open="">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-ru">
+                              <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-ru-192">
+                                    <span id="editor-title-ru-192-label">Titel<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="ru" data-field="title" required maxlength="500" id="editor-title-ru-192" lang="ru" aria-labelledby="editor-title-ru-192-label" />
+                                 </label>
+                                 <label for="editor-alt-ru-191">
+                                    <span id="editor-alt-ru-191-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="ru" data-field="alt" required maxlength="500" id="editor-alt-ru-191" lang="ru" aria-describedby="editor-alt-ru-191-help" placeholder="Например: участники играют вместе на фестивале" aria-labelledby="editor-alt-ru-191-label" />
+                                    <small class="field-hint" id="editor-alt-ru-191-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 >
+                                 <label for="editor-summary-ru-193" class="language-field-wide">
+                                    <span id="editor-summary-ru-193-label">Zusammenfassung <small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea data-language="ru" data-field="summary" required maxlength="2000" id="editor-summary-ru-193" lang="ru" aria-labelledby="editor-summary-ru-193-label"></textarea>
+                                 </label>
+                                 <label for="editor-content-ru-194" class="language-field-wide">
+                                    <span id="editor-content-ru-194-label">Inhalt <small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea class="content-textarea" data-language="ru" data-field="content" required id="editor-content-ru-194" lang="ru" aria-labelledby="editor-content-ru-194-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
 
-                        <fieldset class="language-card language-en">
-                           <legend><span class="language-dot"></span> English <small>EN</small></legend>
-                           <label>
-                              <span>Alt text</span>
-                              <input data-language="en" data-field="alt" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Title</span>
-                              <input data-language="en" data-field="title" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Summary <small class="field-hint">Optional: Section-News-Zusatz mit {Text\nmit Zeilenumbruch}</small></span>
-                              <textarea data-language="en" data-field="summary" required maxlength="2000"></textarea>
-                           </label>
-                           <label>
-                              <span>Content <small class="field-hint">One paragraph per line</small></span>
-                              <textarea class="content-textarea" data-language="en" data-field="content" required></textarea>
-                           </label>
-                        </fieldset>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-en">
+                              <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-en-196">
+                                    <span id="editor-title-en-196-label">Titel<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="en" data-field="title" required maxlength="500" id="editor-title-en-196" lang="en" aria-labelledby="editor-title-en-196-label" />
+                                 </label>
+                                 <label for="editor-alt-en-195">
+                                    <span id="editor-alt-en-195-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="en" data-field="alt" required maxlength="500" id="editor-alt-en-195" lang="en" aria-describedby="editor-alt-en-195-help" placeholder="Example: participants playing together at the festival" aria-labelledby="editor-alt-en-195-label" />
+                                    <small class="field-hint" id="editor-alt-en-195-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 >
+                                 <label for="editor-summary-en-197" class="language-field-wide">
+                                    <span id="editor-summary-en-197-label">Zusammenfassung<small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea data-language="en" data-field="summary" required maxlength="2000" id="editor-summary-en-197" lang="en" aria-labelledby="editor-summary-en-197-label"></textarea>
+                                 </label>
+                                 <label for="editor-content-en-198" class="language-field-wide">
+                                    <span id="editor-content-en-198-label">Inhalt<small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea class="content-textarea" data-language="en" data-field="content" required id="editor-content-en-198" lang="en" aria-labelledby="editor-content-en-198-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
 
-                        <fieldset class="language-card language-de">
-                           <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
-                           <label>
-                              <span>Alt-Text</span>
-                              <input data-language="de" data-field="alt" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Titel</span>
-                              <input data-language="de" data-field="title" required maxlength="500" />
-                           </label>
-                           <label>
-                              <span>Zusammenfassung <small class="field-hint">Optional: Zusatz nur in Section News mit {Text\nmit Zeilenumbruch}</small></span>
-                              <textarea data-language="de" data-field="summary" required maxlength="2000"></textarea>
-                           </label>
-                           <label>
-                              <span>Inhalt <small class="field-hint">Ein Absatz pro Zeile</small></span>
-                              <textarea class="content-textarea" data-language="de" data-field="content" required></textarea>
-                           </label>
-                        </fieldset>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-de">
+                              <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-de-200">
+                                    <span id="editor-title-de-200-label">Titel<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="de" data-field="title" required maxlength="500" id="editor-title-de-200" lang="de" aria-labelledby="editor-title-de-200-label" />
+                                 </label>
+                                 <label for="editor-alt-de-199">
+                                    <span id="editor-alt-de-199-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span>
+                                    <input data-language="de" data-field="alt" required maxlength="500" id="editor-alt-de-199" lang="de" aria-describedby="editor-alt-de-199-help" placeholder="Zum Beispiel: Teilnehmende spielen gemeinsam beim Festival" aria-labelledby="editor-alt-de-199-label" />
+                                    <small class="field-hint" id="editor-alt-de-199-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 >
+                                 <label for="editor-summary-de-201" class="language-field-wide">
+                                    <span id="editor-summary-de-201-label">Zusammenfassung <small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea data-language="de" data-field="summary" required maxlength="2000" id="editor-summary-de-201" lang="de" aria-labelledby="editor-summary-de-201-label"></textarea>
+                                 </label>
+                                 <label for="editor-content-de-202" class="language-field-wide">
+                                    <span id="editor-content-de-202-label">Inhalt <small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
+                                    <textarea class="content-textarea" data-language="de" data-field="content" required id="editor-content-de-202" lang="de" aria-labelledby="editor-content-de-202-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
                      </div>
                   </section>
 
+                  <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
                   <div class="form-actions">
                      <div class="action-copy">
                         <strong>Änderungen fertig?</strong>
-                        <span>Entwurf speichern oder direkt veröffentlichen.</span>
+                        <span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span>
                      </div>
                      <div class="action-buttons">
                         <button class="button button-primary" type="submit">Als Entwurf speichern</button>
@@ -287,13 +368,13 @@
             </section>
          </section>
 
-         <section class="panel gallery-admin-panel admin-view" id="adminViewGallery" data-admin-view="gallery" hidden>
+         <section class="panel gallery-admin-panel admin-view" id="adminViewGallery" data-admin-view="gallery" hidden role="tabpanel" aria-labelledby="galleryTab" tabindex="0">
             <div class="panel-heading gallery-heading">
                <div>
                   <p class="eyebrow" id="galleryPanelEyebrow">MEDIENARCHIV</p>
-                  <h2 id="galleryPanelTitle">Gallery-Bilder</h2>
+                  <h2 id="galleryPanelTitle">Galerie-Bilder</h2>
                </div>
-               <button class="button button-small" id="reloadGallery" type="button">↻ Neu laden</button>
+               <button class="button button-small" id="reloadGallery" type="button">Aktualisieren</button>
             </div>
 
             <div class="gallery-intro">
@@ -303,16 +384,22 @@
                   <p class="muted gallery-help" id="galleryIntroText">Wähle ein Bild aus, ergänze die Texte und veröffentliche es in der Galerie.</p>
                </div>
             </div>
-            <ol class="online-admin-steps" id="onlineProjectSteps" hidden>
-               <li><span>1</span><div><strong>Thema wählen</strong><p>Jeder der zehn Startseiten-Buttons öffnet die passende Bilderbibliothek.</p></div></li>
-               <li><span>2</span><div><strong>Bild und Texte hinzufügen</strong><p>Datei auswählen oder Drive-Link einfügen. Titel und Bildbeschreibung in RU, EN und DE ergänzen.</p></div></li>
-               <li><span>3</span><div><strong>Veröffentlichen</strong><p>Das Bild erscheint sofort in der ausgewählten Bibliothek. Über „Bibliothek öffnen“ kannst du es ansehen.</p></div></li>
-            </ol>
+            <ol class="online-admin-steps" id="onlineProjectSteps" hidden></ol>
+            <nav class="online-admin-media-nav" id="onlineAdminMediaNav" aria-label="Medienart für Online-Projekte" hidden>
+               <button class="button" type="button" data-online-media="photos" aria-pressed="true">Fotos</button>
+               <button class="button" type="button" data-online-media="video" aria-pressed="false">Videos</button>
+               <button class="button" type="button" data-online-media="document" aria-pressed="false">Dokumente</button>
+            </nav>
 
             <form id="galleryForm">
                <input id="galleryCollection" type="hidden" value="gallery" />
                <div class="online-admin-destination" id="onlineProjectDestination" hidden>
-                  <label for="galleryTopic"><span>Thema / Bilderbibliothek</span><select id="galleryTopic" aria-describedby="galleryTopicHelp"><option value="">Bitte ein Thema auswählen</option></select></label>
+                  <label for="galleryTopic"
+                     ><span id="galleryTopic-label">Thema / Bilderbibliothek<small class="required-mark">Pflichtfeld</small></span
+                     ><select id="galleryTopic" aria-describedby="galleryTopicHelp" aria-labelledby="galleryTopic-label">
+                        <option value="">Bitte ein Thema auswählen</option>
+                     </select></label
+                  >
                   <p class="muted" id="galleryTopicHelp">Wohin gehört dieses Bild? Wähle eines der zehn Themen.</p>
                   <a class="button button-secondary" id="onlineProjectLibraryLink" href="/page/onlineProjects/index.html" target="_blank" rel="noopener noreferrer">Bibliothek öffnen ↗</a>
                </div>
@@ -321,22 +408,36 @@
                      <span class="section-index">01</span>
                      <div>
                         <h3 id="galleryUploadHeading">Bild auswählen</h3>
-                        <p>Eine Datei oder ein öffentliches Google-Drive-Bild für das Medienarchiv vorbereiten.</p>
+                        <p>Galerie: Bilder auswählen und als Entwurf hochladen. Online-Projekte: Datei oder öffentliches Drive-Bild verwenden.</p>
                      </div>
                   </div>
 
-                     <div class="gallery-dropzone" id="galleryDropzone" tabindex="0" role="button" aria-describedby="galleryUploadHelp">
-                        <div class="upload-icon" aria-hidden="true">↥</div>
-                        <div><strong>Bilder hierher ziehen oder auswählen</strong><span class="muted" id="galleryUploadHelp">Mehrere Dateien bleiben ausgewählt, bis sie erfolgreich hochgeladen wurden.</span></div>
-                        <label class="button button-secondary file-label"><span>Bilder auswählen</span><input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" /></label>
-                     </div>
-                     <div class="gallery-selected-files" id="gallerySelectedFiles" aria-live="polite"></div>
-                     <div class="gallery-thumbnail-field">
-                        <label><span>Ordner-Thumbnail auswählen</span><input id="galleryThumbnailFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label>
-                        <p class="muted">Optional: Wähle eines der oben ausgewählten Bilder als Vorschaubild für den Ordner.</p>
-                     </div>
+                  <div class="gallery-dropzone" id="galleryDropzone" aria-describedby="galleryUploadHelp">
+                     <div class="upload-icon" aria-hidden="true">↥</div>
+                     <div><strong>Bilder hierher ziehen oder auswählen</strong><span class="muted" id="galleryUploadHelp">Mehrere Dateien bleiben ausgewählt, bis sie erfolgreich hochgeladen wurden.</span></div>
+                     <label class="button button-secondary file-label" for="galleryFile"
+                        ><span id="galleryFile-label">Bilder auswählen</span><input id="galleryFile" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="galleryUploadHelp" aria-labelledby="galleryFile-label"
+                     /></label>
+                  </div>
+                  <div class="gallery-selected-files" id="gallerySelectedFiles" aria-live="polite"></div>
+                  <div class="gallery-thumbnail-field">
+                     <label for="galleryThumbnailFile"
+                        ><span id="galleryThumbnailFile-label">Ordner-Thumbnail auswählen</span><input id="galleryThumbnailFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="galleryThumbnailFile-help" aria-labelledby="galleryThumbnailFile-label" /><small
+                           class="field-hint"
+                           id="galleryThumbnailFile-help"
+                           >Wähle dieselbe Datei wie in der Bilderauswahl. Sie wird zum Vorschaubild des Ordners.</small
+                        ></label
+                     >
+                     <p class="muted">Optional: dieselbe Datei wie in der Bilderauswahl verwenden.</p>
+                  </div>
                   <div class="gallery-source-fields" id="gallerySourceFields">
-                     <label><span>Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" /></label>
+                     <label for="gallerySourceUrl"
+                        ><span id="gallerySourceUrl-label">Oder Google-Drive-URL</span><input id="gallerySourceUrl" type="url" placeholder="https://drive.google.com/file/d/.../view" aria-describedby="gallerySourceUrl-help" aria-labelledby="gallerySourceUrl-label" /><small
+                           class="field-hint"
+                           id="gallerySourceUrl-help"
+                           >Nur für Online-Projekte: Der Link muss zu einem öffentlich freigegebenen Bild führen. Datei und Link können nicht gleichzeitig verwendet werden.</small
+                        ></label
+                     >
                   </div>
                </section>
 
@@ -345,233 +446,857 @@
                      <span class="section-index">02</span>
                      <div>
                         <h3 id="galleryLanguagesHeading">Ordner-Übersetzungen</h3>
-                        <p id="galleryLanguagesHelp">Die Überschrift und der Titel werden für den Ordner in RU, EN und DE gespeichert.</p>
+                        <p id="galleryLanguagesHelp">Ordnernamen in RU, EN und DE eintragen. Die Kurzbeschreibung ist optional.</p>
                      </div>
                   </div>
 
+                  <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                   <div class="translations gallery-translations" id="galleryFolderTranslations">
                      <div class="gallery-folder-target">
-                        <label><span>Ordner-Ziel</span><select id="galleryFolderTarget"><option value="new">Neuen Ordner anlegen</option></select></label>
-                        <label><span>Slug / Ordner-ID</span><input id="galleryFolderSlug" required pattern="[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?" maxlength="80" placeholder="z. B. gemeinsam-unterwegs" /></label>
-                        <p class="muted" id="galleryFolderSlugStatus">Nur Kleinbuchstaben, Zahlen und Bindestriche. Der Slug muss eindeutig sein.</p>
+                        <label for="galleryFolderTarget"
+                           ><span id="galleryFolderTarget-label">Ordner-Ziel</span
+                           ><select id="galleryFolderTarget" aria-labelledby="galleryFolderTarget-label">
+                              <option value="new">Neuen Ordner anlegen</option>
+                           </select></label
+                        >
+                        <label for="galleryFolderSlug"
+                           ><span id="galleryFolderSlug-label">Ordneradresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="galleryFolderSlug" required pattern="[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?" maxlength="80" placeholder="z. B. gemeinsam-unterwegs" aria-describedby="galleryFolderSlugStatus galleryFolderSlug-help" aria-labelledby="galleryFolderSlug-label" /><small
+                              class="field-hint"
+                              id="galleryFolderSlug-help"
+                              >Die Adresse des Ordners, z. B. sommerfest-2026. Für Ergänzungen oben den vorhandenen Ordner auswählen.</small
+                           ></label
+                        >
+                        <p class="muted" id="galleryFolderSlugStatus" aria-live="polite">Nur Kleinbuchstaben, Zahlen und Bindestriche. Der Slug muss eindeutig sein.</p>
                      </div>
-                     <fieldset class="language-card language-ru">
-                        <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
-                        <label><span>Ordner-Überschrift</span><input data-gallery-folder-language="ru" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Вместе в пути" /></label>
-                        <label><span>Ordner-Titel</span><input data-gallery-folder-language="ru" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" /></label>
-                     </fieldset>
+                     <details class="language-details" open="">
+                        <summary>
+                           <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                           ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                        </summary>
+                        <fieldset class="language-card language-ru">
+                           <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                           <div class="language-fields">
+                              <label for="editor-title-ru-203"
+                                 ><span id="editor-title-ru-203-label">Ordnername<small class="required-mark">Pflichtfeld</small></span
+                                 ><input data-gallery-folder-language="ru" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Вместе в пути" id="editor-title-ru-203" lang="ru" aria-labelledby="editor-title-ru-203-label"
+                              /></label>
+                              <label for="editor-subtitle-ru-204"
+                                 ><span id="editor-subtitle-ru-204-label">Kurzbeschreibung</span
+                                 ><input data-gallery-folder-language="ru" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" id="editor-subtitle-ru-204" lang="ru" aria-labelledby="editor-subtitle-ru-204-label"
+                              /></label>
+                           </div>
+                        </fieldset>
+                     </details>
 
-                     <fieldset class="language-card language-en">
-                        <legend><span class="language-dot"></span> English <small>EN</small></legend>
-                        <label><span>Folder heading</span><input data-gallery-folder-language="en" data-gallery-folder-field="title" required maxlength="120" placeholder="e.g. Together on the road" /></label>
-                        <label><span>Folder title</span><input data-gallery-folder-language="en" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Short description of the folder" /></label>
-                     </fieldset>
+                     <details class="language-details">
+                        <summary>
+                           <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                           ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                        </summary>
+                        <fieldset class="language-card language-en">
+                           <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                           <div class="language-fields">
+                              <label for="editor-title-en-205"
+                                 ><span id="editor-title-en-205-label">Ordnername<small class="required-mark">Pflichtfeld</small></span
+                                 ><input data-gallery-folder-language="en" data-gallery-folder-field="title" required maxlength="120" placeholder="e.g. Together on the road" id="editor-title-en-205" lang="en" aria-labelledby="editor-title-en-205-label"
+                              /></label>
+                              <label for="editor-subtitle-en-206"
+                                 ><span id="editor-subtitle-en-206-label">Kurzbeschreibung</span
+                                 ><input data-gallery-folder-language="en" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Short description of the folder" id="editor-subtitle-en-206" lang="en" aria-labelledby="editor-subtitle-en-206-label"
+                              /></label>
+                           </div>
+                        </fieldset>
+                     </details>
 
-                     <fieldset class="language-card language-de">
-                        <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
-                        <label><span>Ordner-Überschrift</span><input data-gallery-folder-language="de" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Gemeinsam unterwegs" /></label>
-                        <label><span>Ordner-Titel</span><input data-gallery-folder-language="de" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" /></label>
-                     </fieldset>
+                     <details class="language-details">
+                        <summary>
+                           <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                           ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                        </summary>
+                        <fieldset class="language-card language-de">
+                           <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                           <div class="language-fields">
+                              <label for="editor-title-de-207"
+                                 ><span id="editor-title-de-207-label">Ordnername<small class="required-mark">Pflichtfeld</small></span
+                                 ><input data-gallery-folder-language="de" data-gallery-folder-field="title" required maxlength="120" placeholder="z. B. Gemeinsam unterwegs" id="editor-title-de-207" lang="de" aria-labelledby="editor-title-de-207-label"
+                              /></label>
+                              <label for="editor-subtitle-de-208"
+                                 ><span id="editor-subtitle-de-208-label">Kurzbeschreibung</span
+                                 ><input data-gallery-folder-language="de" data-gallery-folder-field="subtitle" maxlength="500" placeholder="Kurze Beschreibung des Ordners" id="editor-subtitle-de-208" lang="de" aria-labelledby="editor-subtitle-de-208-label"
+                              /></label>
+                           </div>
+                        </fieldset>
+                     </details>
                   </div>
-
                </section>
 
+               <section class="editor-section translations-section" id="onlinePhotoTranslations" hidden aria-labelledby="onlinePhotoLanguagesHeading">
+                  <div class="section-caption"><span class="section-index">02</span><div><h3 id="onlinePhotoLanguagesHeading">Foto-Beschriftungen</h3><p>Optional. Bei mehreren Fotos gelten die Texte für alle ausgewählten Dateien. Für einzelne Beschriftungen die Fotos einzeln hochladen.</p></div></div>
+                  <div class="translations">
+                     <details class="language-details" open><summary><span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span></span></summary><fieldset class="language-card"><legend class="sr-only">Russisch</legend><div class="language-fields">
+                        <label for="onlinePhotoTitleRu"><span>Titel</span><input id="onlinePhotoTitleRu" data-online-photo-language="ru" data-online-photo-field="title" lang="ru" maxlength="160" /></label>
+                        <label for="onlinePhotoAltRu"><span>Bildbeschreibung</span><input id="onlinePhotoAltRu" data-online-photo-language="ru" data-online-photo-field="alt" lang="ru" maxlength="160" aria-describedby="onlinePhotoAltHelp" /></label>
+                     </div></fieldset></details>
+                     <details class="language-details"><summary><span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span></span></summary><fieldset class="language-card"><legend class="sr-only">Englisch</legend><div class="language-fields">
+                        <label for="onlinePhotoTitleEn"><span>Titel</span><input id="onlinePhotoTitleEn" data-online-photo-language="en" data-online-photo-field="title" lang="en" maxlength="160" /></label>
+                        <label for="onlinePhotoAltEn"><span>Bildbeschreibung</span><input id="onlinePhotoAltEn" data-online-photo-language="en" data-online-photo-field="alt" lang="en" maxlength="160" aria-describedby="onlinePhotoAltHelp" /></label>
+                     </div></fieldset></details>
+                     <details class="language-details"><summary><span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span></span></summary><fieldset class="language-card"><legend class="sr-only">Deutsch</legend><div class="language-fields">
+                        <label for="onlinePhotoTitleDe"><span>Titel</span><input id="onlinePhotoTitleDe" data-online-photo-language="de" data-online-photo-field="title" lang="de" maxlength="160" /></label>
+                        <label for="onlinePhotoAltDe"><span>Bildbeschreibung</span><input id="onlinePhotoAltDe" data-online-photo-language="de" data-online-photo-field="alt" lang="de" maxlength="160" aria-describedby="onlinePhotoAltHelp" /></label>
+                     </div></fieldset></details>
+                  </div>
+                  <p class="field-hint" id="onlinePhotoAltHelp">Die Bildbeschreibung erklärt kurz das Motiv und wird von Screenreadern vorgelesen. Ohne Titel wird das Thema angezeigt.</p>
+               </section>
                <div class="gallery-form-actions">
-                  <label class="feature-toggle"><input id="galleryFeatured" type="checkbox" /><span>Als hervorgehobenes Bild anzeigen</span></label>
+                  <label class="feature-toggle" for="galleryFeatured"><input id="galleryFeatured" type="checkbox" aria-labelledby="galleryFeatured-label" /><span id="galleryFeatured-label">Als hervorgehobenes Bild anzeigen</span></label>
                   <button class="button button-primary" id="galleryPublishButton" type="submit">Bilder als Entwurf hochladen</button>
                </div>
             </form>
 
-            <div class="gallery-divider">
-               <span>Veröffentlichte Medien</span>
+            <section id="onlineProjectResources" hidden aria-labelledby="onlineMediaHeading">
+               <div class="panel-heading"><h3 id="onlineMediaHeading">Videos verwalten</h3><button class="button button-small" id="newOnlineMedia" type="button">Neues Video</button></div>
+               <form id="onlineMediaForm" novalidate>
+                  <section class="editor-section" aria-labelledby="onlineMediaBasicsHeading">
+                     <div class="section-caption"><span class="section-index">01</span><div><h3 id="onlineMediaBasicsHeading">Grunddaten</h3><p>Das Thema bestimmt, wo der Inhalt in der Bibliothek erscheint.</p></div></div>
+                     <div class="field-grid">
+                        <label for="onlineMediaTopic"><span>Thema <small class="required-mark">Pflichtfeld</small></span><select id="onlineMediaTopic" name="topic" required><option value="">Bitte ein Thema auswählen</option></select></label>
+                        <div class="online-media-status"><span>Status</span><strong id="onlineMediaStatus" class="status-badge" data-status="draft">Neuer Inhalt</strong></div>
+                     </div>
+                  </section>
+                  <section class="editor-section" aria-labelledby="onlineMediaFileHeading">
+                     <div class="section-caption"><span class="section-index">02</span><div><h3 id="onlineMediaFileHeading">Datei und Vorschau</h3><p id="onlineMediaFileHelp">MP4, WebM oder OGV · maximal 95 MB. Die Dateiauswahl lädt noch nichts hoch.</p></div></div>
+                     <label for="onlineMediaFile"><span>Datei auswählen <small class="required-mark">Pflichtfeld bei neuen Inhalten</small></span><input id="onlineMediaFile" name="file" type="file" required accept="video/mp4,video/webm,video/ogg" aria-describedby="onlineMediaFileHelp" /></label>
+                     <p id="onlineMediaFileName" class="muted" role="status"></p>
+                     <label for="onlineMediaPosterFile" id="onlineMediaPosterLabel"><span>Vorschaubild auswählen <small class="optional-label">optional</small></span><input id="onlineMediaPosterFile" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="onlineMediaPosterHelp" /><small id="onlineMediaPosterHelp" class="field-hint">JPG, PNG oder WebP · maximal 2 MB. Das Bild wird vor dem Start des Videos angezeigt.</small></label>
+                     <figure class="online-media-preview" id="onlineMediaPreview" hidden><img id="onlineMediaPreviewImage" alt="Vorschau der ersten PDF-Seite" hidden /><video id="onlineMediaPreviewVideo" controls playsinline preload="metadata" aria-label="Vorschau des ausgewählten Videos" hidden></video><figcaption id="onlineMediaPreviewCaption">Vorschau</figcaption></figure>
+                  </section>
+                  <section class="editor-section translations-section" aria-labelledby="onlineMediaLanguagesHeading">
+                     <div class="section-caption"><span class="section-index">03</span><div><h3 id="onlineMediaLanguagesHeading">Sprachversionen</h3><p id="onlineMediaLanguagesHelp">Ein Titel pro Sprache ist Pflicht. Beschreibung und Videotext sind optional.</p></div></div>
+                     <div class="translations">
+                        <details class="language-details" open><summary><span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span></span></summary><fieldset class="language-card"><legend class="sr-only">Russisch</legend><div class="language-fields">
+                           <label for="onlineMediaTitleRu"><span>Titel <small class="required-mark">Pflichtfeld</small></span><input id="onlineMediaTitleRu" data-online-language="ru" data-online-field="title" lang="ru" required maxlength="500" /></label>
+                           <label for="onlineMediaDescriptionRu" class="language-field-wide"><span>Beschreibung</span><textarea id="onlineMediaDescriptionRu" data-online-language="ru" data-online-field="description" lang="ru" maxlength="10000"></textarea></label>
+                           <label for="onlineMediaTranscriptRu" class="language-field-wide" data-online-transcript><span>Videotext</span><textarea id="onlineMediaTranscriptRu" data-online-language="ru" data-online-field="transcript" lang="ru" maxlength="10000" aria-describedby="onlineMediaTranscriptHelp"></textarea></label>
+                        </div></fieldset></details>
+                        <details class="language-details"><summary><span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span></span></summary><fieldset class="language-card"><legend class="sr-only">Englisch</legend><div class="language-fields">
+                           <label for="onlineMediaTitleEn"><span>Titel <small class="required-mark">Pflichtfeld</small></span><input id="onlineMediaTitleEn" data-online-language="en" data-online-field="title" lang="en" required maxlength="500" /></label>
+                           <label for="onlineMediaDescriptionEn" class="language-field-wide"><span>Beschreibung</span><textarea id="onlineMediaDescriptionEn" data-online-language="en" data-online-field="description" lang="en" maxlength="10000"></textarea></label>
+                           <label for="onlineMediaTranscriptEn" class="language-field-wide" data-online-transcript><span>Videotext</span><textarea id="onlineMediaTranscriptEn" data-online-language="en" data-online-field="transcript" lang="en" maxlength="10000" aria-describedby="onlineMediaTranscriptHelp"></textarea></label>
+                        </div></fieldset></details>
+                        <details class="language-details"><summary><span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span></span></summary><fieldset class="language-card"><legend class="sr-only">Deutsch</legend><div class="language-fields">
+                           <label for="onlineMediaTitleDe"><span>Titel <small class="required-mark">Pflichtfeld</small></span><input id="onlineMediaTitleDe" data-online-language="de" data-online-field="title" lang="de" required maxlength="500" /></label>
+                           <label for="onlineMediaDescriptionDe" class="language-field-wide"><span>Beschreibung</span><textarea id="onlineMediaDescriptionDe" data-online-language="de" data-online-field="description" lang="de" maxlength="10000"></textarea></label>
+                           <label for="onlineMediaTranscriptDe" class="language-field-wide" data-online-transcript><span>Videotext</span><textarea id="onlineMediaTranscriptDe" data-online-language="de" data-online-field="transcript" lang="de" maxlength="10000" aria-describedby="onlineMediaTranscriptHelp"></textarea></label>
+                        </div></fieldset></details>
+                     </div>
+                     <p class="field-hint" id="onlineMediaTranscriptHelp">Der Videotext beschreibt gesprochenen Inhalt und wichtige Bildinformationen. Besucher können ihn unter dem Video aufklappen.</p>
+                  </section>
+                  <p class="publish-check" id="onlineMediaPublishHelp">Als Entwurf speichern lädt die Datei hoch und hält sie privat. Veröffentlichen macht den Inhalt unmittelbar öffentlich sichtbar.</p>
+                  <div class="form-actions"><div class="action-buttons"><button class="button button-primary" type="submit" id="saveOnlineMedia">Als Entwurf speichern</button><button class="button button-publish" type="submit" id="publishOnlineMedia">Veröffentlichen</button><button class="button button-danger" type="button" id="archiveOnlineMedia" disabled>Archivieren</button><a class="button button-secondary" id="onlineMediaLibraryLink" href="/page/onlineProjects/" target="_blank" rel="noopener noreferrer">Bibliothek öffnen ↗</a></div></div>
+               </form>
+               <div class="gallery-divider"><span>Gespeicherte Inhalte</span></div>
+               <div class="field-grid"><label for="onlineMediaTopicFilter"><span>Thema anzeigen</span><select id="onlineMediaTopicFilter"><option value="all">Alle Themen</option></select></label><label for="onlineMediaStatusFilter"><span>Status anzeigen</span><select id="onlineMediaStatusFilter"><option value="active">Entwürfe und veröffentlichte Inhalte</option><option value="draft">Entwürfe</option><option value="published">Veröffentlicht</option><option value="archived">Archiviert</option><option value="all">Alle Status</option></select></label></div>
+               <button class="button button-small" id="reloadOnlineMedia" type="button">Liste aktualisieren</button>
+               <div class="online-media-list" id="onlineMediaList" aria-live="polite"></div>
+            </section>
+
+            <div class="gallery-divider" id="galleryListHeading">
+               <span>Ordner und Bilder prüfen &amp; veröffentlichen</span>
             </div>
             <div class="online-admin-library-filter" id="onlineProjectListControls" hidden>
-               <label for="galleryTopicFilter"><span>Bibliothek anzeigen</span><select id="galleryTopicFilter"><option value="all">Alle Themen</option><option value="unassigned">Noch ohne Thema</option></select></label>
+               <label for="galleryTopicFilter"
+                  ><span id="galleryTopicFilter-label">Bibliothek anzeigen</span
+                  ><select id="galleryTopicFilter" aria-labelledby="galleryTopicFilter-label">
+                     <option value="all">Alle Themen</option>
+                     <option value="unassigned">Noch ohne Thema</option>
+                  </select></label
+               >
                <p class="muted">Vorhandene Bilder ohne Thema findest du unter „Noch ohne Thema“. Wähle am Bild ein Thema und klicke auf „Thema speichern“.</p>
             </div>
             <div class="gallery-admin-list" id="galleryList" aria-live="polite"></div>
 
             <div id="galleryQuotesSection">
-            <div class="gallery-divider gallery-quotes-divider">
-               <span>Gallery-Zitate</span>
-            </div>
-            <form id="quoteForm" class="quote-admin-form">
-               <section class="editor-section translations-section" aria-labelledby="quoteHeading">
-                  <div class="section-caption">
-                     <span class="section-index">03</span>
-                     <div>
-                        <h3 id="quoteHeading">Zitat einem Ordner zuweisen</h3>
-                        <p>Ein zugewiesenes Zitat erscheint nach allen Bildern dieses Ordners. Ordner ohne Zitat bleiben ohne Quote.</p>
-                     </div>
-                  </div>
-
-                  <label class="quote-folder-field" for="quoteFolder"><span>Ordner</span><select id="quoteFolder" required><option value="">Ordner auswählen</option></select></label>
-
-                  <div class="translations gallery-translations">
-                     <fieldset class="language-card language-ru">
-                        <legend><span class="language-dot"></span> Русский <small>RU</small></legend>
-                        <label><span>Zitat</span><textarea data-quote-language="ru" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
-                        <label><span>Urheber</span><input data-quote-language="ru" data-quote-field="byline" maxlength="300" /></label>
-                     </fieldset>
-
-                     <fieldset class="language-card language-en">
-                        <legend><span class="language-dot"></span> English <small>EN</small></legend>
-                        <label><span>Quote</span><textarea data-quote-language="en" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
-                        <label><span>Byline</span><input data-quote-language="en" data-quote-field="byline" maxlength="300" /></label>
-                     </fieldset>
-
-                     <fieldset class="language-card language-de">
-                        <legend><span class="language-dot"></span> Deutsch <small>DE</small></legend>
-                        <label><span>Zitat</span><textarea data-quote-language="de" data-quote-field="quote" required maxlength="2000" rows="4"></textarea></label>
-                        <label><span>Urheber</span><input data-quote-language="de" data-quote-field="byline" maxlength="300" /></label>
-                     </fieldset>
-                  </div>
-               </section>
-
-               <div class="gallery-form-actions quote-form-actions">
-                  <button class="button button-primary" type="submit">Zitat veröffentlichen</button>
+               <div class="gallery-divider gallery-quotes-divider">
+                  <span>Zitate für die Galerie</span>
                </div>
-            </form>
-            <div class="gallery-admin-list gallery-quote-list" id="galleryQuoteList" aria-live="polite"></div>
+               <form id="quoteForm" class="quote-admin-form">
+                  <section class="editor-section translations-section" aria-labelledby="quoteHeading">
+                     <div class="section-caption">
+                        <span class="section-index">03</span>
+                        <div>
+                           <h3 id="quoteHeading">Zitat einem Ordner zuweisen</h3>
+                           <p>Das Zitat erscheint nach den Bildern des ausgewählten Ordners. Mit „Zitat veröffentlichen“ wird es sofort sichtbar.</p>
+                        </div>
+                     </div>
+
+                     <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
+                     <label class="quote-folder-field" for="quoteFolder"
+                        ><span id="quoteFolder-label">Ordner<small class="required-mark">Pflichtfeld</small></span
+                        ><select id="quoteFolder" required aria-labelledby="quoteFolder-label">
+                           <option value="">Ordner auswählen</option>
+                        </select></label
+                     >
+
+                     <div class="translations gallery-translations">
+                        <details class="language-details" open="">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-ru">
+                              <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-quote-ru-209" class="language-field-wide"
+                                    ><span id="editor-quote-ru-209-label">Zitat<small class="required-mark">Pflichtfeld</small></span
+                                    ><textarea data-quote-language="ru" data-quote-field="quote" required maxlength="2000" rows="4" id="editor-quote-ru-209" lang="ru" aria-labelledby="editor-quote-ru-209-label"></textarea>
+                                 </label>
+                                 <label for="editor-byline-ru-210"><span id="editor-byline-ru-210-label">Urheber</span><input data-quote-language="ru" data-quote-field="byline" maxlength="300" id="editor-byline-ru-210" lang="ru" aria-labelledby="editor-byline-ru-210-label" /></label>
+                              </div>
+                           </fieldset>
+                        </details>
+
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-en">
+                              <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-quote-en-211" class="language-field-wide"
+                                    ><span id="editor-quote-en-211-label">Zitat<small class="required-mark">Pflichtfeld</small></span
+                                    ><textarea data-quote-language="en" data-quote-field="quote" required maxlength="2000" rows="4" id="editor-quote-en-211" lang="en" aria-labelledby="editor-quote-en-211-label"></textarea>
+                                 </label>
+                                 <label for="editor-byline-en-212"><span id="editor-byline-en-212-label">Urheber</span><input data-quote-language="en" data-quote-field="byline" maxlength="300" id="editor-byline-en-212" lang="en" aria-labelledby="editor-byline-en-212-label" /></label>
+                              </div>
+                           </fieldset>
+                        </details>
+
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-de">
+                              <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-quote-de-213" class="language-field-wide"
+                                    ><span id="editor-quote-de-213-label">Zitat<small class="required-mark">Pflichtfeld</small></span
+                                    ><textarea data-quote-language="de" data-quote-field="quote" required maxlength="2000" rows="4" id="editor-quote-de-213" lang="de" aria-labelledby="editor-quote-de-213-label"></textarea>
+                                 </label>
+                                 <label for="editor-byline-de-214"><span id="editor-byline-de-214-label">Urheber</span><input data-quote-language="de" data-quote-field="byline" maxlength="300" id="editor-byline-de-214" lang="de" aria-labelledby="editor-byline-de-214-label" /></label>
+                              </div>
+                           </fieldset>
+                        </details>
+                     </div>
+                  </section>
+
+                  <div class="gallery-form-actions quote-form-actions">
+                     <button class="button button-primary" type="submit">Zitat veröffentlichen</button>
+                  </div>
+               </form>
+               <div class="gallery-admin-list gallery-quote-list" id="galleryQuoteList" aria-live="polite"></div>
             </div>
          </section>
 
-         <section class="admin-grid admin-view" id="adminViewVideos" data-admin-view="videos" hidden>
+         <section class="admin-grid admin-view" id="adminViewVideos" data-admin-view="videos" hidden role="tabpanel" aria-labelledby="videosTab" tabindex="0">
             <aside class="panel panel-list">
-               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Videos</h2></div><button class="button button-small" id="reloadVideos" type="button">↻ Neu laden</button></div>
-               <p class="panel-helper">YouTube, direkte Dateien und R2-Videos mit Untertiteln verwalten.</p>
+               <div class="panel-heading">
+                  <div>
+                     <p class="panel-kicker">ÜBERSICHT</p>
+                     <h2>Videos</h2>
+                  </div>
+                  <button class="button button-small" id="reloadVideos" type="button">Aktualisieren</button>
+               </div>
+               <p class="panel-helper">YouTube, direkte Dateien und hochgeladene Videos mit Untertiteln verwalten.</p>
                <div id="videosList" class="news-list" aria-live="polite"></div>
             </aside>
             <section class="panel panel-editor">
                <div id="videoEditorMount">
-               <form id="videoForm">
-                  <div class="panel-heading editor-heading"><div><p class="eyebrow">VIDEO EDITOR</p><h2 id="videoHeading">Neues Video</h2></div><span class="status-badge" id="videoStatus">Entwurf</span></div>
-                  <section class="editor-section">
-                     <div class="section-caption"><span class="section-index">01</span><div><h3>Quelle und Metadaten</h3><p>YouTube nutzt den YouTube-Player. R2 und direkte HTTPS-Dateien nutzen den Seiten-Player.</p></div></div>
-                     <div class="field-grid field-grid-three">
-                        <label><span>ID / Slug</span><input id="videoId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="internationaler-dialog" /></label>
-                        <label><span>Quelltyp</span><select id="videoSourceType"><option value="youtube">YouTube</option><option value="external">Direkte externe Datei</option><option value="r2">R2 / eigene Datei</option></select></label>
-                        <label><span>Video-URL</span><input id="videoSourceUrl" type="text" required maxlength="2000" placeholder="https://youtu.be/... oder /media/v1/videos/..." /></label>
-                        <label><span>Poster-URL</span><input id="videoPoster" maxlength="2000" placeholder="/media/v1/video-posters/..." /></label>
-                        <label><span>Dauer (Sekunden)</span><input id="videoDuration" type="number" min="0" max="86400" step="0.01" placeholder="wird automatisch ermittelt" /></label>
-                        <label><span>Sortierung</span><input id="videoSortOrder" type="number" min="0" max="10000" value="0" /></label>
-                        <label><span>Breite</span><input id="videoWidth" type="number" min="1" max="100000" placeholder="automatisch" /></label>
-                        <label><span>Höhe</span><input id="videoHeight" type="number" min="1" max="100000" placeholder="automatisch" /></label>
-                        <label class="feature-toggle"><input id="videoFeatured" type="checkbox" /><span>Als hervorgehobenes Video anzeigen</span></label>
-                     </div>
-                     <div class="upload-row video-upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Videodatei hochladen</span><input id="videoFile" type="file" accept="video/mp4,video/webm,video/ogg" /></label><span class="muted upload-meta">MP4, WebM oder OGG · maximal 95 MB</span></div>
-                     <div class="upload-row video-upload-row"><div class="upload-icon" aria-hidden="true">▧</div><label class="file-label"><span>Poster hochladen</span><input id="videoPosterFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span></div>
-                  </section>
-                  <section class="editor-section translations-section">
-                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel, Alt-Text und Beschreibung für alle drei Sprachversionen.</p></div></div>
-                     <div class="translations content-translations">
-                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-video-language="ru" data-video-field="title" required maxlength="500" /></label><label><span>Alt-текст</span><input data-video-language="ru" data-video-field="alt" required maxlength="500" /></label><label><span>Описание</span><textarea data-video-language="ru" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-video-language="en" data-video-field="title" required maxlength="500" /></label><label><span>Alt text</span><input data-video-language="en" data-video-field="alt" required maxlength="500" /></label><label><span>Description</span><textarea data-video-language="en" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-video-language="de" data-video-field="title" required maxlength="500" /></label><label><span>Alt-Text</span><input data-video-language="de" data-video-field="alt" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-video-language="de" data-video-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
-                     </div>
-                  </section>
-                  <section class="editor-section video-subtitles-section">
-                     <div class="section-caption"><span class="section-index">03</span><div><h3>Untertitel und Cue-Editor</h3><p>Mehrere WebVTT-Spuren hinzufügen. Start und Ende lassen sich mit der aktuellen Videoposition setzen.</p></div></div>
-                     <video id="videoPreview" class="video-admin-preview" controls preload="metadata" hidden></video>
-                     <div id="videoSubtitleRows" class="video-subtitle-rows"></div>
-                     <button class="button button-secondary" id="addVideoSubtitle" type="button">＋ Untertitel hinzufügen</button>
-                     <div id="videoCueEditor" class="video-cue-editor" hidden></div>
-                  </section>
-                  <div class="form-actions"><div class="action-copy"><strong>Video fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newVideo" type="button">Neues Video</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishVideo" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveVideo" type="button">Archivieren</button></div></div>
-               </form>
-               </div>
-            </section>
-         </section>
-
-         <section class="admin-grid admin-view" id="adminViewInterviews" data-admin-view="interviews" hidden>
-            <aside class="panel panel-list">
-               <div class="panel-heading"><div><p class="panel-kicker">INTERVIEW CONTENT</p><h2>Interviews</h2></div><button class="button button-small" id="reloadInterviewContent" type="button">↻ Neu laden</button></div>
-               <p class="panel-helper">Separate Videos und Materialien für die Interview-Seite verwalten.</p>
-               <div class="admin-subtabs" role="tablist" aria-label="Interview-Inhalt">
-                  <button class="admin-subtab is-active" id="interviewVideosContentTab" type="button" role="tab" aria-selected="true" aria-controls="interviewVideosContentPane" data-interview-content-tab="videos">Videos</button>
-                  <button class="admin-subtab" id="interviewMaterialsContentTab" type="button" role="tab" aria-selected="false" aria-controls="interviewMaterialsContentPane" data-interview-content-tab="materials">Materialien</button>
-               </div>
-               <div id="interviewVideosContentPane" data-interview-content-pane="videos">
-                  <div id="interviewVideosList" class="news-list" aria-live="polite"></div>
-               </div>
-               <div id="interviewMaterialsContentPane" data-interview-content-pane="materials" hidden>
-                  <div id="interviewMaterialsList" class="news-list" aria-live="polite"></div>
-               </div>
-            </aside>
-            <section class="panel panel-editor">
-               <div id="interviewVideoEditorPane" data-interview-content-pane="videos"><div id="interviewVideoEditorMount"></div></div>
-               <div id="interviewMaterialEditorPane" data-interview-content-pane="materials" hidden>
-                  <form id="interviewMaterialForm">
-                     <div class="panel-heading editor-heading"><div><p class="eyebrow">INTERVIEW MATERIAL EDITOR</p><h2 id="interviewMaterialHeading">Neues Material</h2></div><span class="status-badge" id="interviewMaterialStatus">Entwurf</span></div>
-                     <section class="editor-section">
-                        <div class="section-caption"><span class="section-index">01</span><div><h3>Material und Datei</h3><p>Dokumente, Prospekte, Formulare und Anfragen getrennt für die Interview-Seite verwalten.</p></div></div>
-                        <div class="field-grid field-grid-three">
-                           <label><span>ID / Slug</span><input id="interviewMaterialId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="interview-anfrage-2026" /></label>
-                           <label><span>Bereich</span><select id="interviewMaterialKind"><option value="documents">Dokumente</option><option value="brochures">Prospekte</option><option value="forms">Formulare</option><option value="requests">Anfragen</option></select></label>
-                           <label><span>Quelle</span><select id="interviewMaterialSourceType"><option value="r2">R2 / eigene Datei</option><option value="external">HTTPS-Link</option></select></label>
-                           <label class="field-span-two"><span>Datei- oder Link-URL</span><input id="interviewMaterialSourceUrl" type="text" required maxlength="2000" placeholder="/media/v1/interview-materials/... oder https://..." /></label>
-                           <label><span>Dateiname</span><input id="interviewMaterialFileName" maxlength="255" /></label>
-                           <label><span>Sortierung</span><input id="interviewMaterialSortOrder" type="number" min="0" max="10000" value="0" /></label>
-                           <label class="feature-toggle"><input id="interviewMaterialFeatured" type="checkbox" /><span>Als hervorgehoben anzeigen</span></label>
+                  <form id="videoForm">
+                     <div class="panel-heading editor-heading">
+                        <div>
+                           <p class="eyebrow">VIDEO BEARBEITEN</p>
+                           <h2 id="videoHeading">Neues Video</h2>
                         </div>
-                        <div class="upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Materialdatei hochladen</span><input id="interviewMaterialFile" type="file" accept="application/pdf,text/plain,image/jpeg,image/png,image/webp,.doc,.docx,.ppt,.pptx" /></label><span class="muted upload-meta">PDF, DOCX, PPTX, Bilder oder TXT · maximal 25 MB</span></div>
+                        <span class="status-badge" id="videoStatus">Entwurf</span>
+                     </div>
+                     <section class="editor-section">
+                        <div class="section-caption">
+                           <span class="section-index">01</span>
+                           <div>
+                              <h3>Video und Grunddaten</h3>
+                              <p>YouTube: einen Video-Link einfügen. Eigene Datei: unten hochladen. Direkte externe Datei: einen HTTPS-Link zu einer MP4-, WebM- oder OGG-Datei einfügen.</p>
+                           </div>
+                        </div>
+                        <div class="field-grid field-grid-three">
+                           <label for="videoId"
+                              ><span id="videoId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                              ><input id="videoId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="internationaler-dialog" aria-describedby="videoId-help" aria-labelledby="videoId-label" /><small class="field-hint" id="videoId-help"
+                                 >Eindeutige Video-Adresse: Kleinbuchstaben, Zahlen und Bindestriche, z. B. gemeinsam-im-dialog.</small
+                              ></label
+                           >
+                           <label for="videoSourceType"
+                              ><span id="videoSourceType-label">Videoquelle</span
+                              ><select id="videoSourceType" aria-describedby="videoSourceType-help" aria-labelledby="videoSourceType-label">
+                                 <option value="youtube">YouTube</option>
+                                 <option value="external">Direkte externe Datei</option>
+                                 <option value="r2">Eigene Datei hochladen</option></select
+                              ><small class="field-hint" id="videoSourceType-help">YouTube-Link, direkte HTTPS-Videodatei oder eine eigene hochgeladene Datei auswählen.</small></label
+                           >
+                           <label for="videoSourceUrl"
+                              ><span id="videoSourceUrl-label">Video-URL<small class="required-mark">Pflichtfeld</small></span
+                              ><input id="videoSourceUrl" type="text" required maxlength="2000" placeholder="https://youtu.be/... oder /media/v1/videos/..." aria-describedby="videoSourceUrl-help" aria-labelledby="videoSourceUrl-label" /><small class="field-hint" id="videoSourceUrl-help"
+                                 >Bei einer eigenen Datei wird diese Adresse nach dem Upload eingetragen. Bei YouTube den Video-Link einfügen.</small
+                              ></label
+                           >
+                           <label for="videoPoster"
+                              ><span id="videoPoster-label">Vorschaubild: Bildadresse</span><input id="videoPoster" maxlength="2000" placeholder="/media/v1/video-posters/..." aria-describedby="videoPoster-help" aria-labelledby="videoPoster-label" /><small class="field-hint" id="videoPoster-help"
+                                 >Optionales Bild, das vor dem Start des Videos angezeigt wird.</small
+                              ></label
+                           >
+                           <label for="videoDuration"
+                              ><span id="videoDuration-label">Dauer (Sekunden)</span><input id="videoDuration" type="number" min="0" max="86400" step="0.01" placeholder="wird automatisch ermittelt" aria-describedby="videoDuration-help" aria-labelledby="videoDuration-label" /><small
+                                 class="field-hint"
+                                 id="videoDuration-help"
+                                 >Bei eigenen oder direkten Videodateien automatisch erkannt. Bei YouTube bei Bedarf selbst eintragen.</small
+                              ></label
+                           >
+                           <label for="videoSortOrder"
+                              ><span id="videoSortOrder-label">Sortierung</span><input id="videoSortOrder" type="number" min="0" max="10000" value="0" aria-describedby="videoSortOrder-help" aria-labelledby="videoSortOrder-label" /><small class="field-hint" id="videoSortOrder-help"
+                                 >Kleinere Werte werden zuerst angezeigt.</small
+                              ></label
+                           >
+                           <label for="videoWidth"><span id="videoWidth-label">Breite</span><input id="videoWidth" type="number" min="1" max="100000" placeholder="automatisch" aria-labelledby="videoWidth-label" /></label>
+                           <label for="videoHeight"><span id="videoHeight-label">Höhe</span><input id="videoHeight" type="number" min="1" max="100000" placeholder="automatisch" aria-labelledby="videoHeight-label" /></label>
+                           <label class="feature-toggle" for="videoFeatured"><input id="videoFeatured" type="checkbox" aria-labelledby="videoFeatured-label" /><span id="videoFeatured-label">Als hervorgehobenes Video anzeigen</span></label>
+                        </div>
+                        <div class="upload-row video-upload-row">
+                           <div class="upload-icon" aria-hidden="true">↥</div>
+                           <label class="file-label" for="videoFile"><span id="videoFile-label">Videodatei hochladen</span><input id="videoFile" type="file" accept="video/mp4,video/webm,video/ogg" aria-labelledby="videoFile-label" /></label
+                           ><span class="muted upload-meta">MP4, WebM oder OGG · maximal 95 MB</span>
+                        </div>
+                        <div class="upload-row video-upload-row">
+                           <div class="upload-icon" aria-hidden="true">▧</div>
+                           <label class="file-label" for="videoPosterFile"><span id="videoPosterFile-label">Poster hochladen</span><input id="videoPosterFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-labelledby="videoPosterFile-label" /></label
+                           ><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                        </div>
                      </section>
                      <section class="editor-section translations-section">
-                        <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel, Beschreibung und Alternativtext für alle drei Sprachversionen.</p></div></div>
+                        <div class="section-caption">
+                           <span class="section-index">02</span>
+                           <div>
+                              <h3>Texte in drei Sprachen</h3>
+                              <p>Titel, Alt-Text und Beschreibung für alle drei Sprachversionen.</p>
+                           </div>
+                        </div>
+                        <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                         <div class="translations content-translations">
-                           <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-interview-material-language="ru" data-interview-material-field="title" required maxlength="500" /></label><label><span>Описание</span><textarea data-interview-material-language="ru" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt-текст</span><input data-interview-material-language="ru" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
-                           <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-interview-material-language="en" data-interview-material-field="title" required maxlength="500" /></label><label><span>Description</span><textarea data-interview-material-language="en" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt text</span><input data-interview-material-language="en" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
-                           <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-interview-material-language="de" data-interview-material-field="title" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-interview-material-language="de" data-interview-material-field="description" maxlength="2000" rows="3"></textarea></label><label><span>Alt-Text</span><input data-interview-material-language="de" data-interview-material-field="alt" maxlength="500" /></label></fieldset>
+                           <details class="language-details" open="">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-ru">
+                                 <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-ru-215"
+                                       ><span id="editor-title-ru-215-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-video-language="ru" data-video-field="title" required maxlength="500" id="editor-title-ru-215" lang="ru" aria-labelledby="editor-title-ru-215-label" /></label
+                                    ><label for="editor-alt-ru-216"
+                                       ><span id="editor-alt-ru-216-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                       ><input
+                                          data-video-language="ru"
+                                          data-video-field="alt"
+                                          required
+                                          maxlength="500"
+                                          id="editor-alt-ru-216"
+                                          lang="ru"
+                                          aria-describedby="editor-alt-ru-216-help"
+                                          placeholder="Например: участники играют вместе на фестивале"
+                                          aria-labelledby="editor-alt-ru-216-label"
+                                       /><small class="field-hint" id="editor-alt-ru-216-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                    ><label for="editor-description-ru-217" class="language-field-wide"
+                                       ><span id="editor-description-ru-217-label">Beschreibung</span><textarea data-video-language="ru" data-video-field="description" maxlength="2000" rows="3" id="editor-description-ru-217" lang="ru" aria-labelledby="editor-description-ru-217-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
+                           <details class="language-details">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-en">
+                                 <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-en-218"
+                                       ><span id="editor-title-en-218-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-video-language="en" data-video-field="title" required maxlength="500" id="editor-title-en-218" lang="en" aria-labelledby="editor-title-en-218-label" /></label
+                                    ><label for="editor-alt-en-219"
+                                       ><span id="editor-alt-en-219-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                       ><input
+                                          data-video-language="en"
+                                          data-video-field="alt"
+                                          required
+                                          maxlength="500"
+                                          id="editor-alt-en-219"
+                                          lang="en"
+                                          aria-describedby="editor-alt-en-219-help"
+                                          placeholder="Example: participants playing together at the festival"
+                                          aria-labelledby="editor-alt-en-219-label"
+                                       /><small class="field-hint" id="editor-alt-en-219-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                    ><label for="editor-description-en-220" class="language-field-wide"
+                                       ><span id="editor-description-en-220-label">Beschreibung</span><textarea data-video-language="en" data-video-field="description" maxlength="2000" rows="3" id="editor-description-en-220" lang="en" aria-labelledby="editor-description-en-220-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
+                           <details class="language-details">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-de">
+                                 <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-de-221"
+                                       ><span id="editor-title-de-221-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-video-language="de" data-video-field="title" required maxlength="500" id="editor-title-de-221" lang="de" aria-labelledby="editor-title-de-221-label" /></label
+                                    ><label for="editor-alt-de-222"
+                                       ><span id="editor-alt-de-222-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                       ><input
+                                          data-video-language="de"
+                                          data-video-field="alt"
+                                          required
+                                          maxlength="500"
+                                          id="editor-alt-de-222"
+                                          lang="de"
+                                          aria-describedby="editor-alt-de-222-help"
+                                          placeholder="Zum Beispiel: Teilnehmende spielen gemeinsam beim Festival"
+                                          aria-labelledby="editor-alt-de-222-label"
+                                       /><small class="field-hint" id="editor-alt-de-222-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                    ><label for="editor-description-de-223" class="language-field-wide"
+                                       ><span id="editor-description-de-223-label">Beschreibung</span><textarea data-video-language="de" data-video-field="description" maxlength="2000" rows="3" id="editor-description-de-223" lang="de" aria-labelledby="editor-description-de-223-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
                         </div>
                      </section>
-                     <div class="form-actions"><div class="action-copy"><strong>Material fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newInterviewMaterial" type="button">Neues Material</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishInterviewMaterial" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveInterviewMaterial" type="button">Archivieren</button></div></div>
+                     <section class="editor-section video-subtitles-section">
+                        <div class="section-caption">
+                           <span class="section-index">03</span>
+                           <div>
+                              <h3>Untertitel hinzufügen (optional)</h3>
+                              <p>Mehrere WebVTT-Spuren hinzufügen. Start und Ende lassen sich mit der aktuellen Videoposition setzen.</p>
+                           </div>
+                        </div>
+                        <video id="videoPreview" class="video-admin-preview" controls preload="metadata" hidden></video>
+                        <div id="videoSubtitleRows" class="video-subtitle-rows"></div>
+                        <button class="button button-secondary" id="addVideoSubtitle" type="button">＋ Untertitel hinzufügen</button>
+                        <div id="videoCueEditor" class="video-cue-editor" hidden></div>
+                     </section>
+                     <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
+                     <div class="form-actions">
+                        <div class="action-copy"><strong>Video fertig?</strong><span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span></div>
+                        <div class="action-buttons">
+                           <button class="button button-secondary" id="newVideo" type="button">Neues Video</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishVideo" type="button">Veröffentlichen</button
+                           ><button class="button button-danger" id="archiveVideo" type="button">Archivieren</button>
+                        </div>
+                     </div>
                   </form>
                </div>
             </section>
          </section>
 
-         <section class="admin-grid admin-view" id="adminViewProjects" data-admin-view="projects" hidden>
+         <section class="admin-grid admin-view" id="adminViewInterviews" data-admin-view="interviews" hidden role="tabpanel" aria-labelledby="interviewsTab" tabindex="0">
             <aside class="panel panel-list">
-               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Projects</h2></div><button class="button button-small" id="reloadProjects" type="button">↻ Neu laden</button></div>
+               <div class="panel-heading">
+                  <div>
+                     <p class="panel-kicker">INTERVIEW-INHALTE</p>
+                     <h2>Interviews</h2>
+                  </div>
+                  <button class="button button-small" id="reloadInterviewContent" type="button">Aktualisieren</button>
+               </div>
+               <p class="panel-helper">Separate Videos und Materialien für die Interview-Seite verwalten.</p>
+               <div class="admin-subtabs" role="tablist" aria-label="Interview-Inhalt">
+                  <button class="admin-subtab is-active" id="interviewVideosContentTab" type="button" role="tab" aria-selected="true" aria-controls="interviewVideosContentPane interviewVideoEditorPane" data-interview-content-tab="videos" tabindex="0">Videos</button>
+                  <button class="admin-subtab" id="interviewMaterialsContentTab" type="button" role="tab" aria-selected="false" aria-controls="interviewMaterialsContentPane interviewMaterialEditorPane" data-interview-content-tab="materials" tabindex="-1">Materialien</button>
+               </div>
+               <div id="interviewVideosContentPane" data-interview-content-pane="videos" role="region" aria-label="Interview-Videos: Übersicht">
+                  <div id="interviewVideosList" class="news-list" aria-live="polite"></div>
+               </div>
+               <div id="interviewMaterialsContentPane" data-interview-content-pane="materials" hidden role="region" aria-label="Interview-Materialien: Übersicht">
+                  <div id="interviewMaterialsList" class="news-list" aria-live="polite"></div>
+               </div>
+            </aside>
+            <section class="panel panel-editor">
+               <div id="interviewVideoEditorPane" data-interview-content-pane="videos" role="region" aria-label="Interview-Video bearbeiten"><div id="interviewVideoEditorMount"></div></div>
+               <div id="interviewMaterialEditorPane" data-interview-content-pane="materials" hidden role="region" aria-label="Interview-Material bearbeiten">
+                  <form id="interviewMaterialForm">
+                     <div class="panel-heading editor-heading">
+                        <div>
+                           <p class="eyebrow">MATERIAL BEARBEITEN</p>
+                           <h2 id="interviewMaterialHeading">Neues Material</h2>
+                        </div>
+                        <span class="status-badge" id="interviewMaterialStatus">Entwurf</span>
+                     </div>
+                     <section class="editor-section">
+                        <div class="section-caption">
+                           <span class="section-index">01</span>
+                           <div>
+                              <h3>Material und Datei</h3>
+                              <p>Dokumente, Prospekte, Formulare und Anfragen getrennt für die Interview-Seite verwalten.</p>
+                           </div>
+                        </div>
+                        <div class="field-grid field-grid-three">
+                           <label for="interviewMaterialId"
+                              ><span id="interviewMaterialId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                              ><input id="interviewMaterialId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="interview-anfrage-2026" aria-describedby="interviewMaterialId-help" aria-labelledby="interviewMaterialId-label" /><small
+                                 class="field-hint"
+                                 id="interviewMaterialId-help"
+                                 >Eindeutige Material-Adresse: nur Kleinbuchstaben, Zahlen und Bindestriche.</small
+                              ></label
+                           >
+                           <label for="interviewMaterialKind"
+                              ><span id="interviewMaterialKind-label">Bereich</span
+                              ><select id="interviewMaterialKind" aria-labelledby="interviewMaterialKind-label">
+                                 <option value="documents">Dokumente</option>
+                                 <option value="brochures">Prospekte</option>
+                                 <option value="forms">Formulare</option>
+                                 <option value="requests">Anfragen</option>
+                              </select></label
+                           >
+                           <label for="interviewMaterialSourceType"
+                              ><span id="interviewMaterialSourceType-label">Quelle</span
+                              ><select id="interviewMaterialSourceType" aria-labelledby="interviewMaterialSourceType-label">
+                                 <option value="r2">Eigene Datei hochladen</option>
+                                 <option value="external">HTTPS-Link</option>
+                              </select></label
+                           >
+                           <label class="field-span-two" for="interviewMaterialSourceUrl"
+                              ><span id="interviewMaterialSourceUrl-label">Datei- oder Link-URL<small class="required-mark">Pflichtfeld</small></span
+                              ><input id="interviewMaterialSourceUrl" type="text" required maxlength="2000" placeholder="/media/v1/interview-materials/... oder https://..." aria-describedby="interviewMaterialSourceUrl-help" aria-labelledby="interviewMaterialSourceUrl-label" /><small
+                                 class="field-hint"
+                                 id="interviewMaterialSourceUrl-help"
+                                 >Nach dem Upload automatisch ausgefüllt. Alternativ einen direkten HTTPS-Link zum Material einfügen.</small
+                              ></label
+                           >
+                           <label for="interviewMaterialFileName"><span id="interviewMaterialFileName-label">Dateiname</span><input id="interviewMaterialFileName" maxlength="255" aria-labelledby="interviewMaterialFileName-label" /></label>
+                           <label for="interviewMaterialSortOrder"><span id="interviewMaterialSortOrder-label">Sortierung</span><input id="interviewMaterialSortOrder" type="number" min="0" max="10000" value="0" aria-labelledby="interviewMaterialSortOrder-label" /></label>
+                           <label class="feature-toggle" for="interviewMaterialFeatured"><input id="interviewMaterialFeatured" type="checkbox" aria-labelledby="interviewMaterialFeatured-label" /><span id="interviewMaterialFeatured-label">Als hervorgehoben anzeigen</span></label>
+                        </div>
+                        <div class="upload-row">
+                           <div class="upload-icon" aria-hidden="true">↥</div>
+                           <label class="file-label" for="interviewMaterialFile"
+                              ><span id="interviewMaterialFile-label">Materialdatei hochladen</span><input id="interviewMaterialFile" type="file" accept="application/pdf,text/plain,image/jpeg,image/png,image/webp,.doc,.docx,.ppt,.pptx" aria-labelledby="interviewMaterialFile-label" /></label
+                           ><span class="muted upload-meta">PDF, DOCX, PPTX, Bilder oder TXT · maximal 25 MB</span>
+                        </div>
+                     </section>
+                     <section class="editor-section translations-section">
+                        <div class="section-caption">
+                           <span class="section-index">02</span>
+                           <div>
+                              <h3>Texte in drei Sprachen</h3>
+                              <p>Titel, Beschreibung und Alternativtext für alle drei Sprachversionen.</p>
+                           </div>
+                        </div>
+                        <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
+                        <div class="translations content-translations">
+                           <details class="language-details" open="">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-ru">
+                                 <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-ru-224"
+                                       ><span id="editor-title-ru-224-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-interview-material-language="ru" data-interview-material-field="title" required maxlength="500" id="editor-title-ru-224" lang="ru" aria-labelledby="editor-title-ru-224-label" /></label
+                                    ><label for="editor-alt-ru-226"
+                                       ><span id="editor-alt-ru-226-label">Bildbeschreibung</span><input data-interview-material-language="ru" data-interview-material-field="alt" maxlength="500" id="editor-alt-ru-226" lang="ru" aria-labelledby="editor-alt-ru-226-label"
+                                    /></label>
+                                    <label for="editor-description-ru-225" class="language-field-wide"
+                                       ><span id="editor-description-ru-225-label">Beschreibung</span
+                                       ><textarea data-interview-material-language="ru" data-interview-material-field="description" maxlength="2000" rows="3" id="editor-description-ru-225" lang="ru" aria-labelledby="editor-description-ru-225-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
+                           <details class="language-details">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-en">
+                                 <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-en-227"
+                                       ><span id="editor-title-en-227-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-interview-material-language="en" data-interview-material-field="title" required maxlength="500" id="editor-title-en-227" lang="en" aria-labelledby="editor-title-en-227-label" /></label
+                                    ><label for="editor-alt-en-229"
+                                       ><span id="editor-alt-en-229-label">Bildbeschreibung</span><input data-interview-material-language="en" data-interview-material-field="alt" maxlength="500" id="editor-alt-en-229" lang="en" aria-labelledby="editor-alt-en-229-label"
+                                    /></label>
+                                    <label for="editor-description-en-228" class="language-field-wide"
+                                       ><span id="editor-description-en-228-label">Beschreibung</span
+                                       ><textarea data-interview-material-language="en" data-interview-material-field="description" maxlength="2000" rows="3" id="editor-description-en-228" lang="en" aria-labelledby="editor-description-en-228-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
+                           <details class="language-details">
+                              <summary>
+                                 <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                                 ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                              </summary>
+                              <fieldset class="language-card language-de">
+                                 <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                                 <div class="language-fields">
+                                    <label for="editor-title-de-230"
+                                       ><span id="editor-title-de-230-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                       ><input data-interview-material-language="de" data-interview-material-field="title" required maxlength="500" id="editor-title-de-230" lang="de" aria-labelledby="editor-title-de-230-label" /></label
+                                    ><label for="editor-alt-de-232"
+                                       ><span id="editor-alt-de-232-label">Bildbeschreibung</span><input data-interview-material-language="de" data-interview-material-field="alt" maxlength="500" id="editor-alt-de-232" lang="de" aria-labelledby="editor-alt-de-232-label"
+                                    /></label>
+                                    <label for="editor-description-de-231" class="language-field-wide"
+                                       ><span id="editor-description-de-231-label">Beschreibung</span
+                                       ><textarea data-interview-material-language="de" data-interview-material-field="description" maxlength="2000" rows="3" id="editor-description-de-231" lang="de" aria-labelledby="editor-description-de-231-label"></textarea>
+                                    </label>
+                                 </div>
+                              </fieldset>
+                           </details>
+                        </div>
+                     </section>
+                     <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
+                     <div class="form-actions">
+                        <div class="action-copy"><strong>Material fertig?</strong><span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span></div>
+                        <div class="action-buttons">
+                           <button class="button button-secondary" id="newInterviewMaterial" type="button">Neues Material</button><button class="button button-primary" type="submit">Als Entwurf speichern</button
+                           ><button class="button button-publish" id="publishInterviewMaterial" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveInterviewMaterial" type="button">Archivieren</button>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </section>
+         </section>
+
+         <section class="admin-grid admin-view" id="adminViewProjects" data-admin-view="projects" hidden role="tabpanel" aria-labelledby="projectsTab" tabindex="0">
+            <aside class="panel panel-list">
+               <div class="panel-heading">
+                  <div>
+                     <p class="panel-kicker">ÜBERSICHT</p>
+                     <h2>Projekte</h2>
+                  </div>
+                  <button class="button button-small" id="reloadProjects" type="button">Aktualisieren</button>
+               </div>
                <p class="panel-helper">MIRoKIT-Projekte als Entwurf vorbereiten und später veröffentlichen. Nach dem Enddatum erscheinen sie automatisch im Archiv.</p>
                <div id="projectsList" class="news-list" aria-live="polite"></div>
             </aside>
             <section class="panel panel-editor">
                <form id="projectForm">
-                  <div class="panel-heading editor-heading"><div><p class="eyebrow">PROJECT EDITOR</p><h2 id="projectHeading">Neues Projekt</h2></div><span class="status-badge" id="projectStatus">Entwurf</span></div>
-                  <section class="editor-section">
-                     <div class="section-caption"><span class="section-index">01</span><div><h3>Projektweg und Zeitraum</h3><p>Das Enddatum entscheidet automatisch, ob ein veröffentlichtes Projekt unter „Current“ oder „Past“ erscheint.</p></div></div>
-                     <div class="field-grid field-grid-three">
-                        <label><span>ID / Slug</span><input id="projectId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="cultural-triathlon-2026" /></label>
-                        <label><span>Startdatum</span><input id="projectStartDate" type="date" required /></label>
-                        <label><span>Enddatum <small class="field-hint">leer = läuft weiter</small></span><input id="projectEndDate" type="date" /></label>
-                        <label><span>Thema</span><select id="projectCategory"><option value="creative">Kreativität</option><option value="game">Spiel und Wettbewerb</option><option value="dialogue">Dialog und Begegnung</option><option value="media">Medien und Storytelling</option><option value="network">Internationales Netzwerk</option><option value="education">Bildung und Methodik</option></select></label>
-                        <label><span>Akzent</span><select id="projectAccent"><option value="blue">Blau</option><option value="red">Rot</option><option value="green">Grün</option><option value="amber">Amber</option><option value="violet">Violett</option></select></label>
-                        <label><span>Sortierung</span><input id="projectSortOrder" type="number" min="0" max="10000" value="0" /></label>
-                        <label><span>Bild-URL <small class="field-hint">optional</small></span><input id="projectImage" maxlength="2000" placeholder="/media/v1/projects/... oder /public/..." /></label>
-                        <label><span>Weiterführender Link <small class="field-hint">optional</small></span><input id="projectLinkUrl" maxlength="2000" placeholder="/page/gallery/ oder https://..." /></label>
-                        <label class="feature-toggle"><input id="projectFeatured" type="checkbox" /><span>Als Leitprojekt hervorheben</span></label>
+                  <div class="panel-heading editor-heading">
+                     <div>
+                        <p class="eyebrow">PROJEKT BEARBEITEN</p>
+                        <h2 id="projectHeading">Neues Projekt</h2>
                      </div>
-                     <div class="upload-row"><div class="upload-icon" aria-hidden="true">↥</div><label class="file-label"><span>Projektbild hochladen</span><input id="projectFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /></label><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span></div>
+                     <span class="status-badge" id="projectStatus">Entwurf</span>
+                  </div>
+                  <section class="editor-section">
+                     <div class="section-caption">
+                        <span class="section-index">01</span>
+                        <div>
+                           <h3>Projektweg und Zeitraum</h3>
+                           <p>Das Enddatum entscheidet automatisch, ob ein veröffentlichtes Projekt unter „Current“ oder „Past“ erscheint.</p>
+                        </div>
+                     </div>
+                     <div class="field-grid field-grid-three">
+                        <label for="projectId"
+                           ><span id="projectId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="projectId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="cultural-triathlon-2026" aria-describedby="projectId-help" aria-labelledby="projectId-label" /><small class="field-hint" id="projectId-help"
+                              >Eindeutige Projekt-Adresse: nur Kleinbuchstaben, Zahlen und Bindestriche.</small
+                           ></label
+                        >
+                        <label for="projectStartDate"
+                           ><span id="projectStartDate-label">Startdatum<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="projectStartDate" type="date" required aria-describedby="projectStartDate-help" aria-labelledby="projectStartDate-label" /><small class="field-hint" id="projectStartDate-help">Vor diesem Datum gilt das veröffentlichte Projekt als bevorstehend.</small></label
+                        >
+                        <label for="projectEndDate"
+                           ><span id="projectEndDate-label">Enddatum <small class="field-hint">leer = läuft weiter</small></span
+                           ><input id="projectEndDate" type="date" aria-describedby="projectEndDate-help" aria-labelledby="projectEndDate-label" /><small class="field-hint" id="projectEndDate-help"
+                              >Nach diesem Datum erscheint das Projekt bei den vergangenen Projekten. Ohne Enddatum bleibt es aktuell.</small
+                           ></label
+                        >
+                        <label for="projectCategory"
+                           ><span id="projectCategory-label">Thema</span
+                           ><select id="projectCategory" aria-labelledby="projectCategory-label">
+                              <option value="creative">Kreativität</option>
+                              <option value="game">Spiel und Wettbewerb</option>
+                              <option value="dialogue">Dialog und Begegnung</option>
+                              <option value="media">Medien und Storytelling</option>
+                              <option value="network">Internationales Netzwerk</option>
+                              <option value="education">Bildung und Methodik</option>
+                           </select></label
+                        >
+                        <label for="projectAccent"
+                           ><span id="projectAccent-label">Akzentfarbe</span
+                           ><select id="projectAccent" aria-labelledby="projectAccent-label">
+                              <option value="blue">Blau</option>
+                              <option value="red">Rot</option>
+                              <option value="green">Grün</option>
+                              <option value="amber">Amber</option>
+                              <option value="violet">Violett</option>
+                           </select></label
+                        >
+                        <label for="projectSortOrder"
+                           ><span id="projectSortOrder-label">Sortierung</span><input id="projectSortOrder" type="number" min="0" max="10000" value="0" aria-describedby="projectSortOrder-help" aria-labelledby="projectSortOrder-label" /><small class="field-hint" id="projectSortOrder-help"
+                              >Kleinere Werte werden zuerst angezeigt.</small
+                           ></label
+                        >
+                        <label for="projectImage"
+                           ><span id="projectImage-label">Bildadresse (URL)<small class="field-hint">optional</small></span
+                           ><input id="projectImage" maxlength="2000" placeholder="/media/v1/projects/... oder /public/..." aria-labelledby="projectImage-label"
+                        /></label>
+                        <label for="projectLinkUrl"
+                           ><span id="projectLinkUrl-label">Weiterführender Link <small class="field-hint">optional</small></span
+                           ><input id="projectLinkUrl" maxlength="2000" placeholder="/page/gallery/ oder https://..." aria-labelledby="projectLinkUrl-label"
+                        /></label>
+                        <label class="feature-toggle" for="projectFeatured"><input id="projectFeatured" type="checkbox" aria-labelledby="projectFeatured-label" /><span id="projectFeatured-label">Als Leitprojekt hervorheben</span></label>
+                     </div>
+                     <div class="upload-row">
+                        <div class="upload-icon" aria-hidden="true">↥</div>
+                        <label class="file-label" for="projectFile"><span id="projectFile-label">Projektbild hochladen</span><input id="projectFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-labelledby="projectFile-label" /></label
+                        ><span class="muted upload-meta">JPG, PNG, WebP oder AVIF · maximal 8 MB</span>
+                     </div>
                   </section>
                   <section class="editor-section translations-section">
-                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Titel und Alt-Text sind pro Sprache erforderlich. Die Beschreibung darf leer bleiben.</p></div></div>
+                     <div class="section-caption">
+                        <span class="section-index">02</span>
+                        <div>
+                           <h3>Texte in drei Sprachen</h3>
+                           <p>Titel und Alt-Text sind pro Sprache erforderlich. Die Beschreibung darf leer bleiben.</p>
+                        </div>
+                     </div>
+                     <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                      <div class="translations content-translations">
-                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-project-language="ru" data-project-field="title" required maxlength="500" /></label><label><span>Alt-текст</span><input data-project-language="ru" data-project-field="alt" required maxlength="500" /></label><label><span>Описание <small class="field-hint">необязательно</small></span><textarea data-project-language="ru" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Title</span><input data-project-language="en" data-project-field="title" required maxlength="500" /></label><label><span>Alt text</span><input data-project-language="en" data-project-field="alt" required maxlength="500" /></label><label><span>Description <small class="field-hint">optional</small></span><textarea data-project-language="en" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Titel</span><input data-project-language="de" data-project-field="title" required maxlength="500" /></label><label><span>Alt-Text</span><input data-project-language="de" data-project-field="alt" required maxlength="500" /></label><label><span>Beschreibung <small class="field-hint">optional</small></span><textarea data-project-language="de" data-project-field="description" maxlength="2000" rows="3"></textarea></label></fieldset>
+                        <details class="language-details" open="">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-ru">
+                              <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-ru-233"
+                                    ><span id="editor-title-ru-233-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-project-language="ru" data-project-field="title" required maxlength="500" id="editor-title-ru-233" lang="ru" aria-labelledby="editor-title-ru-233-label" /></label
+                                 ><label for="editor-alt-ru-234"
+                                    ><span id="editor-alt-ru-234-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-project-language="ru"
+                                       data-project-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-ru-234"
+                                       lang="ru"
+                                       aria-describedby="editor-alt-ru-234-help"
+                                       placeholder="Например: участники играют вместе на фестивале"
+                                       aria-labelledby="editor-alt-ru-234-label"
+                                    /><small class="field-hint" id="editor-alt-ru-234-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-ru-235" class="language-field-wide"
+                                    ><span id="editor-description-ru-235-label">Beschreibung<small class="field-hint">необязательно</small></span
+                                    ><textarea data-project-language="ru" data-project-field="description" maxlength="2000" rows="3" id="editor-description-ru-235" lang="ru" aria-labelledby="editor-description-ru-235-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-en">
+                              <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-en-236"
+                                    ><span id="editor-title-en-236-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-project-language="en" data-project-field="title" required maxlength="500" id="editor-title-en-236" lang="en" aria-labelledby="editor-title-en-236-label" /></label
+                                 ><label for="editor-alt-en-237"
+                                    ><span id="editor-alt-en-237-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-project-language="en"
+                                       data-project-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-en-237"
+                                       lang="en"
+                                       aria-describedby="editor-alt-en-237-help"
+                                       placeholder="Example: participants playing together at the festival"
+                                       aria-labelledby="editor-alt-en-237-label"
+                                    /><small class="field-hint" id="editor-alt-en-237-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-en-238" class="language-field-wide"
+                                    ><span id="editor-description-en-238-label">Beschreibung<small class="field-hint">optional</small></span
+                                    ><textarea data-project-language="en" data-project-field="description" maxlength="2000" rows="3" id="editor-description-en-238" lang="en" aria-labelledby="editor-description-en-238-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-de">
+                              <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-title-de-239"
+                                    ><span id="editor-title-de-239-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-project-language="de" data-project-field="title" required maxlength="500" id="editor-title-de-239" lang="de" aria-labelledby="editor-title-de-239-label" /></label
+                                 ><label for="editor-alt-de-240"
+                                    ><span id="editor-alt-de-240-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-project-language="de"
+                                       data-project-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-de-240"
+                                       lang="de"
+                                       aria-describedby="editor-alt-de-240-help"
+                                       placeholder="Zum Beispiel: Teilnehmende spielen gemeinsam beim Festival"
+                                       aria-labelledby="editor-alt-de-240-label"
+                                    /><small class="field-hint" id="editor-alt-de-240-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-de-241" class="language-field-wide"
+                                    ><span id="editor-description-de-241-label">Beschreibung <small class="field-hint">optional</small></span
+                                    ><textarea data-project-language="de" data-project-field="description" maxlength="2000" rows="3" id="editor-description-de-241" lang="de" aria-labelledby="editor-description-de-241-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
                      </div>
                   </section>
-                  <div class="form-actions"><div class="action-copy"><strong>Projekt bereit?</strong><span>Erst als Entwurf speichern, prüfen und anschließend veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newProject" type="button">Neues Projekt</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishProject" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveProject" type="button">Archivieren</button></div></div>
+                  <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
+                  <div class="form-actions">
+                     <div class="action-copy"><strong>Projekt bereit?</strong><span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span></div>
+                     <div class="action-buttons">
+                        <button class="button button-secondary" id="newProject" type="button">Neues Projekt</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishProject" type="button">Veröffentlichen</button
+                        ><button class="button button-danger" id="archiveProject" type="button">Archivieren</button>
+                     </div>
+                  </div>
                </form>
             </section>
          </section>
 
-         <section class="admin-grid admin-view" id="adminViewWorld" data-admin-view="world" hidden>
+         <section class="admin-grid admin-view" id="adminViewWorld" data-admin-view="world" hidden role="tabpanel" aria-labelledby="worldTab" tabindex="0">
             <aside class="panel panel-list">
                <div class="panel-heading">
-                  <div><p class="panel-kicker">ÜBERSICHT</p><h2>World Points</h2></div>
-                  <button class="button button-small" id="reloadWorldPoints" type="button">↻ Neu laden</button>
+                  <div>
+                     <p class="panel-kicker">ÜBERSICHT</p>
+                     <h2>Standorte</h2>
+                  </div>
+                  <button class="button button-small" id="reloadWorldPoints" type="button">Aktualisieren</button>
                </div>
                <p class="panel-helper">Städte und internationale Standorte der Karte verwalten.</p>
                <div id="worldPointsList" class="news-list" aria-live="polite"></div>
@@ -579,72 +1304,321 @@
 
             <section class="panel panel-editor">
                <form id="worldPointForm">
-                  <div class="panel-heading editor-heading"><div><p class="eyebrow">WORLD POINT EDITOR</p><h2 id="worldPointHeading">Neuer World Point</h2></div><span class="status-badge" id="worldPointStatus">Entwurf</span></div>
+                  <div class="panel-heading editor-heading">
+                     <div>
+                        <p class="eyebrow">STANDORT BEARBEITEN</p>
+                        <h2 id="worldPointHeading">Neuer Standort</h2>
+                     </div>
+                     <span class="status-badge" id="worldPointStatus">Entwurf</span>
+                  </div>
                   <section class="editor-section">
-                     <div class="section-caption"><span class="section-index">01</span><div><h3>Koordinaten und Status</h3><p>Diese Werte bestimmen Position, Farbe und Reihenfolge auf der Weltkarte.</p></div></div>
+                     <div class="section-caption">
+                        <span class="section-index">01</span>
+                        <div>
+                           <h3>Koordinaten und Status</h3>
+                           <p>Diese Werte bestimmen Position, Farbe und Reihenfolge auf der Weltkarte.</p>
+                        </div>
+                     </div>
                      <div class="field-grid field-grid-three">
-                        <label><span>ID / Slug</span><input id="worldPointId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="berlin" /></label>
-                        <label><span>Breitengrad</span><input id="worldLatitude" type="number" min="-90" max="90" step="any" required placeholder="52.52" /></label>
-                        <label><span>Längengrad</span><input id="worldLongitude" type="number" min="-180" max="180" step="any" required placeholder="13.40" /></label>
-                        <label><span>Punktstatus</span><select id="worldPointKind"><option value="hq">HQ</option><option value="done">Event durchgeführt</option><option value="planned">Geplant</option></select></label>
-                        <label><span>Flagge / Emoji</span><input id="worldFlag" maxlength="16" placeholder="🇩🇪" /></label>
-                        <label><span>Sortierung</span><input id="worldSortOrder" type="number" min="0" max="10000" value="0" /></label>
+                        <label for="worldPointId"
+                           ><span id="worldPointId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="worldPointId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="berlin" aria-describedby="worldPointId-help" aria-labelledby="worldPointId-label" /><small class="field-hint" id="worldPointId-help"
+                              >Eindeutige Standort-Adresse, z. B. duesseldorf. Nur Kleinbuchstaben, Zahlen und Bindestriche.</small
+                           ></label
+                        >
+                        <label for="worldLatitude"
+                           ><span id="worldLatitude-label">Breitengrad<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="worldLatitude" type="number" min="-90" max="90" step="any" required placeholder="52.52" aria-describedby="worldLatitude-help" aria-labelledby="worldLatitude-label" /><small class="field-hint" id="worldLatitude-help"
+                              >Nord/Süd-Position von −90 bis 90. Düsseldorf liegt etwa bei 51.23.</small
+                           ></label
+                        >
+                        <label for="worldLongitude"
+                           ><span id="worldLongitude-label">Längengrad<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="worldLongitude" type="number" min="-180" max="180" step="any" required placeholder="13.40" aria-describedby="worldLongitude-help" aria-labelledby="worldLongitude-label" /><small class="field-hint" id="worldLongitude-help"
+                              >Ost/West-Position von −180 bis 180. Düsseldorf liegt etwa bei 6.78.</small
+                           ></label
+                        >
+                        <label for="worldPointKind"
+                           ><span id="worldPointKind-label">Art des Standorts</span
+                           ><select id="worldPointKind" aria-labelledby="worldPointKind-label">
+                              <option value="hq">Hauptstandort</option>
+                              <option value="done">Event durchgeführt</option>
+                              <option value="planned">Geplant</option>
+                           </select></label
+                        >
+                        <label for="worldFlag"><span id="worldFlag-label">Flagge / Emoji</span><input id="worldFlag" maxlength="16" placeholder="🇩🇪" aria-labelledby="worldFlag-label" /></label>
+                        <label for="worldSortOrder"
+                           ><span id="worldSortOrder-label">Sortierung</span><input id="worldSortOrder" type="number" min="0" max="10000" value="0" aria-describedby="worldSortOrder-help" aria-labelledby="worldSortOrder-label" /><small class="field-hint" id="worldSortOrder-help"
+                              >Kleinere Werte werden zuerst angezeigt.</small
+                           ></label
+                        >
                      </div>
                   </section>
                   <section class="editor-section translations-section">
-                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Stadt und Land werden direkt auf der Karte und in der Länderübersicht verwendet.</p></div></div>
+                     <div class="section-caption">
+                        <span class="section-index">02</span>
+                        <div>
+                           <h3>Texte in drei Sprachen</h3>
+                           <p>Stadt und Land werden direkt auf der Karte und in der Länderübersicht verwendet.</p>
+                        </div>
+                     </div>
+                     <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                      <div class="translations content-translations">
-                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Stadt</span><input data-world-language="ru" data-world-field="city" required maxlength="300" /></label><label><span>Land</span><input data-world-language="ru" data-world-field="country" required maxlength="300" /></label><label><span>Beschreibung</span><textarea data-world-language="ru" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>City</span><input data-world-language="en" data-world-field="city" required maxlength="300" /></label><label><span>Country</span><input data-world-language="en" data-world-field="country" required maxlength="300" /></label><label><span>Description</span><textarea data-world-language="en" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Stadt</span><input data-world-language="de" data-world-field="city" required maxlength="300" /></label><label><span>Land</span><input data-world-language="de" data-world-field="country" required maxlength="300" /></label><label><span>Beschreibung</span><textarea data-world-language="de" data-world-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <details class="language-details" open="">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-ru">
+                              <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-city-ru-242"
+                                    ><span id="editor-city-ru-242-label">Stadt<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="ru" data-world-field="city" required maxlength="300" id="editor-city-ru-242" lang="ru" aria-labelledby="editor-city-ru-242-label" /></label
+                                 ><label for="editor-country-ru-243"
+                                    ><span id="editor-country-ru-243-label">Land<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="ru" data-world-field="country" required maxlength="300" id="editor-country-ru-243" lang="ru" aria-labelledby="editor-country-ru-243-label" /></label
+                                 ><label for="editor-description-ru-244" class="language-field-wide"
+                                    ><span id="editor-description-ru-244-label">Beschreibung</span><textarea data-world-language="ru" data-world-field="description" maxlength="1000" rows="3" id="editor-description-ru-244" lang="ru" aria-labelledby="editor-description-ru-244-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-en">
+                              <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-city-en-245"
+                                    ><span id="editor-city-en-245-label">Stadt<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="en" data-world-field="city" required maxlength="300" id="editor-city-en-245" lang="en" aria-labelledby="editor-city-en-245-label" /></label
+                                 ><label for="editor-country-en-246"
+                                    ><span id="editor-country-en-246-label">Land<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="en" data-world-field="country" required maxlength="300" id="editor-country-en-246" lang="en" aria-labelledby="editor-country-en-246-label" /></label
+                                 ><label for="editor-description-en-247" class="language-field-wide"
+                                    ><span id="editor-description-en-247-label">Beschreibung</span><textarea data-world-language="en" data-world-field="description" maxlength="1000" rows="3" id="editor-description-en-247" lang="en" aria-labelledby="editor-description-en-247-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-de">
+                              <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-city-de-248"
+                                    ><span id="editor-city-de-248-label">Stadt<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="de" data-world-field="city" required maxlength="300" id="editor-city-de-248" lang="de" aria-labelledby="editor-city-de-248-label" /></label
+                                 ><label for="editor-country-de-249"
+                                    ><span id="editor-country-de-249-label">Land<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-world-language="de" data-world-field="country" required maxlength="300" id="editor-country-de-249" lang="de" aria-labelledby="editor-country-de-249-label" /></label
+                                 ><label for="editor-description-de-250" class="language-field-wide"
+                                    ><span id="editor-description-de-250-label">Beschreibung</span><textarea data-world-language="de" data-world-field="description" maxlength="1000" rows="3" id="editor-description-de-250" lang="de" aria-labelledby="editor-description-de-250-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
                      </div>
                   </section>
-                  <div class="form-actions"><div class="action-copy"><strong>World Point fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newWorldPoint" type="button">Neuer Punkt</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishWorldPoint" type="button">Veröffentlichen</button><button class="button button-danger" id="archiveWorldPoint" type="button">Archivieren</button></div></div>
+                  <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
+                  <div class="form-actions">
+                     <div class="action-copy"><strong>Standort fertig?</strong><span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span></div>
+                     <div class="action-buttons">
+                        <button class="button button-secondary" id="newWorldPoint" type="button">Neuer Standort</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishWorldPoint" type="button">Veröffentlichen</button
+                        ><button class="button button-danger" id="archiveWorldPoint" type="button">Archivieren</button>
+                     </div>
+                  </div>
                </form>
             </section>
          </section>
 
-         <section class="admin-grid admin-view" id="adminViewPartners" data-admin-view="partners" hidden>
+         <section class="admin-grid admin-view" id="adminViewPartners" data-admin-view="partners" hidden role="tabpanel" aria-labelledby="partnersTab" tabindex="0">
             <aside class="panel panel-list">
-               <div class="panel-heading"><div><p class="panel-kicker">ÜBERSICHT</p><h2>Partners</h2></div><button class="button button-small" id="reloadPartners" type="button">↻ Neu laden</button></div>
+               <div class="panel-heading">
+                  <div>
+                     <p class="panel-kicker">ÜBERSICHT</p>
+                     <h2>Partner</h2>
+                  </div>
+                  <button class="button button-small" id="reloadPartners" type="button">Aktualisieren</button>
+               </div>
                <p class="panel-helper">Logos, Namen, Kategorien und Links der Partner pflegen.</p>
                <div id="partnersList" class="news-list" aria-live="polite"></div>
             </aside>
             <section class="panel panel-editor">
                <form id="partnerForm">
-                  <div class="panel-heading editor-heading"><div><p class="eyebrow">PARTNER EDITOR</p><h2 id="partnerHeading">Neuer Partner</h2></div><span class="status-badge" id="partnerStatus">Entwurf</span></div>
-                  <section class="editor-section">
-                     <div class="section-caption"><span class="section-index">01</span><div><h3>Grunddaten und Logo</h3><p>Logo hochladen, Kategorie wählen und optional auf die Partner-Website verlinken.</p></div></div>
-                     <div class="field-grid field-grid-three">
-                        <label><span>ID / Slug</span><input id="partnerId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="initiative-erleben" /></label>
-                        <label><span>Kategorie</span><select id="partnerCategory"><option value="public">Öffentliche Organisationen</option><option value="social">Soziale Initiativen</option><option value="education">Bildung, Kultur und Netzwerke</option></select></label>
-                        <label><span>Sortierung</span><input id="partnerSortOrder" type="number" min="0" max="10000" value="0" /></label>
-                        <label><span>Website (HTTPS)</span><input id="partnerWebsite" type="url" maxlength="2000" placeholder="https://example.org" /></label>
-                        <label><span>Logo-URL</span><input id="partnerImage" required maxlength="2000" placeholder="/media/v1/partners/..." /></label>
-                        <label class="file-label"><span>Logo hochladen</span><input id="partnerFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" /><small class="field-hint">PNG, JPG, WebP oder AVIF · maximal 4 MB</small></label>
+                  <div class="panel-heading editor-heading">
+                     <div>
+                        <p class="eyebrow">PARTNER BEARBEITEN</p>
+                        <h2 id="partnerHeading">Neuer Partner</h2>
                      </div>
-                     <label class="feature-toggle"><input id="partnerFeatured" type="checkbox" /><span>Als hervorgehobenen Partner anzeigen</span></label>
+                     <span class="status-badge" id="partnerStatus">Entwurf</span>
+                  </div>
+                  <section class="editor-section">
+                     <div class="section-caption">
+                        <span class="section-index">01</span>
+                        <div>
+                           <h3>Grunddaten und Logo</h3>
+                           <p>Logo hochladen, Kategorie wählen und optional auf die Partner-Website verlinken.</p>
+                        </div>
+                     </div>
+                     <div class="field-grid field-grid-three">
+                        <label for="partnerId"
+                           ><span id="partnerId-label">Adresse / Slug<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="partnerId" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxlength="100" placeholder="initiative-erleben" aria-describedby="partnerId-help" aria-labelledby="partnerId-label" /><small class="field-hint" id="partnerId-help"
+                              >Eindeutige Partner-Adresse: nur Kleinbuchstaben, Zahlen und Bindestriche.</small
+                           ></label
+                        >
+                        <label for="partnerCategory"
+                           ><span id="partnerCategory-label">Kategorie</span
+                           ><select id="partnerCategory" aria-labelledby="partnerCategory-label">
+                              <option value="public">Öffentliche Organisationen</option>
+                              <option value="social">Soziale Initiativen</option>
+                              <option value="education">Bildung, Kultur und Netzwerke</option>
+                           </select></label
+                        >
+                        <label for="partnerSortOrder"
+                           ><span id="partnerSortOrder-label">Sortierung</span><input id="partnerSortOrder" type="number" min="0" max="10000" value="0" aria-describedby="partnerSortOrder-help" aria-labelledby="partnerSortOrder-label" /><small class="field-hint" id="partnerSortOrder-help"
+                              >Kleinere Werte werden zuerst angezeigt.</small
+                           ></label
+                        >
+                        <label for="partnerWebsite"><span id="partnerWebsite-label">Website (HTTPS)</span><input id="partnerWebsite" type="url" maxlength="2000" placeholder="https://example.org" aria-labelledby="partnerWebsite-label" /></label>
+                        <label for="partnerImage"
+                           ><span id="partnerImage-label">Logo-Adresse (URL)<small class="required-mark">Pflichtfeld</small></span
+                           ><input id="partnerImage" required maxlength="2000" placeholder="/media/v1/partners/..." aria-describedby="partnerImage-help" aria-labelledby="partnerImage-label" /><small class="field-hint" id="partnerImage-help">Nach dem Logo-Upload automatisch ausgefüllt.</small></label
+                        >
+                        <label class="file-label" for="partnerFile"
+                           ><span id="partnerFile-label">Logo hochladen</span><input id="partnerFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-labelledby="partnerFile-label" /><small class="field-hint">PNG, JPG, WebP oder AVIF · maximal 4 MB</small></label
+                        >
+                     </div>
+                     <label class="feature-toggle" for="partnerFeatured"><input id="partnerFeatured" type="checkbox" aria-labelledby="partnerFeatured-label" /><span id="partnerFeatured-label">Als hervorgehobenen Partner anzeigen</span></label>
                   </section>
                   <section class="editor-section translations-section">
-                     <div class="section-caption"><span class="section-index">02</span><div><h3>Lokalisierte Angaben</h3><p>Name, Alt-Text und optionale Beschreibung für RU, EN und DE.</p></div></div>
+                     <div class="section-caption">
+                        <span class="section-index">02</span>
+                        <div>
+                           <h3>Texte in drei Sprachen</h3>
+                           <p>Name, Alt-Text und optionale Beschreibung für RU, EN und DE.</p>
+                        </div>
+                     </div>
+                     <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
                      <div class="translations content-translations">
-                        <fieldset class="language-card language-ru"><legend><span class="language-dot"></span> Русский <small>RU</small></legend><label><span>Название</span><input data-partner-language="ru" data-partner-field="name" required maxlength="500" /></label><label><span>Alt-текст</span><input data-partner-language="ru" data-partner-field="alt" required maxlength="500" /></label><label><span>Описание</span><textarea data-partner-language="ru" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-en"><legend><span class="language-dot"></span> English <small>EN</small></legend><label><span>Name</span><input data-partner-language="en" data-partner-field="name" required maxlength="500" /></label><label><span>Alt text</span><input data-partner-language="en" data-partner-field="alt" required maxlength="500" /></label><label><span>Description</span><textarea data-partner-language="en" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
-                        <fieldset class="language-card language-de"><legend><span class="language-dot"></span> Deutsch <small>DE</small></legend><label><span>Name</span><input data-partner-language="de" data-partner-field="name" required maxlength="500" /></label><label><span>Alt-Text</span><input data-partner-language="de" data-partner-field="alt" required maxlength="500" /></label><label><span>Beschreibung</span><textarea data-partner-language="de" data-partner-field="description" maxlength="1000" rows="3"></textarea></label></fieldset>
+                        <details class="language-details" open="">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">RU</span><span lang="ru">Русский</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-ru">
+                              <legend class="sr-only"><span class="language-code">RU</span><span lang="ru">Русский</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-name-ru-251"
+                                    ><span id="editor-name-ru-251-label">Titel<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-partner-language="ru" data-partner-field="name" required maxlength="500" id="editor-name-ru-251" lang="ru" aria-labelledby="editor-name-ru-251-label" /></label
+                                 ><label for="editor-alt-ru-252"
+                                    ><span id="editor-alt-ru-252-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-partner-language="ru"
+                                       data-partner-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-ru-252"
+                                       lang="ru"
+                                       aria-describedby="editor-alt-ru-252-help"
+                                       placeholder="Например: участники играют вместе на фестивале"
+                                       aria-labelledby="editor-alt-ru-252-label"
+                                    /><small class="field-hint" id="editor-alt-ru-252-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-ru-253" class="language-field-wide"
+                                    ><span id="editor-description-ru-253-label">Beschreibung</span><textarea data-partner-language="ru" data-partner-field="description" maxlength="1000" rows="3" id="editor-description-ru-253" lang="ru" aria-labelledby="editor-description-ru-253-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">EN</span><span lang="en">English</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-en">
+                              <legend class="sr-only"><span class="language-code">EN</span><span lang="en">English</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-name-en-254"
+                                    ><span id="editor-name-en-254-label">Name<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-partner-language="en" data-partner-field="name" required maxlength="500" id="editor-name-en-254" lang="en" aria-labelledby="editor-name-en-254-label" /></label
+                                 ><label for="editor-alt-en-255"
+                                    ><span id="editor-alt-en-255-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-partner-language="en"
+                                       data-partner-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-en-255"
+                                       lang="en"
+                                       aria-describedby="editor-alt-en-255-help"
+                                       placeholder="Example: participants playing together at the festival"
+                                       aria-labelledby="editor-alt-en-255-label"
+                                    /><small class="field-hint" id="editor-alt-en-255-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-en-256" class="language-field-wide"
+                                    ><span id="editor-description-en-256-label">Beschreibung</span><textarea data-partner-language="en" data-partner-field="description" maxlength="1000" rows="3" id="editor-description-en-256" lang="en" aria-labelledby="editor-description-en-256-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
+                        <details class="language-details">
+                           <summary>
+                              <span class="language-summary-title"><span class="language-code">DE</span><span lang="de">Deutsch</span> </span
+                              ><svg class="language-chevron" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                           </summary>
+                           <fieldset class="language-card language-de">
+                              <legend class="sr-only"><span class="language-code">DE</span><span lang="de">Deutsch</span></legend>
+                              <div class="language-fields">
+                                 <label for="editor-name-de-257"
+                                    ><span id="editor-name-de-257-label">Name<small class="required-mark">Pflichtfeld</small></span
+                                    ><input data-partner-language="de" data-partner-field="name" required maxlength="500" id="editor-name-de-257" lang="de" aria-labelledby="editor-name-de-257-label" /></label
+                                 ><label for="editor-alt-de-258"
+                                    ><span id="editor-alt-de-258-label">Bildbeschreibung<small class="required-mark">Pflichtfeld</small></span
+                                    ><input
+                                       data-partner-language="de"
+                                       data-partner-field="alt"
+                                       required
+                                       maxlength="500"
+                                       id="editor-alt-de-258"
+                                       lang="de"
+                                       aria-describedby="editor-alt-de-258-help"
+                                       placeholder="Zum Beispiel: Teilnehmende spielen gemeinsam beim Festival"
+                                       aria-labelledby="editor-alt-de-258-label"
+                                    /><small class="field-hint" id="editor-alt-de-258-help">Beschreibe kurz, was auf dem Bild zu sehen ist. Diese Beschreibung wird von Screenreadern vorgelesen.</small></label
+                                 ><label for="editor-description-de-259" class="language-field-wide"
+                                    ><span id="editor-description-de-259-label">Beschreibung</span><textarea data-partner-language="de" data-partner-field="description" maxlength="1000" rows="3" id="editor-description-de-259" lang="de" aria-labelledby="editor-description-de-259-label"></textarea>
+                                 </label>
+                              </div>
+                           </fieldset>
+                        </details>
                      </div>
                   </section>
-                  <div class="form-actions"><div class="action-copy"><strong>Partner fertig?</strong><span>Als Entwurf speichern oder veröffentlichen.</span></div><div class="action-buttons"><button class="button button-secondary" id="newPartner" type="button">Neuer Partner</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishPartner" type="button">Veröffentlichen</button><button class="button button-danger" id="archivePartner" type="button">Archivieren</button></div></div>
+                  <p class="publish-check"><strong>Vor dem Veröffentlichen:</strong> Alle drei Sprachversionen, Bildbeschreibungen und Links prüfen. Veröffentlichen macht den Inhalt öffentlich sichtbar.</p>
+                  <div class="form-actions">
+                     <div class="action-copy"><strong>Partner fertig?</strong><span>Entwurf speichern → Angaben prüfen → veröffentlichen.</span></div>
+                     <div class="action-buttons">
+                        <button class="button button-secondary" id="newPartner" type="button">Neuer Partner</button><button class="button button-primary" type="submit">Als Entwurf speichern</button><button class="button button-publish" id="publishPartner" type="button">Veröffentlichen</button
+                        ><button class="button button-danger" id="archivePartner" type="button">Archivieren</button>
+                     </div>
+                  </div>
                </form>
             </section>
          </section>
 
-         <dialog class="delete-dialog" id="deleteDialog" aria-labelledby="deleteDialogTitle">
+         <dialog class="delete-dialog" id="deleteDialog" aria-labelledby="deleteDialogTitle" aria-describedby="deleteDialogMessage">
             <form method="dialog" id="deleteDialogForm">
                <p class="eyebrow">SICHERHEITSCHECK</p>
                <h2 id="deleteDialogTitle">Inhalt entfernen?</h2>
                <p id="deleteDialogMessage">Diese Aktion kann nicht rückgängig gemacht werden.</p>
-               <label for="deleteConfirmation">Zur Bestätigung <strong>DELETE</strong> oder <strong>УДАЛИТЬ</strong> eingeben.</label>
-               <input id="deleteConfirmation" autocomplete="off" spellcheck="false" required />
+               <label for="deleteConfirmation" id="deleteConfirmation-label">Zur Bestätigung <small class="required-mark">Pflichtfeld</small><strong>DELETE</strong> oder <strong>УДАЛИТЬ</strong> eingeben.</label>
+               <input id="deleteConfirmation" autocomplete="off" spellcheck="false" required aria-describedby="deleteDialogMessage" aria-labelledby="deleteConfirmation-label" />
                <div class="delete-dialog-actions">
                   <button class="button button-secondary" id="cancelDelete" type="button">Abbrechen</button>
                   <button class="button button-danger" id="confirmDelete" type="submit" value="confirm" disabled>Entfernen</button>
@@ -652,12 +1626,39 @@
             </form>
          </dialog>
 
-         <footer class="admin-footer">
-            <span class="footer-brand">МИРоКИТ</span>
-            <span>Content Desk · interner Redaktionsbereich</span>
-         </footer>
+         <details class="glossary">
+            <summary>Begriffe kurz erklärt</summary>
+            <dl>
+               <div>
+                  <dt>Entwurf</dt>
+                  <dd>Gespeichert, aber noch nicht auf der Website sichtbar. Auch zum Speichern müssen die Pflichtfelder ausgefüllt sein.</dd>
+               </div>
+               <div>
+                  <dt>Veröffentlicht</dt>
+                  <dd>Der Inhalt ist für Besucherinnen und Besucher der Website sichtbar.</dd>
+               </div>
+               <div>
+                  <dt>Archiviert</dt>
+                  <dd>Der Inhalt wird nicht mehr öffentlich angezeigt.</dd>
+               </div>
+               <div>
+                  <dt>Slug</dt>
+                  <dd>Eine eindeutige Adresse, zum Beispiel sommerfest-2026. Nur Kleinbuchstaben, Zahlen und Bindestriche.</dd>
+               </div>
+               <div>
+                  <dt>Bildbeschreibung</dt>
+                  <dd>Ein kurzer Text zum Bild für Menschen, die das Bild nicht sehen können.</dd>
+               </div>
+               <div>
+                  <dt>Sortierung</dt>
+                  <dd>Die Reihenfolge auf der Website. Kleinere Werte erscheinen zuerst.</dd>
+               </div>
+            </dl>
+         </details>
+         <footer class="admin-footer"><span class="footer-brand" lang="ru">МИРоКИТ</span><span>Redaktion · Inhalte in RU, EN und DE</span></footer>
       </main>
 
+      <noscript><p class="noscript-note">Zum Bearbeiten der Inhalte muss JavaScript im Browser aktiviert sein.</p></noscript>
       <script src="admin.js" type="module"></script>
    </body>
 </html>

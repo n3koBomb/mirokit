@@ -1,4 +1,6 @@
 const ADMIN_ROUTES = [
+	[/^\/online-projects\/media$/, ["GET", "POST"]],
+	[/^\/online-projects\/media\/[^/]+$/, ["PATCH", "DELETE"]],
 	[/^\/(?:news|videos|partners|world-points)$/, ["GET", "POST"]],
 	[/^\/interviews\/videos$/, ["GET", "POST"]],
 	[/^\/interviews\/videos\/media$/, ["POST"]],

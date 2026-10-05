@@ -1,8 +1,32 @@
 import { createAdminMediaPreview } from "./media-preview.js";
+import { OnlineProjectMediaAdmin } from "./online-project-media.js";
 import {
   isOnlineProjectTopic,
   ONLINE_PROJECT_TOPICS,
 } from "../source/scripts/online-project-topics.js";
+
+// Associate actionable feedback with the control, including screen-reader text.
+function markFieldError(field, message) {
+  if (!field) return;
+  if (!field.id) field.id = `admin-field-${crypto.randomUUID()}`;
+  const id = `${field.id}-error`;
+  let error = document.getElementById(id);
+  if (!error) {
+    error = document.createElement("span");
+    error.id = id;
+    error.className = "field-error";
+    const host = field.closest("label, .field-slug") || field.parentElement;
+    host.append(error);
+  }
+  error.textContent = message;
+  field.setAttribute("aria-invalid", "true");
+  const descriptions = new Set((field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+  descriptions.add(id);
+  field.setAttribute("aria-describedby", [...descriptions].join(" "));
+  for (let ancestor = field.parentElement; ancestor; ancestor = ancestor.parentElement) {
+    if (ancestor instanceof HTMLDetailsElement) ancestor.open = true;
+  }
+}
 
 class AdminConfig {
   static languages = ["ru", "en", "de"];
@@ -67,7 +91,7 @@ class AdminNotice {
     const kind = error
       ? "error"
       : type || (String(message).includes("…") ? "info" : "success");
-    const toast = document.createElement("article");
+    const toast = document.createElement("div");
     toast.className = `admin-toast admin-toast-${kind}`;
     toast.setAttribute("role", kind === "error" ? "alert" : "status");
     const icon = document.createElement("span");
@@ -81,18 +105,11 @@ class AdminNotice {
     close.type = "button";
     close.setAttribute("aria-label", "Meldung schließen");
     close.textContent = "×";
-    const dismiss = () => {
-      toast.classList.add("is-leaving");
-      window.setTimeout(() => toast.remove(), 220);
-    };
+    const dismiss = () => toast.remove();
     close.addEventListener("click", dismiss);
     toast.append(icon, text, close);
-    this.element.append(toast);
-    window.requestAnimationFrame(() => toast.classList.add("is-visible"));
-    window.setTimeout(
-      dismiss,
-      kind === "error" ? 9000 : kind === "info" ? 6500 : 5000,
-    );
+    // Keep feedback readable until the next action or explicit dismissal.
+    this.element.replaceChildren(toast);
     if (error) this.focusErrorField(message);
   }
   focusErrorField(message) {
@@ -130,15 +147,14 @@ class AdminNotice {
       );
       const ids = fieldMatch
         ? AdminConfig.fieldIds[fieldMatch[1]] ||
-          AdminConfig.fieldIds[fieldMatch[1].toLowerCase()]
+        AdminConfig.fieldIds[fieldMatch[1].toLowerCase()]
         : [];
       field = this.visibleField(
         (ids || []).map((id) => document.getElementById(id)).filter(Boolean),
       );
     }
     if (!field) return;
-    field.setAttribute("aria-invalid", "true");
-    field.closest("label, fieldset")?.classList.add("has-error");
+    markFieldError(field, message);
     field.focus({ preventScroll: false });
   }
   visibleField(fields) {
@@ -221,8 +237,8 @@ class AdminServices {
     return status === "published"
       ? "Veröffentlicht"
       : status === "archived"
-      ? "Archiviert"
-      : "Entwurf";
+        ? "Archiviert"
+        : "Entwurf";
   }
   clearFieldError(event) {
     const field = event.target instanceof HTMLElement
@@ -231,6 +247,11 @@ class AdminServices {
     if (!field) return;
     field.removeAttribute("aria-invalid");
     field.closest("label, fieldset")?.classList.remove("has-error");
+    const id = `${field.id}-error`;
+    document.getElementById(id)?.remove();
+    const descriptions = (field.getAttribute("aria-describedby") || "").split(/\s+/).filter((value) => value && value !== id);
+    if (descriptions.length) field.setAttribute("aria-describedby", descriptions.join(" "));
+    else field.removeAttribute("aria-describedby");
   }
 }
 
@@ -276,6 +297,7 @@ class NewsAdmin {
       if (this.editingId) this.onDelete({ kind: "news", id: this.editingId });
     });
     this.imageFile.addEventListener("change", () => this.uploadImage());
+    document.getElementById("image").addEventListener("change", () => this.updateImagePreview());
   }
   field(language, name) {
     return this.s.field(this.form, language, name);
@@ -292,8 +314,10 @@ class NewsAdmin {
     this.currentStatus.textContent = "Entwurf";
     document.getElementById("archiveNews").hidden = true;
     this.s.showNotice("");
+    this.updateImagePreview();
   }
   populate(item) {
+    this.form.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
     this.editingId = item.id;
     this.idField.disabled = true;
     this.checkSlugButton.hidden = true;
@@ -317,6 +341,14 @@ class NewsAdmin {
     this.formHeading.textContent = item.id;
     this.currentStatus.textContent = this.s.statusLabel(item.status);
     document.getElementById("archiveNews").hidden = item.status === "archived";
+    this.updateImagePreview();
+  }
+  updateImagePreview() {
+    const value = document.getElementById("image").value.trim();
+    const figure = document.getElementById("newsImagePreview");
+    const image = document.getElementById("newsPreviewImage");
+    figure.hidden = !value;
+    this.s.setMediaPreview(image, "src", value);
   }
   payload() {
     const translations = {};
@@ -367,13 +399,14 @@ class NewsAdmin {
   }
   async publish() {
     try {
+      if (!this.form.reportValidity()) return;
       const item = await this.saveDraft();
       await this.s.api(
         `/api/v1/admin/news/${encodeURIComponent(item.id)}/publish`,
         { method: "POST" },
       );
       await this.load(item.id);
-      this.s.showNotice("News veröffentlicht.");
+      this.s.showNotice("Meldung veröffentlicht.");
     } catch (error) {
       this.s.showNotice(error.message, true);
     }
@@ -407,6 +440,7 @@ class NewsAdmin {
         body,
       });
       this.s.setValue("image", response.image);
+      this.updateImagePreview();
       this.s.showNotice(
         "Bild hochgeladen. Jetzt speichern oder veröffentlichen.",
       );
@@ -423,28 +457,21 @@ class NewsAdmin {
   }
   render() {
     if (!this.items.length) {
-      this.list.innerHTML = '<p class="muted">Noch keine News vorhanden.</p>';
+      this.list.innerHTML = '<p class="muted">Noch keine Meldungen vorhanden. Lege oben eine neue Meldung an.</p>';
       return;
     }
     this.list.innerHTML = this.items.map((item) =>
-      `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-news-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(item.translations?.de?.title || item.id)
-      }</strong><span>${
-        item.featured
-          ? `Hervorgehoben · Rang ${this.s.escapeHtml(item.featured)} · `
-          : ""
-      }${this.s.escapeHtml(item.status)} · ${
-        this.s.escapeHtml(item.publishedAt)
-      }</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" data-news-delete-id="${
-            this.s.escapeHtml(item.id)
-          }">Entfernen</button>`
-          : ""
+      `<article class="news-item${item.id === this.editingId ? " active" : ""
+      }"><button class="news-item-select" type="button" data-news-id="${this.s.escapeHtml(item.id)
+      }"><strong>${this.s.escapeHtml(item.translations?.de?.title || item.id)
+      }</strong><span>${item.featured
+        ? `Hervorgehoben · Rang ${this.s.escapeHtml(item.featured)} · `
+        : ""
+      }${this.s.escapeHtml(this.s.statusLabel(item.status))} · ${this.s.escapeHtml(item.publishedAt)
+      }</span></button>${item.status !== "archived"
+        ? `<button class="button button-danger button-remove" type="button" data-news-delete-id="${this.s.escapeHtml(item.id)
+        }">Entfernen</button>`
+        : ""
       }</article>`
     ).join("");
   }
@@ -573,7 +600,16 @@ class GalleryAdmin {
     ) document.getElementById(id).hidden = !isOnline;
     document.getElementById("galleryQuotesSection").hidden = isOnline;
     this.sourceFields.hidden = !isOnline;
+    this.sourceUrl.disabled = !isOnline;
+    this.thumbnailFile.disabled = isOnline;
+    this.thumbnailFile.closest(".gallery-thumbnail-field").hidden = isOnline;
+    document.getElementById("galleryUploadHeading").textContent = isOnline ? "Bilder auswählen" : "Bilder für den Ordner auswählen";
+    document.querySelector("#galleryUploadHeading + p").textContent = isOnline
+      ? "Dateien auswählen oder einen öffentlich freigegebenen Google-Drive-Bildlink einfügen."
+      : "Mehrere Bilder auswählen. Sie werden zunächst als Entwurf hochgeladen und unten im Ordner geprüft.";
     this.translationsSection.hidden = isOnline;
+    document.getElementById("onlinePhotoTranslations").hidden = !isOnline;
+    document.querySelectorAll("[data-online-photo-field]").forEach((field) => field.disabled = !isOnline);
     this.folderTranslations.hidden = isOnline;
     this.folderTranslations.querySelectorAll(
       "[data-gallery-folder-field=title]",
@@ -581,19 +617,24 @@ class GalleryAdmin {
       field.required = !isOnline;
     });
     this.folderSlug.required = !isOnline;
+    this.folderSlug.disabled = isOnline;
+    this.folderTarget.disabled = isOnline;
+    this.folderTranslations.querySelectorAll("[data-gallery-folder-field]").forEach((field) => field.disabled = isOnline);
+    if (isOnline) this.folderSlug.setCustomValidity("");
+    else this.updateFolderSlugStatus();
     this.sourceUrl.required = false;
     document.getElementById("galleryPanelEyebrow").textContent = isOnline
-      ? "10 THEMEN · BILDERBIBLIOTHEKEN"
+      ? "10 THEMEN · MEDIENBIBLIOTHEK"
       : "MEDIENARCHIV";
     document.getElementById("galleryPanelTitle").textContent = isOnline
       ? "Online-Projekte"
-      : "Gallery-Bilder";
+      : "Galerie-Bilder";
     document.getElementById("galleryIntroTitle").textContent = isOnline
       ? "So landet dein Bild im richtigen Thema"
       : "Bilder für die öffentliche Galerie";
     document.getElementById("galleryIntroText").textContent = isOnline
       ? "Hier verwaltest du die Bilder hinter den zehn Online-Projekte-Buttons. Jede Bibliothek sammelt die Arbeiten zu einem Thema."
-      : "Wähle ein Bild aus, ergänze die Texte und veröffentliche es in der Galerie.";
+      : "Bilder auswählen, Ordner benennen und als Entwurf hochladen. Anschließend den Ordner unten prüfen und veröffentlichen.";
     document.getElementById("adminViewGallery").setAttribute(
       "aria-labelledby",
       isOnline ? "onlineProjectsTab" : "galleryTab",
@@ -605,9 +646,8 @@ class GalleryAdmin {
     const topic = ONLINE_PROJECT_TOPICS.find((item) =>
       item.id === this.topic.value
     );
-    this.libraryLink.href = `/page/onlineProjects/index.html?lang=de${
-      topic ? `&topic=${topic.id}` : ""
-    }`;
+    this.libraryLink.href = `/page/onlineProjects/index.html?lang=de${topic ? `&topic=${topic.id}` : ""
+      }`;
     this.publishButton.textContent =
       this.collection.value === "online-projects" && topic
         ? `In „${topic.label}“ veröffentlichen`
@@ -638,16 +678,18 @@ class GalleryAdmin {
             ? "Dieser Slug wird bereits verwendet. Wähle den vorhandenen Ordner zum Ergänzen."
             : "")),
     );
-    this.folderSlugStatus.textContent = !valid
-      ? "Slug prüfen: Kleinbuchstaben, Zahlen und Bindestriche verwenden."
-      : append
-      ? "Vorhandener Ordner: Neue Bilder werden hinten angefügt."
-      : used
-      ? "Dieser Slug ist bereits vergeben."
-      : "Slug ist frei für einen neuen Ordner.";
-    this.folderSlugStatus.className = `muted ${
-      this.folderSlug.checkValidity() ? "is-valid" : "is-invalid"
-    }`;
+    this.folderSlugStatus.textContent = !slug
+      ? "Eine Adresse mit Kleinbuchstaben, Zahlen und Bindestrichen eingeben."
+      : !valid
+        ? "Slug prüfen: Kleinbuchstaben, Zahlen und Bindestriche verwenden."
+        : append
+          ? "Vorhandener Ordner: Neue Bilder werden hinten angefügt."
+          : used
+            ? "Dieser Slug ist bereits vergeben."
+            : "Slug ist frei für einen neuen Ordner.";
+    // Checking the status must not trigger the form's invalid-event feedback.
+    this.folderSlugStatus.className = !slug ? "muted" : `muted ${this.folderSlug.validity.valid ? "is-valid" : "is-invalid"
+      }`;
   }
   syncFolderTarget() {
     const append = this.folderTarget.value !== "new";
@@ -681,14 +723,11 @@ class GalleryAdmin {
       }
     });
     this.folderTarget.innerHTML =
-      `<option value="new">Neuen Ordner anlegen</option>${
-        [...folders.entries()].map(([slug, title]) =>
-          `<option value="${
-            this.s.escapeHtml(slug)
-          }">Bestehenden Ordner ergänzen: ${this.s.escapeHtml(title)} (${
-            this.s.escapeHtml(slug)
-          })</option>`
-        ).join("")
+      `<option value="new">Neuen Ordner anlegen</option>${[...folders.entries()].map(([slug, title]) =>
+        `<option value="${this.s.escapeHtml(slug)
+        }">Bestehenden Ordner ergänzen: ${this.s.escapeHtml(title)} (${this.s.escapeHtml(slug)
+        })</option>`
+      ).join("")
       }`;
     this.folderTarget.value = folders.has(selected) || selected === "new"
       ? selected
@@ -709,16 +748,13 @@ class GalleryAdmin {
       image.src = previewUrl;
       image.alt = file.name;
       const copy = document.createElement("div");
-      copy.innerHTML = `<strong>${this.s.escapeHtml(file.name)}</strong><span>${
-        (file.size / 1024 / 1024).toFixed(2)
-      } MB · Bild ${index + 1}</span>`;
+      copy.innerHTML = `<strong>${this.s.escapeHtml(file.name)}</strong><span>${(file.size / 1024 / 1024).toFixed(2)
+        } MB · Bild ${index + 1}</span>`;
       const actions = document.createElement("div");
       actions.className = "gallery-selected-file-actions";
       actions.innerHTML =
-        `<button class="button button-small" type="button" data-gallery-selected-move="up" data-gallery-selected-index="${index}"${
-          index === 0 ? " disabled" : ""
-        }>↑</button><button class="button button-small" type="button" data-gallery-selected-move="down" data-gallery-selected-index="${index}"${
-          index === this.selectedFiles.length - 1 ? " disabled" : ""
+        `<button class="button button-small" type="button" aria-label="Ausgewähltes Bild nach oben verschieben" data-gallery-selected-move="up" data-gallery-selected-index="${index}"${index === 0 ? " disabled" : ""
+        }>↑</button><button class="button button-small" type="button" aria-label="Ausgewähltes Bild nach unten verschieben" data-gallery-selected-move="down" data-gallery-selected-index="${index}"${index === this.selectedFiles.length - 1 ? " disabled" : ""
         }>↓</button><button class="button button-small button-danger" type="button" data-gallery-selected-remove="${index}">Entfernen</button>`;
       card.append(image, copy, actions);
       this.selectedFilesList.append(card);
@@ -792,8 +828,7 @@ class GalleryAdmin {
       });
     this.quoteFolder.innerHTML = '<option value="">Ordner auswählen</option>' +
       [...folders.entries()].map(([slug, title]) =>
-        `<option value="${this.s.escapeHtml(slug)}">${
-          this.s.escapeHtml(title)
+        `<option value="${this.s.escapeHtml(slug)}">${this.s.escapeHtml(title)
         }</option>`
       ).join("");
     if (folders.has(selected)) this.quoteFolder.value = selected;
@@ -813,11 +848,10 @@ class GalleryAdmin {
         : item.topic === selectedTopic)
     );
     if (!visibleItems.length) {
-      this.list.innerHTML = `<p class="muted">${
-        isOnline
+      this.list.innerHTML = `<p class="muted">${isOnline
           ? "In dieser Auswahl gibt es noch keine Bilder. Wähle oben ein Thema und veröffentliche das erste Bild."
-          : "Noch keine Gallery-Bilder vorhanden."
-      }</p>`;
+          : "Noch keine Galerie-Bilder vorhanden. Wähle oben Bilder und einen Ordner aus."
+        }</p>`;
       return;
     }
     if (!isOnline) {
@@ -828,17 +862,17 @@ class GalleryAdmin {
           folders.set(slug, {
             slug,
             title: item.folderTitleTranslations ||
-              {
-                ru: item.folderTitle || "Gallery",
-                en: item.folderTitle || "Gallery",
-                de: item.folderTitle || "Gallery",
-              },
+            {
+              ru: item.folderTitle || "Gallery",
+              en: item.folderTitle || "Gallery",
+              de: item.folderTitle || "Gallery",
+            },
             subtitle: item.folderSubtitleTranslations ||
-              {
-                ru: item.folderSubtitle || "",
-                en: item.folderSubtitle || "",
-                de: item.folderSubtitle || "",
-              },
+            {
+              ru: item.folderSubtitle || "",
+              en: item.folderSubtitle || "",
+              de: item.folderSubtitle || "",
+            },
             items: [],
           });
         }
@@ -857,13 +891,10 @@ class GalleryAdmin {
           const folder = folders.get(slug);
           const title = folder?.title?.de || folder?.title?.en ||
             folder?.title?.ru || "Gallery";
-          return `<div class="gallery-publish-batch"><div><strong>Pending: ${
-            this.s.escapeHtml(title)
-          }</strong><span>${keys.length} Bild${
-            keys.length === 1 ? "" : "er"
-          } warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${
-            this.s.escapeHtml(JSON.stringify(keys))
-          }">Ordner veröffentlichen</button></div>`;
+          return `<div class="gallery-publish-batch"><div><strong>Entwurf: ${this.s.escapeHtml(title)
+            }</strong><span>${keys.length} Bild${keys.length === 1 ? "" : "er"
+            } warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${this.s.escapeHtml(JSON.stringify(keys))
+            }">Ordner veröffentlichen</button></div>`;
         },
       ).join("");
       const folderPackages = [...folders.values()].map((folder) => {
@@ -871,66 +902,43 @@ class GalleryAdmin {
           folder.items[0];
         const folderKeys = JSON.stringify(folder.items.map((item) => item.key));
         const folderEditor =
-          `<details class="gallery-folder-editor"><summary>Ordner bearbeiten</summary><div class="gallery-folder-edit-grid">${
-            AdminConfig.languages.map((language) =>
-              `<label>${language.toUpperCase()} Überschrift<input data-gallery-folder-edit-field="title" data-gallery-folder-edit-language="${language}" value="${
-                this.s.escapeHtml(folder.title?.[language] || "")
-              }" maxlength="120" /></label><label>${language.toUpperCase()} Titel<input data-gallery-folder-edit-field="subtitle" data-gallery-folder-edit-language="${language}" value="${
-                this.s.escapeHtml(folder.subtitle?.[language] || "")
-              }" maxlength="500" /></label>`
-            ).join("")
-          }<button class="button button-primary button-small" type="button" data-gallery-save-folder-keys="${
-            this.s.escapeHtml(folderKeys)
+          `<details class="gallery-folder-editor"><summary>Ordner bearbeiten</summary><div class="gallery-folder-edit-grid">${AdminConfig.languages.map((language) =>
+            `<label>${language.toUpperCase()} Überschrift<input data-gallery-folder-edit-field="title" data-gallery-folder-edit-language="${language}" value="${this.s.escapeHtml(folder.title?.[language] || "")
+            }" maxlength="120" /></label><label>${language.toUpperCase()} Titel<input data-gallery-folder-edit-field="subtitle" data-gallery-folder-edit-language="${language}" value="${this.s.escapeHtml(folder.subtitle?.[language] || "")
+            }" maxlength="500" /></label>`
+          ).join("")
+          }<button class="button button-primary button-small" type="button" data-gallery-save-folder-keys="${this.s.escapeHtml(folderKeys)
           }">Ordner speichern</button></div></details>`;
         const items = folder.items.map((item) => {
           const alt = item.alt?.de || item.alt?.en || item.alt?.ru || "";
-          return `<article class="gallery-admin-item" data-gallery-item-card="${
-            this.s.escapeHtml(item.key)
-          }"><img loading="lazy" data-media-url="${
-            this.s.escapeHtml(item.image)
-          }" alt="${
-            this.s.escapeHtml(alt)
-          }" /><div class="gallery-admin-copy"><strong>${
-            this.s.escapeHtml(item.fileName || "Bild")
-          }</strong><span class="gallery-image-order">Position ${
-            item.sortOrder + 1
-          } · ${item.status === "pending" ? "Entwurf · " : ""}${
-            item.featured ? "Hervorgehoben · " : ""
-          }${
-            this.s.escapeHtml(item.status)
-          }</span><details class="gallery-item-editor"><summary>Bildoptionen</summary><div class="gallery-item-edit-grid"><label class="feature-toggle"><input type="checkbox" data-gallery-edit-featured ${
-            item.featured ? "checked" : ""
-          } /><span>Hervorgehoben</span></label><button class="button button-primary button-small" type="button" data-gallery-save-key="${
-            this.s.escapeHtml(item.key)
-          }">Änderungen speichern</button></div></details><div class="gallery-item-actions"><button class="button button-small" type="button" data-gallery-move="up" ${
-            item === folder.items[0] ? "disabled" : ""
-          }>↑</button><button class="button button-small" type="button" data-gallery-move="down" ${
-            item === folder.items[folder.items.length - 1] ? "disabled" : ""
-          }>↓</button>${
-            item.folderThumbnail
+          return `<article class="gallery-admin-item" data-gallery-item-card="${this.s.escapeHtml(item.key)
+            }"><img loading="lazy" data-media-url="${this.s.escapeHtml(item.image)
+            }" alt="${this.s.escapeHtml(alt)
+            }" /><div class="gallery-admin-copy"><strong>${this.s.escapeHtml(item.fileName || "Bild")
+            }</strong><span class="gallery-image-order">Position ${item.sortOrder + 1
+            } · ${""}${item.featured ? "Hervorgehoben · " : ""
+            }${this.s.escapeHtml(this.s.statusLabel(item.status))
+            }</span><details class="gallery-item-editor"><summary>Bildoptionen</summary><div class="gallery-item-edit-grid"><label class="feature-toggle"><input type="checkbox" data-gallery-edit-featured ${item.featured ? "checked" : ""
+            } /><span>Hervorgehoben</span></label><button class="button button-primary button-small" type="button" data-gallery-save-key="${this.s.escapeHtml(item.key)
+            }">Änderungen speichern</button></div></details><div class="gallery-item-actions"><button class="button button-small" type="button" aria-label="Bild nach oben verschieben" data-gallery-move="up" ${item === folder.items[0] ? "disabled" : ""
+            }>↑</button><button class="button button-small" type="button" aria-label="Bild nach unten verschieben" data-gallery-move="down" ${item === folder.items[folder.items.length - 1] ? "disabled" : ""
+            }>↓</button>${item.folderThumbnail
               ? '<span class="gallery-thumbnail-badge">Ordner-Thumbnail</span>'
-              : `<button class="button button-small" type="button" data-gallery-thumbnail-key="${
-                this.s.escapeHtml(item.key)
+              : `<button class="button button-small" type="button" data-gallery-thumbnail-key="${this.s.escapeHtml(item.key)
               }">Als Thumbnail verwenden</button>`
-          }<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${
-            this.s.escapeHtml(item.key)
-          }">Bild löschen</button></div></div></article>`;
+            }<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${this.s.escapeHtml(item.key)
+            }">Bild löschen</button></div></div></article>`;
         }).join("");
         const folderTitle = folder.title?.de || folder.title?.en ||
           folder.title?.ru || "Gallery";
         const folderSubtitle = folder.subtitle?.de || folder.subtitle?.en ||
           folder.subtitle?.ru || "";
-        return `<details class="gallery-admin-folder"><summary><span class="gallery-folder-preview"><img loading="lazy" data-media-url="${
-          this.s.escapeHtml(thumbnail?.image || "")
-        }" alt="" /></span><span><strong>${
-          this.s.escapeHtml(folderTitle)
-        }</strong><small>${
-          this.s.escapeHtml(folderSubtitle || "Ordner ohne Kurzbeschreibung")
-        }</small><small>${folder.items.length} Bild${
-          folder.items.length === 1 ? "" : "er"
-        } · Paket öffnen</small></span></summary>${folderEditor}<div class="gallery-folder-order-actions"><span class="muted">Reihenfolge der Bilder</span><button class="button button-primary button-small" type="button" data-gallery-save-order="${
-          this.s.escapeHtml(folder.slug)
-        }">Reihenfolge speichern</button></div><div class="gallery-folder-package">${items}</div></details>`;
+        return `<details class="gallery-admin-folder"><summary><span class="gallery-folder-preview"><img loading="lazy" data-media-url="${this.s.escapeHtml(thumbnail?.image || "")
+          }" alt="" /></span><span><strong>${this.s.escapeHtml(folderTitle)
+          }</strong><small>${this.s.escapeHtml(folderSubtitle || "Ordner ohne Kurzbeschreibung")
+          }</small><small>${folder.items.length} Bild${folder.items.length === 1 ? "" : "er"
+          } · Paket öffnen</small></span></summary>${folderEditor}<div class="gallery-folder-order-actions"><span class="muted">Reihenfolge der Bilder</span><button class="button button-primary button-small" type="button" data-gallery-save-order="${this.s.escapeHtml(folder.slug)
+          }">Reihenfolge speichern</button></div><div class="gallery-folder-package">${items}</div></details>`;
       }).join("");
       this.list.innerHTML = publishFolders + folderPackages;
       this.list.querySelectorAll("img[data-media-url]").forEach((element) =>
@@ -954,12 +962,9 @@ class GalleryAdmin {
       );
     }
     const publishFolders = [...pendingFolders.values()].map((folder) =>
-      `<div class="gallery-publish-batch"><div><strong>Pending: ${
-        this.s.escapeHtml(folder.title)
-      }</strong><span>${folder.keys.length} Bild${
-        folder.keys.length === 1 ? "" : "er"
-      } warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${
-        this.s.escapeHtml(JSON.stringify(folder.keys))
+      `<div class="gallery-publish-batch"><div><strong>Entwurf: ${this.s.escapeHtml(folder.title)
+      }</strong><span>${folder.keys.length} Bild${folder.keys.length === 1 ? "" : "er"
+      } warten auf Veröffentlichung.</span></div><button class="button button-primary button-small" type="button" data-gallery-publish-keys="${this.s.escapeHtml(JSON.stringify(folder.keys))
       }">Ordner veröffentlichen</button></div>`
     ).join("");
     this.list.innerHTML = publishFolders + visibleItems.map((item, index) => {
@@ -973,33 +978,22 @@ class GalleryAdmin {
         topic.id === item.topic
       )?.label || "Noch ohne Thema";
       const topicEditor = isOnline
-        ? `<div class="gallery-topic-edit"><label for="galleryItemTopic${index}">Thema ändern</label><select id="galleryItemTopic${index}" data-gallery-item-topic><option value="">Bitte zuordnen</option>${
-          ONLINE_PROJECT_TOPICS.map((topic) =>
-            `<option value="${topic.id}"${
-              topic.id === item.topic ? " selected" : ""
-            }>${this.s.escapeHtml(topic.label)}</option>`
-          ).join("")
-        }</select><button class="button button-small" type="button" data-gallery-topic-key="${
-          this.s.escapeHtml(item.key)
+        ? `<div class="gallery-topic-edit"><label for="galleryItemTopic${index}">Thema ändern</label><select id="galleryItemTopic${index}" data-gallery-item-topic><option value="">Bitte zuordnen</option>${ONLINE_PROJECT_TOPICS.map((topic) =>
+          `<option value="${topic.id}"${topic.id === item.topic ? " selected" : ""
+          }>${this.s.escapeHtml(topic.label)}</option>`
+        ).join("")
+        }</select><button class="button button-small" type="button" data-gallery-topic-key="${this.s.escapeHtml(item.key)
         }">Thema speichern</button></div>`
         : "";
-      return `<article class="gallery-admin-item"><img loading="lazy" data-media-url="${
-        this.s.escapeHtml(item.image)
-      }" alt="${
-        this.s.escapeHtml(alt)
-      }" /><div class="gallery-admin-copy"><strong>${
-        this.s.escapeHtml(title)
-      }</strong><span class="gallery-folder-label">${
-        this.s.escapeHtml(folderTitle)
-      }</span>${
-        subtitle ? `<span>${this.s.escapeHtml(subtitle)}</span>` : ""
-      }<span>${isOnline ? `${this.s.escapeHtml(topicName)} · ` : ""}${
-        item.sourceType === "drive" ? "Google Drive · " : ""
-      }${item.featured ? "Hervorgehoben · " : ""}${
-        this.s.escapeHtml(item.status)
-      }</span>${topicEditor}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${
-        this.s.escapeHtml(item.key)
-      }">Bild löschen</button></div></article>`;
+      return `<article class="gallery-admin-item"><img loading="lazy" data-media-url="${this.s.escapeHtml(item.image)
+        }" alt="${this.s.escapeHtml(alt)
+        }" /><div class="gallery-admin-copy"><strong>${this.s.escapeHtml(title)
+        }</strong><span class="gallery-folder-label">${this.s.escapeHtml(folderTitle)
+        }</span>${subtitle ? `<span>${this.s.escapeHtml(subtitle)}</span>` : ""
+        }<span>${isOnline ? `${this.s.escapeHtml(topicName)} · ` : ""}${item.sourceType === "drive" ? "Google Drive · " : ""
+        }${item.featured ? "Hervorgehoben · " : ""}${this.s.escapeHtml(this.s.statusLabel(item.status))
+        }</span>${topicEditor}<button class="button button-danger button-remove" type="button" data-gallery-delete-key="${this.s.escapeHtml(item.key)
+        }">Bild löschen</button></div></article>`;
     }).join("");
     this.list.querySelectorAll("img[data-media-url]").forEach((element) =>
       this.s.setMediaPreview(element, "src", element.dataset.mediaUrl)
@@ -1008,7 +1002,7 @@ class GalleryAdmin {
   renderQuoteList() {
     if (!this.quotes.length) {
       this.quoteList.innerHTML =
-        '<p class="muted">Noch keine Gallery-Zitate vorhanden.</p>';
+        '<p class="muted">Noch keine Zitate vorhanden. Wähle einen Ordner und ergänze das Zitat in drei Sprachen.</p>';
       return;
     }
     this.quoteList.innerHTML = this.quotes.map((item) => {
@@ -1018,17 +1012,12 @@ class GalleryAdmin {
       const folder = this.items.find((galleryItem) =>
         (galleryItem.folderSlug || "uncategorized") === item.folderSlug
       )?.folderTitle || item.folderSlug || "Nicht zugewiesen";
-      return `<article class="gallery-quote-admin-item"><div><strong>„${
-        this.s.escapeHtml(quote)
-      }“</strong><span class="gallery-folder-label">${
-        this.s.escapeHtml(folder)
-      }</span>${
-        byline ? `<span>${this.s.escapeHtml(byline)}</span>` : ""
-      }<span>${
-        this.s.escapeHtml(item.status)
-      }</span></div><button class="button button-danger button-remove" type="button" data-quote-delete-id="${
-        this.s.escapeHtml(item.id)
-      }">Zitat entfernen</button></article>`;
+      return `<article class="gallery-quote-admin-item"><div><strong>„${this.s.escapeHtml(quote)
+        }“</strong><span class="gallery-folder-label">${this.s.escapeHtml(folder)
+        }</span>${byline ? `<span>${this.s.escapeHtml(byline)}</span>` : ""
+        }<span>${this.s.escapeHtml(this.s.statusLabel(item.status))
+        }</span></div><button class="button button-danger button-remove" type="button" data-quote-delete-id="${this.s.escapeHtml(item.id)
+        }">Zitat entfernen</button></article>`;
     }).join("");
   }
   async handleListClick(event) {
@@ -1043,9 +1032,8 @@ class GalleryAdmin {
         });
         await this.load();
         this.s.showNotice(
-          `${keys.length} Bild${
-            keys.length === 1 ? "" : "er"
-          } veröffentlicht und dem R2-Ordner zugeordnet.`,
+          `${keys.length} Bild${keys.length === 1 ? "" : "er"
+          }. Der Ordner ist jetzt öffentlich sichtbar.`,
         );
       } catch (error) {
         this.s.showNotice(error.message, true);
@@ -1135,8 +1123,7 @@ class GalleryAdmin {
       saveImage.disabled = true;
       try {
         await this.s.api(
-          `/api/v1/admin/gallery/${
-            encodeURIComponent(saveImage.dataset.gallerySaveKey)
+          `/api/v1/admin/gallery/${encodeURIComponent(saveImage.dataset.gallerySaveKey)
           }`,
           {
             method: "PATCH",
@@ -1163,8 +1150,7 @@ class GalleryAdmin {
       thumbnailButton.disabled = true;
       try {
         await this.s.api(
-          `/api/v1/admin/gallery/${
-            encodeURIComponent(thumbnailButton.dataset.galleryThumbnailKey)
+          `/api/v1/admin/gallery/${encodeURIComponent(thumbnailButton.dataset.galleryThumbnailKey)
           }`,
           { method: "PATCH", body: JSON.stringify({ folderThumbnail: true }) },
         );
@@ -1190,8 +1176,7 @@ class GalleryAdmin {
       saveTopic.disabled = true;
       try {
         await this.s.api(
-          `/api/v1/admin/gallery/${
-            encodeURIComponent(saveTopic.dataset.galleryTopicKey)
+          `/api/v1/admin/gallery/${encodeURIComponent(saveTopic.dataset.galleryTopicKey)
           }`,
           { method: "PATCH", body: JSON.stringify({ topic: select.value }) },
         );
@@ -1218,8 +1203,8 @@ class GalleryAdmin {
     event.preventDefault();
     if (this.publishButton.disabled || !this.form.reportValidity()) return;
     const files = [...this.selectedFiles];
-    const thumbnail = this.thumbnailFile.files?.[0];
-    const sourceUrl = this.sourceUrl.value.trim();
+    const thumbnail = this.collection.value === "gallery" ? this.thumbnailFile.files?.[0] : null;
+    const sourceUrl = this.collection.value === "online-projects" ? this.sourceUrl.value.trim() : "";
     if (!files.length && !sourceUrl) {
       this.s.showNotice(
         "Bitte mindestens ein Bild oder eine Google-Drive-URL angeben.",
@@ -1257,7 +1242,10 @@ class GalleryAdmin {
     const collection = this.collection.value;
     const topic = this.topic.value;
     body.append("collection", collection);
-    if (collection === "online-projects") body.append("topic", topic);
+    if (collection === "online-projects") {
+      body.append("topic", topic);
+      document.querySelectorAll("[data-online-photo-field]").forEach((field) => body.append(`${field.dataset.onlinePhotoField}_${field.dataset.onlinePhotoLanguage}`, field.value.trim()));
+    }
     if (collection === "gallery") {
       body.append(
         "folder_mode",
@@ -1283,8 +1271,7 @@ class GalleryAdmin {
       this.s.showNotice(
         collection === "online-projects"
           ? "Bild wird hochgeladen und veröffentlicht …"
-          : `${files.length} Bild${
-            files.length === 1 ? "" : "er"
+          : `${files.length} Bild${files.length === 1 ? "" : "er"
           } werden als Entwurf hochgeladen …`,
       );
       await this.s.api("/api/v1/admin/gallery", { method: "POST", body });
@@ -1312,7 +1299,7 @@ class GalleryAdmin {
       this.s.showNotice(
         collection === "online-projects"
           ? "Bild veröffentlicht. Über „Bibliothek öffnen“ kannst du es im gewählten Thema ansehen."
-          : "Bilder stehen jetzt in Pending. Veröffentliche sie unten gesammelt in den gewählten Ordner.",
+          : "Bilder als Entwurf hochgeladen. Öffne den Ordner unten, prüfe die Bilder und wähle „Ordner veröffentlichen“.",
       );
     } catch (error) {
       this.s.showNotice(error.message, true);
@@ -1334,7 +1321,7 @@ class GalleryAdmin {
       };
     }
     try {
-      this.s.showNotice("Gallery-Zitat wird veröffentlicht …");
+      this.s.showNotice("Zitat wird veröffentlicht …");
       await this.s.api("/api/v1/admin/gallery/quotes", {
         method: "POST",
         body: JSON.stringify({
@@ -1344,7 +1331,7 @@ class GalleryAdmin {
       });
       this.quoteForm.reset();
       await this.load();
-      this.s.showNotice("Gallery-Zitat veröffentlicht.");
+      this.s.showNotice("Zitat veröffentlicht.");
     } catch (error) {
       this.s.showNotice(error.message, true);
     }
@@ -1396,13 +1383,14 @@ class WorldPointsAdmin {
     this.form.reset();
     document.getElementById("worldPointId").disabled = false;
     document.getElementById("worldPointHeading").textContent =
-      "Neuer World Point";
+      "Neuer Standort";
     document.getElementById("worldPointStatus").textContent = "Entwurf";
     document.getElementById("archiveWorldPoint").hidden = true;
     document.getElementById("worldPointKind").value = "planned";
     document.getElementById("worldSortOrder").value = "0";
   }
   populate(item) {
+    this.form.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
     this.editingId = item.id;
     const id = document.getElementById("worldPointId");
     id.value = item.id;
@@ -1459,7 +1447,7 @@ class WorldPointsAdmin {
       );
       this.editingId = response.point.id;
       await this.load(this.editingId);
-      this.s.showNotice("World Point als Entwurf gespeichert.");
+      this.s.showNotice("Standort als Entwurf gespeichert.");
     } catch (error) {
       this.s.showNotice(error.message, true);
     }
@@ -1478,13 +1466,12 @@ class WorldPointsAdmin {
       );
       this.editingId = response.point.id;
       await this.s.api(
-        `/api/v1/admin/world-points/${
-          encodeURIComponent(this.editingId)
+        `/api/v1/admin/world-points/${encodeURIComponent(this.editingId)
         }/publish`,
         { method: "POST" },
       );
       await this.load(this.editingId);
-      this.s.showNotice("World Point veröffentlicht.");
+      this.s.showNotice("Standort veröffentlicht.");
     } catch (error) {
       this.s.showNotice(error.message, true);
     }
@@ -1499,27 +1486,21 @@ class WorldPointsAdmin {
   render() {
     if (!this.items.length) {
       this.list.innerHTML =
-        '<p class="muted">Noch keine World Points vorhanden.</p>';
+        '<p class="muted">Noch keine Standorte vorhanden. Lege unten einen neuen Standort an.</p>';
       return;
     }
     this.list.innerHTML = this.items.map((item) => {
       const translation = item.translations?.de || item.translations?.en ||
         item.translations?.ru || {};
-      return `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-world-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(translation.city || item.id)
-      }</strong><span>${this.s.escapeHtml(translation.country || "")} · ${
-        this.s.escapeHtml(item.pointStatus)
-      } · ${this.s.escapeHtml(item.status)}</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" data-world-delete-id="${
-            this.s.escapeHtml(item.id)
+      return `<article class="news-item${item.id === this.editingId ? " active" : ""
+        }"><button class="news-item-select" type="button" data-world-id="${this.s.escapeHtml(item.id)
+        }"><strong>${this.s.escapeHtml(translation.city || item.id)
+        }</strong><span>${this.s.escapeHtml(translation.country || "")} · ${this.s.escapeHtml(item.pointStatus)
+        } · ${this.s.escapeHtml(this.s.statusLabel(item.status))}</span></button>${item.status !== "archived"
+          ? `<button class="button button-danger button-remove" type="button" data-world-delete-id="${this.s.escapeHtml(item.id)
           }">Archivieren</button>`
           : ""
-      }</article>`;
+        }</article>`;
     }).join("");
   }
   handleListClick(event) {
@@ -1583,6 +1564,7 @@ class PartnersAdmin {
     document.getElementById("partnerSortOrder").value = "0";
   }
   populate(item) {
+    this.form.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
     this.editingId = item.id;
     const id = document.getElementById("partnerId");
     id.value = item.id;
@@ -1704,21 +1686,15 @@ class PartnersAdmin {
     this.list.innerHTML = this.items.map((item) => {
       const translation = item.translations?.de || item.translations?.en ||
         item.translations?.ru || {};
-      return `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-partner-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(translation.name || item.id)
-      }</strong><span>${this.s.escapeHtml(item.category)} · ${
-        item.featured ? "Hervorgehoben · " : ""
-      }${this.s.escapeHtml(item.status)}</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" data-partner-delete-id="${
-            this.s.escapeHtml(item.id)
+      return `<article class="news-item${item.id === this.editingId ? " active" : ""
+        }"><button class="news-item-select" type="button" data-partner-id="${this.s.escapeHtml(item.id)
+        }"><strong>${this.s.escapeHtml(translation.name || item.id)
+        }</strong><span>${this.s.escapeHtml(item.category)} · ${item.featured ? "Hervorgehoben · " : ""
+        }${this.s.escapeHtml(this.s.statusLabel(item.status))}</span></button>${item.status !== "archived"
+          ? `<button class="button button-danger button-remove" type="button" data-partner-delete-id="${this.s.escapeHtml(item.id)
           }">Archivieren</button>`
           : ""
-      }</article>`;
+        }</article>`;
     }).join("");
   }
   handleListClick(event) {
@@ -1844,14 +1820,14 @@ class VideoAdmin {
       ? "Neues Interview"
       : "Neues Video";
     document.querySelector("#videoForm .eyebrow").textContent = interviews
-      ? "INTERVIEW VIDEO EDITOR"
-      : "VIDEO EDITOR";
+      ? "INTERVIEW BEARBEITEN"
+      : "VIDEO BEARBEITEN";
     document.querySelector("#videoForm .action-copy strong").textContent =
       interviews ? "Interview fertig?" : "Video fertig?";
     document.querySelector("#videoForm .action-copy span").textContent =
       interviews
-        ? "Als Interview-Entwurf speichern oder veröffentlichen."
-        : "Als Entwurf speichern oder veröffentlichen.";
+        ? "Interview-Entwurf speichern → Angaben prüfen → veröffentlichen."
+        : "Entwurf speichern → Angaben prüfen → veröffentlichen.";
   }
   apiPath(id = "") {
     const base = this.scope === "interviews"
@@ -1897,9 +1873,8 @@ class VideoAdmin {
     const hours = Math.floor(total / 3600);
     const minutes = Math.floor((total % 3600) / 60);
     const seconds = (total % 60).toFixed(3).padStart(6, "0");
-    return `${String(hours).padStart(2, "0")}:${
-      String(minutes).padStart(2, "0")
-    }:${seconds}`;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")
+      }:${seconds}`;
   }
   parseCues(content) {
     const lines = String(content || "").replace(/^\uFEFF/, "").split(/\r?\n/);
@@ -1922,13 +1897,11 @@ class VideoAdmin {
     return cues;
   }
   serializeCues(cues) {
-    return `WEBVTT\n\n${
-      cues.map((cue) =>
-        `${this.formatTime(cue.start)} --> ${
-          this.formatTime(Math.max(cue.end, cue.start + 0.1))
-        }\n${cue.text || ""}`
-      ).join("\n\n")
-    }\n`;
+    return `WEBVTT\n\n${cues.map((cue) =>
+      `${this.formatTime(cue.start)} --> ${this.formatTime(Math.max(cue.end, cue.start + 0.1))
+      }\n${cue.text || ""}`
+    ).join("\n\n")
+      }\n`;
   }
   syncSubtitleRows() {
     this.subtitleRows.querySelectorAll("[data-video-subtitle-index]").forEach(
@@ -1987,22 +1960,17 @@ class VideoAdmin {
     }
     this.cueEditor.hidden = false;
     this.cueEditor.innerHTML =
-      `<div class="video-cue-editor-head"><strong>Cues bearbeiten · ${
-        this.s.escapeHtml(
-          this.subtitleState[this.activeSubtitleIndex].label || "Untertitel",
-        )
-      }</strong><button class="button button-small" type="button" data-video-add-cue>＋ Cue</button></div>${
-        this.cueState.length
-          ? this.cueState.map((cue, index) =>
-            `<div class="video-cue-row" data-video-cue-index="${index}"><label><span>Start</span><input data-video-cue-field="start" value="${
-              this.s.escapeHtml(this.formatTime(cue.start))
-            }" /></label><button class="button button-small" type="button" data-video-cue-now="start" data-video-cue-index="${index}">aktuell</button><label><span>Ende</span><input data-video-cue-field="end" value="${
-              this.s.escapeHtml(this.formatTime(cue.end))
-            }" /></label><button class="button button-small" type="button" data-video-cue-now="end" data-video-cue-index="${index}">aktuell</button><label class="video-cue-text"><span>Text</span><textarea data-video-cue-field="text" rows="2">${
-              this.s.escapeHtml(cue.text)
-            }</textarea></label><button class="button button-danger button-small" type="button" data-video-remove-cue="${index}">×</button></div>`
-          ).join("")
-          : '<p class="muted">Noch keine Cues. Füge einen Cue hinzu oder lade eine WebVTT-Datei hoch.</p>'
+      `<div class="video-cue-editor-head"><strong>Cues bearbeiten · ${this.s.escapeHtml(
+        this.subtitleState[this.activeSubtitleIndex].label || "Untertitel",
+      )
+      }</strong><button class="button button-small" type="button" data-video-add-cue>＋ Cue</button></div>${this.cueState.length
+        ? this.cueState.map((cue, index) =>
+          `<div class="video-cue-row" data-video-cue-index="${index}"><label><span>Start</span><input data-video-cue-field="start" value="${this.s.escapeHtml(this.formatTime(cue.start))
+          }" /></label><button class="button button-small" type="button" data-video-cue-now="start" data-video-cue-index="${index}">aktuell</button><label><span>Ende</span><input data-video-cue-field="end" value="${this.s.escapeHtml(this.formatTime(cue.end))
+          }" /></label><button class="button button-small" type="button" data-video-cue-now="end" data-video-cue-index="${index}">aktuell</button><label class="video-cue-text"><span>Text</span><textarea data-video-cue-field="text" rows="2">${this.s.escapeHtml(cue.text)
+          }</textarea></label><button class="button button-danger button-small" type="button" data-video-remove-cue="${index}">×</button></div>`
+        ).join("")
+        : '<p class="muted">Noch keine Cues. Füge einen Cue hinzu oder lade eine WebVTT-Datei hoch.</p>'
       }`;
   }
   renderSubtitleRows() {
@@ -2013,22 +1981,14 @@ class VideoAdmin {
       return;
     }
     this.subtitleRows.innerHTML = this.subtitleState.map((item, index) =>
-      `<article class="video-subtitle-row" data-video-subtitle-index="${index}"><div class="video-subtitle-row-head"><strong>Spur ${
-        index + 1
-      }</strong><button class="button button-small" type="button" data-video-edit-subtitle="${index}">Cues bearbeiten</button><button class="button button-danger button-small" type="button" data-video-remove-subtitle="${index}">Entfernen</button></div><div class="field-grid field-grid-three"><label><span>Sprache</span><select data-video-subtitle-field="language"><option value="ru"${
-        item.language === "ru" ? " selected" : ""
-      }>RU</option><option value="en"${
-        item.language === "en" ? " selected" : ""
-      }>EN</option><option value="de"${
-        item.language === "de" ? " selected" : ""
-      }>DE</option></select></label><label><span>Label</span><input data-video-subtitle-field="label" value="${
-        this.s.escapeHtml(item.label || "")
-      }" maxlength="100" /></label><label><span>Sprachcode</span><input data-video-subtitle-field="srcLang" value="${
-        this.s.escapeHtml(item.srcLang || item.language || "")
-      }" maxlength="10" /></label></div><label class="file-label"><span>WebVTT-Datei</span><input data-video-subtitle-file type="file" accept=".vtt,text/vtt" /></label><label><span>WebVTT-Inhalt</span><textarea data-video-subtitle-content rows="5" spellcheck="false" placeholder="WEBVTT\n\n00:00:00.000 --> 00:00:03.000\nText">${
-        this.s.escapeHtml(item.content || "")
-      }</textarea></label><label class="feature-toggle"><input data-video-subtitle-field="default" type="checkbox"${
-        item.isDefault ? " checked" : ""
+      `<article class="video-subtitle-row" data-video-subtitle-index="${index}"><div class="video-subtitle-row-head"><strong>Spur ${index + 1
+      }</strong><button class="button button-small" type="button" data-video-edit-subtitle="${index}">Cues bearbeiten</button><button class="button button-danger button-small" type="button" data-video-remove-subtitle="${index}">Entfernen</button></div><div class="field-grid field-grid-three"><label><span>Sprache</span><select data-video-subtitle-field="language"><option value="ru"${item.language === "ru" ? " selected" : ""
+      }>RU</option><option value="en"${item.language === "en" ? " selected" : ""
+      }>EN</option><option value="de"${item.language === "de" ? " selected" : ""
+      }>DE</option></select></label><label><span>Label</span><input data-video-subtitle-field="label" value="${this.s.escapeHtml(item.label || "")
+      }" maxlength="100" /></label><label><span>Sprachcode</span><input data-video-subtitle-field="srcLang" value="${this.s.escapeHtml(item.srcLang || item.language || "")
+      }" maxlength="10" /></label></div><label class="file-label"><span>WebVTT-Datei</span><input data-video-subtitle-file type="file" accept=".vtt,text/vtt" /></label><label><span>WebVTT-Inhalt</span><textarea data-video-subtitle-content rows="5" spellcheck="false" placeholder="WEBVTT\n\n00:00:00.000 --> 00:00:03.000\nText">${this.s.escapeHtml(item.content || "")
+      }</textarea></label><label class="feature-toggle"><input data-video-subtitle-field="default" type="checkbox"${item.isDefault ? " checked" : ""
       } /><span>Standardspur</span></label></article>`
     ).join("");
   }
@@ -2169,7 +2129,7 @@ class VideoAdmin {
     body.append("kind", kind);
     try {
       this.s.showNotice(
-        `${kind === "video" ? "Video" : "Poster"} wird nach R2 hochgeladen …`,
+        `${kind === "video" ? "Video" : "Vorschaubild"} wird hochgeladen …`,
       );
       const response = await this.s.api(this.mediaApiPath(), {
         method: "POST",
@@ -2181,8 +2141,7 @@ class VideoAdmin {
       } else document.getElementById("videoPoster").value = response.url;
       this.setPreview();
       this.s.showNotice(
-        `${
-          kind === "video" ? "Video" : "Poster"
+        `${kind === "video" ? "Video" : "Vorschaubild"
         } hochgeladen. Jetzt Metadaten speichern.`,
       );
     } catch (error) {
@@ -2201,9 +2160,8 @@ class VideoAdmin {
       value === null || value === undefined || !Number.isFinite(Number(value))
     ) return "Dauer unbekannt";
     const total = Math.max(0, Math.round(Number(value)));
-    return `${String(Math.floor(total / 60)).padStart(2, "0")}:${
-      String(total % 60).padStart(2, "0")
-    }`;
+    return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")
+      }`;
   }
   render() {
     const list = this.scope === "interviews" ? this.interviewList : this.list;
@@ -2219,21 +2177,15 @@ class VideoAdmin {
       const deleteAttribute = this.scope === "interviews"
         ? "data-interview-video-delete-id"
         : "data-video-delete-id";
-      return `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-video-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(translation.title || item.id)
-      }</strong><span>${this.s.escapeHtml(item.sourceType)} · ${
-        this.formatDuration(item.durationSeconds)
-      } · ${this.s.escapeHtml(item.status)}</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" ${deleteAttribute}="${
-            this.s.escapeHtml(item.id)
+      return `<article class="news-item${item.id === this.editingId ? " active" : ""
+        }"><button class="news-item-select" type="button" data-video-id="${this.s.escapeHtml(item.id)
+        }"><strong>${this.s.escapeHtml(translation.title || item.id)
+        }</strong><span>${this.s.escapeHtml(item.sourceType)} · ${this.formatDuration(item.durationSeconds)
+        } · ${this.s.escapeHtml(this.s.statusLabel(item.status))}</span></button>${item.status !== "archived"
+          ? `<button class="button button-danger button-remove" type="button" ${deleteAttribute}="${this.s.escapeHtml(item.id)
           }">Archivieren</button>`
           : ""
-      }</article>`;
+        }</article>`;
     }).join("");
   }
   handleListClick(event) {
@@ -2391,6 +2343,7 @@ class InterviewMaterialsAdmin {
     document.getElementById("interviewMaterialSortOrder").value = "0";
   }
   populate(item) {
+    this.form.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
     this.editingId = item.id;
     document.getElementById("interviewMaterialId").value = item.id;
     document.getElementById("interviewMaterialId").disabled = true;
@@ -2454,8 +2407,7 @@ class InterviewMaterialsAdmin {
     try {
       const response = await this.s.api(
         this.editingId
-          ? `/api/v1/admin/interviews/materials/${
-            encodeURIComponent(this.editingId)
+          ? `/api/v1/admin/interviews/materials/${encodeURIComponent(this.editingId)
           }`
           : "/api/v1/admin/interviews/materials",
         {
@@ -2475,8 +2427,7 @@ class InterviewMaterialsAdmin {
       if (!this.form.reportValidity()) return;
       const response = await this.s.api(
         this.editingId
-          ? `/api/v1/admin/interviews/materials/${
-            encodeURIComponent(this.editingId)
+          ? `/api/v1/admin/interviews/materials/${encodeURIComponent(this.editingId)
           }`
           : "/api/v1/admin/interviews/materials",
         {
@@ -2486,8 +2437,7 @@ class InterviewMaterialsAdmin {
       );
       this.editingId = response.material.id;
       await this.s.api(
-        `/api/v1/admin/interviews/materials/${
-          encodeURIComponent(this.editingId)
+        `/api/v1/admin/interviews/materials/${encodeURIComponent(this.editingId)
         }/publish`,
         { method: "POST" },
       );
@@ -2503,7 +2453,7 @@ class InterviewMaterialsAdmin {
     const body = new FormData();
     body.append("file", file);
     try {
-      this.s.showNotice("Interview-Material wird nach R2 hochgeladen …");
+      this.s.showNotice("Interview-Material wird hochgeladen …");
       const response = await this.s.api(
         "/api/v1/admin/interviews/materials/media",
         { method: "POST", body },
@@ -2538,23 +2488,16 @@ class InterviewMaterialsAdmin {
     this.list.innerHTML = this.items.map((item) => {
       const translation = item.translations?.de || item.translations?.en ||
         item.translations?.ru || {};
-      return `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-interview-material-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(translation.title || item.id)
-      }</strong><span>${this.s.escapeHtml(item.kind)} · ${
-        this.s.escapeHtml(item.status)
-      }${
-        item.fileName ? ` · ${this.s.escapeHtml(item.fileName)}` : ""
-      }</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" data-interview-material-delete-id="${
-            this.s.escapeHtml(item.id)
+      return `<article class="news-item${item.id === this.editingId ? " active" : ""
+        }"><button class="news-item-select" type="button" data-interview-material-id="${this.s.escapeHtml(item.id)
+        }"><strong>${this.s.escapeHtml(translation.title || item.id)
+        }</strong><span>${this.s.escapeHtml(item.kind)} · ${this.s.escapeHtml(this.s.statusLabel(item.status))
+        }${item.fileName ? ` · ${this.s.escapeHtml(item.fileName)}` : ""
+        }</span></button>${item.status !== "archived"
+          ? `<button class="button button-danger button-remove" type="button" data-interview-material-delete-id="${this.s.escapeHtml(item.id)
           }">Archivieren</button>`
           : ""
-      }</article>`;
+        }</article>`;
     }).join("");
   }
   handleListClick(event) {
@@ -2627,6 +2570,7 @@ class ProjectsAdmin {
     this.render();
   }
   populate(item) {
+    this.form.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
     this.editingId = item.id;
     document.getElementById("projectId").value = item.id;
     document.getElementById("projectId").disabled = true;
@@ -2714,7 +2658,7 @@ class ProjectsAdmin {
       );
       await this.load(this.editingId);
       this.s.showNotice(
-        "Projekt veröffentlicht. Das Datum steuert seine Current/Past-Ansicht automatisch.",
+        "Projekt veröffentlicht. Der Zeitraum bestimmt, ob es bevorstehend, aktuell oder vergangen ist.",
       );
     } catch (error) {
       this.s.showNotice(error.message, true);
@@ -2726,7 +2670,7 @@ class ProjectsAdmin {
     const body = new FormData();
     body.append("file", file);
     try {
-      this.s.showNotice("Projektbild wird nach R2 hochgeladen …");
+      this.s.showNotice("Projektbild wird hochgeladen …");
       const response = await this.s.api("/api/v1/admin/projects/media", {
         method: "POST",
         body,
@@ -2754,27 +2698,20 @@ class ProjectsAdmin {
       const translation = item.translations?.de || item.translations?.en ||
         item.translations?.ru || {};
       const phase = item.phase === "past"
-        ? "Past"
+        ? "Vergangen"
         : item.phase === "upcoming"
-        ? "Upcoming"
-        : "Current";
-      return `<article class="news-item${
-        item.id === this.editingId ? " active" : ""
-      }"><button class="news-item-select" type="button" data-project-id="${
-        this.s.escapeHtml(item.id)
-      }"><strong>${
-        this.s.escapeHtml(translation.title || item.id)
-      }</strong><span>${this.s.escapeHtml(phase)} · ${
-        this.s.escapeHtml(item.status)
-      } · ${this.s.escapeHtml(item.startDate)}${
-        item.endDate ? ` – ${this.s.escapeHtml(item.endDate)}` : ""
-      }</span></button>${
-        item.status !== "archived"
-          ? `<button class="button button-danger button-remove" type="button" data-project-delete-id="${
-            this.s.escapeHtml(item.id)
+          ? "Bevorstehend"
+          : "Aktuell";
+      return `<article class="news-item${item.id === this.editingId ? " active" : ""
+        }"><button class="news-item-select" type="button" data-project-id="${this.s.escapeHtml(item.id)
+        }"><strong>${this.s.escapeHtml(translation.title || item.id)
+        }</strong><span>${this.s.escapeHtml(phase)} · ${this.s.escapeHtml(this.s.statusLabel(item.status))
+        } · ${this.s.escapeHtml(item.startDate)}${item.endDate ? ` – ${this.s.escapeHtml(item.endDate)}` : ""
+        }</span></button>${item.status !== "archived"
+          ? `<button class="button button-danger button-remove" type="button" data-project-delete-id="${this.s.escapeHtml(item.id)
           }">Archivieren</button>`
           : ""
-      }</article>`;
+        }</article>`;
     }).join("");
   }
   handleListClick(event) {
@@ -2833,35 +2770,37 @@ class AdminDeleteDialog {
   request(target) {
     this.pending = target;
     this.title.textContent = target.kind === "news"
-      ? "News entfernen?"
+      ? "Meldung archivieren?"
       : target.kind === "gallery"
-      ? "Gallery-Bild löschen?"
-      : target.kind === "quote"
-      ? "Gallery-Zitat entfernen?"
-      : target.kind === "world"
-      ? "World Point archivieren?"
-      : target.kind === "video"
-      ? "Video archivieren?"
-      : target.kind === "interview-video"
-      ? "Interview archivieren?"
-      : target.kind === "interview-material"
-      ? "Interview-Material archivieren?"
-      : target.kind === "project"
-      ? "Projekt archivieren?"
-      : "Partner archivieren?";
+        ? "Galerie-Bild löschen?"
+        : target.kind === "quote"
+          ? "Galerie-Zitat entfernen?"
+          : target.kind === "world"
+            ? "Standort archivieren?"
+            : target.kind === "video"
+              ? "Video archivieren?"
+              : target.kind === "interview-video"
+                ? "Interview archivieren?"
+                : target.kind === "interview-material"
+                  ? "Interview-Material archivieren?"
+                  : target.kind === "project"
+                    ? "Projekt archivieren?"
+                    : "Partner archivieren?";
+    if (target.kind === "online-media") this.title.textContent = "Inhalt archivieren?";
     this.message.textContent = target.kind === "news"
-      ? "Die News wird aus der öffentlichen Veröffentlichung entfernt."
+      ? "Die Meldung wird archiviert und ist danach nicht mehr öffentlich sichtbar."
       : target.kind === "gallery"
-      ? "Das Bild und seine R2-Metadaten werden endgültig gelöscht."
-      : target.kind === "quote"
-      ? "Das Zitat wird aus der öffentlichen Gallery entfernt."
-      : target.kind === "video" || target.kind === "interview-video"
-      ? "Das Video wird archiviert und ist danach nicht mehr öffentlich sichtbar."
-      : target.kind === "interview-material"
-      ? "Das Material wird archiviert und ist danach nicht mehr öffentlich sichtbar."
-      : target.kind === "project"
-      ? "Das Projekt wird archiviert und ist danach nicht mehr öffentlich sichtbar."
-      : "Der Inhalt wird archiviert und ist danach nicht mehr öffentlich sichtbar.";
+        ? "Das Bild wird endgültig aus der Galerie gelöscht."
+        : target.kind === "quote"
+          ? "Das Zitat wird aus der öffentlichen Galerie entfernt."
+          : target.kind === "video" || target.kind === "interview-video"
+            ? "Das Video wird archiviert und ist danach nicht mehr öffentlich sichtbar."
+            : target.kind === "interview-material"
+              ? "Das Material wird archiviert und ist danach nicht mehr öffentlich sichtbar."
+              : target.kind === "project"
+                ? "Das Projekt wird archiviert und ist danach nicht mehr öffentlich sichtbar."
+                : "Der Inhalt wird archiviert und ist danach nicht mehr öffentlich sichtbar.";
+    if (target.kind === "online-media") this.message.textContent = "Der Inhalt wird von der öffentlichen Online-Projekte-Seite entfernt. Die Datei bleibt gespeichert und kann später erneut veröffentlicht werden.";
     this.confirmation.value = "";
     this.confirmButton.disabled = true;
     this.dialog.showModal();
@@ -2881,6 +2820,35 @@ class AdminShell {
     this.tabs.forEach((tab) =>
       tab.addEventListener("click", () => this.setView(tab.dataset.adminTab))
     );
+    this.bindTabKeyboard(this.tabs);
+    this.bindTabKeyboard([...document.querySelectorAll("[data-interview-content-tab]")]);
+    const orientation = () => document.querySelector(".admin-tabs").setAttribute("aria-orientation", window.matchMedia("(max-width: 980px)").matches ? "horizontal" : "vertical");
+    orientation();
+    window.matchMedia("(max-width: 980px)").addEventListener("change", orientation);
+    document.getElementById("openGuide").addEventListener("click", () => {
+      document.getElementById("quickGuide").open = true;
+    });
+    this.newNews.addEventListener("click", () => {
+      document.getElementById("newsId").focus();
+    });
+    document.addEventListener("reset", (event) => {
+      event.target.querySelectorAll("[aria-invalid]").forEach((field) => this.s.clearFieldError({ target: field }));
+    }, true);
+    document.addEventListener("invalid", (event) => {
+      const field = event.target;
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement)) return;
+      const message = field.validity.valueMissing ? "Bitte dieses Pflichtfeld ausfüllen."
+        : field.validity.patternMismatch ? "Bitte das angegebene Format verwenden. Kleinbuchstaben, Zahlen und Bindestriche sind erlaubt."
+          : field.validity.typeMismatch ? "Bitte eine gültige Adresse eingeben."
+            : field.validationMessage;
+      markFieldError(field, message);
+    }, true);
+    const statuses = [...document.querySelectorAll(".status-badge")];
+    const refreshStatuses = () => statuses.forEach((badge) => {
+      badge.dataset.status = badge.textContent === "Veröffentlicht" ? "published" : badge.textContent === "Archiviert" ? "archived" : "draft";
+    });
+    statuses.forEach((badge) => new MutationObserver(refreshStatuses).observe(badge, { childList: true, characterData: true, subtree: true }));
+    refreshStatuses();
     document.addEventListener(
       "input",
       (event) => this.s.clearFieldError(event),
@@ -2896,12 +2864,46 @@ class AdminShell {
       )
     );
   }
+  bindTabKeyboard(tabs) {
+    tabs.forEach((tab, index) => tab.addEventListener("keydown", (event) => {
+      let target;
+      if (["ArrowDown", "ArrowRight"].includes(event.key)) target = (index + 1) % tabs.length;
+      else if (["ArrowUp", "ArrowLeft"].includes(event.key)) target = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") target = 0;
+      else if (event.key === "End") target = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      tabs.forEach((item, i) => item.tabIndex = i === target ? 0 : -1);
+      tabs[target].focus();
+    }));
+  }
+  updateGuidance(key) {
+    const standard = ["Entwurf speichern & prüfen", "Pflichtfelder ausfüllen, als Entwurf speichern und alle Sprachversionen prüfen.", "Veröffentlichen", "Mit „Veröffentlichen“ wird der Inhalt auf der Website sichtbar."];
+    const content = {
+      news: ["Meldungen", "Neuigkeiten, Veranstaltungen und Berichte für die Website erstellen.", "So veröffentlichst du eine Meldung", "Inhalt vorbereiten", "Grunddaten und Titelbild angeben. Texte in RU, EN und DE ausfüllen.", ...standard, "Hochladen allein veröffentlicht noch keine Meldung. Das Datum ist das angezeigte Datum, keine automatische Freigabe."],
+      gallery: ["Galerie", "Bilder in Ordnern sammeln, prüfen und gemeinsam veröffentlichen.", "So veröffentlichst du einen Galerieordner", "Bilder & Ordner wählen", "Dateien auswählen. Einen vorhandenen Ordner ergänzen oder einen neuen Ordner in drei Sprachen benennen.", "Als Entwurf hochladen", "„Bilder als Entwurf hochladen“ speichert die Auswahl zunächst privat. Den Ordner unten öffnen und prüfen.", "Ordner veröffentlichen", "Unten im Ordner „Ordner veröffentlichen“ anklicken. Erst dann sind die neuen Bilder öffentlich.", "Galerie-Bilder werden zuerst als Entwurf gespeichert. Ein Zitat wird über „Zitat veröffentlichen“ sofort sichtbar."],
+      "online-projects": ["Online-Projekte", "Fotos, Videos und PDF-Dokumente den zehn Themen zuordnen.", "So ergänzt du Medien in einem Thema", "Medienart & Thema wählen", "Fotos, Videos oder Dokumente wählen und das passende Thema angeben.", "Datei & Texte prüfen", "Eine Datei auswählen, die Vorschau prüfen und die Sprachversionen ergänzen. Bei PDFs entsteht die Vorschau aus der ersten Seite.", "Speichern & veröffentlichen", "Videos und Dokumente als Entwurf speichern und anschließend veröffentlichen. Fotos werden über „In … veröffentlichen“ sofort sichtbar.", "Fotos werden sofort veröffentlicht. Videos und Dokumente bleiben über „Als Entwurf speichern“ privat. Archivieren nimmt sie von der Website und behält die Dateien."],
+      videos: ["Videos", "YouTube-Videos oder eigene Videodateien mit mehrsprachigen Texten verwalten.", "So veröffentlichst du ein Video", "Video & Texte ergänzen", "Videoquelle auswählen, Link einfügen oder Datei hochladen. Titel und Bildbeschreibungen in drei Sprachen ergänzen.", ...standard, "Untertitel sind optional. Eigene Videodateien: maximal 95 MB. Ein Upload allein veröffentlicht das Video noch nicht."],
+      interviews: ["Interviews", "Videos und begleitende Materialien für die Interview-Seite verwalten.", "So ergänzt du ein Interview", "Inhaltsart auswählen", "Links zwischen „Videos“ und „Materialien“ wählen. Quelle, Datei und Sprachversionen ergänzen.", ...standard, "Interview-Videos gehören zur Interview-Seite. Unter „Materialien“ können Dokumente, Prospekte, Formulare und Anfragen ergänzt werden."],
+      projects: ["Projekte", "Projekte beschreiben und über ihren Zeitraum einordnen.", "So veröffentlichst du ein Projekt", "Zeitraum & Texte ergänzen", "Startdatum und optional ein Enddatum angeben. Titel und Bildbeschreibungen in drei Sprachen ausfüllen.", ...standard, "Nach dem Enddatum zählt das Projekt automatisch zu den vergangenen Projekten. Ohne Enddatum bleibt es aktuell."],
+      world: ["Weltkarte", "Standorte und Länder auf der öffentlichen Weltkarte pflegen.", "So ergänzt du einen Standort", "Position & Texte angeben", "Breiten- und Längengrad eintragen. Stadt und Land in RU, EN und DE ergänzen.", ...standard, "Koordinaten bestimmen die Position auf der Karte. Die Art des Standorts kennzeichnet Hauptstandort, durchgeführte oder geplante Veranstaltung."],
+      partners: ["Partner", "Organisationen, Logos und Links für die Partnerübersicht pflegen.", "So ergänzt du einen Partner", "Organisation & Logo ergänzen", "Kategorie auswählen, Logo hochladen und Namen sowie Bildbeschreibungen in drei Sprachen eintragen.", ...standard, "Die Website-Adresse ist optional. Kleinere Sortierungswerte erscheinen zuerst."],
+    }[key];
+    const ids = ["workspaceCategory", "workspaceDescription", "guideTitle", "guideStep1Title", "guideStep1", "guideStep2Title", "guideStep2", "guideStep3Title", "guideStep3"];
+    ids.forEach((id, index) => document.getElementById(id).textContent = content[index]);
+    document.getElementById("workspaceTitle").textContent = content[0];
+    const note = document.getElementById("workflowNote");
+    const label = document.createElement("strong");
+    label.textContent = "Gut zu wissen: ";
+    note.replaceChildren(label, document.createTextNode(content[9]));
+  }
   setInterviewContent(selected) {
     document.querySelectorAll("[data-interview-content-tab]").forEach(
       (item) => {
         const active = item.dataset.interviewContentTab === selected;
         item.classList.toggle("is-active", active);
         item.setAttribute("aria-selected", String(active));
+        item.tabIndex = active ? 0 : -1;
       },
     );
     document.querySelectorAll("[data-interview-content-pane]").forEach(
@@ -2912,7 +2914,7 @@ class AdminShell {
   }
   setView(viewKey) {
     const selectedView = viewKey === "online-projects" ||
-        this.views.some((view) => view.dataset.adminView === viewKey)
+      this.views.some((view) => view.dataset.adminView === viewKey)
       ? viewKey
       : "news";
     const panelKey = selectedView === "online-projects"
@@ -2936,11 +2938,14 @@ class AdminShell {
       const active = tab.dataset.adminTab === selectedView;
       tab.classList.toggle("is-active", active);
       tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
     });
     this.newNews.hidden = selectedView !== "news";
+    this.updateGuidance(selectedView);
     if (panelKey === "gallery") {
       this.modules.gallery.configureView(selectedView === "online-projects");
     }
+    this.modules.onlineMedia.setEnabled(selectedView === "online-projects");
     if (selectedView === "videos") {
       this.modules.video.load().catch((error) =>
         this.s.showNotice(error.message, true)
@@ -2992,6 +2997,7 @@ class AdminApp {
     const requestDeletion = (target) => this.deleteDialog.request(target);
     this.modules.news = new NewsAdmin(this.s, requestDeletion);
     this.modules.gallery = new GalleryAdmin(this.s, requestDeletion);
+    this.modules.onlineMedia = new OnlineProjectMediaAdmin(this.s, markFieldError, requestDeletion);
     this.modules.world = new WorldPointsAdmin(this.s, requestDeletion);
     this.modules.partners = new PartnersAdmin(this.s, requestDeletion);
     this.modules.video = new VideoAdmin(this.s, requestDeletion);
@@ -3007,6 +3013,13 @@ class AdminApp {
   }
   async executeDeletion(target) {
     try {
+      if (target.kind === "online-media") {
+        await this.s.api(`/api/v1/admin/online-projects/media/${encodeURIComponent(target.id)}`, { method: "DELETE" });
+        await this.modules.onlineMedia.load();
+        this.modules.onlineMedia.clear();
+        this.s.showNotice("Inhalt archiviert. Die Datei bleibt gespeichert und ist nicht mehr öffentlich sichtbar.");
+        return;
+      }
       if (target.kind === "news") {
         await this.s.api(
           `/api/v1/admin/news/${encodeURIComponent(target.id)}`,
@@ -3014,21 +3027,21 @@ class AdminApp {
         );
         await this.modules.news.load();
         this.modules.news.clear();
-        this.s.showNotice("News entfernt.");
+        this.s.showNotice("Meldung archiviert.");
       } else if (target.kind === "gallery") {
         await this.s.api(
           `/api/v1/admin/gallery/${encodeURIComponent(target.key)}`,
           { method: "DELETE" },
         );
         await this.modules.gallery.load();
-        this.s.showNotice("Gallery-Bild gelöscht.");
+        this.s.showNotice("Galerie-Bild gelöscht.");
       } else if (target.kind === "quote") {
         await this.s.api(
           `/api/v1/admin/gallery/quotes/${encodeURIComponent(target.id)}`,
           { method: "DELETE" },
         );
         await this.modules.gallery.load();
-        this.s.showNotice("Gallery-Zitat entfernt.");
+        this.s.showNotice("Zitat entfernt.");
       } else if (target.kind === "world") {
         await this.s.api(
           `/api/v1/admin/world-points/${encodeURIComponent(target.id)}`,
@@ -3036,7 +3049,7 @@ class AdminApp {
         );
         await this.modules.world.load();
         this.modules.world.clear();
-        this.s.showNotice("World Point archiviert.");
+        this.s.showNotice("Standort archiviert.");
       } else if (target.kind === "partner") {
         await this.s.api(
           `/api/v1/admin/partners/${encodeURIComponent(target.id)}`,

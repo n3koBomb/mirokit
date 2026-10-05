@@ -5,6 +5,7 @@ import { CSP_REPORT_ONLY } from "./security-headers.js";
 import { fetchDriveImage } from "./remote-media.js";
 import { adminMethodResponse } from "./admin-methods.js";
 import { isOnlineProjectTopic } from "../../site/source/scripts/online-project-topics.js";
+import { handleOnlineProjectMedia } from "./online-project-media.js";
 import {
 	NEWS_ADMIN_QUERY,
 	NEWS_PUBLIC_QUERY,
@@ -2288,6 +2289,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 	const relativePath = url.pathname.slice(apiPrefix.length).replace(/\/$/, "") || "/";
 	const isGalleryQuotePath = relativePath === "/gallery/quotes" || relativePath.startsWith("/gallery/quotes/");
 	const isGalleryPath = relativePath === "/gallery" || (relativePath.startsWith("/gallery/") && !isGalleryQuotePath);
+	if (relativePath === "/online-projects/media" || relativePath.startsWith("/online-projects/media/")) return handleOnlineProjectMedia(request, env, url, true);
 	if (isGalleryQuotePath && !env.SITE_DB) return newsDatabaseUnavailable(origin, env);
 	if (!env.SITE_DB && !isGalleryPath && relativePath !== "/media") return newsDatabaseUnavailable(origin, env);
 
@@ -2626,6 +2628,7 @@ export default {
 		if (url.pathname === GALLERY_API_PATH) {
 			return handlePublicGallery(request, env, origin);
 		}
+		if (url.pathname === "/api/v1/online-projects/media") return handleOnlineProjectMedia(request, env, url);
 
 		if (url.pathname === WORLD_POINTS_API_PATH) {
 			return handlePublicWorldPoints(request, env, origin);

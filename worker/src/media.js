@@ -1,5 +1,6 @@
 import { authorizeAdmin } from "./access.js";
 import { SITE_HOSTS } from "./hosts.js";
+import { isPublishedOnlineProjectMedia } from "./online-project-media.js";
 
 const MEDIA_PREFIX = "/media/v1/";
 const ADMIN_MEDIA_PREFIX = "/api/v1/admin/media/";
@@ -9,6 +10,7 @@ const PUBLIC_MEDIA_CACHE = "public, max-age=0, must-revalidate";
 const MEDIA_KEY_PATTERN = /^(?:(?:news|partners|projects|video-posters)\/(?:pending\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|gallery\/(?:pending\/[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/|[a-z0-9](?:[a-z0-9-]{0,78}[a-z0-9])?\/)?[a-f0-9-]+\.(?:jpg|png|webp|avif)|videos\/(?:pending\/)?[a-f0-9-]+\.(?:mp4|webm|ogv)|subtitles\/(?:pending\/)?[a-z0-9-]+\.vtt|interview-materials\/(?:pending\/)?[a-f0-9-]+\.(?:pdf|txt|jpg|png|webp|doc|docx|ppt|pptx))$/;
 
 async function isPublishedMedia(env, key, object) {
+	if (key.startsWith("online-projects/")) return isPublishedOnlineProjectMedia(env, key);
 	if (key.includes("/pending/")) return false;
 	if (key.startsWith("gallery/")) return object.customMetadata?.status === "published";
 	if (!env.SITE_DB) throw new Error("SITE_DB is not configured");
@@ -49,7 +51,8 @@ async function handleMediaRequest(request, env, url, preview = false) {
 	if (preview && !(await authorizeAdmin(request, env))) return mediaError(request, 401, "Admin authentication required");
 	if (!["GET", "HEAD"].includes(request.method)) return mediaError(request, 405, "Method not allowed", { Allow: "GET, HEAD" });
 	const key = url.pathname.slice((preview ? ADMIN_MEDIA_PREFIX : MEDIA_PREFIX).length);
-	if (!MEDIA_KEY_PATTERN.test(key) || (!preview && key.includes("/pending/"))) return mediaError(request, 404, "Not found");
+	const onlineKey = /^online-projects\/(?:files\/[a-f0-9-]+\.(?:pdf|mp4|webm|ogv)|previews\/[a-f0-9-]+\.(?:jpg|png|webp))$/.test(key);
+	if ((!MEDIA_KEY_PATTERN.test(key) && !onlineKey) || (!preview && key.includes("/pending/"))) return mediaError(request, 404, "Not found");
 	try {
 		if (!env.SITE_MEDIA) throw new Error("SITE_MEDIA is not configured");
 		const metadata = await env.SITE_MEDIA.head(key);
