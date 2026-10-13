@@ -79,6 +79,12 @@ Im Browser entspricht `site/index.html` der URL `/`. Asset-URLs beginnen mit `/p
 
 ## Lokal starten
 
+Die öffentliche [Statusseite](site/status/index.html) liegt unter `/status/`;
+`/site/status` führt ebenfalls dorthin. Sie bietet einen Seitenwechsel zwischen
+Live-Dienstprüfungen und zusammengefassten Aufrufzahlen. Einzelne Aufrufdetails
+liegen geschützt unter `/admin/status/`. Einrichtung, Zählweise und Grenzen
+stehen in [docs/site-status.md](docs/site-status.md).
+
 Voraussetzungen sind Git, Node.js **24 oder neuer** (CI verwendet Version 24) und npm. Für die vollständige Website mit APIs und Content Desk den Worker verwenden:
 
 ```bash

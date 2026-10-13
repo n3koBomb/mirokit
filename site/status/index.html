@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Current MIRoKIT service health and aggregated website visits." />
+  <title>Status — MIRoKIT</title>
+  <link rel="canonical" href="https://mirokit.com/status/" />
+  <link rel="icon" href="/public/favicon/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/source/style/style.css" />
+  <link rel="stylesheet" href="/status/status.css" />
+  <link rel="stylesheet" href="/source/style/subpage.css" />
+</head>
+<body class="status-page">
+  <a class="st-skip" href="#statusMain" data-key="st_skip">Skip to status</a>
+  <header class="subpage-header">
+    <a class="subpage-brand" href="/" aria-label="MIRoKIT"><img src="/public/assets/brand/miroKit_logo_full-1.png" alt="MIRoKIT" width="144" height="48" /></a>
+    <a class="subpage-home" href="/"><span aria-hidden="true">↖</span><span data-key="op_library_home">Back to home</span></a>
+    <div class="subpage-actions">
+      <a class="subpage-contact" href="/#contact" data-key="contact_title">Contact</a>
+      <button class="subpage-theme" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span></button>
+      <label class="sr-only" for="statusLanguage" data-key="language_label">Language</label>
+      <select class="subpage-lang" id="statusLanguage" data-lang-select><option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option></select>
+    </div>
+  </header>
+  <main class="st-main" id="statusMain" tabindex="-1">
+    <div class="st-heading"><div><p class="st-kicker">MIRoKIT / STATUS</p><h1 data-key="st_title">A look behind the scenes.</h1><p data-key="st_intro">Service availability and the visits that bring our community together.</p></div><span class="st-host" id="statusHost"></span></div>
+    <div class="st-toolbar">
+      <nav class="st-switch" aria-label="Switch Page" data-i18n-attrs="aria-label:st_switch">
+        <a href="?view=server" data-status-view="server" aria-current="page"><span aria-hidden="true">◉</span> <span data-key="st_server">Service status</span></a>
+        <a href="?view=visitors" data-status-view="visitors"><span aria-hidden="true">↗</span> <span data-key="st_visitors">Visits</span></a>
+      </nav>
+      <button class="st-button" id="statusRefresh" type="button" data-key="st_refresh">Refresh</button>
+    </div>
+    <p id="statusNotice" class="st-notice" role="status" aria-live="polite"></p>
+    <section id="serverPanel" aria-labelledby="serviceTitle">
+      <div class="st-banner" id="serviceBanner" data-state="unknown"><span class="st-dot" aria-hidden="true"></span><div><h2 id="serviceTitle" data-key="st_waiting">Waiting for a live check</h2><p id="serviceChecked" data-key="st_loading">Checking services…</p></div></div>
+      <div class="st-services" id="serviceComponents" aria-busy="true"></div>
+      <p class="st-explanation" data-key="st_check_note">Live checks run every 60 seconds while this view is open. They verify the Worker, static website, database connection and media listing. They do not verify email delivery, every media file or historical uptime.</p>
+      <div class="st-provider"><div><h2 data-key="st_provider">Infrastructure provider</h2><p data-key="st_provider_note">Cloudflare incidents may also affect this website.</p></div><a href="https://www.cloudflarestatus.com/" target="_blank" rel="noopener noreferrer" data-key="st_provider_link">Cloudflare Status ↗</a></div>
+    </section>
+    <section id="visitorsPanel" aria-labelledby="visitorsTitle" hidden>
+      <h2 id="visitorsTitle" data-key="st_visitors_title">Our community in numbers</h2>
+      <p id="visitsSince" class="st-explanation"></p>
+      <div class="st-metrics"><article class="st-card"><p data-key="st_total">Recorded page views</p><strong id="visitsTotal">—</strong><small data-key="st_all_time">Since recording began</small></article><article class="st-card"><p data-key="st_today">Page views today</p><strong id="visitsToday">—</strong><small data-key="st_utc">Calendar day in UTC</small></article><article class="st-card"><p data-key="st_identity">Who visits?</p><strong class="st-word" data-key="st_anonymous">Anonymous</strong><small data-key="st_no_identity">Views count requests, not unique people.</small></article></div>
+      <article class="st-card st-activity"><div class="st-card-heading"><h3 data-key="st_daily">Last 30 days</h3><span data-key="st_pageviews">Page views / UTC</span></div><div class="st-chart" id="visitsChart" role="img" data-i18n-attrs="aria-label:st_daily"></div><details><summary data-key="st_daily_table">Show daily counts</summary><div id="visitsDaily"></div></details></article>
+      <div class="st-breakdowns"><article class="st-card"><h3 data-key="st_countries">Where from?</h3><p data-key="st_country_note">Approximate country from the network connection. Top 20.</p><div id="visitCountries"></div></article><article class="st-card"><h3 data-key="st_devices">Which devices?</h3><p data-key="st_device_note">Device types estimated from browser information.</p><div id="visitDevices"></div></article></div>
+      <article class="st-card"><h3 data-key="st_pages">Most visited pages</h3><div id="visitPages"></div></article>
+      <p class="st-explanation" data-key="st_privacy">Only successful public document requests are counted on this domain. Known bots, prefetch requests and requests with Do Not Track or Global Privacy Control are excluded. No IP addresses, cookies, visitor IDs or URL query strings are stored. Earlier visits cannot be reconstructed.</p>
+      <div class="st-provider"><div><h3 data-key="st_details">Individual request details</h3><p data-key="st_details_note">Time, page, country, device and browser are available only to administrators. No personal identity or returning-person tracking.</p></div><a href="/admin/status/" data-key="st_admin">Open admin details ↗</a></div>
+    </section>
+    <footer class="st-footer"><a href="/page/privacyPolicy/" data-key="st_policy">Privacy policy</a><span>MIRoKIT · <span data-key="st_footer">Connected through play.</span></span></footer>
+    <noscript><p>Enable JavaScript for live status and statistics. / Bitte JavaScript aktivieren. / Включите JavaScript.</p></noscript>
+  </main>
+  <script src="/source/scripts/language.js"></script>
+  <script src="/status/status-i18n.js"></script>
+  <script src="/source/scripts/subpage.js"></script>
+  <script type="module" src="/status/status.js"></script>
+</body>
+</html>

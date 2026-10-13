@@ -15,6 +15,7 @@
          "/",
          "/index.html",
          "/page/*",
+         "/status", "/status/*", "/site/status", "/site/status/*",
          "/robots.txt",
          "/sitemap.xml",
          "/public/assets/archive/*",

@@ -13,7 +13,8 @@
       "/media/v1/*",
       "/",
       "/index.html",
-      "/page/*"
+      "/page/*",
+      "/status", "/status/*", "/site/status", "/site/status/*"
     ]
   },
   "d1_databases": [

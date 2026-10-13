@@ -1,4 +1,5 @@
 import { authorizeAdmin, isLocalHostname } from "./access.js";
+import { handleStatusRequest, queueVisit } from "./status.js";
 import { getCanonicalSiteHostname } from "./hosts.js";
 import { ADMIN_MEDIA_PREFIX, PRIVATE_MEDIA_CACHE, handleMediaRequest } from "./media.js";
 import { CSP_REPORT_ONLY } from "./security-headers.js";
@@ -186,6 +187,7 @@ const COMMON_RESPONSE_HEADERS = Object.freeze({
 });
 
 const SITEMAP_PATHS = Object.freeze([
+	{ path: "/status/", changefreq: "daily", priority: "0.4" },
 	{
 		path: "/page/gallery/",
 		changefreq: "weekly",
@@ -346,6 +348,7 @@ function withSiteHeaders(response, pathname) {
 	if (
 		pathname === "/" ||
 		pathname === "/index.html" ||
+		pathname.startsWith("/status/") ||
 		pathname.startsWith("/page/")
 	) {
 		headers.set("Cache-Control", "public, max-age=0, must-revalidate");
@@ -388,6 +391,7 @@ function rewriteDocumentMetadata(response, url) {
 }
 
 function getCanonicalDocumentPath(pathname) {
+	if (["/status", "/status/", "/status/index.html"].includes(pathname)) return "/status/";
 	if (["/page/gallery", "/page/gallery/", "/page/gallery/index.html"].includes(pathname)) return "/page/gallery/";
 	if (pathname === "/" || pathname === "/index.html") return "/";
 	if (pathname === "/page/onlineProjects" || pathname === "/page/onlineProjects/") return "/page/onlineProjects/";
@@ -396,6 +400,7 @@ function getCanonicalDocumentPath(pathname) {
 
 function isDocumentPath(pathname) {
 	return (
+		["/status", "/status/", "/status/index.html"].includes(pathname) ||
 		["/page/gallery", "/page/gallery/", "/page/gallery/index.html"].includes(pathname) ||
 		pathname === "/" ||
 		pathname === "/index.html" ||
@@ -2612,10 +2617,17 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 }
 
 export default {
-	async fetch(request, env) {
+	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 		const requestHostname = url.hostname.toLowerCase();
 		const origin = request.headers.get("Origin");
+
+		if (["/api/v1/status", "/api/v1/status/visits", "/api/v1/admin/status/visits"].includes(url.pathname)) {
+			return handleStatusRequest(request, env);
+		}
+		if (["/site/status", "/site/status/", "/site/status/index.html", "/status", "/status/index.html"].includes(url.pathname) && ["GET", "HEAD"].includes(request.method)) {
+			return new Response(null, { status: 301, headers: { ...COMMON_RESPONSE_HEADERS, Location: `/status/${url.search}` } });
+		}
 
 		if (isProtectedAssetPath(url.pathname)) {
 			return forbiddenAssetResponse();
@@ -2733,6 +2745,7 @@ export default {
 			);
 
 			if (request.method === "HEAD") return siteResponse;
+			queueVisit(request, siteResponse, env, ctx);
 
 			return rewriteDocumentMetadata(siteResponse, url);
 		}

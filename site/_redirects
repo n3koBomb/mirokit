@@ -1,5 +1,9 @@
 # Stable, crawlable document URLs.
 /index.html / 301
+/status /status/ 301
+/site/status /status/ 301
+/site/status/ /status/ 301
+/site/status/index.html /status/ 301
 /page/privacyPolicy /page/privacyPolicy/ 301
 /page/onlineProjects /page/onlineProjects/ 301
 /page/gallery /page/gallery/ 301

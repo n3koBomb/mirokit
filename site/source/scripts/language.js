@@ -2815,6 +2815,10 @@ Object.assign(T.de, {
    programs_closing: "Kommunizieren. Spielen. Gestalten. Einander verstehen.",
 });
 
+T.ru.status_link = "Статус";
+T.en.status_link = "Status";
+T.de.status_link = "Status";
+
 function setLang(lang) {
    const dictionary = T[lang] || T.ru;
    currentLang = T[lang] ? lang : "ru";
