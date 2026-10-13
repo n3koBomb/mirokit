@@ -2622,7 +2622,7 @@ export default {
 		const requestHostname = url.hostname.toLowerCase();
 		const origin = request.headers.get("Origin");
 
-		if (["/api/v1/status", "/api/v1/status/visits", "/api/v1/admin/status/visits"].includes(url.pathname)) {
+		if (["/api/v1/status", "/api/v1/status/visits", "/api/v1/admin/status/visits", "/api/v1/admin/status/diagnostics"].includes(url.pathname)) {
 			return handleStatusRequest(request, env);
 		}
 		if (["/site/status", "/site/status/", "/site/status/index.html", "/status", "/status/index.html"].includes(url.pathname) && ["GET", "HEAD"].includes(request.method)) {
@@ -2709,20 +2709,18 @@ export default {
 			url.pathname === "/robots.txt" &&
 			(request.method === "GET" || request.method === "HEAD")
 		) {
-			return textResponse(
-				createRobotsTxt(requestHostname),
-				"text/plain; charset=utf-8"
-			);
+			const response = textResponse(createRobotsTxt(requestHostname), "text/plain; charset=utf-8");
+			queueVisit(request, response, env, ctx);
+			return response;
 		}
 
 		if (
 			url.pathname === "/sitemap.xml" &&
 			(request.method === "GET" || request.method === "HEAD")
 		) {
-			return textResponse(
-				createSitemapXml(requestHostname),
-				"application/xml; charset=utf-8"
-			);
+			const response = textResponse(createSitemapXml(requestHostname), "application/xml; charset=utf-8");
+			queueVisit(request, response, env, ctx);
+			return response;
 		}
 
 		const documentRedirect = canonicalDocumentRedirect(request, url);

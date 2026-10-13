@@ -7,7 +7,9 @@ Der gemeinsame Header unterstützt RU, EN, DE und Hell/Dunkel.
 
 ## Einrichtung
 
-Die neue Migration `worker/migrations/0009_site_status.sql` ergänzt zwei Tabellen.
+Migration `worker/migrations/0009_site_status.sql` ergänzt die Besuchstabellen;
+`0010_request_diagnostics.sql` ergänzt die getrennten Admin-Tageszähler für Bots,
+Automation und DNT/GPC-Anfragen.
 Es werden keine weiteren Secrets, Dienste oder Abhängigkeiten benötigt.
 Für die lokale Entwicklungsdatenbank aus `worker/`:
 
@@ -34,9 +36,14 @@ Der Worker zählt erfolgreiche GET-Anfragen auf öffentliche HTML-Dokumente unte
 `/`, `/index.html`, `/page/*` und `/status/*`. Es gibt keinen zusätzlichen
 Tracking-Request im Frontend. Worker-first-Routen sorgen auch bei statischen
 Dokumenten für die serverseitige Erfassung. Weiterleitungen, Fehlerseiten, HEAD,
-Admin- und API-Aufrufe, Assets, erkannte Bots, Prefetch, DNT und GPC zählen nicht.
-Ein Browser kann HTML aus seinem eigenen Cache oder beim Zurücknavigieren anzeigen,
-ohne eine neue Serveranfrage auszulösen; das zählt daher nicht erneut.
+Admin- und API-Aufrufe, Assets, erkannte Bots, Prefetch, DNT und GPC zählen nicht
+zur öffentlichen Statistik. Bots und DNT/GPC werden ausschließlich als getrennte
+Tageszähler für Administratoren erfasst (siehe unten).
+Auch eine Browser-Neuladung mit einer bedingten Anfrage zählt: Eine HTML-Antwort
+mit `304 Not Modified` bestätigt, dass die vorhandene Seite aus dem Browsercache
+verwendet werden kann, und wird ebenso wie `200 OK` erfasst. Eine reine Anzeige
+aus dem Browsercache oder beim Zurücknavigieren ohne neue Serveranfrage zählt
+dagegen nicht erneut.
 
 `site_visit_totals` enthält dauerhafte Zähler pro Host, UTC-Tag, öffentlichem Pfad,
 ungefährem Land und Gerätetyp. Die öffentliche API `/api/v1/status/visits` liefert
@@ -72,6 +79,48 @@ angewendete Migration, verhindern keine Auslieferung der Website. Die Statistik
 zeigt bei fehlenden Tabellen oder Bindungen einen Fehler statt erfundener Nullen.
 API-Antworten verwenden `private, no-store`.
 
+## Bots, Automation und DNT/GPC im Adminbereich
+
+Der Container „Bots & DNT/GPC-Anfragen“ unter `/admin/status/` lädt ausschließlich
+die geschützte API `/api/v1/admin/status/diagnostics`. Diese prüft dieselbe
+Admin-Authentifizierung wie die Aufrufdetails, bevor sie Daten abfragt.
+Der gemeinsame Aktualisieren-Button lädt beide Container unabhängig voneinander;
+eine fehlende Migration 0010 verhindert nicht das Laden regulärer Aufrufdetails.
+
+`site_request_diagnostics` enthält nur Tagesgruppen pro Host, UTC-Tag, öffentlichem
+Pfad, fester Agentfamilie, Botstatus, Cloudflare-Verifizierung und DNT/GPC-Flags.
+Weder IP, Name, Besucherkennung, Roh-User-Agent, Land, Gerät noch individuelle
+Zeitpunkte werden dort gespeichert. Ein normaler Browser mit DNT/GPC erscheint
+als „Browser (DNT/GPC)“, ohne als Bot behandelt zu werden.
+Jede passende Anfrage erhöht genau eine Gruppe; Bot-, DNT- und GPC-Summen können
+sich überschneiden. Die öffentliche Statistik und reguläre Einzelaufrufdetails
+enthalten diese Anfragen weiterhin nicht.
+
+Erfasst werden erfolgreiche öffentliche HTML-Antworten (200/304) und erfolgreiche
+Aufrufe von `/robots.txt` und `/sitemap.xml`, soweit sie den Worker erreichen.
+Vorladen, HEAD, Fehler, Weiterleitungen, APIs, Adminseiten und Medien-/Codeassets
+bleiben ausgeschlossen. Anfragen, die Cloudflare vor dem Worker blockiert,
+und bislang nicht gespeicherte historische Aufrufe sind nicht enthalten.
+
+Bekannte Agentfamilien umfassen etwa Googlebot, bingbot, YandexBot, GPTBot,
+OAI-SearchBot, ChatGPT-User, ClaudeBot, PerplexityBot sowie Linkvorschauen und
+automatisierte Werkzeuge. Die Namen sind aus dem User-Agent abgeleitet und können
+vorgetäuscht werden. Als „Cloudflare bestätigt“ gilt nur ein positives
+`request.cf.botManagement.verifiedBot`-Signal; ohne Signal bleibt der Botstatus
+unbestätigt. Es erfolgt kein zusätzlicher Netzwerkaufruf zur Identitätsprüfung.
+Das Cloudflare-Signal beschreibt den Botstatus, keine Personenidentität.
+Die verfügbaren Worker-Felder sind in der
+[Cloudflare-Dokumentation](https://developers.cloudflare.com/bots/reference/bot-management-variables/#workers-variables)
+beschrieben.
+Unbekannte erkannte Automation wird unter einer festen Sammelbezeichnung gespeichert.
+
+Die API liefert Summen der letzten 90 UTC-Kalendertage, bis zu 50 Botgruppen und
+bis zu 200 Tagesgruppen nach Seite. Die UI nennt die Begrenzungen ausdrücklich.
+Ältere Tagesgruppen werden bei der nächsten erfassten Diagnoseanfrage gelöscht
+und bereits zuvor nicht mehr ausgeliefert. Jede Domain bleibt getrennt.
+Die Daten sind `private, no-store`; ein Fehler beim Schreiben verhindert nicht die
+Auslieferung der Seite. Normale Besucher werden auch ohne Migration 0010 gezählt.
+
 ## Dienststatus
 
 `/api/v1/status` prüft parallel die Antwortfähigkeit dieser Worker-API, die
@@ -89,7 +138,9 @@ E-Mail-Zustellgarantien behauptet. Der Cloudflare-Status ist separat verlinkt.
 ## Prüfung
 
 Die Tests in `worker/src/status.test.js` führen die SQL-Abfragen gegen SQLite
-mit der neuen Migration aus und prüfen Summen, Domaintrennung, Datenschutzfilter,
+mit beiden Statusmigrationen aus und prüfen Summen, Domaintrennung, Datenschutzfilter,
 Hintergrunderfassung, Detailschutz, Paginierung, Aufbewahrung, Weiterleitungen,
-fehlende Bindungen und Zeitlimits. Die bestehenden Repository-Checks bleiben
-unverändert.
+fehlende Bindungen und Zeitlimits. Die Diagnoseprüfungen decken außerdem Botfamilien,
+Cloudflare-Verifizierung, kombinierte DNT/GPC-Flags, private Tagesgruppen,
+robots.txt/sitemap.xml und fehlende Migration 0010 ab. Die bestehenden
+Repository-Checks bleiben unverändert.

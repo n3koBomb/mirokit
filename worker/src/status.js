@@ -28,15 +28,46 @@ export function visitMetadata(request) {
   };
 }
 
-export function shouldRecordVisit(request, response) {
+const KNOWN_AGENTS = [
+  ["Googlebot", /googlebot/i], ["GoogleOther", /googleother/i],
+  ["Google-InspectionTool", /google-inspectiontool/i], ["AdsBot-Google", /adsbot-google/i],
+  ["bingbot", /bingbot/i], ["BingPreview", /bingpreview/i],
+  ["DuckDuckBot", /duckduckbot/i], ["YandexBot", /yandex(?:bot|images|accessibilitybot)/i],
+  ["Baiduspider", /baiduspider/i], ["Applebot", /applebot/i],
+  ["GPTBot", /gptbot/i], ["OAI-SearchBot", /oai-searchbot/i], ["ChatGPT-User", /chatgpt-user/i],
+  ["ClaudeBot", /claudebot|claude-searchbot|claude-user|anthropic-ai/i],
+  ["PerplexityBot", /perplexitybot|perplexity-user/i], ["Bytespider", /bytespider/i],
+  ["Amazonbot", /amazonbot/i], ["CCBot", /ccbot/i],
+  ["AhrefsBot", /ahrefsbot/i], ["SemrushBot", /semrushbot/i], ["MJ12bot", /mj12bot/i],
+  ["Facebook crawler", /facebookexternalhit|facebot|meta-externalagent/i],
+  ["Twitterbot", /twitterbot/i], ["TelegramBot", /telegrambot/i],
+  ["Discordbot", /discordbot/i], ["LinkedInBot", /linkedinbot/i], ["Slackbot", /slackbot/i],
+  ["curl", /\bcurl\//i], ["wget", /\bwget\//i],
+];
+
+export function requestActivity(request) {
+  const ua = request.headers.get("User-Agent") || "";
+  const knownAgent = KNOWN_AGENTS.find(([, pattern]) => pattern.test(ua))?.[0];
+  const verifiedBot = request.cf?.botManagement?.verifiedBot === true;
+  const isBot = Boolean(knownAgent) || verifiedBot || /bot|crawler|spider|headless|preview|monitor|curl|wget/i.test(ua);
+  return {
+    agent: knownAgent || (verifiedBot ? "verified-bot" : isBot ? "other-automation" : "browser"),
+    isBot, verifiedBot, dnt: request.headers.get("DNT") === "1", gpc: request.headers.get("Sec-GPC") === "1",
+  };
+}
+
+function isPublicDocumentResponse(request, response) {
   const path = new URL(request.url).pathname;
-  return request.method === "GET" && response.status === 200 &&
+  // A conditional browser reload can reuse cached HTML via 304 and is still a page view.
+  return request.method === "GET" && (response.status === 200 || response.status === 304) &&
     Boolean(response.headers.get("Content-Type")?.includes("text/html")) &&
     (path === "/" || path === "/index.html" || path.startsWith("/page/") || path.startsWith("/status/")) &&
-    request.headers.get("DNT") !== "1" && request.headers.get("Sec-GPC") !== "1" &&
-    !request.headers.get("Purpose")?.includes("prefetch") && !request.headers.get("Sec-Purpose")?.includes("prefetch") &&
-    !/bot|crawler|spider|headless|preview|monitor|curl|wget/i.test(request.headers.get("User-Agent") || "") &&
-    request.cf?.botManagement?.verifiedBot !== true;
+    !request.headers.get("Purpose")?.includes("prefetch") && !request.headers.get("Sec-Purpose")?.includes("prefetch");
+}
+
+export function shouldRecordVisit(request, response) {
+  const activity = requestActivity(request);
+  return isPublicDocumentResponse(request, response) && !activity.isBot && !activity.dnt && !activity.gpc;
 }
 
 export async function recordVisit(request, env, now = new Date()) {
@@ -57,11 +88,38 @@ export async function recordVisit(request, env, now = new Date()) {
   ]);
 }
 
+function diagnosticsSince(now = new Date()) {
+  return new Date(now.getTime() - (DETAIL_DAYS - 1) * DAY_MS).toISOString().slice(0, 10);
+}
+
+export async function recordRequestDiagnostic(request, env, now = new Date()) {
+  const url = new URL(request.url);
+  const activity = requestActivity(request);
+  const path = url.pathname === "/index.html" ? "/" : url.pathname.replace(/\/index\.html$/, "/");
+  await env.SITE_DB.batch([
+    env.SITE_DB.prepare(`INSERT INTO site_request_diagnostics (host, day, path, agent, is_bot, verified_bot, dnt, gpc, views)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+      ON CONFLICT(host, day, path, agent, is_bot, verified_bot, dnt, gpc) DO UPDATE SET views = views + 1`)
+      .bind(url.hostname, now.toISOString().slice(0, 10), path, activity.agent,
+        Number(activity.isBot), Number(activity.verifiedBot), Number(activity.dnt), Number(activity.gpc)),
+    env.SITE_DB.prepare("DELETE FROM site_request_diagnostics WHERE day < ?").bind(diagnosticsSince(now)),
+  ]);
+}
+
 export function queueVisit(request, response, env, ctx) {
-  if (!env.SITE_DB || !ctx?.waitUntil || !shouldRecordVisit(request, response)) return;
-  ctx.waitUntil(recordVisit(request, env).catch(() => {
+  if (!env.SITE_DB || !ctx?.waitUntil) return;
+  const document = isPublicDocumentResponse(request, response);
+  const crawlerIndex = request.method === "GET" && (response.status === 200 || response.status === 304) &&
+    ["/robots.txt", "/sitemap.xml"].includes(new URL(request.url).pathname) &&
+    !request.headers.get("Purpose")?.includes("prefetch") && !request.headers.get("Sec-Purpose")?.includes("prefetch");
+  if (!document && !crawlerIndex) return;
+  const activity = requestActivity(request);
+  const diagnostic = activity.isBot || activity.dnt || activity.gpc;
+  if (!diagnostic && !document) return;
+  const operation = diagnostic ? recordRequestDiagnostic(request, env) : recordVisit(request, env);
+  ctx.waitUntil(operation.catch(() => {
     // An unapplied migration or unavailable analytics must never break the website.
-    console.warn("Site visit counters unavailable");
+    console.warn(diagnostic ? "Site request diagnostics unavailable" : "Site visit counters unavailable");
   }));
 }
 
@@ -122,6 +180,30 @@ async function visitSummary(request, env) {
   }
 }
 
+async function requestDiagnostics(request, env) {
+  if (!await authorizeAdmin(request, env)) return statusJson({ success: false, code: "unauthorized" }, 401);
+  if (!env.SITE_DB) return statusJson({ success: false, code: "statistics_unavailable" }, 503);
+  const host = new URL(request.url).hostname;
+  const since = diagnosticsSince();
+  try {
+    const [totals, agents, groups] = await Promise.all([
+      env.SITE_DB.prepare(`SELECT COALESCE(SUM(views), 0) AS requests,
+        COALESCE(SUM(CASE WHEN is_bot = 1 THEN views ELSE 0 END), 0) AS bots,
+        COALESCE(SUM(CASE WHEN dnt = 1 THEN views ELSE 0 END), 0) AS dnt,
+        COALESCE(SUM(CASE WHEN gpc = 1 THEN views ELSE 0 END), 0) AS gpc,
+        COUNT(*) AS groups FROM site_request_diagnostics WHERE host = ? AND day >= ?`).bind(host, since).first(),
+      env.SITE_DB.prepare(`SELECT agent, verified_bot AS verifiedBot, SUM(views) AS views, MAX(day) AS lastDay
+        FROM site_request_diagnostics WHERE host = ? AND day >= ? AND is_bot = 1
+        GROUP BY agent, verified_bot ORDER BY views DESC, agent, verified_bot LIMIT 50`).bind(host, since).all(),
+      env.SITE_DB.prepare(`SELECT day, path, agent, is_bot AS isBot, verified_bot AS verifiedBot, dnt, gpc, views
+        FROM site_request_diagnostics WHERE host = ? AND day >= ? ORDER BY day DESC, views DESC, id DESC LIMIT 200`).bind(host, since).all(),
+    ]);
+    return statusJson({ success: true, host, since, totals, agents: agents.results, groups: groups.results, retentionDays: DETAIL_DAYS });
+  } catch {
+    return statusJson({ success: false, code: "diagnostics_unavailable" }, 503);
+  }
+}
+
 async function visitDetails(request, env) {
   if (!await authorizeAdmin(request, env)) return statusJson({ success: false, code: "unauthorized" }, 401);
   if (!env.SITE_DB) return statusJson({ success: false, code: "statistics_unavailable" }, 503);
@@ -144,5 +226,6 @@ export async function handleStatusRequest(request, env) {
   const path = new URL(request.url).pathname;
   if (path === "/api/v1/status") return serviceStatus(request, env);
   if (path === "/api/v1/status/visits") return visitSummary(request, env);
+  if (path === "/api/v1/admin/status/diagnostics") return requestDiagnostics(request, env);
   return visitDetails(request, env);
 }

@@ -12,11 +12,26 @@
   <main class="st-main">
     <div class="st-heading"><div><p class="st-kicker">MIRoKIT / REDAKTION</p><h1>Einzelne Seitenaufrufe</h1><p>Geschützte Aufrufdetails dieser Domain aus den letzten 90 Tagen. Jeder Eintrag ist eine Anfrage; Personen und wiederkehrende Besucher werden nicht identifiziert.</p></div></div>
     <div class="st-toolbar"><nav class="st-switch" aria-label="Navigation"><a href="/admin/">← Content Desk</a><a href="/status/?view=visitors">Öffentliche Statistik ↗</a></nav><button class="st-button" id="adminStatusRefresh" type="button">Aktualisieren</button></div>
-    <p class="st-explanation">Es werden keine IP-Adressen, Namen, Besucherkennungen oder vollständigen User-Agent-Daten gespeichert. Land und Gerätetyp sind Schätzungen. Bekannte Bots und Anfragen mit DNT/GPC sind ausgeschlossen.</p>
+    <p class="st-explanation">Es werden keine IP-Adressen, Namen, Besucherkennungen oder vollständigen User-Agent-Daten gespeichert. Land und Gerätetyp sind Schätzungen. Bekannte Bots und Anfragen mit DNT/GPC erscheinen separat als Tageszähler im Container unten.</p>
     <form class="st-login" id="statusLogin" hidden><label for="statusToken">Lokales Admin-Token<input type="password" id="statusToken" autocomplete="off" required /></label><button class="st-button" type="submit">Anmelden</button></form>
     <p id="adminStatusNotice" class="st-notice" role="status" aria-live="polite"></p>
-    <div class="st-card st-table-wrap"><table class="st-table"><caption>Neueste erfasste Aufrufe · Zeitpunkt in deiner lokalen Zeitzone</caption><thead><tr><th scope="col">Zeitpunkt</th><th scope="col">Seite</th><th scope="col">Land</th><th scope="col">Gerät</th><th scope="col">Browser</th></tr></thead><tbody id="adminStatusRows"></tbody></table></div>
+    <div class="st-card st-table-wrap"><table class="st-table"><caption>Reguläre Aufrufe · Zeitpunkt in deiner lokalen Zeitzone</caption><thead><tr><th scope="col">Zeitpunkt</th><th scope="col">Seite</th><th scope="col">Land</th><th scope="col">Gerät</th><th scope="col">Browser</th></tr></thead><tbody id="adminStatusRows"></tbody></table></div>
     <button class="st-button" id="adminStatusMore" type="button" hidden>Weitere Aufrufe laden</button>
+    <section class="st-card st-diagnostics" aria-labelledby="diagnosticsTitle">
+      <p class="st-kicker">NUR FÜR ADMINS · LETZTE 90 TAGE</p>
+      <h2 id="diagnosticsTitle">Bots &amp; DNT/GPC-Anfragen</h2>
+      <p>Diese Aufrufe zählen nicht zur öffentlichen Besucherstatistik. Gespeichert werden Tagesgruppen nach Seite, Botfamilie und DNT/GPC-Signal, ohne Zuordnung zu einzelnen Personen. DNT/GPC bedeutet nicht automatisch, dass ein Bot zugreift.</p>
+      <div class="st-diagnostic-metrics"><div><span>Anfragen gesamt</span><strong id="diagnosticRequests">—</strong></div><div><span>Bots / Automation</span><strong id="diagnosticBots">—</strong></div><div><span>DNT gesetzt</span><strong id="diagnosticDnt">—</strong></div><div><span>GPC gesetzt</span><strong id="diagnosticGpc">—</strong></div></div>
+      <p>Die Kategorien können sich überschneiden: Ein Bot kann zugleich DNT und GPC senden.</p>
+      <p id="diagnosticNotice" class="st-notice" role="status" aria-live="polite"></p>
+      <h3>Wer ruft die Seiten automatisiert ab?</h3>
+      <p>Botnamen stammen aus dem User-Agent und können vorgetäuscht werden. „Cloudflare bestätigt“ erscheint nur bei einem entsprechenden Cloudflare-Signal; sonst ist der Botstatus nicht bestätigt. Auch Linkvorschauen und automatisierte Werkzeuge können hier erscheinen.</p>
+      <div id="diagnosticAgents"></div>
+      <h3>Tagesgruppen nach Seite</h3>
+      <p>Erfasst werden erfolgreiche öffentliche HTML-Aufrufe sowie robots.txt und sitemap.xml. Von Cloudflare blockierte Anfragen und reine Cacheanzeigen ohne Serveranfrage sind hier nicht enthalten.</p>
+      <p id="diagnosticScope">Erfassung ab Aktivierung; frühere Aufrufe lassen sich nicht rekonstruieren.</p>
+      <div class="st-table-wrap"><table class="st-table"><caption>Bot- und DNT/GPC-Aufrufe · Kalendertag in UTC</caption><thead><tr><th scope="col">Tag (UTC)</th><th scope="col">Seite</th><th scope="col">Bot / Browser</th><th scope="col">Botstatus</th><th scope="col">DNT</th><th scope="col">GPC</th><th scope="col">Aufrufe</th></tr></thead><tbody id="diagnosticRows"></tbody></table></div>
+    </section>
     <noscript>Bitte JavaScript aktivieren, um die Aufrufdetails zu laden.</noscript>
   </main>
   <script type="module" src="/admin/status/status.js"></script>

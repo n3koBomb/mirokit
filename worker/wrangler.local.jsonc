@@ -14,7 +14,8 @@
       "/",
       "/index.html",
       "/page/*",
-      "/status", "/status/*", "/site/status", "/site/status/*"
+      "/status", "/status/*", "/site/status", "/site/status/*",
+      "/robots.txt", "/sitemap.xml"
     ]
   },
   "d1_databases": [

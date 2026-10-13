@@ -2,18 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import worker from "./index.js";
-import { queueVisit, recordVisit, shouldRecordVisit, visitMetadata } from "./status.js";
+import { queueVisit, recordVisit, shouldRecordVisit, visitMetadata, requestActivity, recordRequestDiagnostic } from "./status.js";
 
 let database, env;
 const html = () => new Response("<h1>Website</h1>", { headers: { "Content-Type": "text/html" } });
-function request(path = "/", headers = {}, host = "localhost") {
+function request(path = "/", headers = {}, host = "localhost", cf = { country: "DE" }) {
   const req = new Request(`http://${host}${path}`, { headers: { "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS) AppleWebKit/605.1 Safari/605.1", ...headers } });
-  Object.defineProperty(req, "cf", { value: { country: "DE" } });
+  Object.defineProperty(req, "cf", { value: cf });
   return req;
 }
 beforeEach(() => {
   database = new DatabaseSync(":memory:");
   database.exec(readFileSync(new URL("../migrations/0009_site_status.sql", import.meta.url), "utf8"));
+  database.exec(readFileSync(new URL("../migrations/0010_request_diagnostics.sql", import.meta.url), "utf8"));
   const statement = (sql, params = []) => ({
     bind: (...values) => statement(sql, values),
     first: async () => database.prepare(sql).get(...params) || null,
@@ -67,6 +68,25 @@ describe("visit counting and privacy boundaries", () => {
     expect(shouldRecordVisit(new Request("http://localhost/", { method: "HEAD" }), html())).toBe(false);
     expect(shouldRecordVisit(request(), new Response("missing", { status: 404, headers: { "Content-Type": "text/html" } }))).toBe(false);
     expect(shouldRecordVisit(request(), new Response("CSS", { headers: { "Content-Type": "text/css" } }))).toBe(false);
+    expect(shouldRecordVisit(request("/page/gallery/gallery.css"), new Response(null, { status: 304, headers: { "Content-Type": "text/css" } }))).toBe(false);
+  });
+  it("counts HTML revalidation on refresh while preserving the 304 response", async () => {
+    const pending = [];
+    const ctx = { waitUntil: (promise) => pending.push(promise) };
+    await worker.fetch(request("/status/"), env, ctx);
+    await Promise.all(pending);
+    env.ASSETS.fetch = async () => new Response(null, {
+      status: 304, headers: { "Content-Type": "text/html; charset=utf-8", ETag: '"unchanged"' },
+    });
+    const response = await worker.fetch(request("/status/", { "If-None-Match": '"unchanged"' }), env, ctx);
+    await Promise.all(pending);
+    expect(response.status).toBe(304);
+    expect(response.body).toBeNull();
+    expect(response.headers.get("ETag")).toBe('"unchanged"');
+    expect(database.prepare("SELECT SUM(views) AS views FROM site_visit_totals").get().views).toBe(2);
+  });
+  it.each([{ DNT: "1" }, { "Sec-GPC": "1" }, { "User-Agent": "Googlebot" }])("still excludes cached HTML visits with %j", (headers) => {
+    expect(shouldRecordVisit(request("/status/", headers), new Response(null, { status: 304, headers: { "Content-Type": "text/html" } }))).toBe(false);
   });
   it("uses unknown instead of fabricating a country or device", () => {
     expect(visitMetadata(new Request("http://localhost/"))).toEqual({ country: "unknown", device: "unknown", browser: "unknown" });
@@ -81,6 +101,114 @@ describe("visit counting and privacy boundaries", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
     queueVisit(request(), html(), env, { waitUntil: (promise) => pending.push(promise) });
     await expect(Promise.all(pending)).resolves.toBeDefined();
+  });
+});
+
+describe("admin-only bot and DNT/GPC aggregates", () => {
+  const adminHeaders = { "X-MiroKIT-Admin-Token": "test-admin" };
+  async function diagnostics(host = "localhost") {
+    return (await worker.fetch(request("/api/v1/admin/status/diagnostics", adminHeaders, host), env)).json();
+  }
+  async function track(req, response = html()) {
+    const pending = [];
+    queueVisit(req, response, env, { waitUntil: (promise) => pending.push(promise) });
+    await Promise.all(pending);
+  }
+  it.each([
+    ["Googlebot/2.1", "Googlebot"], ["bingbot/2.0", "bingbot"], ["YandexBot/3.0", "YandexBot"],
+    ["GPTBot/1.2", "GPTBot"], ["OAI-SearchBot/1.0", "OAI-SearchBot"], ["ChatGPT-User/1.0", "ChatGPT-User"],
+    ["ClaudeBot/1.0", "ClaudeBot"], ["PerplexityBot/1.0", "PerplexityBot"],
+    ["facebookexternalhit/1.1", "Facebook crawler"], ["curl/8.0", "curl"],
+  ])("recognizes %s without treating its name as verification", (ua, agent) => {
+    expect(requestActivity(request("/", { "User-Agent": ua }))).toMatchObject({ agent, isBot: true, verifiedBot: false });
+  });
+  it("keeps bots and privacy signals separate from normal visits and counts overlapping signals once", async () => {
+    await track(request());
+    await track(request("/page/gallery/?token=private", { "User-Agent": "Googlebot/2.1" }));
+    await track(request("/page/gallery/?email=secret", { "User-Agent": "Googlebot/2.1" }));
+    await track(request("/", { DNT: "1" }));
+    await track(request("/", { "Sec-GPC": "1" }));
+    await track(request("/status/", { "User-Agent": "GPTBot/1.0", DNT: "1", "Sec-GPC": "1" }), new Response(null, { status: 304, headers: { "Content-Type": "text/html" } }));
+    const data = await diagnostics();
+    expect(data.totals).toEqual({ requests: 5, bots: 3, dnt: 2, gpc: 2, groups: 4 });
+    expect(data.groups.find((row) => row.agent === "Googlebot")).toMatchObject({ views: 2, path: "/page/gallery/", verifiedBot: 0 });
+    expect(data.groups.find((row) => row.agent === "browser")).toMatchObject({ isBot: 0 });
+    const publicData = await (await worker.fetch(request("/api/v1/status/visits"), env)).json();
+    expect(publicData.totals.views).toBe(1);
+    expect(publicData).not.toHaveProperty("agents");
+    expect(database.prepare("SELECT COUNT(*) AS count FROM site_visit_details").get().count).toBe(1);
+    const stored = database.prepare("SELECT * FROM site_request_diagnostics").all();
+    expect(JSON.stringify(stored)).not.toMatch(/private|secret|Mozilla|iPhone|Googlebot\/2\.1/);
+    expect(stored[0]).not.toHaveProperty("visited_at");
+    expect(stored[0]).not.toHaveProperty("country");
+  });
+  it("accepts only Cloudflare metadata as verification, including an otherwise unrecognized bot", async () => {
+    await track(request("/", {}, "localhost", { botManagement: { verifiedBot: true } }));
+    await track(request("/", { "User-Agent": "Googlebot/2.1", "X-Verified-Bot": "true" }));
+    const { agents } = await diagnostics();
+    expect(agents.find((item) => item.agent === "verified-bot").verifiedBot).toBe(1);
+    expect(agents.find((item) => item.agent === "Googlebot").verifiedBot).toBe(0);
+  });
+  it("uses fixed labels for unknown automation and does not classify privacy signals as bots", () => {
+    expect(requestActivity(request("/", { "User-Agent": "private-custom-crawler/person@example.com" }))).toMatchObject({ agent: "other-automation", isBot: true });
+    expect(requestActivity(request("/", { DNT: "1", "Sec-GPC": "1" }))).toEqual({ agent: "browser", isBot: false, verifiedBot: false, dnt: true, gpc: true });
+  });
+  it("authenticates before querying storage and never accepts a local token on production", async () => {
+    const prepare = vi.spyOn(env.SITE_DB, "prepare");
+    expect((await worker.fetch(request("/api/v1/admin/status/diagnostics"), env)).status).toBe(401);
+    expect((await worker.fetch(request("/api/v1/admin/status/diagnostics", adminHeaders, "mirokit.com"), env)).status).toBe(401);
+    expect(prepare).not.toHaveBeenCalled();
+  });
+  it("isolates domains and keeps diagnostic responses private", async () => {
+    await recordRequestDiagnostic(request("/", { DNT: "1" }), env);
+    await recordRequestDiagnostic(request("/", { "User-Agent": "Googlebot/2.1" }, "mirokit.ru"), env);
+    const response = await worker.fetch(request("/api/v1/admin/status/diagnostics", adminHeaders), env);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    const data = await response.json();
+    expect(data.totals.requests).toBe(1);
+    expect(data.totals.bots).toBe(0);
+    expect(data.agents).toEqual([]);
+  });
+  it("hides and prunes expired daily groups", async () => {
+    await recordRequestDiagnostic(request("/", { DNT: "1" }), env, new Date(Date.now() - 90 * 86400000));
+    expect((await diagnostics()).totals.requests).toBe(0);
+    await recordRequestDiagnostic(request("/", { DNT: "1" }), env);
+    expect(database.prepare("SELECT COUNT(*) AS count FROM site_request_diagnostics").get().count).toBe(1);
+  });
+  it("bounds displayed groups without truncating totals", async () => {
+    for (let i = 0; i < 201; i++) await recordRequestDiagnostic(request(`/page/item-${i}/`, { DNT: "1" }), env);
+    const data = await diagnostics();
+    expect(data.groups).toHaveLength(200);
+    expect(data.totals.groups).toBe(201);
+    expect(data.totals.requests).toBe(201);
+  });
+  it("keeps ordinary recording and page delivery working when migration 0010 is missing", async () => {
+    database.exec("DROP TABLE site_request_diagnostics");
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    await track(request());
+    await expect(track(request("/", { DNT: "1" }))).resolves.toBeUndefined();
+    expect(database.prepare("SELECT SUM(views) AS views FROM site_visit_totals").get().views).toBe(1);
+    expect((await worker.fetch(request("/api/v1/admin/status/diagnostics", adminHeaders), env)).status).toBe(503);
+  });
+  it.each(["/robots.txt", "/sitemap.xml"])("includes crawler requests to %s without inflating public visits", async (path) => {
+    const pending = [];
+    const ctx = { waitUntil: (promise) => pending.push(promise) };
+    expect((await worker.fetch(request(path, { "User-Agent": "Googlebot/2.1" }), env, ctx)).status).toBe(200);
+    await worker.fetch(request(path), env, ctx);
+    await Promise.all(pending);
+    const data = await diagnostics();
+    expect(data.totals.requests).toBe(1);
+    expect(data.groups[0].path).toBe(path);
+    expect(database.prepare("SELECT COUNT(*) AS count FROM site_visit_totals").get().count).toBe(0);
+  });
+  it("ignores admin, API, assets, errors, HEAD and prefetch even with bot/privacy signals", async () => {
+    const headers = { "User-Agent": "Googlebot/2.1", DNT: "1" };
+    for (const path of ["/admin/", "/api/v1/status", "/public/test.html"]) await track(request(path, headers));
+    await track(request("/", { ...headers, Purpose: "prefetch" }));
+    await track(request("/", headers), new Response("error", { status: 404, headers: { "Content-Type": "text/html" } }));
+    await track(new Request("http://localhost/", { method: "HEAD", headers }));
+    await track(request("/page/gallery/gallery.css", headers), new Response("css", { headers: { "Content-Type": "text/css" } }));
+    expect((await diagnostics()).totals.requests).toBe(0);
   });
 });
 
@@ -157,7 +285,7 @@ describe("status routing and live checks", () => {
     expect(result.status).toBe("degraded");
     expect(result.components.find((item) => item.id === "media").status).toBe("unavailable");
   });
-  it.each(["/api/v1/status", "/api/v1/status/visits", "/api/v1/admin/status/visits"])("rejects writes at %s", async (path) => {
+  it.each(["/api/v1/status", "/api/v1/status/visits", "/api/v1/admin/status/visits", "/api/v1/admin/status/diagnostics"])("rejects writes at %s", async (path) => {
     const response = await worker.fetch(new Request(`http://localhost${path}`, { method: "POST" }), env);
     expect(response.status).toBe(405);
     expect(response.headers.get("Allow")).toBe("GET");
