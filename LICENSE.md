@@ -139,3 +139,16 @@ Anfragen zu Nutzung, Lizenzierung, Kooperation oder Freigabe sind direkt an **in
 ---
 
 **Rechtlicher Hinweis:** Dieser Text dokumentiert eine proprietäre „Alle Rechte vorbehalten“-Regelung. Für eine belastbare geschäftliche Nutzung sollten die genaue juristische Firmierung, Anschrift, anwendbares Recht und bestehende Verträge durch eine qualifizierte Rechtsberatung geprüft werden.
+
+
+## Technischer Verzeichnisabgleich vom 18. Oktober 2026
+
+Dieser redaktionelle Hinweis ergänzt ausschließlich die technischen Fundstellen.
+Die vorstehenden Lizenzbedingungen und Rechtezuordnungen bleiben unverändert.
+Die dokumentierte Projektstruktur umfasst auch `site/status/`,
+`site/admin/status/`, `worker/test/helpers/` und die zugehörigen Tests.
+Für die lokal mitgelieferte PDF.js-Distribution einschließlich CMaps, Schriften
+und WASM gelten die eigenen Hinweise unter
+[site/public/vendor/pdfjs/README.md](site/public/vendor/pdfjs/README.md) und die
+dort beigefügten Lizenzdateien. Der technische Dokumentationsabgleich bestätigt
+keine Nutzungsrechte an einzelnen Bildern, Profilen oder hochgeladenen Medien.

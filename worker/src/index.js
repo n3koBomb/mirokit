@@ -1,5 +1,6 @@
 import { authorizeAdmin, isLocalHostname } from "./access.js";
 import { handleStatusRequest, queueVisit } from "./status.js";
+import { sendContactReceipt } from "./contact-receipt.js";
 import { getCanonicalSiteHostname } from "./hosts.js";
 import { ADMIN_MEDIA_PREFIX, PRIVATE_MEDIA_CACHE, handleMediaRequest } from "./media.js";
 import { CSP_REPORT_ONLY } from "./security-headers.js";
@@ -3089,6 +3090,18 @@ export default {
 					mailFrom,
 				}
 			);
+
+			const receipt = sendContactReceipt(env, {
+				formType,
+				language: meta?.language,
+				senderEmail,
+				mailFrom,
+			});
+			if (ctx?.waitUntil) {
+				ctx.waitUntil(receipt);
+			} else {
+				await receipt;
+			}
 
 			return jsonResponse(
 				{

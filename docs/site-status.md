@@ -1,5 +1,9 @@
 # Status und Besucherstatistik
 
+Stand: **18. Oktober 2026**, lokaler Quellcode. Einstieg: [README](../README.md),
+Testumgebung: [docs/testing.md](testing.md). Diese Seite ist kein unabhängiges
+Produktionsmonitoring und zählt keine identifizierten Personen.
+
 `site/status/` entspricht auf dem Worker der URL `/status/`.
 `/site/status`, `/site/status/` und `/site/status/index.html` leiten dorthin weiter.
 `?view=server` und `?view=visitors` wählen die Ansicht, auch beim Teilen eines Links.
@@ -49,7 +53,8 @@ dagegen nicht erneut.
 ungefährem Land und Gerätetyp. Die öffentliche API `/api/v1/status/visits` liefert
 Gesamtzahlen seit Erfassungsbeginn, heute, die letzten 30 Tage, Länder, Gerätetypen
 und Seiten. Länder und Seiten sind auf die 20 häufigsten Einträge begrenzt.
-Die vier Domains haben getrennte Statistiken. Filter und Sprachwechsel innerhalb
+Jeder exakte Requesthostname hat getrennte Statistiken. Apex, Alias und `www`
+werden dabei nicht über die Canonical-Zuordnung zusammengelegt. Filter und Sprachwechsel innerhalb
 einer bereits geladenen Seite erzeugen keine neuen Dokumentaufrufe.
 
 Diese Zahlen beschreiben **Aufrufe**, keine eindeutigen Besucher oder Personen.
@@ -74,7 +79,8 @@ zu diesem Zeitpunkt gespeichert, werden aber nicht mehr ausgeliefert.
 Dauerhafte Summen bleiben erhalten. Es gibt keine personenübergreifende oder
 wiederkehrende Besucherzuordnung.
 
-Erfassung läuft über `ctx.waitUntil`. Fehler beim Zählen, etwa eine noch nicht
+Erfassung läuft nur mit vorhandener `SITE_DB`-Bindung und `ctx.waitUntil`.
+Direkte Aufrufe des Workers ohne Ausführungskontext erfassen keine Besuche. Fehler beim Zählen, etwa eine noch nicht
 angewendete Migration, verhindern keine Auslieferung der Website. Die Statistik
 zeigt bei fehlenden Tabellen oder Bindungen einen Fehler statt erfundener Nullen.
 API-Antworten verwenden `private, no-store`.
@@ -144,3 +150,24 @@ fehlende Bindungen und Zeitlimits. Die Diagnoseprüfungen decken außerdem Botfa
 Cloudflare-Verifizierung, kombinierte DNT/GPC-Flags, private Tagesgruppen,
 robots.txt/sitemap.xml und fehlende Migration 0010 ab. Die bestehenden
 Repository-Checks bleiben unverändert.
+
+## Methoden und Antwortformen
+
+| Methode / Route | Öffentliche beziehungsweise geschützte Daten |
+| --- | --- |
+| `GET /api/v1/status` | `status`, `checkedAt`, `components` |
+| `GET /api/v1/status/visits` | `host`, `totals`, `daily`, `countries`, `devices`, `pages` |
+| `GET /api/v1/admin/status/visits?before=<id>` | `visits`, `nextCursor`, `retentionDays`; Authentifizierung erforderlich |
+| `GET /api/v1/admin/status/diagnostics` | `since`, `totals`, `agents`, `groups`, `retentionDays`; Authentifizierung erforderlich |
+
+Andere Methoden einschließlich `HEAD` liefern `405` mit `Allow: GET`. Fehlerhafte
+Cursor liefern `400`; fehlende Identität `401`; fehlende Datenbank/Tabellen
+`503`. Ein degradierter Dienststatus kann weiterhin eine erfolgreiche API-Antwort
+mit `status=degraded` sein. Alle Antworten setzen `private, no-store` und
+`noindex, nofollow`. Ein Timeout beendet das Warten auf die Probe, garantiert
+aber keinen Abbruch der zugrunde liegenden Binding-Operation.
+
+Der Dokumentationsaudit führte die lokale Suite mit 578 Tests in 19 Dateien aus,
+darunter 57 Status-Tests. Er hat die Statusseite nicht erneut im Browser oder
+gegen Produktionsdaten geprüft. Weitere Nachweise und Grenzen stehen im
+[Repository-Audit](repository-audit.md#prüfnachweise).

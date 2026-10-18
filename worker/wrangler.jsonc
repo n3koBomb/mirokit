@@ -73,6 +73,13 @@
             "info@mirokit.com",
             "info@mirokit.ru"
          ]
+      },
+      {
+         "name": "CONTACT_RECEIPT_EMAIL",
+         "allowed_sender_addresses": [
+            "info@mirokit.com",
+            "info@mirokit.ru"
+         ]
       }
    ],
    "vars": {

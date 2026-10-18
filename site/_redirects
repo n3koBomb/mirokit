@@ -9,6 +9,7 @@
 /page/gallery /page/gallery/ 301
 /page/news /page/news/ 301
 /page/interviews /page/interviews/ 301
+/page/contactPersons /page/contactPersons/ 301
 
 # Asset organization: retain previously published public URLs.
 /public/assets/photos_background_thumbnail.png /public/assets/backgrounds/photos_background_thumbnail.png 301

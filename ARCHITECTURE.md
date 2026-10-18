@@ -1,142 +1,208 @@
 # Architektur
 
-Dieses Dokument beschreibt den implementierten Aufbau des Repositorys. Einstieg und Betriebsbefehle stehen in der [README](README.md), Regeln für Änderungen in [CONTRIBUTING.md](CONTRIBUTING.md).
+Stand: **18. Oktober 2026**, lokaler Quellcode. Dieses Dokument beschreibt implementierte Verträge; offene Abweichungen stehen im [Audit](docs/repository-audit.md). Einstieg: [README](README.md), Prüfungen: [docs/testing.md](docs/testing.md).
 
-## Laufzeit und Zuständigkeiten
+## Laufzeit und Routing
 
-`site/` ist der Document Root von Cloudflare Workers Static Assets. Die öffentliche Website besteht aus statischem HTML, CSS und JavaScript; redaktionelle Daten werden im Browser über APIs ergänzt. Es gibt keinen Frontend-Build und keine serverseitige UI-Rendering-Schicht.
+`site/` ist der Document Root von Workers Static Assets. HTML/CSS/Vanilla JavaScript werden ohne Frontend-Build ausgeliefert. Der Worker empfängt die in `assets.run_worker_first` genannten Pfade, führt API-, Authentifizierungs-, Medien- und Dokumentlogik aus und delegiert übrige Requests an `env.ASSETS.fetch`.
 
-Der Worker in `worker/` erhält durch `run_worker_first` ausgewählte Requests vor dem Asset-Dienst. Er verarbeitet APIs, den geschützten Admin-Bereich, R2-Medien und bestimmte Dokument-/SEO-Pfade. Übrige Dateien liefert das `ASSETS`-Binding aus.
+Die Konfiguration umfasst `/api/*`, `/admin/*`, `/media/v1/*`, `/`, `/index.html`, `/page/*`, Status-Aliase und SEO-Dateien. Produktion ergänzt gesperrte interne Asset-Pfade. [Cloudflare dokumentiert die Worker-first-Reihenfolge](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/).
 
-| Modul | Verantwortung |
+```mermaid
+flowchart LR
+  B[Browser] --> W[Worker-Routing]
+  W --> A[Static Assets: site]
+  W --> U[Admin-Authentifizierung]
+  U --> C[Validierung und Content-Handler]
+  C --> D[D1]
+  C --> R[R2]
+  W --> M[Veröffentlichungsprüfung für Medien]
+  M --> D
+  M --> R
+  W --> E[Kontaktprüfung und Mailbindings]
+  W --> S[Status und Hintergrundzähler]
+  S --> D
+```
+
+Es gibt keine Queue, keinen Durable Object, keinen Cronjob und kein serverseitiges Rendering der Redaktionsoberfläche. Die Dokument-Metadaten werden im Worker bei geeigneten HTML-Antworten umgeschrieben.
+
+## Worker-Module
+
+| Datei unter `worker/src/` | Verantwortung |
 | --- | --- |
-| `site/index.html` | Seitenstruktur, Formulare, Dialoge und statische Ausgangsinhalte |
-| `site/source/style/style.css` | Öffentliches Layout, Komponenten, Themes und Breakpoints |
-| `site/source/style/subpage.css` | Gemeinsamer responsiver Header für Gallery, News, Online Projects und Privacy Policy |
-| `site/source/scripts/language.js` | RU/EN/DE-Wörterbücher einschließlich Programme- und Three-Bears-Inhalten sowie Text-/Attributübersetzungen |
-| `site/source/scripts/news-data.js` | Gebündelte News einschließlich lokalisierter Modal-Inhalte |
-| `site/source/scripts/main.js` | Navigation, Theme, News-/Projects-/Galerie-/Partnerdarstellung, Dialoge und verzögertes Laden |
-| `site/source/scripts/mirokit-world-map.js` | Canvas-Karte, Standortdaten und Länderübersicht |
-| `site/source/scripts/contact-mail.js` | Formularzustand, Turnstile und Kontakt-API-Anfragen |
-| `site/admin/index.html` | Redaktionsformulare und Bereichs-Tabs |
-| `site/admin/admin.css` | Darstellung des Content Desk |
-| `site/admin/admin.js` | Admin-API-Aufrufe, Uploads und Bearbeitungszustand |
-| `worker/src/index.js` | Routing, API-Handler, Datenzugriff, Uploads, E-Mail und SEO |
-| `worker/src/access.js` | Lokales Token sowie Access-JWT- und E-Mail-Prüfung |
-| `worker/src/media.js` | Veröffentlichungsprüfung, geschützte Vorschau, Cache und Byte-Ranges |
-| `worker/src/hosts.js` | Explizite MIRoKIT-Hostnamen und Canonical-Zuordnung |
-| `worker/src/remote-media.js` | Begrenzte Google-Drive-Imports mit geprüften Redirects |
-| `worker/src/admin-methods.js` | Erlaubte HTTP-Methoden je Admin-Route |
-| `worker/src/security-headers.js` | Report-Only-CSP für Worker-Antworten |
-| `site/admin/media-preview.js` | Authentifizierte Medienvorschau, lokal mit Blob-URLs |
-| `site/source/scripts/subpage.js` | Theme-Synchronisierung des Privacy-Policy-Headers ohne Landingpage-Bootstrap |
-| `worker/src/news.js` | News-Validierung, Abfragen und Datenabbildung |
-| `worker/src/content.js` | World-/Partner-Validierung, Abfragen und Datenabbildung |
-| `worker/src/*.test.js` | Datenverträge, SQLite-Abfragen, Zugriffsgrenzen, JWTs und Vorschauverhalten |
+| `index.js` | Routing, CRUD-Handler, Uploads/Promotion, Gallery-Ordner, Formulare und SEO |
+| `access.js` | Lokaler Token, RS256-JWT, JWKS-Cache und E-Mail-Allowlist |
+| `admin-methods.js` | Methodenvertrag und Route-Präzedenz für Content-Admin-APIs |
+| `hosts.js` | Vier Site-Domains und ihre vier `www`-Aliase |
+| `security-headers.js` | Gemeinsame Report-Only-CSP |
+| `remote-media.js` | Begrenzte Google-Drive-Bilddownloads mit geprüften Weiterleitungen |
+| `media.js` | Medienpfade, Veröffentlichungsprüfung, Vorschau, ETag und Range |
+| `news.js` | News-Validierung, SQL und öffentliche/admin Datenformen |
+| `content.js` | World Points und Partners |
+| `projects.js` | Projektzeiträume, Phasen und Übersetzungen |
+| `videos.js` | Videos, Collections, YouTube-Normalisierung und WebVTT |
+| `interviews.js` | Interview-Materialien und Übersetzungen |
+| `online-project-media.js` | Video-/PDF-Datensätze und Dateien in R2 |
+| `status.js` | Live-Probes, Aufrufaggregate, Details und Bot-/DNT-/GPC-Gruppen |
+| `contact-receipt.js` | Reine Mailvorlagen und isolierter Bestätigungsversand |
 
-Die öffentliche Seite lädt `language.js`, `news-data.js` und `main.js` in dieser Reihenfolge, anschließend das verzögert ausgeführte Formularskript. Das Kartenmodul wird bedarfsabhängig geladen; seine Geometrie verwendet externe D3-Geo-, TopoJSON- und World-Atlas-Ressourcen.
+Alle 15 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests prüfen querliegende Verträge. Der SQLite-Helfer liegt außerhalb von `src/` unter `worker/test/helpers/database.js`.
 
-## Inhalte und Datenfluss
+## Frontend-Module
 
-Die Redaktion öffnet `/admin/`. Das Admin-Skript sendet authentifizierte Anfragen an `/api/v1/admin/...`. Der Worker validiert sie und schreibt Datensätze in D1 beziehungsweise Bilder in R2. Öffentliche Browser lesen die veröffentlichten Inhalte über die Lese-APIs und rendern sie in die vorhandene Seite.
-
-| Route | Aufgabe |
+| Pfad | Aufgabe |
 | --- | --- |
-| `GET/HEAD /api/v1/news` | Veröffentlichte und zeitlich freigegebene News |
-| `GET/HEAD /api/v1/gallery` | Veröffentlichte Gallery-Bilder und Zitate |
-| `GET/HEAD /api/v1/videos` | Veröffentlichte Videos mit Postern und Untertiteln |
-| `GET/HEAD /api/v1/interviews` | Veröffentlichte Interview-Videos und Materialien aus getrennten Beständen |
-| `GET/HEAD /api/v1/projects` | Veröffentlichte Projekte mit berechneter Current/Upcoming/Past-Phase |
-| `GET/HEAD /api/v1/world-points` | Veröffentlichte Kartenpunkte |
-| `GET/HEAD /api/v1/partners` | Veröffentlichte Partner |
-| `/api/v1/admin/news`, `/api/v1/admin/media` | News-Verwaltung und Bild-Uploads |
-| `/api/v1/admin/gallery`, `/api/v1/admin/gallery/quotes` | Gallery-Bilder und Zitate verwalten |
-| `POST /api/v1/admin/gallery/publish` | Bis zu 100 Pending-Gallery-Schlüssel gesammelt in ihre Ordner verschieben und als veröffentlicht markieren |
-| `POST /api/v1/admin/gallery/reorder` | Die Reihenfolge veröffentlichter oder noch ausstehender Bilder innerhalb genau eines normalen Gallery-Ordners speichern |
-| `PATCH /api/v1/admin/gallery/<encoded-key>` | Einem vorhandenen Online-Projekte-Bild ein Thema zuweisen |
-| `/api/v1/admin/interviews/videos` | Interview-Videos unabhängig vom normalen Video-/Gallery-Bestand verwalten und veröffentlichen |
-| `/api/v1/admin/interviews/materials` | Dokumente, Prospekte, Formulare und Anfragen mit R2-/HTTPS-Quelle verwalten und veröffentlichen |
-| `/api/v1/admin/world-points` | Kartenpunkte verwalten |
-| `/api/v1/admin/partners`, `/api/v1/admin/partners/media` | Partner und Logos verwalten |
-| `GET/HEAD /media/v1/...` | Nur aktuell veröffentlichte R2-Medien ausliefern |
-| `GET/HEAD /api/v1/admin/media/...` | Authentifizierte Vorschau einschließlich Pending, Draft und Archiv |
-| `POST /api/v1/contact` | Kontaktformular und Liga-Antrag verarbeiten |
+| `site/index.html` | Landingpage-Struktur, Programme, Ausgangsinhalte und beide Formulare |
+| `site/source/style/style.css` | Gemeinsame Gestaltung, Themes und responsive Regeln |
+| `site/source/style/subpage.css` | Wiederverwendeter Unterseiten-Header und gemeinsame Dokumentregeln |
+| `site/source/scripts/language.js` | Wörterbuch `T`, `currentLang`, `setLang`, Text-/Attributübersetzung |
+| `site/source/scripts/news-data.js` | Gebündelte News für Landingpage, News-Seite und Seed |
+| `site/source/scripts/main.js` | Navigation, Theme, Hero, News-Dialoge, Projects, Partners und Lazy Loading |
+| `site/source/scripts/contact-mail.js` | Formularvalidierung im Browser, Turnstile und Kontakt-Requests |
+| `site/source/scripts/mirokit-world-map.js` | Lazy geladenes Canvas-Kartenmodul, API-/Fallback-Punkte und Länderfeed |
+| `site/source/scripts/online-project-topics.js` | Zehn Topic-IDs, gemeinsam für Worker/Admin/Online Projects |
+| `site/source/scripts/subpage.js` | Eigenständige Theme-Steuerung für Kontakt-/Datenschutzseiten |
+| `site/page/gallery/` | Ordner-, Foto- und Videoansicht, Suche, Dialog und eigener HTML5-Player |
+| `site/page/news/` | Eigenständige News-Liste, Filter, Suche, Sortierung und Dialog |
+| `site/page/interviews/` | Gesprächsvideos und Material-Tabs |
+| `site/page/onlineProjects/` | Themenfilter, Masonry-Fotos, eigener Videoplayer und PDF-Karten |
+| `site/page/contactPersons/` | Profil-/Impressumsfenster und Hash-/Tastatur-Tabs |
+| `site/page/privacyPolicy/` | Russische Richtlinie, EU-Platzhalter und regionale Dokument-Tabs |
+| `site/status/` | Öffentliche Dienst- und Aufrufansicht, zusätzliches Statuswörterbuch |
+| `site/admin/admin.js` | Klassen für Config, Services, Notice, einzelne Inhaltsbereiche, Shell und App |
+| `site/admin/media-preview.js` | Geschützte Medien-URLs und lokale Token-/Blob-Vorschau |
+| `site/admin/online-project-media.js` | Video-/PDF-Editor und lokale PDF.js-Vorschau |
+| `site/admin/status/` | Geschützte Aufrufdetails und Diagnosegruppen |
 
-Die Verwaltungsrouten besitzen je nach Bereich zusätzliche ID-, Veröffentlichungs- oder Verfügbarkeitsrouten. Die implementierten Handler in `worker/src/index.js` sind die genaue Referenz für Methoden und Payloads.
+Landingpage-Skripte laden Sprache, News-Ausgangsdaten und Hauptinteraktionen; Formulare und Karteninitialisierung werden separat koordiniert. Unterseiten laden eigene Skripte und sollen nicht unbeabsichtigt den Landingpage-Bootstrap starten.
 
-### D1
+## Öffentliche APIs
 
-- `0001_news.sql`: News und RU/EN/DE-Übersetzungen.
-- `0002_gallery_quotes.sql`: Gallery-Zitate mit Übersetzungen.
-- `0003_world_points_partners.sql`: World Points, Partner, Übersetzungen und Ausgangsdaten.
-- `0004_videos.sql`: Videos, lokalisierte Metadaten und WebVTT-Untertitel.
-- `0005_projects.sql`: Projekte, Zeiträume, lokalisierte Metadaten und optionale Bild-/Link-Verweise.
-- `0006_gallery_quote_folders.sql` und `0007_news_links.sql`: spätere Gallery-/News-Erweiterungen.
-- `0008_interviews.sql`: Video-Collection `interviews` sowie Materialien und RU/EN/DE-Übersetzungen für Dokumente, Prospekte, Formulare und Anfragen.
+| Methode / Pfad | Antwortbestand |
+| --- | --- |
+| `GET/HEAD /api/v1/news` | `news`, nur `published` und UTC-Datum erreicht |
+| `GET/HEAD /api/v1/gallery?collection=gallery` | `gallery`, `folders`, `quotes`; Collection optional, `online-projects` ebenfalls erlaubt |
+| `GET/HEAD /api/v1/videos` | `videos`, Collection `general` |
+| `GET/HEAD /api/v1/interviews` | `interviews` aus Collection `interviews`, dazu `materials` |
+| `GET/HEAD /api/v1/projects` | `projects` mit berechneter Phase |
+| `GET/HEAD /api/v1/world-points` | `points` |
+| `GET/HEAD /api/v1/partners` | `partners` |
+| `GET /api/v1/online-projects/media` | Veröffentlichte Video-/PDF-Objekte unter `media` |
+| `GET /api/v1/status` | Read-only-Bindungsprüfungen und Gesamtstatus |
+| `GET /api/v1/status/visits` | Hostbezogene Aufrufaggregate |
+| `POST /api/v1/contact` | Kontakt-/Liga-Formularergebnis; `OPTIONS` für Preflight |
+| `GET/HEAD /media/v1/<key>` | Aktuell veröffentlichte Datei mit optionaler Byte-Range |
 
-News, World Points, Partner und Projects haben den Veröffentlichungsstatus `draft`, `published` oder `archived`. Bei World Points ist `hq`, `done` oder `planned` ein davon unabhängiger Kartenstatus. News speichern zusätzlich das Veröffentlichungsdatum; die öffentliche Abfrage vergleicht es mit dem aktuellen UTC-Datum. Projects speichern `startDate` und optional `endDate`; `endDate < heute` wird in der API als `phase: "past"` ausgegeben. Die Redaktion kann ein Projekt zuerst als Entwurf anlegen und vor der Veröffentlichung alle drei Sprachversionen, Zeitraum und Bild prüfen.
+Status und Online-Medien unterstützen derzeit nur `GET`, kein `HEAD`. Die übrigen Content-Handler akzeptieren `HEAD`; HTTP-Laufzeitsemantik gesondert prüfen. Unbekannte `/api/`-Pfade liefern `404`.
 
-Das News-Seed-Skript liest die gebündelten News, erzeugt SQL und führt Upserts aus. Ein erneuter Lauf kann bereits redigierte Daten mit denselben IDs überschreiben und erneut veröffentlichen. Es ist keine Synchronisation zwischen Backend und Frontend.
+## Admin-Verträge
 
-### R2 und statische Assets
+Content-Handler prüfen Identität, den Methodenvertrag und bei vorhandener schreibender `Origin` den gleichen Ursprung. Status- und Medienvorschau-Routen prüfen ihre Methoden selbst. Fehlende Origin ist für authentifizierte Nicht-Browser-Clients nicht grundsätzlich verboten. Methodenzulassung allein bestätigt weder gültige Identität noch gültige Nutzdaten.
 
-`SITE_MEDIA` enthält hochgeladene News-Bilder, Gallery-Bilder, Partnerlogos, Projektbilder, Videos, Poster, WebVTT-Dateien und Interview-Materialien. Gallery-Titel, Alt-Texte, Untertitel und Hervorhebung liegen in den Custom-Metadata der Bildobjekte; Gallery-Zitate, Project-Metadaten und Interview-Metadaten liegen separat in D1. Interview-Videos nutzen die `videos`-Tabelle mit `collection = 'interviews'`; Dokumente, Prospekte, Formulare und Anfragen liegen in `interview_materials` mit eigener Übersetzungstabelle. Projektbilder werden zunächst unter `projects/pending/` gespeichert und beim Entwurf-/Veröffentlichungsspeichern nach `projects/` promoted.
+| Routenfamilie unter `/api/v1/admin/` | Methoden und Verhalten |
+| --- | --- |
+| `news`, `videos`, `projects`, `partners`, `world-points` | `GET` Liste, `POST` neuer Datensatz |
+| `news/:id`, `videos/:id`, `projects/:id` | `PUT` speichern, `DELETE` archivieren |
+| `partners/:id`, `world-points/:id` | `POST`/`PUT` speichern, `DELETE` archivieren |
+| `<bereich>/:id/publish` | `POST` veröffentlichen |
+| `news/availability` | `GET` Slug prüfen |
+| `media`, `videos/media`, `projects/media`, `partners/media` | `POST` Upload |
+| `interviews/videos`, `interviews/materials` | Eigene CRUD-, Upload- und Publish-Routen nach demselben Muster |
+| `gallery` | `GET` inklusive privater Bestände, `POST` Bild-Upload |
+| `gallery/:encoded-key` | `PATCH` Metadaten, `DELETE` archivieren |
+| `gallery/publish`, `gallery/reorder` | `POST`, maximal 100 Schlüssel |
+| `gallery/quotes`, `gallery/quotes/:id` | `GET/POST` beziehungsweise `DELETE` |
+| `online-projects/media`, `online-projects/media/:id` | `GET/POST` beziehungsweise `PATCH/DELETE` |
+| `media/<key>` | `GET/HEAD` authentifizierte Bytes |
+| `status/visits`, `status/diagnostics` | `GET` geschützte Statistik |
 
-Normale Gallery-Bilder verwenden `folder_slug`, lokalisierte `folder_title`-/`folder_subtitle`-Werte, `file_name` und `sort_order` in den R2-Custom-Metadaten. Mehrere Admin-Dateien bleiben zunächst unter `gallery/pending/<folder-slug>/`; die explizite Publish-Route setzt `status=published` und verschiebt sie nach `gallery/<folder-slug>/`. Ein vorhandener Ordner kann über seinen validierten Slug ausgewählt werden; neue Ordner mit bereits belegtem Slug werden abgelehnt. Die Reorder-Route prüft, dass alle Schlüssel zum selben normalen Gallery-Ordner gehören, und schreibt die Reihenfolge mit ETag-Schutz zurück. Die öffentliche Gallery-API liefert daraus neben `gallery` auch gruppierte `folders` mit Bildlisten. Pending-Schlüssel dürfen nur im authentifizierten Admin-Bereich als Vorschau geladen werden.
+Konkrete Payloads stehen in den Normalisierern und [Admin-Anleitung](site/admin/README.md). `admin-methods.js` liefert bei bekanntem Pfad `405` mit `Allow`, sonst `404`; für Content-Adminrouten erfolgt dies nach der Authentifizierung.
 
-Online-Projekte verwenden weiterhin `collection=online-projects` und eines der zehn validierten `topic`-Kennzeichen in den R2-Metadaten. Startseiten-Links öffnen `/page/onlineProjects/index.html?topic=<thema>`; die Unterseite lädt die Sammlung und filtert sie im Browser. Bilder erscheinen mit ihren natürlichen Seitenverhältnissen in einem Masonry-Raster. Bilder ohne bisherige Zuordnung bleiben unter „Alle Themen“ sichtbar und können im eigenen Admin-Tab nachträglich zugeordnet werden. Die Themenkennzeichen sind in `site/source/scripts/online-project-topics.js` für Worker, Admin und Galerieseite gemeinsam definiert.
+## Datenbank
 
-Neue Uploads durchlaufen den jeweiligen `pending/`-Bereich. Beim Speichern werden sie in den permanenten Bereich übernommen, auch bei Entwürfen. Neue WebVTT-Inhalte erhalten bei jedem Speichern einen neuen UUID-Schlüssel. Ablaufregeln dürfen nur verwaiste Pending-Objekte betreffen, nicht gespeicherte Entwürfe; siehe README.
+| Migration | Inhalt |
+| --- | --- |
+| `0001_news.sql` | `news`, `news_translations` |
+| `0002_gallery_quotes.sql` | Zitate und Übersetzungen |
+| `0003_world_points_partners.sql` | Kartenpunkte, Partner, Übersetzungen und Ausgangsdaten |
+| `0004_videos.sql` | Videos, Übersetzungen und Untertitel |
+| `0005_projects.sql` | Projekte und Übersetzungen |
+| `0006_gallery_quote_folders.sql` | Optionale Ordnerbindung für Zitate |
+| `0007_news_links.sql` | Optionaler News-Link |
+| `0008_interviews.sql` | Video-Collection, Interview-Materialien und Übersetzungen |
+| `0009_site_status.sql` | Aufruftotale und Einzelaufrufdetails |
+| `0010_request_diagnostics.sql` | Getrennte Bot-/DNT-/GPC-Tagesgruppen |
 
-`/media/v1/` blockiert Pending-Pfade grundsätzlich. Permanente Gallery-Objekte benötigen ausdrücklich `status=published` in den R2-Metadaten. Andere unterstützte Objekte benötigen eine aktuell veröffentlichte Referenz in D1 (News-Bild, Partnerlogo, Video, Poster, Untertitel oder Interview-Material); bei News muss außerdem das UTC-Veröffentlichungsdatum erreicht sein. Relative Medienpfade und absolute HTTPS-Pfade auf den acht bekannten Site-Hostnamen werden berücksichtigt. Solange ein Objekt von einem anderen veröffentlichten Datensatz verwendet wird, bleibt es öffentlich. Unbekannter Status und Speicherfehler geben keine Datei frei.
+Redaktionsstatus ist überwiegend `draft|published|archived`. Kartenstatus `hq|done|planned` ist davon unabhängig. Projects berechnen ihre Phase beim Lesen anhand des UTC-Datums. Der Seed führt Upserts aus und kann bestehende News erneut veröffentlichen; `link_url` wird vom Seed nicht aktualisiert.
 
-Vorschauen laufen separat über `/api/v1/admin/media/<key>` mit derselben JWT-/E-Mail-Prüfung wie die übrigen Admin-APIs. Lokal fordert das Admin-Skript die Bytes mit dem lokalen Token an und erzeugt Blob-URLs für Bilder und Videos; das Token steht nie in der URL. Produktiv laden Medienelemente direkt vom Access-geschützten Preview-Endpunkt und behalten die Range-Unterstützung. Externe HTTPS-Medien und statische Assets werden dadurch nicht privat.
+## R2 und statische Assets
 
-R2-Schreibvorgänge verwenden `private, no-store`. Der öffentliche Worker-Endpunkt setzt nach erfolgreicher Statusprüfung `public, max-age=0, must-revalidate`; Preview und Fehler bleiben `private, no-store`. Auch vor einer `304`-Antwort wird die Veröffentlichung geprüft. So kann eine Archivierung weitere Abrufe sperren. Bereits heruntergeladene oder nach der früheren Jahres-Cache-Policy gespeicherte Kopien lassen sich damit nicht zurückholen. Direkte öffentliche R2-Bucket-URLs würden diese Kontrollen umgehen und müssen separat ausgeschlossen werden.
+Konventionelle Uploads verwenden `news/`, `partners/`, `projects/`, `videos/`, `video-posters/`, `subtitles/` und `interview-materials/`, anfangs unter dem jeweiligen `pending/`-Präfix. Speichern kann diese Objekte bereits für einen privaten Entwurf in den permanenten Bereich verschieben. Die Position allein beweist deshalb keine Veröffentlichung.
 
-Dateien in `site/public/assets/` sind dagegen Bestandteil des statischen Deployments. Marke, Hintergründe, Illustrationen, Fotos, Dokumente und Downloads sind nach Zweck geordnet. Favicons und Manifest liegen außerhalb von `assets/` unter `site/public/`. Siehe [Asset-Struktur](site/public/assets/README.md).
+Normale Gallery-Bilder liegen vor dem Publish unter `gallery/pending/<folder-slug>/` und danach unter `gallery/<folder-slug>/`. Custom-Metadaten enthalten Status, Collection, lokalisierte Ordner-/Bildtexte, Dateiname, Covermarkierung und Sortierung. Neue Slugs müssen frei sein; Append verwendet ausdrücklich einen vorhandenen Ordner. Publish und Neuordnung sind nicht atomar über mehrere R2-Objekte. Neuordnung prüft einen gemeinsamen Gallery-Ordner und verwendet vorhandene ETags für bedingte Writes.
 
-### Statische Ausgangsinhalte und leere Antworten
+Online-Projekte-Fotos verwenden Gallery-Objekte mit `collection=online-projects` und validiertem `topic`. Videos/PDFs liegen unter `online-projects/files/`, Vorschauen unter `online-projects/previews/`, JSON-Datensätze unter `online-projects/records/`. Änderungen am JSON sind ETag-geschützt; Archivieren behält Datei und Datensatz. Diese drei Präfixe erhalten keine pauschale Pending-Ablaufregel.
 
-Die öffentliche Seite kann sofort mit gebündelten Inhalten starten. API-Fehler lassen diese bestehen. Erfolgreiche Antworten werden je Bereich unterschiedlich behandelt:
+Der öffentliche Medienhandler erlaubt nur bekannte Schlüssel und sperrt Pending-Pfade. Gallery benötigt eigenen Status `published`; konventionelle Dateien benötigen mindestens eine veröffentlichte D1-Referenz, News zusätzlich ein erreichtes Datum. Online-Dateien und Vorschauen benötigen den passenden veröffentlichten JSON-Datensatz. JSON selbst ist über die Medienroute nicht abrufbar. Speicherfehler geben keine Bytes frei.
 
-- News: Eine gültige Liste ersetzt die gebündelten News auch dann, wenn sie leer ist.
-- Gallery: `/page/gallery/` lädt Ordner und Fotos über `/api/v1/gallery?collection=gallery` und Videos bei Bedarf über `/api/v1/videos`. Die Startseite enthält nur verlinkte Vorschaukarten. Vier gebündelte Archivbilder bleiben bei leerer Fotoliste oder API-Fehler verfügbar und werden als Archiv gekennzeichnet; Fehler zeigen zusätzlich eine Wiederholen-Aktion. Leere Videolisten zeigen einen Leerzustand. Die Ordneransicht unterstützt URL-Status über `folder=<slug>`, Zurück zur Ordnerübersicht, Suche, Sortierung und weiterhin den nativen Medien-Dialog.
-- Partners: Eine leere Partnerliste ersetzt die statischen Partnergruppen nicht.
-- World Points: Eine leere Liste lässt die eingebauten Kartenpunkte bestehen.
+Vorschau authentifiziert vor dem Speicherzugriff. Lokal lädt `media-preview.js` mit Token die vollständige Datei und erzeugt eine Blob-URL; produktiv wird direkt über den Access-geschützten Pfad gestreamt. Ersetzung widerruft alte Blob-URLs. Der bekannte Fehler für kodierte Pending-Gallery-URLs steht im Audit.
 
-Die Landingpage enthält außerdem redaktionell gebündelte Programme und das Projekt „Drei Bären“. `#programs` ist ein mehrsprachiger, informativer Abschnitt mit fünf statischen Illustrationen, Zielgruppen- und Teilnahmehinweisen; die Karten besitzen bewusst noch keine eigenen Aktionen. Die Bilddateien liegen in `site/public/assets/images/illustrations/`. `#threeBears` ist ebenfalls ein statischer, lokalisierter Projektabschnitt und nutzt seine eigene Section-Logo-Zuordnung im gemeinsamen SVG.
+Konventionelle R2-Schreibmetadaten setzen `private, no-store`. Online-Medien-Writes setzen derzeit nur den Content-Type; der Worker erzwingt trotzdem seine Auslieferungsheader. Ein direkt öffentlicher Bucket würde den gesamten Veröffentlichungsschutz umgehen. Statische Dateien in `site/public/` und fremde HTTPS-Medien sind durch D1-/R2-Statuswechsel nicht widerrufbar.
 
-Damit ist das Archivieren sämtlicher Backend-Einträge nicht in jedem Bereich gleichbedeutend mit einer leeren öffentlichen Sektion. Änderungen an diesem Verhalten gehören gemeinsam in Backend- und Frontend-Review.
+## Cache und SEO
 
-## Sprache, Darstellung und Laden
+| Antwort | Cache-Verhalten im Code |
+| --- | --- |
+| Worker-Dokumente unter `/`, `/page/`, `/status/` | `public, max-age=0, must-revalidate` |
+| Statische `/page/*` ohne Worker-Override | `_headers`: `public, max-age=3600, must-revalidate` |
+| News, World, Partners, Projects, Videos, Interviews | `public, max-age=60, stale-while-revalidate=300` |
+| Gallery-Liste | `no-store` |
+| Online-Medien-JSON und Status | `private, no-store` |
+| Admin, Medienvorschau und Medienfehler | Privat beziehungsweise `no-store` |
+| Veröffentlichte R2-Bytes | `public, max-age=0, must-revalidate`, Statusprüfung vor `304` |
+| Statische `/source/*`, `/public/*` | Ein Tag plus ein Tag stale-while-revalidate |
 
-Die eigenständige Galerie liegt in `site/page/gallery/` (`index.html`, `gallery.css`, `gallery.js`). `view=photos|video`, `folder`, `q`, `sort=featured|newest|title` und `lang=ru|en|de` bilden den teilbaren Ansichtsstatus. Filter und Sortierung arbeiten mit den lokalisierten Metadaten; jeweils 24 Karten werden angezeigt. Die Ordnerübersicht zeigt bei fehlendem Untertitel die lokalisierte Fotoanzahl. Der native Dialog unterstützt Fokus-Rückgabe, Escape, Foto-Pfeiltasten und Wischgesten. Videos verwenden native HTML5-Steuerung mit WebVTT oder einen beim Öffnen geladenen YouTube-No-Cookie-Embed. Schließen und Medienwechsel beenden die Wiedergabe. Die öffentlichen Video-Antworten enthalten `createdAt`/`updatedAt` für die Sortierung. D1-/R2-Bindings, Admin-Endpunkte und der Veröffentlichungsschutz bleiben bestehen; Gallery-Ordner benötigen keine D1-Migration.
+Aliase werden im geöffneten Host normalisiert; sie werden nicht pauschal auf die Canonical-Domain umgeleitet. `HTMLRewriter` passt unterstützte Metadaten an. Die dynamische Sitemap enthält derzeit Startseite, Status, Gallery, Datenschutz und Online Projects; News, Interviews und Ansprechpartner fehlen dort noch. `_redirects`, statische `sitemap.xml` und Worker-Routing müssen getrennt betrachtet werden.
 
-Die eigenständige Interview-Seite liegt in `site/page/interviews/` (`index.html`, `interviews.css`, `interviews.js`). Gespräche verwenden bewusst einen getrennten Endpunkt `/api/v1/interviews` und greifen nicht auf den normalen Video-Bestand `/api/v1/videos` zu. Der Materialbereich hat eigene Tabs für Dokumente, Prospekte, Formulare und Anfragen und ersetzt die statischen Platzhalter, sobald veröffentlichte Admin-Materialien vorhanden sind. Der Content Desk hat dafür den Interview-Tab mit getrennten Untertabs für Videos und Materialien; noch nicht veröffentlichte Dateien werden nicht als öffentliche Inhalte vorgetäuscht.
+`.assetsignore` schließt Archiv, eingehende Uploads, Interview-Transkripte und Pressematerial aus. Produktion sperrt diese Präfixe zusätzlich im Worker. `_headers` und `security-headers.js` teilen eine Report-Only-CSP ohne zentralen Report-Sammler; sie erzwingt noch keine Blockierung.
 
-`language.js` übersetzt sichtbare Inhalte über `data-key` und Attribute über `data-i18n-attrs`. Der Sprachwechsel löst `mirokit:languagechange` aus, auf das dynamische Ansichten reagieren.
+## Ausgangsinhalte und Leerzustände
 
-Die initiale Sprache folgt dem geöffneten Host: lokal Deutsch, auf `.ru` Russisch, auf `.com` je nach Gerätesprache Deutsch oder Englisch, sonst Englisch. Der derzeitige Initialisierungsweg liest die gespeicherte Sprachwahl nicht zur Wiederherstellung ein.
+| Bereich | Erfolgreiche leere API | API-Fehler |
+| --- | --- | --- |
+| News | Ersetzt gebündelte Liste | Gebündelte News bleiben |
+| Projects | Rendert Leerzustände für Current/Past | Statische Ausgangskarten bleiben |
+| Partners / World Points | Statischer Bestand bleibt | Statischer Bestand bleibt |
+| Gallery-Fotos | Vier gebündelte Archivbilder | Archivbilder plus Wiederholen-Aktion |
+| Gallery-Videos | Leerzustand | Fehler-/Wiederholen-Zustand |
+| Online-Projekte | Leerzustand je Medienart | Eigener Fehlerzustand je Medienart |
+| Interviews | Statische Material-Platzhalter können bestehen bleiben | Fehlerdarstellung und vorhandene Platzhalter |
 
-Der Hero zeigt eine News-Meldung auf einmal. Die drei neuesten verfügbaren Meldungen bilden die Auswahl; Feature-Ränge bestimmen ihre Reihenfolge. Die Hauptseite bleibt vertikal und responsiv. Themes, Navigation, Fokusführung und verzögertes Laden werden in den bestehenden Frontend-Modulen koordiniert.
+Archivieren aller Backend-Zeilen leert somit nicht jede öffentliche Sektion. Statische Programme, History und Three Bears sind keine D1-verwalteten Bereiche.
 
-`data-src`, `data-svg-src` und `data-deferred-background` ermöglichen bedarfsabhängiges Laden. Hintergrund-URLs werden vor der CSS-Zuweisung gegen `document.baseURI` aufgelöst. Sichtbare Inhalte sollen durch Viewport-Erkennung laden, ohne einen ersten Scrollschritt vorauszusetzen.
+## Sprache und Browserzustand
 
-## Authentifizierung und Formulare
+`language.js` übersetzt `data-key`, `data-i18n-attrs` und Einzelattribute und sendet `mirokit:languagechange`. Lokale Hosts starten Deutsch, `.ru` Russisch, `.com` Deutsch bei deutscher Gerätesprache, sonst Englisch. `mirokitLang` wird geschrieben, aber vom allgemeinen Initialisierer nicht gelesen; einzelne Medienseiten berücksichtigen zusätzlich URL-Sprache.
 
-Produktive Admin-Seiten und Admin-APIs prüfen das von Cloudflare Access gelieferte JWT. Die Prüfung umfasst Signatur, Ablaufzeit, einen vorhandenen `nbf`-Claim, Issuer, Audience und die konfigurierte E-Mail-Allowlist. JWKS werden höchstens eine Stunde gecacht; bei unbekanntem `kid` wird erneut geladen, mit 30 Sekunden Mindestabstand zwischen Abrufen zum Schutz vor wiederholten unbekannten Schlüsseln. Gleichzeitige Abrufe teilen ein Promise; fehlgeschlagene Abrufe werden nicht dauerhaft gecacht. Die Access-Anwendung muss die UI und die Admin-API-Pfade abdecken.
+`mirokitTheme` liegt in `localStorage`, der lokale Admin-Token in `sessionStorage`. Online-Videos speichern Zeit, Lautstärke und Stummzustand pro URL unter `mirokitOnlineProjectVideo:<url>` und stellen sie ohne Autoplay wieder her. Der eigene Gallery-Player ist ebenfalls implementiert; beide Player benötigen Browserprüfungen für Medienwechsel, Tastatur und Vollbild. Die neuen Playerbeschriftungen sind noch nicht durchgehend lokalisiert.
 
-Auf `localhost` beziehungsweise `127.0.0.1` sind Admin-API-Anfragen mit `X-MiroKIT-Admin-Token` und dem passenden `ADMIN_DEV_TOKEN` möglich. Die lokale Admin-Seite selbst kann ohne Access geladen werden. Das Token wird vom Admin-Skript pro Browser-Sitzung gespeichert.
+Kontakt- und Datenschutzseiten haben eigene CSS-/JS-Dateien für Fenstertabs. Hash-/History-Zustand, Home/End und Pfeiltasten wählen Panels. Die UI-Sprache übersetzt freigegebene Rechtstexte nicht automatisch.
 
-Beide öffentlichen Formulare verwenden `/api/v1/contact`. Der Worker prüft Origin, Formularfelder, Pflichtangaben, Honeypot, Rate-Limit und Turnstile und erzeugt Text-/HTML-E-Mails. Der Versand nutzt `CONTACT_EMAIL`, der Absender wird dem Website-Host zugeordnet und Antworten gehen über `Reply-To` an die angegebene Kontaktadresse. Lokal verwendet die Turnstile-Prüfung Test-Zugangsdaten; tatsächlicher E-Mail-Versand ist in `wrangler.local.jsonc` nicht gebunden.
+## Kontakt und Beobachtbarkeit
 
-## Routing, SEO und Cache
+Kontakt prüft exakte Origin, JSON, Formulartyp, Rate-Limit, Feld-/Pflichtverträge, Honeypot und Turnstile. Rate-Limit-Schlüssel ist `<formType>:<client-address>`; fehlender Limiter führt zu `503`, Überschreitung zu `429` mit `Retry-After: 60`. Der Content-Length-Check bei 100.000 Bytes ist keine Begrenzung eines Streams ohne diesen Header. Der Mailabsender wird aus dem Request-Host bestimmt.
 
-Die Produktionskonfiguration benennt vier MIRoKIT-Domains. Dokumentpfade werden innerhalb des geöffneten Hostnamens normalisiert. Canonical-, Sprachalternativen- und Social-Metadaten werden für unterstützte Dokumente angepasst; die Produktion routet auch `robots.txt` und `sitemap.xml` durch den Worker.
+Moderationsmail und Bestätigung verwenden getrennte Bindings. Die Bestätigung bleibt bei Versandfehlern unabhängig vom bereits erfolgreichen Formularergebnis. Technische Schalterdetails stehen in der README; es gibt keine automatische Wiederholung oder Zustellhistorie.
 
-`site/_redirects` enthält zusätzlich statische Dokument- und Asset-Weiterleitungen. `site/_headers` definiert Header für statische Antworten. Admin- und sensible API-Antworten erhalten `no-store`; öffentliche Content-Antworten haben kurze Cache-Zeiten. R2-Medien verlangen eine erneute Veröffentlichungsprüfung vor Wiederverwendung. Die Report-Only-CSP wird sowohl in `_headers` als auch im Worker gesetzt. Sie protokolliert Verstöße in der Browser-Konsole und blockiert noch nichts; ein zentraler Report-Endpunkt ist nicht eingerichtet. Inline-Styles bleiben vorerst erlaubt, Inline-JavaScript muss vor einer späteren Erzwingung geprüft werden.
+Statusprobes prüfen ASSETS, `SELECT 1` und eine begrenzte R2-Liste mit je vier Sekunden Wartezeit. Statistik schreibt nur mit `SITE_DB` und `ctx.waitUntil`; ohne Kontext wird nicht gezählt. Aggregate bleiben dauerhaft, Details und Diagnosegruppen werden nach 90 Tagen beim nächsten passenden Schreibzugriff bereinigt und bereits beim Lesen zeitlich begrenzt. Keine IPs, Querystrings, Roh-User-Agents oder wiederkehrenden Besucher-IDs werden gespeichert. DNT/GPC wird von normalen Besuchen ausgeschlossen, aber separat aggregiert. Details: [docs/site-status.md](docs/site-status.md).
 
-`site/.assetsignore` schließt Archiv, Upload-Zwischenablage, Interviewtranskripte und Pressematerial aus dem Asset-Bundle aus. Die Produktionskonfiguration führt diese Pfade zusätzlich durch eine 403-Antwort im Worker. Öffentlich benötigte CSS-, JavaScript- und Bilddateien bleiben erreichbar.
+## Ignorierter React-/Express-Prototyp
 
-Lokale und produktive Wrangler-Konfiguration unterscheiden sich bei Domains, E-Mail-Bindung und `run_worker_first`. Lokale Tests ersetzen deshalb keine Prüfung von Access, Versand und Routing in der Zielumgebung.
+`claude-philosophy/` enthält lokal einen eigenen npm-Workspace mit React/Vite,
+Express und gemeinsamen Zod-/TypeScript-Modellen. Er wird durch `.gitignore`
+ausgeschlossen und weder von Wrangler noch vom aktuellen GitHub-CI-Pfad
+bereitgestellt. Sein Router hat sprachpräfixierte Seiten; seine Kontakt-API
+ist ein validierender 202-Stub. Diese Verträge ersetzen nicht die oben
+beschriebene Worker-Anwendung. Die zehn historischen Markdown-Pläne wurden
+mit einer aktuellen technischen Einordnung versehen; Prüfprobleme des
+Prototyps stehen im [Audit](docs/repository-audit.md#ignorierter-react-express-prototyp).

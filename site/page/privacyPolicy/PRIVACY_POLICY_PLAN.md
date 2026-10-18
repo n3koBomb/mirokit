@@ -1,164 +1,72 @@
-# Aufbauplan: Privacy-Policy-Seite
+# Datenschutzseite: Aufbau und Inhaltsgrenzen
 
-## Aktueller Implementierungsstand – 19. September 2026
+Stand: **18. Oktober 2026**. Der Dateiname bleibt als bestehende Referenz erhalten; dieses Dokument beschreibt die aktuelle Umsetzung und verbleibende Prüfungen, keinen noch ausstehenden Seitenbau. Einstieg: [README](../../../README.md).
 
-Die eigenständige Seite `/page/privacyPolicy/` ist umgesetzt. Sie enthält den
-vollständigen russischen Rechtstext mit Kapiteln 1–14, Inhaltsübersicht,
-normalem vertikalem Dokument-Scroll und den im Plan festgelegten Links. Sie
-verwendet den gemeinsamen `subpage-header` zusammen mit Gallery, News und
-Online Projects sowie `subpage.css` und `subpage.js` für Header, Theme und
-Sprachauswahl. Der Rechtstext selbst bleibt russisch und wird nicht durch die
-allgemeine Übersetzung ersetzt.
+## Aktuelle Seite
 
-Dieser Plan dokumentiert weiterhin die verbindliche Inhaltsquelle und die
-rechtlich neutralen Strukturgrenzen. Die verbleibende Prüfung ist ein
-regelmäßiger Vergleich des HTML-Textes mit der freigegebenen PDF sowie die
-responsive Browserprüfung; daraus folgt keine juristische Prüfung.
+`/page/privacyPolicy/` enthält ein Fenster mit zwei Dokument-Tabs:
 
-## 1. Verbindliche Inhaltsquelle
+| Tab / Hash | Inhalt |
+| --- | --- |
+| Russland / `#privacy-russia` | Russischer Richtlinientext, Ausgabe 2026, Kapitel 1–14 |
+| EU / `#privacy-eu` | Englischer Platzhalter; noch keine ausgearbeitete EU-Richtlinie |
 
-Die Datei `/home/nikas/Downloads/ПОЛИТИКА обработки персональных данных 2026.pdf` ist die alleinige Quelle für den Inhalt der Richtlinie.
+Der russische Artikel hat `lang="ru"`, der EU-Artikel `lang="en"`. Der globale Sprachumschalter übersetzt die UI, nicht die Dokumenttexte. Das EU-Panel nennt Article 6 GDPR als Platzhalterhinweis; daraus folgt keine abgeschlossene rechtliche Bewertung oder freigegebene Rechtsgrundlage.
 
-- Umfang: 7 A4-Seiten, Edition 2026.
-- Sprache des Rechtstextes: Russisch.
-- Der Rechtstext wird vollständig übernommen: nichts kürzen, zusammenfassen, umformulieren, übersetzen oder inhaltlich ergänzen.
-- Die originale Bedeutung, Reihenfolge, Nummerierung, URLs und E-Mail-Adresse bleiben erhalten.
-- Die Dokumentausgabe muss alle Kapitel 1–14 und alle Unterpunkte 1.1–14.4 enthalten.
-- Erlaubt sind nur HTML-Struktur und visuelle Formatierung, die die Lesbarkeit verbessern, ohne den Text zu verändern.
-- Keine zusätzlichen rechtlichen Aussagen, keine erfundenen Fristen, Verantwortlichen, Cookie-Anbieter oder Kontaktdaten.
+## Dateien und Verhalten
 
-Originalangaben, die exakt erhalten bleiben müssen:
+- `index.html`: gemeinsamer Unterseiten-Header, Fenstershell, Tabs, russischer Artikel, EU-Platzhalter und Footer.
+- `privacy-policy.css`: seiteneigene Fenster-/Tab-/Dokumentdarstellung.
+- `privacy-policy.js`: Panelwahl, Hash-Deep-Links, Browser-Zurück/Vorwärts und Tastatursteuerung.
+- `../../source/style/style.css`, `subpage.css`: gemeinsame Gestaltung.
+- `../../source/scripts/language.js`, `subpage.js`: UI-Sprache und Theme ohne Landingpage-Bootstrap.
 
-- Titel: `ПОЛИТИКА в отношении обработки персональных данных Международной Лиги детской дипломатии «МИРоКИТ»`
-- Versionsangabe: `Редакция от 2026 года`
-- Websites: `https://ligamirokit.ru` und `https://mirokit.ru`
-- E-Mail: `mirokit2025@gmail.com`
+Tabs verwenden `role=tablist|tab|tabpanel`, `aria-controls`, `aria-selected`, roving `tabIndex` und `hidden`. Pfeiltasten, Home und End aktivieren Tabs und bewegen den Fokus. `pushState`, `hashchange` und `popstate` halten URL und Auswahl zusammen.
 
-## 2. Vollständige Inhaltsgliederung der PDF
+Kapitel-Links wie `#privacy-6` aktivieren den russischen Artikel, auch wenn zuvor EU offen war. Ohne passenden Hash wird das erste Panel gewählt. Es gibt normalen vertikalen Dokument-Scroll; ein langes Richtliniendokument ist keine horizontale Landingpage-Panelansicht.
 
-Die HTML-Seite wird anhand dieser vollständigen Gliederung aufgebaut. Die Abschnittstitel und nummerierten Klauseln werden aus der PDF übernommen, nicht neu formuliert.
+## Russische Inhaltsquelle
 
-1. **Общие положения** — 1.1 bis 1.5
-2. **Основные понятия** — Definitionen zu personenbezogenen Daten, Betreiber, Verarbeitung, automatisierter Verarbeitung, Verbreitung, Bereitstellung und Vernichtung
-3. **Правовые основания обработки персональных данных** — gesetzliche Grundlagen und Einwilligung/Durchführung gesetzlicher oder vertraglicher Pflichten
-4. **Цели обработки персональных данных** — sieben aufgezählte Verarbeitungszwecke
-5. **Категории субъектов персональных данных, категории и состав обрабатываемых персональных данных**
-   - 5.1 Kategorien der betroffenen Personen
-   - 5.2 Kategorien der personenbezogenen Daten
-   - 5.3 Keine besonderen Kategorien, außer gesetzlich vorgesehen
-   - 5.4 Keine biometrischen Daten, außer gesetzlich oder durch separate schriftliche Einwilligung vorgesehen
-6. **Порядок и условия обработки персональных данных** — 6.1 bis 6.6, einschließlich zulässiger Verarbeitungsvorgänge und Anforderungen an Umfang, Genauigkeit, Ausreichendheit und Aktualität
-7. **Сроки хранения персональных данных** — 7.1 bis 7.3
-8. **Обработка персональных данных несовершеннолетних** — 8.1 bis 8.4, einschließlich Zustimmung gesetzlicher Vertreter und zusätzlicher Schutzmaßnahmen
-9. **Права субъекта персональных данных** — 9.1 bis 9.3, einschließlich der vollständigen Liste der Rechte und der E-Mail für Anfragen
-10. **Обязанности Оператора** — 10.1 bis 10.3
-11. **Меры по обеспечению безопасности персональных данных** — 11.1 bis 11.3
-12. **Трансграничная передача персональных данных** — 12.1 bis 12.3
-13. **Использование файлов cookie** — 13.1 bis 13.3
-14. **Заключительные положения** — 14.1 bis 14.4, einschließlich Geltungsbeginn, Änderungen, Verfügbarkeit und Kontakt
+Die ursprüngliche Vorgabe benennt die sieben Seiten umfassende Datei `ПОЛИТИКА обработки персональных данных 2026.pdf` als freigegebene Quelle. Der dabei früher genannte persönliche Downloadpfad ist kein portabler Repository-Pfad. Der Dokumentationsaudit hat die Original-PDF nicht erneut gegen den HTML-Wortlaut abgeglichen; die Textidentität ist damit nicht neu bestätigt.
 
-Wichtig für die spätere Umsetzung: Seitenumbrüche aus der PDF werden nicht als inhaltliche Trennungen interpretiert. Ein Satz oder eine Aufzählung, die in der PDF über zwei Seiten läuft, wird im Web vollständig und zusammenhängend dargestellt.
+Bei einem erneuten Abgleich gelten die ursprünglichen Inhaltsgrenzen:
 
-PDF-Seitenprüfung:
+- Wortlaut, Reihenfolge, Nummerierung, vollständige Aufzählungen, Links und E-Mail erhalten.
+- Keine Kürzung, Umformulierung, automatische Übersetzung oder zusätzliche rechtliche Aussage.
+- Seitenumbrüche aus der PDF sind keine inhaltlichen Abschnittsgrenzen.
+- Nur semantische HTML-Struktur und lesbare Formatierung ändern.
+- Keine `data-key`-Ersetzung des eigentlichen freigegebenen Richtlinientextes.
 
-- Seite 1: Dokumentkopf, Kapitel 1 vollständig, Kapitel 2 beginnt.
-- Seite 2: Kapitel 2 endet, Kapitel 3 und 4 vollständig.
-- Seite 3: Kapitel 5 vollständig, Kapitel 6 beginnt.
-- Seite 4: Kapitel 6 endet, Kapitel 7 vollständig, Kapitel 8 beginnt.
-- Seite 5: Kapitel 8 endet, Kapitel 9 und 10 vollständig, Kapitel 11 beginnt.
-- Seite 6: Kapitel 11 endet, Kapitel 12 und 13 vollständig, Kapitel 14 beginnt.
-- Seite 7: Kapitel 14.3 und 14.4; Dokumentende.
+Erhaltene Originalangaben:
 
-## 3. Ziel der Seite und Einordnung in das Projekt
+- `ПОЛИТИКА в отношении обработки персональных данных Международной Лиги детской дипломатии «МИРоКИТ»`
+- `Редакция от 2026 года`
+- `https://ligamirokit.ru`, `https://mirokit.ru`
+- `mirokit2025@gmail.com`
 
-Die Datei `page/privacyPolicy/index.html` ist als eigenständige, direkt
-aufrufbare Richtlinienseite unter `/page/privacyPolicy/` umgesetzt.
+## Kapitelstruktur
 
-Die Seite übernimmt die visuelle Sprache der Startseite aus `index.html` und `source/style/style.css`, aber nicht deren horizontales Panel-Verhalten. Ein sieben Seiten langer Rechtstext benötigt einen normalen vertikalen Dokument-Scroll auf allen Bildschirmgrößen.
+| Nr. | Abschnitt |
+| --- | --- |
+| 1 | Общие положения |
+| 2 | Основные понятия |
+| 3 | Правовые основания обработки персональных данных |
+| 4 | Цели обработки персональных данных |
+| 5 | Категории субъектов персональных данных, категории и состав обрабатываемых персональных данных |
+| 6 | Порядок и условия обработки персональных данных |
+| 7 | Сроки хранения персональных данных |
+| 8 | Обработка персональных данных несовершеннолетних |
+| 9 | Права субъекта персональных данных |
+| 10 | Обязанности Оператора |
+| 11 | Меры по обеспечению безопасности персональных данных |
+| 12 | Трансграничная передача персональных данных |
+| 13 | Использование файлов cookie |
+| 14 | Заключительные положения |
 
-Empfohlene DOM-Hierarchie:
+Stabile Sprungmarken sind `privacy-1` bis `privacy-14`; Kapitel 14 endet mit Klausel 14.4. Die Inhaltsübersicht ist Navigation und kein Ersatz für den Text.
 
-```text
-body.privacy-page
-├── header.subpage-header
-│   ├── brand → zurück zur Startseite
-│   └── kompakte Seitennavigation / Zurück-Link
-├── main.privacy-main
-│   └── article.privacy-document
-│       ├── Dokumentkopf: exakter Titel + exakte Editionsangabe
-│       ├── optionales Inhaltsverzeichnis mit Sprungmarken 1–14
-│       └── privacy-content
-│           ├── section#privacy-1
-│           ├── section#privacy-2
-│           ├── ...
-│           └── section#privacy-14
-└── footer.fixed-footer oder normaler Dokument-Footer
-```
+## Noch zu prüfen
 
-Für die eigentlichen Richtlinienabschnitte gilt:
+Die EU-Richtlinie muss als ausdrücklich freigegebener Text geliefert werden. Betreiberangaben, Rechtsgrundlagen und Fristen nicht aus dem Projektcode ableiten. Eine technische Dokumentation ersetzt weder die Inhaltsfreigabe noch eine rechtliche Prüfung.
 
-- Jedes Hauptkapitel erhält ein eigenes `<section>` mit stabilem `id`.
-- Hauptkapitel werden mit `<h2>` und Unterkapitel mit `<h3>` ausgezeichnet, wobei die Nummer und der originale russische Titel erhalten bleiben.
-- Nummerierte Klauseln bleiben als einzelne nummerierte Textblöcke lesbar.
-- PDF-Aufzählungen werden als semantische `<ul>`-Listen umgesetzt; der Wortlaut der Listeneinträge bleibt unverändert.
-- Definitionen in Kapitel 2 werden als einzelne Absätze oder als `<dl>` dargestellt, ohne Begriffe zusammenzulegen.
-- E-Mail und Websites dürfen anklickbar sein (`mailto:` bzw. externe Links), aber der sichtbare Text bleibt exakt wie in der PDF.
-- Es werden keine Zusammenfassungsboxen innerhalb des Rechtstextes eingefügt, die als neue rechtliche Aussagen missverstanden werden könnten.
-- Der Rechtstext erhält keine `data-key`-Attribute aus dem Übersetzungssystem der Startseite, damit `source/scripts/main.js` ihn nicht dynamisch ersetzt oder verkürzt.
-- Eine Inhaltsübersicht darf nur aus den originalen Kapitelnummern und -titeln bestehen; sie ist Navigation und kein Ersatz für den vollständigen Text.
-
-## 4. Visuelles System aus `style.css`
-
-Die Seite verwendet die vorhandenen Root-Variablen als Designgrundlage:
-
-- Grundfarben: `--bld`, `--dk`, `--bl`, `--bl2`, `--bll`, `--bg`, `--paper`, `--muted`
-- Akzentfarben nur sparsam für Navigation, Links und Fokuszustände: `--rd`, `--orange`, `--green`, `--violet`, `--cyan`, `--gold`
-- Oberflächen: `--shadow` und `--soft-shadow`
-- Shell-Höhen: `--nav-h` und `--footer-h`
-- Typografie wie auf der Startseite: `Inter` für Fließtext, `Montserrat` für Titel und Navigation; russische Zeichen müssen vollständig unterstützt werden.
-
-Geplante Gestaltung:
-
-- Heller Seitenhintergrund mit einer zentralen weißen Dokumentfläche.
-- Dokumentbreite begrenzen, damit lange russische Zeilen gut lesbar bleiben; auf Mobilgeräten volle verfügbare Breite mit ausreichendem Rand.
-- Titelbereich klar vom Rechtstext trennen, aber ohne zusätzliche rechtliche Interpretation.
-- Kapitelabstände, feine Trennlinien und dezente Akzentfarbe für Orientierung.
-- Links deutlich erkennbar, Tastaturfokus aus dem bestehenden Fokus-System übernehmen.
-- Kontrast, Textgröße, Zeilenhöhe und Touch-Flächen auf kleine Bildschirme auslegen.
-
-Technische CSS-Regel:
-
-- Die bestehende globale Regel für den Desktop-Panel-Modus setzt `body` ab `721px` Breite und `480px` Höhe auf `overflow: hidden`. Für die Richtlinienseite muss deshalb ein klar gescopter Override wie `body.privacy-page` den normalen vertikalen Scroll wieder aktivieren.
-- Keine `.h-scroll`-Leinwand und keine `.panel`-Sections für den Rechtstext verwenden.
-- Gemeinsame Klassen wie `.subpage-header`, `.subpage-brand`, Buttons und Fokuszustände werden wiederverwendet; Privacy-spezifische Regeln sind unter `.privacy-page` bzw. `.privacy-document` gekapselt.
-- Bestehende Breakpoints aus der Startseite bleiben die Orientierung: mobile Basis, 600px, 721px, 900px, 1081px, 1200px und 1440px. Sie werden für Lesbarkeit angepasst, nicht für horizontales Snapping.
-- `prefers-reduced-motion` respektieren; für eine statische Richtlinienseite sind Animationen nicht erforderlich.
-
-## 5. Navigation und Formularverknüpfung
-
-Die Seite muss von der Website aus erreichbar sein und zurückführen können.
-
-- Die Links `Политике конфиденциальности` in den Formularen der `index.html` werden später auf `./page/privacyPolicy/` bzw. den im Deployment gültigen Pfad gesetzt.
-- Die Zustimmungstexte in den Formularen werden dabei nicht inhaltlich neu formuliert.
-- Der Link aus der Privacy-Policy-Seite zurück zur Startseite zeigt auf `../../index.html` bzw. den passenden Produktionspfad.
-- Ein Footer-Link zur Richtlinie kann ergänzt werden, sofern er nur Navigation ist und keinen neuen Rechtstext einführt.
-- Die PDF ist russisch. Eine automatische Übersetzung über den vorhandenen Sprachumschalter darf den Rechtstext nicht ersetzen, solange keine geprüften und ausdrücklich freigegebenen Übersetzungen vorliegen.
-
-## 6. Erfüllte Umsetzung und verbleibende Prüfungen
-
-1. Der russische Text aus allen 7 PDF-Seiten wurde in die HTML-Struktur
-   übertragen; Kapitel 1–14, Listen, URLs und E-Mail bleiben Bestandteil der
-   Seite.
-2. `page/privacyPolicy/index.html` ist eigenständig, hat `lang="ru"`, Seitentitel
-   und die gemeinsamen Styles/Skripte.
-3. Der gemeinsame `subpage-header` mit Startseiten-, Kontakt-, Theme- und
-   Sprachauswahl ist eingebunden.
-4. Der `privacy-page`-Override erlaubt normalen vertikalen Scroll und kapselt
-   die Dokumentregeln in `subpage.css`.
-5. Noch regelmäßig prüfen: Textvergleich gegen die freigegebene PDF und
-   Browserdarstellung bei Mobilgerät, Tablet, Desktop und niedriger Höhe.
-   Inhaltliche oder juristische Änderungen werden nicht eigenmächtig ergänzt.
-
-## 7. Abgrenzung
-
-Dieser Plan beschreibt die technische und visuelle Umsetzung. Er stellt keine juristische Prüfung der Richtlinie dar. Inhaltliche, rechtliche oder sprachliche Änderungen am Dokument werden nur nach ausdrücklicher Freigabe vorgenommen.
+Vor Veröffentlichung Wortlaut mit der Originalquelle vergleichen und regionale Tabs, Kapitel-Deep-Links, Sprache, Themes, Tastatur/Fokus, 200-Prozent-Textgröße, schmale Breiten und niedrige Viewports im Browser prüfen. Die aktuellen statischen Checks bestätigen keine Browser- oder Rechtsabnahme.

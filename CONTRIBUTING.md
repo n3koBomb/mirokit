@@ -1,21 +1,31 @@
 # Beiträge und Prüfungen
 
-MIRoKIT ist ein proprietäres Projekt. Änderungen dürfen nur im autorisierten
-Arbeitskontext und mit geklärten Rechten für Code, Medien, Logos, Fonts und
-Daten eingebracht werden.
+MIRoKIT ist proprietär; autorisierte Mitarbeit richtet sich nach [LICENSE.md](LICENSE.md). Dieses Dokument beschreibt den technischen Ablauf, Stand 18. Oktober 2026.
 
-## Arbeitsregeln
+## Änderungen vorbereiten
 
-- Keine Secrets, Tokens, privaten Schlüssel oder personenbezogenen Daten committen.
-- Bestehende Hostnamen, öffentliche URL-Pfade, Sprachschlüssel und API-Verträge nur nach Prüfung ändern.
-- Neue redaktionelle Inhalte müssen RU, EN und DE berücksichtigen, sofern der betreffende Bereich mehrsprachig ist.
-- Lokale Runtime-Dateien wie `.env*`, `.dev.vars`, `.wrangler/` und `node_modules/` bleiben ignoriert.
-- Access, D1, R2, Secrets und Lifecycle-Regeln werden getrennt vom Git-Commit in Cloudflare konfiguriert.
-- Deployment erfolgt erst nach ausdrücklicher Freigabe und einer Prüfung der Zielumgebung.
+1. `git status --short` und vorhandenen Diff lesen. Fremde oder bereits laufende Änderungen erhalten; keine pauschalen Resets, Stashes oder Bereinigungen.
+2. Den betroffenen Vertrag in [ARCHITECTURE.md](ARCHITECTURE.md), der Admin-Anleitung oder den Fach-Dokumenten prüfen und mit dem tatsächlichen Code vergleichen.
+3. Pfade, Payloads, Speicherstatus, Sprachschlüssel und Frontend-Verbraucher gemeinsam betrachten. Öffentliche URLs nicht unbeabsichtigt brechen.
+4. Änderungen auf den beauftragten Umfang begrenzen. Für einen Dokumentationsauftrag offene Codefehler benennen, statt stillschweigend Anwendungslogik zu verändern.
 
-## Lokale Prüfungen
+Secrets, private Schlüssel, Formularinhalte und nicht freigegebene personenbezogene Medien gehören nicht in Git. `.env*`, `.dev.vars*`, `.wrangler/` und `node_modules/` bleiben lokal; Beispieldateien enthalten ausschließlich Platzhalter.
 
-Aus dem Repository-Stamm:
+## UI- und Inhaltsverträge
+
+Freigegebene Texte, Section-Header und etablierte Seitenstrukturen erhalten. Neue sichtbare Texte und Attribute über RU/EN/DE-Schlüssel pflegen; bestehende separate Wörterbücher berücksichtigen. Das Sprachereignis heißt `mirokit:languagechange`.
+
+Asset-Pfade beziehen sich auf `site/` als Document Root. Browser laden `/public/...`, `/source/...` oder `/admin/...`, niemals `/site/public/...`. Nach Verschiebungen alle HTML-, JS-, CSS- und verzögerten Referenzen gemeinsam prüfen und veröffentlichte Alt-URLs gegebenenfalls weiterleiten.
+
+Gallery-Collection `gallery`, Online-Fotos `online-projects`, normale Videos `general`, Interview-Videos `interviews` und Online-Video/PDF-JSON sind unterschiedliche Bestände. Ihre Upload-, Publish- und Archivierungsverträge nicht vermischen.
+
+Rechtstexte und Impressumsangaben nur aus freigegebenen Quellen pflegen. Technische Platzhalter sind kein veröffentlichungsfertiger Rechtstext. Keine erfundenen Betreiberangaben oder Übersetzungen ergänzen.
+
+## Lokale Checks
+
+Voraussetzung ist Node.js 24 oder neuer. Es gibt nur im Verzeichnis `worker/` ein npm-Paket.
+
+Vom Repository-Stamm:
 
 ```bash
 node scripts/check-js.mjs
@@ -25,44 +35,37 @@ git diff --check
 Aus `worker/`:
 
 ```bash
+npm ci
 npm test -- --run
-XDG_CONFIG_HOME=/tmp/mirokit-wrangler-config npx wrangler deploy --dry-run
+XDG_CONFIG_HOME=/tmp/mirokit-wrangler-config npx --no-install wrangler deploy --dry-run
 ```
 
-Für diese Prüfungen Node.js 24 oder neuer verwenden; die Medientests führen die
-echten SQL-Abfragen mit `node:sqlite` gegen die Repository-Migrationen aus.
-`npm test` verwendet den Node-Thread-Pool. Der alternative `test:workers`-Befehl
-ist kein Ersatz für diese Node-Tests.
+`npm ci` ist für Einrichtung und Änderungen am Lockfile erforderlich, nicht vor jedem einzelnen Testlauf. Abhängigkeitskonflikte anhand der Manifest-/Lockfile-Versionen lösen; keine Umgehung mit `--force` oder `--legacy-peer-deps`.
 
-`.github/workflows/ci.yml` führt diese Checks auf Pull Requests, auf `master`/`main`
-und in einer Merge Queue als `mirokit-ci` aus. Der Workflow enthält nur einen
-lokalen Wrangler-Dry-Run und keine Deployment-Credentials. Der Repository-Owner
-muss den Check separat im GitHub-Ruleset verpflichtend machen. `CODEOWNERS` und
-Dependabot werden erst nach Aufnahme der Dateien in GitHub wirksam.
+Die [Testdokumentation](docs/testing.md) erklärt Thread-Pool, SQLite, gemockte Bindings, die optionale Vitest-Oberfläche und die Grenzen von `test:workers`. Tests für veränderte Verträge und relevante Fehlerfälle ergänzen. Ein zusätzlicher Test sollte einen beobachtbaren Vertrag absichern.
 
-Bei Änderungen an HTML/CSS zusätzlich IDs, Asset- und API-Pfade sowie die
-Darstellung in mehreren Viewports manuell prüfen. Ein erfolgreicher Syntaxcheck
-oder Wrangler-Dry-Run ersetzt keinen Test mit Access, D1, R2, Turnstile und
-E-Mail-Versand in der Zielumgebung.
+`check-js.mjs` prüft eigene JS-/Inline-Skripte, überspringt unter anderem `public/` und prüft weder Typen noch Browserfunktionalität. Der Dry-Run bündelt den Worker ohne Deployment und ohne Migrationen. Syntax, Unit-/SQL-Tests, Browser und Produktion sind unterschiedliche Nachweise.
 
-Bei Änderungen an Gallery oder den eigenständigen Unterseiten zusätzlich mit
-Firefox bei mindestens 390 × 844 und einem Desktop-Viewport prüfen: Gallery-
-Ordner, Mehrfachupload, Slug-Validierung, Admin-Vorschau, Sammelveröffentlichung,
-Ordner-Anhängen, Neuordnung, öffentliche `folders`-Antwort, Rücknavigation und
-leere/API-Fehlerzustände. Die
-statische Browserprüfung belegt nur Layout und Fallback-Verhalten; sie ersetzt
-keinen Test gegen Worker, Access, D1 oder R2.
+## Browserprüfung
 
-## Git-Workflow
+Bei Frontend-Änderungen Firefox bei schmalem Mobilformat, Tablet und Desktop verwenden; etwa 390 × 844 sowie 320 px Breite prüfen. Zusätzlich Tastatur, Fokus, Zoom, reduzierte Bewegung, Hell/Dunkel, RU/EN/DE, leere Antworten, API-Fehler und horizontales Overflow prüfen.
 
-Änderungen gehören auf einen thematischen Zweig. Vor dem Commit den vollständigen
-Status, den staged Diff und die Ziel-Remote prüfen. Commit-Nachrichten sollen
-den tatsächlichen Umfang beschreiben. Push und Deployment sind getrennte Schritte;
-vor einem Push muss geprüft werden, ob außerhalb dieses Repositorys eine
-Cloudflare-Build-Integration oder andere Deployment-Automation eingerichtet ist.
-Eine Freigabe zum lokalen Arbeiten ist keine Deployment-Freigabe.
+Für Medienänderungen gehören Upload, private Vorschau, Veröffentlichung, Archivierung, erneuter Abruf, Navigation und Player-Cleanup dazu. Bei Playerzustand zusätzlich Reload, `pagehide`, Medienwechsel, Lautstärke und Vollbild prüfen. Kontakt-/Datenschutz-Tabs benötigen Hash-Deep-Links, Browser-Zurück/Vorwärts sowie Pfeiltasten/Home/End.
 
-Vor einem Release müssen außerdem die betroffenen Markdown-Verträge, der
-vollständige staged Diff und der Ziel-Remote gemeinsam geprüft werden. Ein
-GitHub-Push und ein Cloudflare-Deployment bleiben getrennte, ausdrücklich zu
-bestätigende Schritte.
+Der vorhandene optionale Online-Medien-Harness verwendet Chromium/Edge und R2-Testdaten im Arbeitsspeicher. Er ist kein Firefox- oder Cloudflare-Runtime-Nachweis; siehe [Medien-Dokumentation](docs/online-project-media.md#optionale-browserprüfung). Wenn ein Browsercheck nicht ausführbar ist, ihn als offen berichten.
+
+## CI und Git
+
+`.github/workflows/ci.yml` definiert `mirokit-ci` für Pull Requests, Pushes auf `master`/`main`, Merge Queue und manuelle Ausführung. Er verwendet Node 24, SHA-gepinnte Actions und lesende Token-Rechte; Schritte sind Syntax, Whitespace, `npm ci`, Tests und Wrangler-Dry-Run. Der Workflow enthält kein Deployment.
+
+`CODEOWNERS` benennt den Repository-Owner, Dependabot prüft npm in `/worker` und GitHub Actions wöchentlich. Wirksame Reviewpflicht, Branchschutz, Bypasses und Statuscheck-Anforderungen müssen separat in GitHub geprüft werden. Ihre Existenz lässt sich nicht aus YAML oder Markdown beweisen.
+
+Vor einem autorisierten Commit den vollständigen Status und den tatsächlich gestagten Diff prüfen. Ein Auftrag zum Testen oder Dokumentieren umfasst keinen automatischen Commit/Push. Vor einem Push Ziel-Remote und externe Build-/Deployment-Automation prüfen.
+
+## Betrieb und Nachweise
+
+Produktive Migrationen, News-Seeds, Secrets, Access-Regeln, Custom Domains, TLS/HSTS, R2-Lifecycle-Regeln und Deployment benötigen den passenden Betriebsauftrag. Ein Push ist kein vom Repository-Workflow ausgeführtes Deployment; eine externe Workers-Builds-Integration kann dennoch auf ihn reagieren.
+
+Nach Änderungen Bindings, APIs, Frontend und Dokumentation zusammen prüfen. `wrangler types` ist nach Binding-Änderungen gemäß [worker/AGENTS.md](worker/AGENTS.md) auszuführen; dieser Dokumentationsauftrag ändert keine Bindings.
+
+Berichte nennen konkret: welche Dateien geändert wurden, welche Checks liefen, deren Ergebnisse sowie offene Browser-, Laufzeit- oder Produktionsprüfungen. Alte Screenshots und frühere Testergebnisse als historische Artefakte kennzeichnen.

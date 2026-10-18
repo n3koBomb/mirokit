@@ -1,0 +1,72 @@
+/* Match the contacts page's window tabs while retaining the document typography. */
+.privacy-page {
+  --privacy-paper: #fff;
+  --privacy-muted: #586985;
+  --privacy-line: #dce5f3;
+  --privacy-soft: #f5f8fe;
+  --privacy-blue: var(--bl);
+}
+
+.privacy-page.theme-dark {
+  --privacy-paper: #14223b;
+  --privacy-muted: #b0c0d9;
+  --privacy-line: #304461;
+  --privacy-soft: #1b2d4a;
+  --privacy-blue: #91baff;
+}
+
+.privacy-page .privacy-main {
+  width: auto;
+  margin-inline: 3%;
+  padding-inline: 0;
+}
+
+.privacy-window {
+  overflow: clip;
+  border: 1px solid var(--privacy-line);
+  border-radius: 32px;
+  background: var(--privacy-paper);
+  box-shadow: 0 28px 85px rgba(13, 44, 105, .1), 0 3px 9px rgba(13, 44, 105, .03);
+}
+
+.privacy-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 22px; border-bottom: 1px solid var(--privacy-line); background: var(--privacy-soft); }
+.privacy-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+.privacy-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 12px 18px; border: 1px solid var(--privacy-line); border-radius: 13px; background: var(--privacy-paper); color: var(--privacy-muted); font: 800 12px/1.3 var(--font-display); cursor: pointer; transition: background-color .2s, box-shadow .2s; }
+.privacy-tabs button > span:first-child { font-size: 17px; }
+.privacy-tabs button:hover { border-color: var(--privacy-blue); color: var(--privacy-blue); }
+.privacy-tabs button[aria-selected="true"] { border-color: var(--bl); background: var(--bl); color: #fff; box-shadow: 0 5px 14px rgba(21, 101, 255, .19); }
+.privacy-page :is(.privacy-tabs button, .privacy-document):focus-visible { outline: 3px solid var(--privacy-blue); outline-offset: 5px; }
+.privacy-window-dots { display: flex; gap: 7px; padding-right: 4px; }
+.privacy-window-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--privacy-line); }
+.privacy-window-dots i:first-child { background: var(--rd); }
+.privacy-window-dots i:nth-child(2) { background: var(--yl); }
+.privacy-window-dots i:last-child { background: var(--green); }
+.privacy-page [hidden] { display: none !important; }
+.privacy-page .privacy-document h1 { color: inherit; }
+
+.privacy-eu-document { min-height: 540px; }
+.privacy-placeholder { margin-top: 32px; padding: clamp(24px, 4vw, 40px); border: 1px dashed var(--privacy-line); border-radius: 20px; background: var(--privacy-soft); text-align: center; font-family: var(--font-body); }
+.privacy-placeholder-mark { color: var(--privacy-blue); font: 800 38px/1 var(--font-display); }
+.privacy-placeholder h2 { margin: 20px 0 12px; font: 800 clamp(18px, 2vw, 24px)/1.4 var(--font-display); }
+.privacy-placeholder p { color: var(--privacy-muted); font-size: 14px; line-height: 1.75; }
+
+@media (max-width: 650px) {
+  .privacy-window { border-radius: 23px; }
+  .privacy-toolbar { padding: 13px; gap: 10px; }
+  .privacy-tabs { gap: 7px; }
+  .privacy-tabs button { padding-inline: 12px; font-size: 10px; }
+  .privacy-window-dots { display: none; }
+  .privacy-eu-document { min-height: 460px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .privacy-tabs button { transition: none; }
+}
+
+@media print {
+  .privacy-page .privacy-main { margin: 0; }
+  .privacy-window { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  .privacy-toolbar { display: none; }
+  .privacy-eu-document { min-height: 0; }
+  .privacy-placeholder { border-color: #777; background: #fff; color: #000; }
+}

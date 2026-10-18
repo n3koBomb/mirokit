@@ -17,6 +17,7 @@
       <link rel="icon" type="image/x-icon" href="../../public/favicon/favicon.ico" />
       <link rel="stylesheet" href="../../source/style/style.css" />
       <link rel="stylesheet" href="../../source/style/subpage.css" />
+      <link rel="stylesheet" href="./privacy-policy.css" />
    </head>
    <body class="privacy-page">
       <header class="subpage-header">
@@ -27,13 +28,19 @@
          <div class="subpage-actions">
             <a class="subpage-contact" href="../../index.html#contact"><span data-key="contact_title">Контакты</span></a>
             <button class="subpage-theme" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-toggle-label" data-key="theme_dark">Dark</span></button>
-            <label class="sr-only" for="privacyLanguage" data-key="language_label">Language</label>
-            <select class="subpage-lang" id="privacyLanguage" data-lang-select data-i18n-attrs="aria-label:language_selector"><option value="ru">RU</option><option value="en">EN</option><option value="de">DE</option></select>
          </div>
       </header>
 
       <main class="privacy-main">
-         <article class="privacy-document">
+         <div class="privacy-window">
+            <div class="privacy-toolbar">
+               <div class="privacy-tabs" role="tablist" aria-label="Privacy policies" data-i18n-attrs="aria-label:pp_tabs_aria">
+                  <button type="button" id="privacy-russia-tab" role="tab" aria-selected="true" aria-controls="privacy-russia" tabindex="0"><span aria-hidden="true">§</span><span data-key="pp_russia">Россия · RU</span></button>
+                  <button type="button" id="privacy-eu-tab" role="tab" aria-selected="false" aria-controls="privacy-eu" tabindex="-1"><span aria-hidden="true">§</span><span data-key="pp_eu">EU · EN</span></button>
+               </div>
+               <div class="privacy-window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+         <article class="privacy-document" id="privacy-russia" role="tabpanel" aria-labelledby="privacy-russia-tab" tabindex="0" lang="ru">
             <header class="privacy-document-header">
                <span class="privacy-eyebrow">Официальный документ</span>
                <h1>ПОЛИТИКА в отношении обработки персональных данных Международной Лиги детской дипломатии «МИРоКИТ»</h1>
@@ -305,6 +312,21 @@
                </section>
             </div>
          </article>
+         <article class="privacy-document privacy-eu-document" id="privacy-eu" role="tabpanel" aria-labelledby="privacy-eu-tab" tabindex="0" lang="en" hidden>
+            <header class="privacy-document-header">
+               <h1>EU Privacy Policy</h1>
+               <p class="privacy-version">English version · Article 6 GDPR</p>
+            </header>
+            <div class="privacy-placeholder">
+               <span class="privacy-placeholder-mark" aria-hidden="true">§</span>
+               <h2>Privacy policy coming soon</h2>
+               <p>The English privacy policy for the EU will be added here.</p>
+               <!-- EU PRIVACY POLICY: Replace this placeholder with the supplied English
+                    policy, including its information on Article 6 GDPR.
+                    Keep lang="en" and the tab panel attributes on the article. -->
+            </div>
+         </article>
+         </div>
       </main>
 
       <footer class="fixed-footer privacy-footer" aria-label="Footer">
@@ -317,5 +339,6 @@
       </footer>
       <script src="../../source/scripts/language.js"></script>
       <script src="../../source/scripts/subpage.js"></script>
+      <script src="./privacy-policy.js"></script>
    </body>
 </html>

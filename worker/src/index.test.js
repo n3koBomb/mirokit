@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
 	FORM_FIELD_ALLOWLIST,
@@ -94,13 +94,19 @@ describe("contact rate limit", () => {
 	});
 
 	it("fails closed when the binding is unavailable", async () => {
-		await expect(
-			checkContactRateLimit(
-				new Request("http://localhost:8787/api/v1/contact"),
-				{},
-				"main-contact"
-			)
-		).resolves.toEqual({ success: false, unavailable: true });
+		const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
+		try {
+			await expect(
+				checkContactRateLimit(
+					new Request("http://localhost:8787/api/v1/contact"),
+					{},
+					"main-contact"
+				)
+			).resolves.toEqual({ success: false, unavailable: true });
+			expect(errorLog).toHaveBeenCalledExactlyOnceWith("CONTACT_FORM_RATE_LIMITER is not configured");
+		} finally {
+			errorLog.mockRestore();
+		}
 	});
 });
 

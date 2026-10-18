@@ -1,35 +1,30 @@
 # Security policy
 
-Security maintenance targets the current `master` branch. Older revisions have no
-separate maintenance commitment. A local fix or a merged pull request does not
-confirm that the deployed website has received it.
+Security maintenance targets the current `master` branch; older revisions have no separate maintenance commitment. A local fix or merged pull request does not confirm a production release. Implementation status is tracked in [SECURITY_PLAN.md](SECURITY_PLAN.md), with the local review dated 18 October 2026 in [the repository audit](docs/repository-audit.md).
 
-Report suspected vulnerabilities privately to **mirokit2025@gmail.com**, the
-contact also listed in [security.txt](site/.well-known/security.txt). Include the
-affected URL or revision, the impact, and minimal steps to reproduce with test
-data. Do not include passwords, Access tokens, private media, or personal data.
-Please avoid publishing exploit details or opening a public issue containing
-sensitive evidence before the maintainers have investigated.
+## Private reporting
 
-Maintainers should acknowledge the report, reproduce it in an isolated local
-environment, assess affected data and versions, prepare a fix with regression
-coverage, and coordinate any release and disclosure with the project manager.
-There is no guaranteed response or resolution deadline.
+Report suspected vulnerabilities to **mirokit2025@gmail.com**, also listed in [security.txt](site/.well-known/security.txt). Provide the affected revision or URL, expected and observed behavior, likely impact, and minimal reproduction using test data. Do not include credentials, Access assertions, unpublished media or personal data. Avoid public issues containing sensitive evidence until maintainers can investigate.
 
-Cloudflare deployment and changes to production Access, D1, R2, secrets, or
-security settings require separate authorization. CI only checks code and builds
-the Worker with `--dry-run`; it does not publish a Worker.
+Maintainers should acknowledge the report, reproduce it in isolation, assess affected data and versions, prepare a fix with appropriate regression checks, and coordinate release and disclosure with the project manager. There is no promised response or resolution deadline. `security.txt` currently expires on **29 August 2027**; keep its contact, canonical URL and expiry current.
 
-Implementation status and outstanding operational work are tracked in
-[SECURITY_PLAN.md](SECURITY_PLAN.md). This policy is not a claim that the project
-or its production configuration has undergone a complete security audit.
+## Implemented boundaries
 
-The current Gallery folder workflow keeps newly uploaded normal-Gallery objects
-under private `gallery/pending/<folder-slug>/` keys until an authenticated admin
-batch publish. Public listings include only objects marked `published`; admin
-previews use the protected media route. The batch has a bounded key count and is
-not a transactional database operation. Folder reordering is limited to one
-normal Gallery folder per request and uses conditional R2 writes, so operators
-must review partial failures before retrying. This behavior is covered by local
-Worker tests, but production Access and R2 behavior still require a separate
-release check.
+- Production admin pages and APIs require a valid Cloudflare Access JWT and an allowed email. The development token is accepted only on `localhost` and `127.0.0.1`.
+- `/media/v1/` checks publication before returning bytes or `304`. Pending, draft and archived objects are not public merely because their keys are known.
+- `/api/v1/admin/media/` authenticates previews; local requests attach the token as a header, never as a URL parameter.
+- Conventional media uses D1 references or Gallery metadata; Online Projects videos/PDFs use a published R2 JSON record. JSON manifests are not downloadable through the media handler.
+- Contact handling includes origin checks, field validation, Turnstile, honeypot and a rate limiter that rejects requests when unavailable.
+- Status details and bot/privacy-signal groups are admin-only. Public totals count requests, not identified people. DNT/GPC requests are excluded from normal visits but retained in separate admin aggregates.
+
+These are implemented controls, not a claim of exhaustive security assurance. The open defects and missing regression cases in the audit remain actionable.
+
+## Operational limitations
+
+Public static files, third-party media, previously downloaded copies and directly public R2 endpoints fall outside revocation through the Worker. Keep the R2 bucket private and verify alternate delivery routes. Gallery batch publication/reordering spans multiple objects and can partially succeed. Review the stored state before retrying.
+
+The CSP is report-only; it does not block violations. No central CSP report collector, comprehensive admin audit trail, automated backup/restore workflow or extra admin rate limiter is implemented.
+
+CI performs local checks and bundling only. Production Access, D1/R2 bindings, mail permissions, secrets, routing, lifecycle rules and TLS settings require separate operational verification and authorization. Never infer account state from a checked-in configuration.
+
+Third-party notices and restricted project/media rights remain applicable; see [LICENSE.md](LICENSE.md) and the [asset guide](site/public/assets/README.md).

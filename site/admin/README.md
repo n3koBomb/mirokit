@@ -1,139 +1,96 @@
 # MIRoKIT Content Desk
 
-- `index.html`: editor shell and forms for News, Gallery, Online Projects, Videos, Projects, World Points and Partners.
-- `admin.css`: editor presentation and responsive layout.
-- `admin.js`: tab navigation, forms, uploads and API requests.
-- `media-preview.js`: protected media URLs and authenticated local Blob previews.
-- `online-project-media.js`: Online-Projekte, Video-/PDF-Uploads und lokale PDF-Vorschau.
-- Shared icons: `/public/favicon/` (no duplicate icon files here).
+Stand: **18. Oktober 2026**. Redaktion unter `/admin/`, geschützte Aufrufdetails unter `/admin/status/`. Einstieg und lokale Einrichtung: [Haupt-README](../../README.md). API-/Speicheraufbau: [Architektur](../../ARCHITECTURE.md).
 
-Open `/admin/` through the local Worker (`cd worker` then `npm run dev` from the repository root). A static HTML server or `file://` cannot provide the `/api/v1/admin/` endpoints. Production access requires the configured Cloudflare Access identity; local API access uses the configured development token.
+## Dateien und Zugang
 
-CSS and script URLs are rooted at `/admin/`. Stored relative image URLs in gallery previews resolve from the website root. Never include `site/` in deployed URLs.
+| Datei | Aufgabe |
+| --- | --- |
+| `index.html`, `admin.css` | Formulare, Tabs, responsive Gestaltung und Themes |
+| `admin.js` | `AdminConfig`, `AdminNotice`, `AdminServices`, Bereichsklassen, Löschdialog, Shell und App |
+| `media-preview.js` | Geschützte Medien-URLs, lokale Token-Requests und Blob-Vorschauen |
+| `online-project-media.js` | Video-/PDF-Editor und lokale PDF.js-Vorschau |
+| `status/index.html`, `status/status.js` | Aufrufdetails und getrennte Diagnosegruppen |
 
-## Video workflow
+Den lokalen Worker aus `worker/` mit `npm run dev` starten. Ein statischer Server stellt keine Admin-APIs bereit. Auf localhost/127.0.0.1 den konfigurierten `ADMIN_DEV_TOKEN` eingeben; er wird pro Browsersitzung als `mirokitAdminToken` gespeichert. Produktiv sind Access-JWT und E-Mail-Allowlist erforderlich. Access muss `/admin`, `/admin/*` und `/api/v1/admin/*` auf dem verwendeten Host schützen.
 
-- YouTube records store a YouTube embed source and always use YouTube's own player controls.
-- `external` records need a direct HTTPS media URL (MP4, WebM or OGG), not a Drive/Dropbox share page. The remote server must support browser playback, CORS and byte ranges.
-- `r2` records use `/media/v1/videos/...` and are uploaded from the Videos panel (maximum 95 MB per video). The Worker serves these files with byte-range responses.
-- Subtitle tracks are WebVTT. Add one or more tracks, upload or paste the VTT text, then use `Cues bearbeiten` with the preview player to set cue start/end times from the current video position.
-- Duration and dimensions are filled from HTML5 `loadedmetadata` for direct/R2 sources. YouTube metadata is not scraped; enter a fallback duration if the YouTube API is not available.
-- Save as draft first. Publishing makes the video visible at `/api/v1/videos`; archiving removes it from the public feed but does not delete the stored media automatically.
+CSS/JS liegen unter `/admin/`, Favicons unter `/public/favicon/`. Gespeicherte relative Bilder beziehen sich auf die Websitewurzel, nicht auf `/admin/`. Tokens gehören weder in URLs noch an fremde Medienhosts.
 
-## Private media previews
+## Gemeinsame Bearbeitung
 
-Owned R2 previews use `/api/v1/admin/media/<key>`, including drafts, pending uploads
-and archived items. The production Access application must cover this path via
-`/api/v1/admin/*`. The public `/media/v1/` URL only serves published content.
+Tabs verwalten News, Gallery, Online Projects, Videos, Interviews, Projects, World Points und Partners. Der Interview-Tab trennt Videos und Materialien. RU/EN/DE-Gruppen lassen sich unabhängig öffnen; fehlende Pflichttexte müssen vor dem Speichern ergänzt werden.
 
-Locally the helper fetches preview bytes with `X-MiroKIT-Admin-Token` and creates
-short-lived Blob URLs for media elements, revoking them on replacement. A local
-video therefore downloads fully before its preview appears (up to the existing
-95 MB limit). Production previews stream directly through Access and support
-byte ranges. Tokens are never embedded in URLs or sent to external media hosts.
-Subtitle edits create a new UUID path; old objects are retained privately unless
-another published item still references them.
+Die meisten Content-Bereiche unterstützen `draft`, `published`, `archived`. Speichern und Veröffentlichen sind eigene Aktionen. Eine gespeicherte Datei kann bereits außerhalb von `pending/` liegen und trotzdem privat bleiben. `DELETE` archiviert in den beschriebenen Verwaltungswegen; es ist keine automatische physische R2-Löschung. Löschdialoge verlangen `DELETE` oder `УДАЛИТЬ`.
 
-## Projects workflow
+Bei Speicherfehlern oder `409` Listen neu laden und den tatsächlich gespeicherten Zustand prüfen. R2 und D1 bilden keine gemeinsame Transaktion; Gallery-Batches können teilweise erfolgreich sein.
 
-- Open the **Projects** tab and save a project as a draft first. Add a unique slug, start date, optional end date, theme, localized titles and alt texts.
-- Publish only after checking the three language versions. The public `/api/v1/projects` response calculates `phase`: `past` when `endDate` is before today, `upcoming` before the start date, otherwise `current`.
-- This is a computed archive, so no cron job or manual database move is needed. Project images can be uploaded in the same panel; pending R2 objects are promoted when the project is saved.
+## News
 
-## Online-Projekte: Fotos, Videos und Dokumente
+Slug, Veröffentlichungsdatum, Kategorie, Akzent, Bild sowie drei vollständige Übersetzungen mit Titel, Alt-Text, Zusammenfassung und Absätzen pflegen. `linkUrl` ist optional; lokale Pfade und HTTPS sind unterstützt. Feature-Ränge reichen von 1 bis 10; der Hero wählt zuerst die drei neuesten verfügbaren News und sortiert diese nach Rang.
 
-Im Bereich **Online-Projekte** zuerst die Medienart wählen. Alle drei Arten verwenden
-die zehn gemeinsamen Themen aus `site/source/scripts/online-project-topics.js`.
+Die öffentliche API liefert nur veröffentlichte News mit erreichtem UTC-Datum. R2-Bilder werden beim Speichern promoted; ihre öffentliche Auslieferung bleibt an eine veröffentlichte Referenz gebunden. Der optionale News-Seed kann redigierte Inhalte gleicher ID überschreiben und erneut veröffentlichen.
 
-- **Fotos:** Thema wählen, Bilddateien oder einen öffentlichen Google-Drive-Bildlink
-  angeben. Titel und Bildbeschreibungen können in RU, EN und DE ergänzt werden.
-  Bei mehreren Dateien gelten diese Texte für alle; individuelle Beschriftungen
-  durch einzelne Uploads anlegen. **In „[Thema]“ veröffentlichen** veröffentlicht
-  sofort. Bestehende Fotos ohne Thema lassen sich weiterhin unter **Noch ohne Thema**
-  zuordnen. Die normale Galerie und ihre Ordner bleiben ein eigener Bereich.
-- **Videos:** MP4, WebM oder OGV bis 95 MB auswählen. Ein Vorschaubild (JPG, PNG,
-  WebP bis 2 MB), Beschreibung und Videotext sind optional. Die drei Titel sind
-  Pflichtfelder. **Als Entwurf speichern** lädt die Datei hoch und hält sie privat;
-  **Veröffentlichen** macht sie unmittelbar öffentlich sichtbar.
-- **Dokumente:** PDF bis 20 MB auswählen. PDF.js erzeugt im Browser ein WebP-Bild
-  der ersten Seite; beide Dateien werden beim Speichern hochgeladen. Eine lesbare
-  PDF ohne Passwort ist erforderlich. Die drei Titel sind Pflichtfelder;
-  Beschreibungen sind optional. Entwurf und Veröffentlichung funktionieren wie
-  bei Videos. Auf der öffentlichen Seite öffnet ein Klick die PDF in einem neuen Tab.
+## Normale Gallery-Ordner
 
-Die Sprachgruppen lassen sich unabhängig öffnen; Russisch startet geöffnet.
-Fehlende Pflichtfelder öffnen ihre Gruppe und erhalten einen zugeordneten Fehlertext.
-Eine Dateiauswahl startet bei Videos und Dokumenten noch keinen Upload.
+1. Neuen Ordner mit Namen, optionalem Slug und Untertitel anlegen oder ausdrücklich einen vorhandenen Ordner zum Anhängen wählen.
+2. Mehrere Bilder auswählen. Sie bleiben unter `gallery/pending/<folder-slug>/` privat.
+3. Bild-/Ordnertexte in RU/EN/DE, Cover und Sortierung prüfen.
+4. **Ordner veröffentlichen** sendet maximal 100 Schlüssel an `POST /api/v1/admin/gallery/publish` und verschiebt sie in den permanenten Gallery-Ordner.
 
-**Bearbeiten** lädt einen gespeicherten Inhalt in das Formular. Thema und Texte
-lassen sich ändern. Eine andere Datei als neuen Inhalt anlegen. **Als Entwurf
-speichern** nimmt auch einen zuvor veröffentlichten Inhalt von der Website;
-das Formular weist darauf hin. **Archivieren** verlangt eine Bestätigung und
-entfernt den Inhalt aus der öffentlichen Bibliothek, behält jedoch die Dateien.
-Archivierte Inhalte über den Statusfilter öffnen und bei Bedarf erneut veröffentlichen.
-**Bibliothek öffnen** zeigt die passende Medienart und das Thema.
+Neue Slugs dürfen nicht kollidieren. `POST /api/v1/admin/gallery/reorder` speichert eine Liste eindeutiger Schlüssel aus genau einem normalen Gallery-Ordner, maximal 100. ETag-bedingte Writes können Konflikte melden; bereits erfolgreiche Teilschritte werden nicht zurückgerollt.
 
-Öffentliche Direktlinks:
+`PATCH /api/v1/admin/gallery/:encoded-key` ändert Metadaten; `DELETE` archiviert. Gallery-Zitate werden separat in D1 verwaltet und können einen Ordnerbezug haben. Öffentlich erscheinen gruppierte `folders` und `gallery`; ein Ordnerlink verwendet `?folder=<slug>`.
 
-- Fotos: `/page/onlineProjects/?topic=drawing&lang=de`
-- Videos: `/page/onlineProjects/?media=videos&topic=drawing&lang=de`
-- Dokumente: `/page/onlineProjects/?media=documents&topic=drawing&lang=de`
+**Bekannter Fehler:** Die API erzeugt für Pending-Gallery-Vorschauen derzeit kodierte Slash-Pfade, die der Medienhandler mit `404` ablehnt. Lokale Dateivorschauen vor dem Upload sind davon zu unterscheiden. Details im [Audit](../../docs/repository-audit.md#konkrete-offene-befunde).
 
-Technik und Einbau:
+## Videos und Interview-Videos
 
-- Die Dateien im bestehenden `site/` und `worker/` verwenden. Die neue
-  `site/public/vendor/pdfjs/`-Bibliothek einschließlich Worker, Zeichentabellen,
-  Schriften und WASM-Dateien gehört zur lokalen Website. Kein CDN ist erforderlich.
-- Keine neuen Bindings oder Datenbankmigrationen. Der bestehende `SITE_MEDIA`-Speicher
-  enthält Video-/PDF-Dateien unter `online-projects/files/`, Vorschaubilder unter
-  `online-projects/previews/` und JSON-Datensätze unter `online-projects/records/`.
-  Die Texte liegen in JSON und verbrauchen kein R2-Custom-Metadata-Budget.
-- `GET /api/v1/online-projects/media` liefert ausschließlich veröffentlichte
-  Videos und Dokumente. Fotos verwenden weiterhin die Galerie-Schnittstelle.
-- `GET/POST /api/v1/admin/online-projects/media` listet Inhalte bzw. lädt einen
-  Entwurf hoch. POST erwartet FormData mit `kind`, `topic`, `file`, `translations`
-  (JSON für RU/EN/DE mit `title`, `description`, optional `transcript`) und
-  `thumbnail` (bei PDFs Pflicht, bei Videos optional).
-- `PATCH /api/v1/admin/online-projects/media/:id` speichert `topic`, `translations`
-  und `status` (`draft` oder `published`). `DELETE` archiviert. Änderungen verwenden
-  bedingte Schreibzugriffe, um gleichzeitig erfolgende Änderungen zu erkennen.
-- Öffentliche Medienzugriffe prüfen den zugehörigen Datensatz bei jeder Anfrage;
-  Entwürfe und archivierte Dateien sind auch mit bekanntem Direktlink gesperrt.
-  Admin-Vorschauen verwenden die vorhandene Authentifizierung. Videos unterstützen
-  Byte-Range-Anfragen. JSON-Datensätze sind über die Medienroute nicht abrufbar.
+- `youtube`: unterstützte YouTube-URL; Wiedergabe über YouTube-Embed und dessen Steuerung.
+- `external`: direkte HTTPS-Medienquelle; fremde Abspiel-/CORS-/Range-Eigenschaften müssen geprüft werden.
+- `r2`: eigener Upload bis 95 MiB, mit separatem Poster bis 8 MiB. Unterstützt sind MP4, WebM und OGV.
+- Untertitel: WebVTT-Datei oder Text, bis zu acht Tracks. Cue-Editor kann Zeiten aus der Vorschau übernehmen; neue Inhalte erhalten neue Objektschlüssel.
+- Dauer/Bildmaße können aus HTML5-Metadaten übernommen werden; keine garantierte automatische YouTube-Metadatenbeschaffung.
 
-Lokale Prüfung mit der vorhandenen Node.js-Umgebung: im Ordner `worker/`
-`npm test -- --run`. Die Umsetzung wurde ausschließlich lokal geändert und geprüft.
-Prüfbericht und Screenshots: [`../../docs/online-project-media.md`](../../docs/online-project-media.md).
+Normale Videos verwenden Collection `general` und `/api/v1/admin/videos`; Interview-Videos Collection `interviews` und `/api/v1/admin/interviews/videos`. Veröffentlichen/Archivieren wirkt auf den jeweiligen öffentlichen Feed. Ein normales Video wird dadurch nicht automatisch zum Interview oder Online-Projekt.
 
-Die wiederholbare Browserprüfung liegt in `worker/scripts/check-online-project-media.mjs`.
-Sie verwendet ausschließlich einen lokalen HTTP-Server auf Port 4173, Testdaten und
-einen Speicher im Arbeitsspeicher. Zum Ausführen werden optional `playwright-core`
-und `axe-core` benötigt, z. B. lokal im Ordner `worker/` über
-`npm install --no-save --package-lock=false playwright-core@1.55.1 axe-core@4.10.3`.
-Anschließend `node scripts/check-online-project-media.mjs` ausführen. Unter Windows
-wird ein vorhandenes Edge verwendet; alternativ `MIROKIT_BROWSER_PATH` auf eine
-Chromium-/Chrome-Datei setzen. Die Prüfung erzeugt die Screenshots im Ordner `docs/`.
+## Interview-Materialien
 
-## Gallery folder workflow
+Materialarten sind `documents`, `brochures`, `forms`, `requests`. HTTPS-Quelle oder eigener R2-Upload bis 25 MiB: PDF, TXT, JPG/PNG/WebP, DOC/DOCX, PPT/PPTX. Titel sind in RU/EN/DE erforderlich; Alt-Text fällt auf den Titel zurück. Quelle, Dateiname, MIME-Typ, Größe und Sortierung gehören zum Datensatz.
 
-The normal **Gallery** tab accepts multiple files together with a folder name,
-an optional validated slug and optional subtitles. Choose **Neuen Ordner anlegen**
-for a new folder or select an existing folder to append files. Each file is first stored privately under
-`gallery/pending/<folder-slug>/`; it is not included in the public Gallery
-response. The admin list groups these pending items and provides authenticated
-previews through `/api/v1/admin/media/...`.
+CRUD und Upload laufen unter `/api/v1/admin/interviews/materials`; öffentlich liefert `/api/v1/interviews` die freigegebenen Materialien neben Gesprächsvideos.
 
-Use **Ordner veröffentlichen** only after reviewing the complete group. The
-button calls `POST /api/v1/admin/gallery/publish` with up to 100 pending keys.
-The Worker moves the objects to `gallery/<folder-slug>/`, marks them
-`published`, and exposes the folder through the public `folders` response. A
-batch is deliberately not a D1 transaction, so a partial storage failure must
-be reviewed in the admin list before retrying or deleting items.
+**Bekannter Fehler:** Die Admin-Listenabfrage selektiert den Status nicht. Deshalb ist die Statusanzeige geladener Materialien derzeit kein verlässlicher Nachweis ihres Speicherstatus; siehe Audit. Die öffentliche Abfrage filtert dennoch auf `published`.
 
-The public Gallery opens folders with `?folder=<slug>` and provides a back
-control to the folder list. Online Projects photos remain a separate immediate-
-publication workflow and do not use this pending folder path. Folder images can
-be reordered in the editor; the order is persisted through
-`POST /api/v1/admin/gallery/reorder` and is limited to one normal Gallery folder
-per request.
+## Projects, World Points und Partners
+
+Projects benötigen Slug, Startdatum, optionales Enddatum, Kategorie/Akzent und drei Sprachversionen. Bilder sind optional; Pending-Bilder werden beim Speichern promoted. Phase wird anhand des heutigen UTC-Datums berechnet: vergangenes Enddatum → `past`, zukünftiges Startdatum → `upcoming`, sonst `current`.
+
+World Points trennen Veröffentlichungsstatus von `hq|done|planned`; Koordinaten und Orts-/Ländertexte werden validiert. Partners speichern Kategorie, Logo, optionale HTTPS-Website, Hervorhebung und Sprachversionen. Vollständig leere Partner-/Kartenfeeds entfernen die statischen Ausgangsinhalte nicht.
+
+## Online Projects
+
+Alle Medien verwenden die zehn Topics aus `site/source/scripts/online-project-topics.js`. Zuerst die Medienart wählen:
+
+| Art | Speicherung und Freigabe |
+| --- | --- |
+| Fotos | Gallery-Collection `online-projects`; Upload veröffentlicht unmittelbar, ohne normalen Pending-Ordnerworkflow |
+| Videos | MP4/WebM/OGV bis 95 MiB; optionales JPG/PNG/WebP-Poster bis 2 MiB; Upload als Entwurf |
+| Dokumente | PDF bis 20 MiB; erste Seite wird mit lokalem PDF.js als WebP-Vorschau erzeugt; Upload als Entwurf |
+
+Titel in RU/EN/DE sind bei Videos/PDFs Pflicht; Beschreibungen und Videotext sind optional. Eine Dateiauswahl allein startet keinen Upload. Für PDFs ist eine erzeugbare Vorschau erforderlich. Videos haben keinen WebVTT-Editor in diesem Bereich.
+
+**Bearbeiten** ändert Thema und Texte. Eine andere Datei als neuen Datensatz anlegen. **Als Entwurf speichern** nimmt einen veröffentlichten Inhalt wieder aus der Öffentlichkeit; **Archivieren** behält Datei und Datensatz. Archivierte Inhalte können erneut veröffentlicht werden.
+
+`POST /api/v1/admin/online-projects/media` erwartet FormData mit `kind=video|document`, `topic`, `file`, `translations` als JSON und optionalem `thumbnail` (bei PDF Pflicht). `PATCH /:id` erwartet JSON mit `topic`, `translations`, `status=draft|published`; `DELETE /:id` archiviert. Änderungen am Manifest verwenden ETags.
+
+Direktlinks: `/page/onlineProjects/?topic=drawing&lang=de`, mit `media=videos` oder `media=documents` für andere Arten. Speicherung und genauer API-Vertrag: [Medien-Dokumentation](../../docs/online-project-media.md).
+
+## Private Vorschauen und Dateigrenzen
+
+Eigene R2-Medien werden über `/api/v1/admin/media/<key>` geladen. Lokal lädt der Helper die vollständigen Bytes mit Header-Token und erzeugt eine Blob-URL; bei großen Videos entsprechend Speicher-/Ladezeit einplanen. Produktiv wird direkt über Access gestreamt, mit Byte-Ranges. Alte Blob-URLs werden bei Ersatz verworfen.
+
+Allgemeine Bilder und konventionelle Poster sind auf 8 MiB begrenzt; Online-Medien-Poster auf 2 MiB. MiB entspricht den im Code verwendeten Vielfachen von `1024 * 1024`; die UI bezeichnet diese Grenzen teils als MB. Nicht alle Uploadwege führen dieselbe Signaturprüfung aus.
+
+## Prüfung und Grenzen
+
+`npm test -- --run` aus `worker/` prüft lokale Verträge; [docs/testing.md](../../docs/testing.md) beschreibt den Umfang. Browserprüfungen benötigen echte Bedienung, Fokus, Sprachwechsel, Medienzustand und Zugriff nach Archivierung. Der optionale Online-Medien-Harness ist in der Fach-Dokumentation beschrieben. Lokale Fakes und alte Screenshots bestätigen weder aktuelle Cloudflare-Policies noch echte Mailzustellung.
