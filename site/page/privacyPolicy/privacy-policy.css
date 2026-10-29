@@ -44,11 +44,10 @@
 .privacy-page [hidden] { display: none !important; }
 .privacy-page .privacy-document h1 { color: inherit; }
 
-.privacy-eu-document { min-height: 540px; }
-.privacy-placeholder { margin-top: 32px; padding: clamp(24px, 4vw, 40px); border: 1px dashed var(--privacy-line); border-radius: 20px; background: var(--privacy-soft); text-align: center; font-family: var(--font-body); }
-.privacy-placeholder-mark { color: var(--privacy-blue); font: 800 38px/1 var(--font-display); }
-.privacy-placeholder h2 { margin: 20px 0 12px; font: 800 clamp(18px, 2vw, 24px)/1.4 var(--font-display); }
-.privacy-placeholder p { color: var(--privacy-muted); font-size: 14px; line-height: 1.75; }
+.privacy-eu-document .privacy-content { margin-top: 24pt; }
+.privacy-principles { width: 100%; margin: 0 0 8pt; border-collapse: collapse; font: inherit; text-align: left; }
+.privacy-principles th, .privacy-principles td { padding: 8pt; border: 1px solid var(--privacy-line); vertical-align: top; overflow-wrap: anywhere; }
+.privacy-principles th { width: 32%; font-weight: 700; }
 
 @media (max-width: 650px) {
   .privacy-window { border-radius: 23px; }
@@ -56,7 +55,7 @@
   .privacy-tabs { gap: 7px; }
   .privacy-tabs button { padding-inline: 12px; font-size: 10px; }
   .privacy-window-dots { display: none; }
-  .privacy-eu-document { min-height: 460px; }
+  .privacy-principles th, .privacy-principles td { padding: 5pt; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -67,6 +66,5 @@
   .privacy-page .privacy-main { margin: 0; }
   .privacy-window { overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
   .privacy-toolbar { display: none; }
-  .privacy-eu-document { min-height: 0; }
-  .privacy-placeholder { border-color: #777; background: #fff; color: #000; }
+  .privacy-principles th, .privacy-principles td { border-color: #777; }
 }
