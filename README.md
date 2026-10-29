@@ -157,7 +157,7 @@ Produktive Migrationen, Seeds, Secrets, Access-Policies, Bucket-Regeln und Deplo
 
 Sichtbare neue UI-Texte und Attribute über RU/EN/DE-Schlüssel pflegen. Einzelne Module besitzen zusätzlich eigene Wörterbücher; nicht alle vorhandenen Strings sind zentralisiert. Freigegebene Texte und Section-Header erhalten. Profil- und Impressumsangaben dürfen nicht aus Annahmen ergänzt werden.
 
-Ansprechpartner-Tabs verwenden `#ansprechpartner` und `#impressum`; die Datenschutz-Tabs `#privacy-russia` und `#privacy-eu`. Pfeiltasten, Home/End und Browser-Verlauf sind implementiert. Der EU-Text ist ein englischer Platzhalter, das Impressum enthält noch Platzhalterangaben. Die [Datenschutz-Seitendokumentation](site/page/privacyPolicy/PRIVACY_POLICY_PLAN.md) beschreibt die Inhaltsgrenzen.
+Ansprechpartner-Tabs verwenden `#ansprechpartner` und `#impressum`; die Datenschutz-Tabs `#privacy-russia` und `#privacy-eu`. Pfeiltasten, Home/End und Browser-Verlauf sind implementiert. Der EU-Tab enthält den englischen Originaltext der gelieferten Global Privacy Policy; das Impressum enthält noch Platzhalterangaben. Die [Datenschutz-Seitendokumentation](site/page/privacyPolicy/PRIVACY_POLICY_PLAN.md) beschreibt die Inhaltsgrenzen.
 
 Statische Medien und ihre Ablage stehen in der [Asset-Dokumentation](site/public/assets/README.md). Eingebundene Drittkomponenten behalten ihre eigenen Rechte; PDF.js liegt mit Lizenz und Begleitdateien unter `site/public/vendor/pdfjs/`.
 
