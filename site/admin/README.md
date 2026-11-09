@@ -1,6 +1,6 @@
 # MIRoKIT Content Desk
 
-Stand: **18. Oktober 2026**. Redaktion unter `/admin/`, geschützte Aufrufdetails unter `/admin/status/`. Einstieg und lokale Einrichtung: [Haupt-README](../../README.md). API-/Speicheraufbau: [Architektur](../../ARCHITECTURE.md).
+Stand: **9. November 2026**. Produktiv liegt die Redaktion unter `https://admin.<domain>/`, geschützte Aufrufdetails unter `/status/` auf demselben Host. Lokal bleiben `/admin/` und `/admin/status/` erhalten. [Subdomain-Umstellung und Betriebsanleitung](../../docs/subdomain-migration.md), Einstieg: [Haupt-README](../../README.md), API-/Speicheraufbau: [Architektur](../../ARCHITECTURE.md).
 
 ## Dateien und Zugang
 
@@ -12,9 +12,9 @@ Stand: **18. Oktober 2026**. Redaktion unter `/admin/`, geschützte Aufrufdetail
 | `online-project-media.js` | Video-/PDF-Editor und lokale PDF.js-Vorschau |
 | `status/index.html`, `status/status.js` | Aufrufdetails und getrennte Diagnosegruppen |
 
-Den lokalen Worker aus `worker/` mit `npm run dev` starten. Ein statischer Server stellt keine Admin-APIs bereit. Auf localhost/127.0.0.1 den konfigurierten `ADMIN_DEV_TOKEN` eingeben; er wird pro Browsersitzung als `mirokitAdminToken` gespeichert. Produktiv sind Access-JWT und E-Mail-Allowlist erforderlich. Access muss `/admin`, `/admin/*` und `/api/v1/admin/*` auf dem verwendeten Host schützen.
+Den lokalen Worker aus `worker/` mit `npm run dev` starten. Ein statischer Server stellt keine Admin-APIs bereit. Auf localhost/127.0.0.1 den konfigurierten `ADMIN_DEV_TOKEN` eingeben; er wird pro Browsersitzung als `mirokitAdminToken` gespeichert. Produktiv sind Access-JWT und E-Mail-Allowlist erforderlich. Access muss den gesamten `admin.<domain>`-Host schützen, einschließlich `/v1/admin/*` und aller Assets.
 
-CSS/JS liegen unter `/admin/`, Favicons unter `/public/favicon/`. Gespeicherte relative Bilder beziehen sich auf die Websitewurzel, nicht auf `/admin/`. Tokens gehören weder in URLs noch an fremde Medienhosts.
+CSS/JS liegen produktiv auf der Admin-Hostwurzel, lokal unter `/admin/`; Favicons unter `/public/favicon/`. Gespeicherte relative Bilder beziehen sich auf die öffentliche Websitewurzel. Die folgenden API-Pfade beschreiben die internen/lokalen Handler: produktiv wird aus `/api/v1/admin/...` derselbe Pfad unter `/v1/admin/...` auf dem Admin-Host. Tokens gehören weder in URLs noch an fremde Medienhosts.
 
 ## Gemeinsame Bearbeitung
 

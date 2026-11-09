@@ -20,7 +20,7 @@ describe('standalone Gallery routing', () => {
   it('keeps collection filtering and publication boundaries across R2 pages', async () => {
     const queries = [];
     const object = (id, metadata) => ({ key: `gallery/00000000-0000-0000-0000-${id.padStart(12, '0')}.webp`, customMetadata: metadata });
-    const response = await worker.fetch(new Request('https://mirokit.com/api/v1/gallery?collection=gallery'), {
+    const response = await worker.fetch(new Request('https://api.mirokit.com/v1/gallery?collection=gallery'), {
       SITE_MEDIA: { list: async (query) => {
         queries.push(query);
         return query.cursor ? { objects: [object('3', { status: 'published', collection: 'online-projects' }), object('4', { status: 'archived', collection: 'gallery' })] } : { truncated: true, cursor: 'next', objects: [object('1', { status: 'published', collection: 'gallery' }), object('2', { status: 'published' })] };
@@ -29,7 +29,7 @@ describe('standalone Gallery routing', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data.gallery).toHaveLength(2);
-    expect(data.gallery.every((item) => item.collection === 'gallery' && item.status === 'published' && item.image.startsWith('/media/v1/gallery/'))).toBe(true);
+    expect(data.gallery.every((item) => item.collection === 'gallery' && item.status === 'published' && item.image.startsWith('https://api.mirokit.com/v1/media/gallery/'))).toBe(true);
     expect(queries[1].cursor).toBe('next');
   });
 });

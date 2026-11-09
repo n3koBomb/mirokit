@@ -7,6 +7,8 @@ import { queueVisit, recordVisit, shouldRecordVisit, visitMetadata, requestActiv
 let database, env;
 const html = () => new Response("<h1>Website</h1>", { headers: { "Content-Type": "text/html" } });
 function request(path = "/", headers = {}, host = "localhost", cf = { country: "DE" }) {
+  if (host === "mirokit.com" && path.startsWith("/api/v1/admin/")) { host = "admin.mirokit.com"; path = path.replace("/api/v1/", "/v1/"); }
+  if (host === "mirokit.com" && path.startsWith("/admin/")) { host = "admin.mirokit.com"; path = path.slice(6); }
   const req = new Request(`http://${host}${path}`, { headers: { "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS) AppleWebKit/605.1 Safari/605.1", ...headers } });
   Object.defineProperty(req, "cf", { value: cf });
   return req;

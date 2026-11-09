@@ -1,3 +1,4 @@
+import { storedMediaPath } from "../../site/source/scripts/service-urls.js";
 const INTERVIEW_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const INTERVIEW_MATERIAL_KINDS = new Set(["documents", "brochures", "forms", "requests"]);
 const INTERVIEW_MATERIAL_STATUSES = new Set(["draft", "published", "archived"]);
@@ -41,7 +42,7 @@ function textValue(value, field, maxLength, { optional = false, multiline = fals
 }
 
 function optionalUrl(value, field) {
-  const normalized = textValue(value, field, 2_000, { optional: true });
+  const normalized = storedMediaPath(textValue(value, field, 2_000, { optional: true }));
   if (!normalized) return "";
   if (normalized.startsWith("/media/v1/") || normalized.startsWith("/public/")) {
     if (normalized.includes("..")) throw interviewMaterialError(`Invalid ${field}`);

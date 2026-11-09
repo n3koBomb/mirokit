@@ -7,7 +7,7 @@ const CSP_REPORT_ONLY = [
 	"img-src 'self' data: blob: https:",
 	"media-src 'self' blob: https:",
 	"frame-src https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com",
-	"connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net",
+	"connect-src 'self' https://api.mirokit.com https://api.mirokit.ru https://api.ligamirokit.com https://api.ligamirokit.ru https://challenges.cloudflare.com https://cdn.jsdelivr.net",
 	"object-src 'none'",
 	"base-uri 'self'",
 	"form-action 'self'",

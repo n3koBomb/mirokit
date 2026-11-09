@@ -1,9 +1,14 @@
 import { createAdminMediaPreview } from "./media-preview.js";
+import { apiUrl, adminUrl, siteUrl } from "../source/scripts/service-urls.js";
 import { OnlineProjectMediaAdmin } from "./online-project-media.js";
+
 import {
   isOnlineProjectTopic,
   ONLINE_PROJECT_TOPICS,
 } from "../source/scripts/online-project-topics.js";
+
+for (const link of document.querySelectorAll('a[href^="/page/"]')) link.href = siteUrl(link.getAttribute("href"));
+for (const link of document.querySelectorAll('a[href^="/admin/"]')) link.href = adminUrl(link.getAttribute("href").slice(6));
 
 // Associate actionable feedback with the control, including screen-reader text.
 function markFieldError(field, message) {
@@ -198,7 +203,7 @@ class AdminServices {
     if (options.body && !(options.body instanceof FormData)) {
       headers.set("Content-Type", "application/json");
     }
-    const response = await fetch(path, {
+    const response = await fetch(apiUrl(path), {
       ...options,
       headers,
       credentials: "same-origin",
@@ -646,8 +651,7 @@ class GalleryAdmin {
     const topic = ONLINE_PROJECT_TOPICS.find((item) =>
       item.id === this.topic.value
     );
-    this.libraryLink.href = `/page/onlineProjects/index.html?lang=de${topic ? `&topic=${topic.id}` : ""
-      }`;
+    this.libraryLink.href = siteUrl(`/page/onlineProjects/?lang=de${topic ? `&topic=${topic.id}` : ""}`);
     this.publishButton.textContent =
       this.collection.value === "online-projects" && topic
         ? `In „${topic.label}“ veröffentlichen`

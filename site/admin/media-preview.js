@@ -1,12 +1,18 @@
+import { apiUrl, serviceHost, siteUrl } from "../source/scripts/service-urls.js";
+
 function createAdminMediaPreview({ origin, isLocal, getLocalToken, showNotice }) {
 	// Stored static image paths are relative to the public site, not /admin/.
 	function resolveMediaUrl(value) {
 		if (!value) return "";
 		const url = new URL(value, `${origin}/`);
-		const siteHosts = ["mirokit.com", "mirokit.ru", "ligamirokit.com", "ligamirokit.ru"];
-		if (url.pathname.startsWith("/media/v1/") && (url.origin === origin || siteHosts.includes(url.hostname.replace(/^www\./, "")))) {
-			return `${origin}/api/v1/admin/media/${url.pathname.slice("/media/v1/".length)}`;
+		const host = serviceHost(url.hostname);
+		const trusted = url.origin === origin || (host && url.protocol === "https:" && !url.port && !url.username && !url.password);
+		const mediaPrefix = ["/media/v1/", "/v1/media/"].find((prefix) => url.pathname.startsWith(prefix));
+		if (mediaPrefix && trusted) {
+			return new URL(apiUrl(`/v1/admin/media/${url.pathname.slice(mediaPrefix.length)}`, origin), origin).href;
 		}
+		if (trusted && /^\/(?:api\/)?v1\/admin\/media\//.test(url.pathname)) return new URL(apiUrl(url.pathname, origin), origin).href;
+		if (!/^(?:https?:)?\/\//.test(value) && url.pathname.startsWith("/public/")) return siteUrl(`${url.pathname}${url.search}`, origin);
 		return url.href;
 	}
 

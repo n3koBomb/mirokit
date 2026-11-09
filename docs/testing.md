@@ -41,6 +41,7 @@ npm test -- --run --reporters=dot
 | `projects.test.js` | Datumsgrenzen, Phasen, Übersetzungen und SQL |
 | `remote-media.test.js` | Drive-Hosts, Weiterleitungen, Formate, Streamlimits, Reader-Cleanup und Fehler |
 | `security-headers.test.js` | CSP-Direktiven und Gleichheit statischer/Worker-Header |
+| `service-routing.test.js` | Subdomains, abgeschaltete Service-Pfade ohne Weiterleitung, Admin-Assets, CORS, Medien-URLs, Range und Statistikzuordnung |
 | `status.test.js` | Zähler, Datenschutzfilter, Bot-/DNT-/GPC-Gruppen, Paginierung, Routing und Probes |
 | `videos.test.js` | Quellen, Collections, YouTube, WebVTT, Join-Deduplizierung und SQL |
 | `admin-preview.test.js` | Frontend-Helfer für Token-, URL-, Blob- und konkurrierende Vorschauen |
@@ -48,7 +49,7 @@ npm test -- --run --reporters=dot
 | `online-projects.test.js` | Topics und normale Gallery-Ordner einschließlich Upload, Append und Reorder |
 | `security.test.js` | Übergreifende Hosts, CSP, Methoden und Drive-Grenzen |
 
-Der aktuelle Lauf umfasst **578 Tests in 19 Dateien**. Eine eigene Testdatei für jedes Laufzeitmodul ist keine Zusage von 100 Prozent Zeilen-/Zweigabdeckung. Die offenen Fälle im [Audit](repository-audit.md#konkrete-offene-befunde) sind trotz erfolgreicher Suite nicht abgesichert.
+Der aktuelle Lauf umfasst **646 Tests in 20 Dateien**, einschließlich der [Subdomain-Verträge](subdomain-migration.md). Eine eigene Testdatei für jedes Laufzeitmodul ist keine Zusage von 100 Prozent Zeilen-/Zweigabdeckung. Die offenen Fälle im [Audit](repository-audit.md#konkrete-offene-befunde) sind trotz erfolgreicher Suite nicht abgesichert.
 
 ## Umgebung und Isolation
 

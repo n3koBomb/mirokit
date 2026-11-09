@@ -1,5 +1,21 @@
 import { authorizeAdmin } from "./access.js";
 import { CSP_REPORT_ONLY } from "./security-headers.js";
+import { serviceHost } from "../../site/source/scripts/service-urls.js";
+
+export function statisticsHostname(request) {
+  const url = new URL(request.url);
+  const host = serviceHost(url.hostname);
+  if (!host || host.service === "site") return url.hostname;
+  const requested = url.searchParams.get("host");
+  const selection = serviceHost(requested);
+  if (selection?.service === "site" && selection.root === host.root) return requested;
+  try {
+    const origin = new URL(request.headers.get("Origin"));
+    const source = serviceHost(origin.hostname);
+    if (origin.protocol === "https:" && source?.service === "site" && source.root === host.root) return origin.hostname;
+  } catch { /* Same-origin admin requests default to their website's root host. */ }
+  return host.root;
+}
 
 const DETAIL_DAYS = 90;
 const DAY_MS = 86400000;
@@ -159,7 +175,7 @@ async function serviceStatus(request, env) {
 }
 
 async function visitSummary(request, env) {
-  const host = new URL(request.url).hostname;
+  const host = statisticsHostname(request);
   const today = new Date().toISOString().slice(0, 10);
   const since = new Date(Date.now() - 29 * DAY_MS).toISOString().slice(0, 10);
   const db = env.SITE_DB;
@@ -183,7 +199,7 @@ async function visitSummary(request, env) {
 async function requestDiagnostics(request, env) {
   if (!await authorizeAdmin(request, env)) return statusJson({ success: false, code: "unauthorized" }, 401);
   if (!env.SITE_DB) return statusJson({ success: false, code: "statistics_unavailable" }, 503);
-  const host = new URL(request.url).hostname;
+  const host = statisticsHostname(request);
   const since = diagnosticsSince();
   try {
     const [totals, agents, groups] = await Promise.all([
@@ -213,7 +229,7 @@ async function visitDetails(request, env) {
   try {
     const result = await env.SITE_DB.prepare(`SELECT id, visited_at AS visitedAt, path, country, device, browser
       FROM site_visit_details WHERE host = ? AND visited_at >= ? AND id < ? ORDER BY id DESC LIMIT 101`)
-      .bind(url.hostname, new Date(Date.now() - DETAIL_DAYS * DAY_MS).toISOString(), before ? Number(before) : Number.MAX_SAFE_INTEGER).all();
+      .bind(statisticsHostname(request), new Date(Date.now() - DETAIL_DAYS * DAY_MS).toISOString(), before ? Number(before) : Number.MAX_SAFE_INTEGER).all();
     const visits = result.results.slice(0, 100);
     return statusJson({ success: true, visits, nextCursor: result.results.length > 100 ? String(visits.at(-1).id) : null, retentionDays: DETAIL_DAYS });
   } catch {

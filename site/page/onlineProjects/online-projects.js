@@ -1,3 +1,4 @@
+import { apiUrl } from "../../source/scripts/service-urls.js";
 /* global T, currentLang, setLang */
 import { ONLINE_PROJECT_TOPICS, isOnlineProjectTopic } from "../../source/scripts/online-project-topics.js";
 
@@ -397,7 +398,7 @@ async function loadPhotos() {
  for (const kind of Object.keys(mediaStates)) mediaStates[kind] = "loading";
  renderPhotos();
  const photos = async () => { try {
-  const response = await fetch("../../api/v1/gallery?collection=online-projects", { headers: { Accept: "application/json" }, cache: "no-store" });
+  const response = await fetch(apiUrl("/v1/gallery?collection=online-projects"), { headers: { Accept: "application/json" }, cache: "no-store" });
   if (!response.ok) throw new Error(`Gallery returned ${response.status}`);
   const payload = await response.json();
   if (payload.success === false || !Array.isArray(payload.gallery)) throw new Error("Invalid gallery response");
@@ -412,7 +413,7 @@ async function loadPhotos() {
  if (activeMedia === "photos") renderPhotos();
  };
  const resources = async () => { try {
-  const response = await fetch("/api/v1/online-projects/media", { headers: { Accept: "application/json" }, cache: "no-store" });
+  const response = await fetch(apiUrl("/v1/online-projects/media"), { headers: { Accept: "application/json" }, cache: "no-store" });
   if (!response.ok) throw new Error("Media unavailable");
   const payload = await response.json();
   if (payload.success === false || !Array.isArray(payload.media)) throw new Error("Invalid media response");
