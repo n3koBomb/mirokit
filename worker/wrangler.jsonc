@@ -8,7 +8,21 @@
       "directory": "../site",
       "not_found_handling": "404-page",
       "binding": "ASSETS",
-      "run_worker_first": true
+      "run_worker_first": [
+         "/api/*",
+         "/admin/*",
+         "/media/v1/*",
+         "/",
+         "/index.html",
+         "/page/*",
+         "/status", "/status/*", "/site/status", "/site/status/*",
+         "/robots.txt",
+         "/sitemap.xml",
+         "/public/assets/archive/*",
+         "/public/assets/uploads/*",
+         "/public/assets/media/interviews/transcripts/*",
+         "/public/assets/media/press/*"
+      ]
    },
    "d1_databases": [
       {
@@ -49,38 +63,6 @@
       {
          "pattern": "ligamirokit.ru",
          "custom_domain": true
-      },
-      {
-         "pattern": "admin.mirokit.com",
-         "custom_domain": true
-      },
-      {
-         "pattern": "api.mirokit.com",
-         "custom_domain": true
-      },
-      {
-         "pattern": "admin.mirokit.ru",
-         "custom_domain": true
-      },
-      {
-         "pattern": "api.mirokit.ru",
-         "custom_domain": true
-      },
-      {
-         "pattern": "admin.ligamirokit.com",
-         "custom_domain": true
-      },
-      {
-         "pattern": "api.ligamirokit.com",
-         "custom_domain": true
-      },
-      {
-         "pattern": "admin.ligamirokit.ru",
-         "custom_domain": true
-      },
-      {
-         "pattern": "api.ligamirokit.ru",
-         "custom_domain": true
       }
    ],
    "send_email": [
@@ -102,7 +84,7 @@
    ],
    "vars": {
       "MAIL_TO": "mirokit2025@gmail.com",
-      "ALLOWED_ORIGINS": "https://mirokit.com,https://www.mirokit.com,https://mirokit.ru,https://www.mirokit.ru,https://ligamirokit.com,https://www.ligamirokit.com,https://ligamirokit.ru,https://www.ligamirokit.ru",
+      "ALLOWED_ORIGINS": "https://mirokit.com,https://mirokit.ru,https://ligamirokit.com,https://ligamirokit.ru",
       "TURNSTILE_HOSTNAMES": "mirokit.com,mirokit.ru,ligamirokit.com,ligamirokit.ru"
    },
    "secrets": {

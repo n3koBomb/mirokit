@@ -1,5 +1,3 @@
-import { apiUrl } from "./service-urls.js";
-
 /**
  * MIRoKIT world map
  * Real Natural Earth country geometry rendered on Canvas with D3 Geo.
@@ -44,7 +42,7 @@ async function initWorldCanvas() {
   ];
 
   try {
-    const response = await fetch(apiUrl("/v1/world-points"), { headers: { Accept: "application/json" }, cache: "no-store" });
+    const response = await fetch("/api/v1/world-points", { headers: { Accept: "application/json" }, cache: "no-store" });
     if (!response.ok) throw new Error(`World points API returned ${response.status}`);
     const payload = await response.json();
     if (!Array.isArray(payload.points)) throw new Error("World points API returned invalid data");

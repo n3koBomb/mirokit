@@ -1,4 +1,3 @@
-import { apiUrl, serviceHost } from "../../source/scripts/service-urls.js";
 /* global T, currentLang, setLang */
 const $ = (id) => document.getElementById(id);
 const t = (key) => T[currentLang]?.[key] || T.en[key] || key;
@@ -656,9 +655,9 @@ async function load(kind, retry = false) {
 
   try {
     const response = await fetch(
-      apiUrl(kind === 'photos'
-        ? '/v1/gallery?collection=gallery'
-        : '/v1/videos'),
+      kind === 'photos'
+        ? '/api/v1/gallery?collection=gallery'
+        : '/api/v1/videos',
       {
         headers: {
           Accept: 'application/json'
@@ -923,7 +922,6 @@ function createHtml5Player(item) {
   video.preload = 'metadata';
   video.tabIndex = 0;
   video.poster = item.poster || '';
-  if (serviceHost(new URL(item.sourceUrl, location.origin).hostname)?.service === 'api') video.crossOrigin = 'anonymous';
   video.src = item.sourceUrl;
 
   mediaStage.append(video);

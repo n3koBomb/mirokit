@@ -1,4 +1,3 @@
-import { storedMediaPath } from "../../site/source/scripts/service-urls.js";
 const NEWS_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const NEWS_CATEGORIES = new Set(["event", "interview", "photo", "announce"]);
 const NEWS_ACCENTS = new Set(["blue", "red", "green", "amber", "violet"]);
@@ -81,7 +80,7 @@ function validateDate(value) {
 }
 
 function validateImage(value) {
-	const image = storedMediaPath(normalizeLocalPath(requireString(value, "image", 2_000)));
+	const image = normalizeLocalPath(requireString(value, "image", 2_000));
 	if (image.startsWith("/media/v1/") || image.startsWith("/public/")) {
 		if (image.includes("..") || /[\r\n]/.test(image)) throw newsError("Invalid image");
 		return image;

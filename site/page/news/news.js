@@ -1,4 +1,3 @@
-import { apiUrl } from "../../source/scripts/service-urls.js";
 /* News archive page: one public feed for both bundled fallback and D1 content. */
 const grid = document.getElementById("newsGrid");
 const empty = document.getElementById("newsEmpty");
@@ -202,7 +201,7 @@ document.addEventListener("mirokit:languagechange", () => { syncTheme(); render(
 syncTheme();
 render();
 
-fetch(apiUrl("/v1/news"), { headers: { Accept: "application/json" }, cache: "no-store" })
+fetch("/api/v1/news", { headers: { Accept: "application/json" }, cache: "no-store" })
   .then((response) => { if (!response.ok) throw new Error(`News API returned ${response.status}`); return response.json(); })
   .then((payload) => {
     if (!Array.isArray(payload.news)) throw new Error("News API returned invalid data");

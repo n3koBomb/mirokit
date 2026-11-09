@@ -1,4 +1,3 @@
-import { storedMediaPath } from "../../site/source/scripts/service-urls.js";
 const CONTENT_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const CONTENT_STATUSES = new Set(["draft", "published", "archived"]);
 const WORLD_POINT_STATUSES = new Set(["hq", "done", "planned"]);
@@ -99,7 +98,7 @@ function optionalUrl(value, field) {
 }
 
 function localImageUrl(value, field = "image") {
-	const image = storedMediaPath(textValue(value, field, 2_000));
+	const image = textValue(value, field, 2_000);
 	if (image.startsWith("/media/v1/") || image.startsWith("/public/")) {
 		if (image.includes("..") || /[\r\n]/.test(image)) throw contentError(`Invalid ${field}`);
 		return image;

@@ -1,6 +1,4 @@
 import { authorizeAdmin, isLocalHostname } from "./access.js";
-import { routeServiceRequest } from "./service-routing.js";
-import { serviceHost } from "../../site/source/scripts/service-urls.js";
 import { handleStatusRequest, queueVisit } from "./status.js";
 import { sendContactReceipt } from "./contact-receipt.js";
 import { getCanonicalSiteHostname } from "./hosts.js";
@@ -2619,7 +2617,7 @@ async function handleNewsAdminApi(request, env, url, origin, apiPrefix) {
 	}
 }
 
-const legacyWorker = {
+export default {
 	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 		const requestHostname = url.hostname.toLowerCase();
@@ -3009,9 +3007,10 @@ const legacyWorker = {
 			String(fields.email).trim();
 
 		/*
-		 * Derive the website from the exact service-host allowlist, never form data.
+		 * requestHostname comes from request.url, i.e. the domain that
+		 * actually received /api/v1/contact. It is not supplied by form data.
 		 */
-		const sourceDomain = serviceHost(requestHostname)?.root || requestHostname;
+		const sourceDomain = requestHostname;
 		const mailFrom =
 			getMailFromForHostname(sourceDomain, env);
 
@@ -3133,12 +3132,6 @@ const legacyWorker = {
 				env
 			);
 		}
-	},
-};
-
-export default {
-	fetch(request, env, ctx) {
-		return routeServiceRequest(request, env, ctx, legacyWorker.fetch);
 	},
 };
 

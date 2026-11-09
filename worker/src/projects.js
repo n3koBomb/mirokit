@@ -1,4 +1,3 @@
-import { storedMediaPath } from "../../site/source/scripts/service-urls.js";
 const PROJECT_LANGUAGES = Object.freeze(["ru", "en", "de"]);
 const PROJECT_STATUSES = new Set(["draft", "published", "archived"]);
 const PROJECT_CATEGORIES = new Set(["creative", "game", "dialogue", "media", "network", "education"]);
@@ -69,7 +68,7 @@ function integerValue(value, field, minimum = 0, maximum = 10_000) {
 }
 
 function localImageUrl(value) {
-	const image = storedMediaPath(textValue(value, "image", 2_000, { optional: true }));
+	const image = textValue(value, "image", 2_000, { optional: true });
 	if (!image) return "";
 	if (image.startsWith("/media/v1/") || image.startsWith("/public/")) {
 		if (image.includes("..") || /[\r\n]/.test(image)) throw projectError("Invalid image");

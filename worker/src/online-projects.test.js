@@ -57,7 +57,7 @@ describe("Online Projects libraries", () => {
   const item = (await response.json()).gallery;
   expect(item).toMatchObject({ topic, collection: "online-projects", status: "published" });
   expect(objects.get(item.key).customMetadata.topic).toBe(topic);
-  const publicResponse = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery?collection=online-projects"), env);
+  const publicResponse = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=online-projects"), env);
   expect((await publicResponse.json()).gallery).toEqual([expect.objectContaining({ key: item.key, topic })]);
  });
  it.each([undefined, "", "unknown", "<script>"])("rejects an invalid or missing upload topic (%s) before writing", async (topic) => {
@@ -85,7 +85,7 @@ describe("Online Projects libraries", () => {
   addImage();
   objects.set(key.replace("550", "660"), { key: key.replace("550", "660"), customMetadata: { collection: "gallery", status: "published" } });
   objects.set(key.replace("550", "770"), { key: key.replace("550", "770"), customMetadata: { collection: "online-projects", topic: "drawing", status: "archived" } });
-  const response = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery?collection=online-projects"), env);
+  const response = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=online-projects"), env);
   expect((await response.json()).gallery).toEqual([expect.objectContaining({ key, topic: "" })]);
  });
  it("assigns an existing image without altering bytes, texts, publication status or original date", async () => {
@@ -132,7 +132,7 @@ describe("Gallery folder workflow", () => {
   expect(pending).toHaveLength(2);
   expect(pending.every((item) => item.status === "pending" && item.key.startsWith("gallery/pending/sommer-freunde/"))).toBe(true);
 
-  const publicBefore = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery?collection=gallery"), env);
+  const publicBefore = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
   expect((await publicBefore.json()).gallery).toEqual([]);
 
   const publish = await request("/publish", { method: "POST", body: JSON.stringify({ keys: pending.map((item) => item.key) }) });
@@ -142,7 +142,7 @@ describe("Gallery folder workflow", () => {
   expect(published.every((item) => item.status === "published" && item.key.startsWith("gallery/sommer-freunde/"))).toBe(true);
   expect([...objects.values()].filter((item) => item.key.startsWith("gallery/sommer-freunde/")).every((item) => item.customMetadata.status === "published" && item.customMetadata.folder_slug === "sommer-freunde")).toBe(true);
 
-  const publicAfter = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery?collection=gallery"), env);
+  const publicAfter = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
   const data = await publicAfter.json();
   expect(data.gallery).toHaveLength(2);
   expect(data.folders).toHaveLength(1);
@@ -191,7 +191,7 @@ describe("Gallery folder workflow", () => {
 
 		const reorder = await request("/reorder", { method: "POST", body: JSON.stringify({ keys: [...published].reverse() }) });
 		expect(reorder.status).toBe(200);
-		const publicResponse = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery?collection=gallery"), env);
+		const publicResponse = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery?collection=gallery"), env);
 		expect((await publicResponse.json()).folders[0].images.map((item) => item.key)).toEqual([...published].reverse());
 	});
 });

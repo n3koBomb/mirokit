@@ -77,28 +77,4 @@ describe("Access JWT validation and key rotation", () => {
 		const request = new Request("https://mirokit.com/api/v1/admin/news", { headers: { "Cf-Access-Jwt-Assertion": await token({ email: "other@example.org" }) } });
 		expect(await authorizeAdmin(request, env)).toBeNull();
 	});
-	it("serves the admin host root only after validating a signed Access token", async () => {
-		const { default: worker } = await import("./index.js");
-		const assets = vi.fn(async () => new Response("Content Desk"));
-		const bindings = { ...env, ASSETS: { fetch: assets }, ADMIN_DEV_TOKEN: "local-token" };
-		const url = "https://admin.mirokit.com/";
-		expect((await worker.fetch(new Request(url, { headers: { "X-MiroKIT-Admin-Token": "local-token" } }), bindings)).status).toBe(401);
-		expect(assets).not.toHaveBeenCalled();
-		const response = await worker.fetch(new Request(url, { headers: { "Cf-Access-Jwt-Assertion": await token() } }), bindings);
-		expect(response.status).toBe(200);
-		expect(new URL(assets.mock.calls[0][0].url).pathname).toBe("/admin/");
-		expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-	});
-	it("uses a signed Access token for same-origin private media streaming", async () => {
-		const { default: worker } = await import("./index.js");
-		const bindings = { ...env, SITE_MEDIA: {
-			head: async () => ({ size: 3, customMetadata: { status: "draft" }, writeHttpMetadata: (headers) => headers.set("Content-Type", "video/mp4") }),
-			get: vi.fn(async () => ({ body: "abc" })),
-		} };
-		const request = new Request("https://admin.mirokit.com/v1/admin/media/videos/pending/550e8400-e29b-41d4-a716-446655440000.mp4", { headers: { "Cf-Access-Jwt-Assertion": await token() } });
-		const response = await worker.fetch(request, bindings);
-		expect(response.status).toBe(200);
-		expect(await response.text()).toBe("abc");
-		expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-	});
 });

@@ -33,7 +33,7 @@ const FORM_FIELDS = {
 };
 
 function contactRequest({ formType = "main-contact", language = "de", hostname = "mirokit.com", fields = {} } = {}) {
-	return new Request(`https://api.${hostname}/v1/contact`, {
+	return new Request(`https://${hostname}/api/v1/contact`, {
 		method: "POST",
 		headers: { Origin: `https://${hostname}`, "Content-Type": "application/json", "CF-Connecting-IP": "192.0.2.1" },
 		body: JSON.stringify({

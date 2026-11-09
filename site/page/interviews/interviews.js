@@ -1,4 +1,3 @@
-import { apiUrl, serviceHost } from "../../source/scripts/service-urls.js";
 /* global T, currentLang, setLang */
 const $ = (id) => document.getElementById(id);
 
@@ -69,10 +68,9 @@ function renderVideoCard(item) {
   const title = localized(item, 'title') || 'MIRoKIT';
   const description = localized(item, 'description');
   const poster = safeUrl(item.poster) || '/public/assets/backgrounds/videos_background_thumbnail.png';
-  const cors = source && serviceHost(new URL(source, location.origin).hostname)?.service === 'api' ? ' crossorigin="anonymous"' : '';
   const media = embed
     ? `<iframe src="${escapeHtml(embed)}" title="${escapeHtml(title)}" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`
-    : `<video controls preload="metadata" poster="${escapeHtml(poster)}" playsinline${cors}>${(item.subtitles || []).map((track) => { const src = safeUrl(track.src); return src ? `<track kind="subtitles" src="${escapeHtml(src)}" srclang="${escapeHtml(track.srcLang || track.language || 'en')}" label="${escapeHtml(track.label || String(track.language || '').toUpperCase())}"${track.isDefault ? ' default' : ''} />` : ''; }).join('')}<source src="${escapeHtml(source)}" />${escapeHtml(tr('load_error'))}</video>`;
+    : `<video controls preload="metadata" poster="${escapeHtml(poster)}" playsinline>${(item.subtitles || []).map((track) => { const src = safeUrl(track.src); return src ? `<track kind="subtitles" src="${escapeHtml(src)}" srclang="${escapeHtml(track.srcLang || track.language || 'en')}" label="${escapeHtml(track.label || String(track.language || '').toUpperCase())}"${track.isDefault ? ' default' : ''} />` : ''; }).join('')}<source src="${escapeHtml(source)}" />${escapeHtml(tr('load_error'))}</video>`;
   const meta = [duration(item.durationSeconds), item.sourceType === 'youtube' ? 'YouTube' : 'MIRoKIT'].filter(Boolean).join(' · ');
   return `<article class="iv-video-card"><div class="iv-player">${media}</div><div class="iv-video-copy"><span class="iv-card-label">${escapeHtml(tr('video_label'))}${meta ? ` · ${escapeHtml(meta)}` : ''}</span><h3>${escapeHtml(title)}</h3>${description ? `<p>${escapeHtml(description)}</p>` : ''}</div></article>`;
 }
@@ -113,7 +111,7 @@ async function loadInterviews() {
   loading = true;
   renderVideos();
   try {
-    const response = await fetch(apiUrl('/v1/interviews'), { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    const response = await fetch('/api/v1/interviews', { headers: { Accept: 'application/json' }, cache: 'no-store' });
     if (response.status === 404) {
       interviews = [];
     } else {

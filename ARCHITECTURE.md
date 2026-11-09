@@ -6,7 +6,7 @@ Stand: **18. Oktober 2026**, lokaler Quellcode. Dieses Dokument beschreibt imple
 
 `site/` ist der Document Root von Workers Static Assets. HTML/CSS/Vanilla JavaScript werden ohne Frontend-Build ausgeliefert. Der Worker empfängt die in `assets.run_worker_first` genannten Pfade, führt API-, Authentifizierungs-, Medien- und Dokumentlogik aus und delegiert übrige Requests an `env.ASSETS.fetch`.
 
-Seit der [Subdomain-Umstellung](docs/subdomain-migration.md) ist `assets.run_worker_first: true` gesetzt. `service-routing.js` trennt Website, `admin.<domain>` und `api.<domain>` vor jeder Asset-Auslieferung, authentifiziert den Admin-Host und übersetzt `/v1/...` intern in bestehende Handlerpfade. Die API-Pfade in diesem Dokument bezeichnen diese internen/lokalen Verträge; produktive öffentliche Aufrufe verwenden `https://api.<domain>/v1/...`, geschützte Verwaltung `https://admin.<domain>/v1/admin/...`. [Cloudflare dokumentiert die Worker-first-Reihenfolge](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/).
+Die Konfiguration umfasst `/api/*`, `/admin/*`, `/media/v1/*`, `/`, `/index.html`, `/page/*`, Status-Aliase und SEO-Dateien. Produktion ergänzt gesperrte interne Asset-Pfade. [Cloudflare dokumentiert die Worker-first-Reihenfolge](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/).
 
 ```mermaid
 flowchart LR
@@ -31,7 +31,6 @@ Es gibt keine Queue, keinen Durable Object, keinen Cronjob und kein serverseitig
 | Datei unter `worker/src/` | Verantwortung |
 | --- | --- |
 | `index.js` | Routing, CRUD-Handler, Uploads/Promotion, Gallery-Ordner, Formulare und SEO |
-| `service-routing.js` | Subdomain-Trennung, Abschaltung bisheriger Service-Pfade, Admin-Assets, API-CORS und öffentliche Medien-URLs |
 | `access.js` | Lokaler Token, RS256-JWT, JWKS-Cache und E-Mail-Allowlist |
 | `admin-methods.js` | Methodenvertrag und Route-Präzedenz für Content-Admin-APIs |
 | `hosts.js` | Vier Site-Domains und ihre vier `www`-Aliase |
@@ -47,7 +46,7 @@ Es gibt keine Queue, keinen Durable Object, keinen Cronjob und kein serverseitig
 | `status.js` | Live-Probes, Aufrufaggregate, Details und Bot-/DNT-/GPC-Gruppen |
 | `contact-receipt.js` | Reine Mailvorlagen und isolierter Bestätigungsversand |
 
-Alle 16 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests prüfen querliegende Verträge. Der SQLite-Helfer liegt außerhalb von `src/` unter `worker/test/helpers/database.js`.
+Alle 15 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests prüfen querliegende Verträge. Der SQLite-Helfer liegt außerhalb von `src/` unter `worker/test/helpers/database.js`.
 
 ## Frontend-Module
 

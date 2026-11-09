@@ -11,13 +11,6 @@ function element() {
 }
 
 describe("admin media previews", () => {
-	it("resolves migrated API media on the admin host and bundled assets on the website", () => {
-		const { resolveMediaUrl } = createAdminMediaPreview({ origin: "https://admin.mirokit.ru", isLocal: false, getLocalToken: () => "", showNotice: vi.fn() });
-		expect(resolveMediaUrl("https://api.mirokit.ru/v1/media/news/pending/abc.webp")).toBe("https://admin.mirokit.ru/v1/admin/media/news/pending/abc.webp");
-		expect(resolveMediaUrl("/media/v1/videos/abc.mp4")).toBe("https://admin.mirokit.ru/v1/admin/media/videos/abc.mp4");
-		expect(resolveMediaUrl("/public/assets/images/news/example.png")).toBe("https://mirokit.ru/public/assets/images/news/example.png");
-		expect(resolveMediaUrl("https://api.mirokit.ru.evil.test/v1/media/news/abc.webp")).toBe("https://api.mirokit.ru.evil.test/v1/media/news/abc.webp");
-	});
 	it("uses protected URLs for site media and resolves static media from the root", () => {
 		const { resolveMediaUrl } = preview();
 		expect(resolveMediaUrl("/media/v1/news/pending/abc.webp")).toBe("http://localhost:8787/api/v1/admin/media/news/pending/abc.webp");
