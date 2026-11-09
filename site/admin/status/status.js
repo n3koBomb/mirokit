@@ -1,3 +1,6 @@
+import { apiUrl, adminUrl, siteUrl } from "../../source/scripts/service-urls.js";
+for (const link of document.querySelectorAll('a[href="/admin/"]')) link.href = adminUrl();
+for (const link of document.querySelectorAll('a[href^="/status/"]')) link.href = siteUrl(link.getAttribute("href"));
 const $ = (id) => document.getElementById(id);
 const local = ["localhost", "127.0.0.1"].includes(location.hostname);
 let token = "";
@@ -32,7 +35,7 @@ async function load(more = false) {
   if (!more) { $("adminStatusRows").replaceChildren(); cursor = null; $("adminStatusMore").hidden = true; }
   try {
     const query = more && cursor ? `?before=${encodeURIComponent(cursor)}` : "";
-    const response = await fetch(`/api/v1/admin/status/visits${query}`, {
+    const response = await fetch(apiUrl(`/v1/admin/status/visits${query}`), {
       credentials: "same-origin", cache: "no-store", signal: AbortSignal.timeout(10000),
       headers: local && token ? { "X-MiroKIT-Admin-Token": token } : {},
     });
@@ -66,7 +69,7 @@ async function loadDiagnostics() {
   $("diagnosticAgents").replaceChildren();
   $("diagnosticScope").textContent = "";
   try {
-    const response = await fetch("/api/v1/admin/status/diagnostics", {
+    const response = await fetch(apiUrl("/v1/admin/status/diagnostics"), {
       credentials: "same-origin", cache: "no-store", signal: AbortSignal.timeout(10000),
       headers: local && token ? { "X-MiroKIT-Admin-Token": token } : {},
     });

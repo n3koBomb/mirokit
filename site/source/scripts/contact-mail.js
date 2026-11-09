@@ -1,3 +1,5 @@
+import { apiUrl } from "./service-urls.js";
+
 (() => {
    "use strict";
 
@@ -11,7 +13,7 @@
 
    const CONTACT_ENDPOINT = IS_LOCAL
       ? `http://${LOCAL_WORKER_HOST}:8787/api/v1/contact`
-      : "/api/v1/contact";
+      : apiUrl("/v1/contact");
 
    // Official Cloudflare Turnstile always-pass test site key.
    // It is used only on localhost / 127.0.0.1.

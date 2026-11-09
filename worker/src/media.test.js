@@ -120,7 +120,7 @@ describe("media publication boundary", () => {
 		expect(response.status).toBe(200);
 		expect(response.headers.get("Cache-Control")).toBe("private, no-store");
 		expect(await response.text()).toBe("0123456789");
-		expect((await worker.fetch(new Request(`https://mirokit.com/api/v1/admin/media/${key}`, { headers: localHeaders }), env)).status).toBe(401);
+		expect((await worker.fetch(new Request(`https://admin.mirokit.com/v1/admin/media/${key}`, { headers: localHeaders }), env)).status).toBe(401);
 	});
 	it("fails closed when D1 fails and does not leak the database error", async () => {
 		const key = `news/${UUID}.webp`;

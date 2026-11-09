@@ -17,6 +17,7 @@ Dokumentationsstand: **18. Oktober 2026**, anhand des lokalen Arbeitsstands. Imp
 | Sicherheitsmaßnahmen und offene Betriebsarbeiten | [SECURITY_PLAN.md](SECURITY_PLAN.md) |
 | Online-Projekte mit Fotos, Videos und PDFs | [Medienvertrag](docs/online-project-media.md) |
 | Dienststatus und Aufrufstatistik | [Statusdokumentation](docs/site-status.md) |
+| Admin/API auf Subdomains umstellen | [Umstellung und Cloudflare-Einrichtung](docs/subdomain-migration.md) |
 
 ## Aufbau und Funktionen
 
@@ -33,7 +34,7 @@ site/
   admin/                       Geschützter Content Desk und Aufrufdetails
   public/                      Assets, Favicons, Manifest und PDF.js
 worker/
-  src/                         15 Laufzeitmodule und zugehörige Tests
+  src/                         16 Laufzeitmodule und zugehörige Tests
   migrations/                  0001 bis 0010
   scripts/                     News-Seed und optionale Medien-Browserprüfung
   test/helpers/                SQLite-Testdatenbank
@@ -44,6 +45,8 @@ scripts/check-js.mjs            Syntaxprüfung des eigenen Anwendungscodes
 ```
 
 Die Website bietet RU/EN/DE, Themes, Programme, History und Projektansichten, eine Weltkarte, Partner, News-Dialoge, Gallery-Ordner sowie Kontakt- und Liga-Formulare. Einzelne Bereiche und Platzhalter bleiben redaktionell unvollständig. Die Programme-Karten sind informativ.
+
+Die folgende Tabelle nennt lokale/interne API-Pfade. Produktiv verwenden öffentliche APIs `https://api.<domain>/v1/...`, der Content Desk `https://admin.<domain>/` und Verwaltungsaufrufe `https://admin.<domain>/v1/admin/...`. Details: [Subdomain-Umstellung](docs/subdomain-migration.md).
 
 | Seite | Browserpfad | Datenquelle |
 | --- | --- | --- |
@@ -57,7 +60,7 @@ Die Website bietet RU/EN/DE, Themes, Programme, History und Projektansichten, ei
 | Status | `/status/` | `/api/v1/status`, `/api/v1/status/visits` |
 | Redaktion / Aufrufdetails | `/admin/`, `/admin/status/` | Authentifizierte Admin-APIs |
 
-Browser-URLs enthalten niemals `/site/`, mit Ausnahme des ausdrücklich weitergeleiteten Alias `/site/status`. Statische Assets beginnen mit `/public/`, hochgeladene Medien mit `/media/v1/`.
+Browser-URLs enthalten niemals `/site/`, mit Ausnahme des ausdrücklich weitergeleiteten Alias `/site/status`. Statische Assets beginnen mit `/public/`; hochgeladene Medien liegen produktiv unter `https://api.<domain>/v1/media/...`, lokal unter `/media/v1/...`.
 
 ## Lokal starten
 
@@ -121,11 +124,11 @@ API-Fehler lassen in einigen Ansichten gebündelte Inhalte stehen. Eine erfolgre
 | `CONTACT_RECEIPT_EMAIL` | Automatische Eingangsbestätigung an Besucher |
 | `USE_SEND_EMAIL_RESPONSE` | Nur Eingangsbestätigung ein-/ausschalten |
 | `TURNSTILE_SECRET`, `TURNSTILE_HOSTNAMES` | Serverseitige Bot-Prüfung |
-| `ALLOWED_ORIGINS` | Exakte erlaubte Kontakt-Origins |
+| `ALLOWED_ORIGINS` | Exakte Website-Origins für Kontaktprüfung und öffentliche API-CORS |
 | `ACCESS_TEAM_DOMAIN`, `ACCESS_AUDIENCE`, `ACCESS_ADMIN_EMAILS` | Access-JWT und Admin-Allowlist |
 | `ADMIN_DEV_TOKEN` | Nur lokale Admin-Authentifizierung |
 
-`.dev.vars` wirkt lokal. Produktive Werte müssen in der tatsächlichen Zielumgebung eingerichtet sein. Die Produktionsdatei nennt die vier Apex-Domains `mirokit.com`, `mirokit.ru`, `ligamirokit.com`, `ligamirokit.ru`, `mirokit-database` und `mirokit-media`. Die Host-Allowlist kennt zusätzlich `www`; daraus folgt keine eingerichtete `www`-Route.
+`.dev.vars` wirkt lokal. Produktive Werte müssen in der tatsächlichen Zielumgebung eingerichtet sein. Die Produktionsdatei nennt die vier Apex-Domains `mirokit.com`, `mirokit.ru`, `ligamirokit.com`, `ligamirokit.ru` und jeweils ihre `admin.`-/`api.`-Subdomains sowie die Speicher `mirokit-database` und `mirokit-media`. Die Host-Allowlist kennt zusätzlich `www`; daraus folgt keine eingerichtete `www`-Route.
 
 Nach Annahme der Moderationsmail läuft die Eingangsbestätigung über `ctx.waitUntil()`; ohne Kontext wird auf sie gewartet. Die Vorlagen unterstützen Kontakt/Liga und RU/EN/DE, mit Rückfall RU. Eingegebene Namen, Texte und Links werden nicht übernommen. Fehler der Bestätigung ändern den Erfolg der angenommenen Anfrage nicht.
 
@@ -147,7 +150,7 @@ npm test -- --run
 XDG_CONFIG_HOME=/tmp/mirokit-wrangler-config npx --no-install wrangler deploy --dry-run
 ```
 
-Die lokale Testsuite enthält 578 Tests in 19 Dateien. Die [Testdokumentation](docs/testing.md) erklärt Abdeckung und Grenzen. Ein Test-Pass ist kein Beleg vollständiger Zweigabdeckung oder einer Cloudflare-Laufzeitprüfung.
+Die lokale Testsuite enthält 646 Tests in 20 Dateien, einschließlich der Subdomain- und Access-Verträge. Die [Testdokumentation](docs/testing.md) erklärt Abdeckung und Grenzen. Ein Test-Pass ist kein Beleg vollständiger Zweigabdeckung oder einer produktiven Cloudflare-Prüfung.
 
 CI führt Syntax, Whitespace, `npm ci`, Tests und Bundle-Dry-Run aus. Dieser Workflow veröffentlicht nicht. Externe Workers-Builds-Automation kann separat existieren und muss vor einem Push geprüft werden.
 

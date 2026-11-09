@@ -225,7 +225,7 @@ describe("projects content contract", () => {
 
 	it("serves published projects through the public API", async () => {
 		const database = { prepare: () => ({ all: async () => ({ results: [{ id: "live-project", start_date: "2026-09-01", end_date: null, category: "creative", accent: "blue", image_url: "", link_url: "", featured: 1, sort_order: 1, language: "en", title: "Live project", alt: "Live project", description: "" }] }) }) };
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/projects"), { SITE_DB: database });
+		const response = await worker.fetch(new Request("https://api.mirokit.com/v1/projects"), { SITE_DB: database });
 		const body = await response.json();
 		expect(response.status).toBe(200);
 		expect(body.projects[0]).toMatchObject({ id: "live-project", phase: "current" });
@@ -324,7 +324,7 @@ describe("news API and admin access", () => {
 	};
 
 	it("serves public news from D1", async () => {
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/news"), { SITE_DB: database });
+		const response = await worker.fetch(new Request("https://api.mirokit.com/v1/news"), { SITE_DB: database });
 		const body = await response.json();
 		expect(response.status).toBe(200);
 		expect(body.news[0].id).toBe("test-news");
@@ -336,7 +336,7 @@ describe("news API and admin access", () => {
 				all: async () => ({ results: [{ id: "video-1", source_type: "external", source_url: "https://cdn.example.org/video.mp4", poster_url: "", duration_seconds: 12, width: 1280, height: 720, featured: 0, sort_order: 1, language: "en", title: "Video", alt: "Video", description: "", subtitle_id: null }] }),
 			}),
 		};
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/videos"), { SITE_DB: database });
+		const response = await worker.fetch(new Request("https://api.mirokit.com/v1/videos"), { SITE_DB: database });
 		const body = await response.json();
 		expect(response.status).toBe(200);
 		expect(body.videos[0].sourceType).toBe("external");
@@ -350,7 +350,7 @@ describe("news API and admin access", () => {
 					: [{ id: "conversation-1", collection: "interviews", source_type: "external", source_url: "https://cdn.example.org/interview.mp4", poster_url: "", duration_seconds: 12, width: 1280, height: 720, featured: 0, sort_order: 1, language: "en", title: "Conversation", alt: "Conversation", description: "", subtitle_id: null }] }),
 			}),
 		};
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/interviews"), { SITE_DB: database });
+		const response = await worker.fetch(new Request("https://api.mirokit.com/v1/interviews"), { SITE_DB: database });
 		const body = await response.json();
 		expect(response.status).toBe(200);
 		expect(body.interviews[0].id).toBe("conversation-1");
@@ -407,7 +407,7 @@ describe("news API and admin access", () => {
 	});
 
 	it("returns 401 for an unauthenticated admin API request", async () => {
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/admin/news"), { SITE_DB: database });
+		const response = await worker.fetch(new Request("https://admin.mirokit.com/v1/admin/news"), { SITE_DB: database });
 		expect(response.status).toBe(401);
 	});
 
@@ -500,7 +500,7 @@ describe("news API and admin access", () => {
 	});
 
 	it("serves only published gallery objects with localized metadata", async () => {
-		const response = await worker.fetch(new Request("https://mirokit.com/api/v1/gallery"), {
+		const response = await worker.fetch(new Request("https://api.mirokit.com/v1/gallery"), {
 			SITE_MEDIA: {
 				list: async () => ({
 					objects: [
@@ -523,7 +523,7 @@ describe("news API and admin access", () => {
 
 		expect(response.status).toBe(200);
 		expect(body.gallery).toHaveLength(1);
-		expect(body.gallery[0].image).toBe("/media/v1/gallery/550e8400-e29b-41d4-a716-446655440000.webp");
+		expect(body.gallery[0].image).toBe("https://api.mirokit.com/v1/media/gallery/550e8400-e29b-41d4-a716-446655440000.webp");
 		expect(body.gallery[0].title.en).toBe("Team day");
 	});
 

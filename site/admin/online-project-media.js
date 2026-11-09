@@ -1,4 +1,5 @@
 import { ONLINE_PROJECT_TOPICS } from "../source/scripts/online-project-topics.js";
+import { siteUrl } from "../source/scripts/service-urls.js";
 
 const byId = (id) => document.getElementById(id);
 const languages = ["ru", "en", "de"];
@@ -200,11 +201,11 @@ class OnlineProjectMediaAdmin {
       : "Als Entwurf speichern lädt neue Dateien hoch und hält den Inhalt privat. Veröffentlichen macht ihn unmittelbar öffentlich sichtbar. Archivieren nimmt ihn von der Website; die Datei bleibt gespeichert.";
   }
   updateLibraryLink() {
-    const url = new URL("/page/onlineProjects/", location.origin);
+    const url = new URL(siteUrl("/page/onlineProjects/"));
     url.searchParams.set("media", this.kind === "document" ? "documents" : "videos");
     url.searchParams.set("lang", "de");
     if (byId("onlineMediaTopic").value) url.searchParams.set("topic", byId("onlineMediaTopic").value);
-    byId("onlineMediaLibraryLink").href = url.pathname + url.search;
+    byId("onlineMediaLibraryLink").href = url.href;
   }
   populate(item) {
     this.clear();

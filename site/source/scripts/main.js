@@ -1,3 +1,4 @@
+import { apiUrl } from "./service-urls.js";
 /* eslint-disable no-undef */
 /* The translation object and language switch live in language.js. */
 const scroller = document.querySelector(".site-main.scroller"), progress = document.getElementById("progress"), burger = document.querySelector(".burger"), mobileMenu = document.getElementById("mobileMenu"), backdrop = document.getElementById("mobileBackdrop"), closeBtn = document.querySelector(".close-menu"), modal = document.getElementById("signupModal"), toast = document.getElementById("toast");
@@ -480,7 +481,7 @@ renderNewsViews();
 
 async function loadRemoteNews() {
    try {
-      const response = await fetch("/api/v1/news", { headers: { Accept: "application/json" }, cache: "no-store" });
+      const response = await fetch(apiUrl("/v1/news"), { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error(`News API returned ${response.status}`);
       const payload = await response.json();
       if (!Array.isArray(payload.news)) throw new Error("News API returned invalid data");
@@ -494,7 +495,7 @@ async function loadRemoteNews() {
 async function loadRemotePartners() {
    if (!partnersRemote || !partnersStatic) return;
    try {
-      const response = await fetch("/api/v1/partners", { headers: { Accept: "application/json" }, cache: "no-store" });
+      const response = await fetch(apiUrl("/v1/partners"), { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error(`Partners API returned ${response.status}`);
       const payload = await response.json();
       if (!Array.isArray(payload.partners)) throw new Error("Partners API returned invalid data");
@@ -814,7 +815,7 @@ function renderRemoteProjects() {
 async function loadRemoteProjects() {
    if (!projectsCurrentGrid || !projectsPastGrid) return;
    try {
-      const response = await fetch("/api/v1/projects", { headers: { Accept: "application/json" }, cache: "no-store" });
+      const response = await fetch(apiUrl("/v1/projects"), { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error(`Projects API returned ${response.status}`);
       const payload = await response.json();
       if (!Array.isArray(payload.projects)) throw new Error("Projects API returned invalid data");

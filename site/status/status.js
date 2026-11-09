@@ -1,3 +1,5 @@
+import { apiUrl, adminUrl } from "../source/scripts/service-urls.js";
+for (const link of document.querySelectorAll('a[href^="/admin/"]')) link.href = adminUrl(link.getAttribute("href").slice(6));
 /* global T, currentLang */
 const $ = (id) => document.getElementById(id);
 const copy = (key) => T[currentLang]?.[`st_${key}`] || T.en[`st_${key}`] || key;
@@ -115,7 +117,7 @@ async function load(section) {
   notice();
   if (section === "server") renderServer();
   try {
-    const response = await fetch(section === "server" ? "/api/v1/status" : "/api/v1/status/visits", { cache: "no-store", signal: AbortSignal.timeout(10000) });
+    const response = await fetch(apiUrl(section === "server" ? "/v1/status" : "/v1/status/visits"), { cache: "no-store", signal: AbortSignal.timeout(10000) });
     if (!response.ok) throw new Error("Request failed");
     const data = await response.json();
     if (data.success !== true) throw new Error("Invalid response");
