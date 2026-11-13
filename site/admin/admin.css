@@ -1212,11 +1212,10 @@ small.field-hint {
   padding: 12px;
 }
 
-.gallery-selected-file img {
+.gallery-selected-file canvas {
   width: 65px;
   height: 58px;
   border-radius: 5px;
-  object-fit: cover;
 }
 
 .gallery-selected-file strong {

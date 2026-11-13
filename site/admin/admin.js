@@ -499,7 +499,6 @@ class GalleryAdmin {
     this.items = [];
     this.quotes = [];
     this.selectedFiles = [];
-    this.selectedPreviewUrls = [];
     this.form = document.getElementById("galleryForm");
     this.file = document.getElementById("galleryFile");
     this.dropzone = document.getElementById("galleryDropzone");
@@ -735,18 +734,16 @@ class GalleryAdmin {
     this.syncFolderTarget();
   }
   renderSelectedFiles() {
-    this.selectedPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
-    this.selectedPreviewUrls = [];
     this.selectedFilesList.replaceChildren();
     if (!this.selectedFiles.length) return;
     this.selectedFiles.forEach((file, index) => {
       const card = document.createElement("article");
       card.className = "gallery-selected-file";
-      const image = document.createElement("img");
-      const previewUrl = URL.createObjectURL(file);
-      this.selectedPreviewUrls.push(previewUrl);
-      image.src = previewUrl;
-      image.alt = file.name;
+      const image = document.createElement("canvas");
+      image.width = 130;
+      image.height = 116;
+      image.setAttribute("role", "img");
+      image.setAttribute("aria-label", file.name);
       const copy = document.createElement("div");
       const name = document.createElement("strong");
       name.textContent = file.name;
@@ -761,11 +758,31 @@ class GalleryAdmin {
         }>↓</button><button class="button button-small button-danger" type="button" data-gallery-selected-remove="${index}">Entfernen</button>`;
       card.append(image, copy, actions);
       this.selectedFilesList.append(card);
+      void this.renderSelectedImagePreview(image, file);
     });
+  }
+  async renderSelectedImagePreview(canvas, file) {
+    let bitmap;
+    try {
+      // Decode into pixels instead of giving a DOM URL the original file bytes.
+      bitmap = await createImageBitmap(file);
+      if (!canvas.isConnected) return;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Canvas context unavailable");
+      const scale = Math.max(canvas.width / bitmap.width, canvas.height / bitmap.height);
+      const width = bitmap.width * scale;
+      const height = bitmap.height * scale;
+      context.drawImage(bitmap, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
+    } catch {
+      // An undecodable file must never fall back to a URL or HTML preview.
+      canvas.hidden = true;
+    } finally {
+      bitmap?.close();
+    }
   }
   addFiles(files) {
     for (const file of files) {
-      if (!file.type.startsWith("image/") || file.size === 0) continue;
+      if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(file.type) || file.size === 0) continue;
       if (
         !this.selectedFiles.some((candidate) =>
           candidate.name === file.name && candidate.size === file.size &&
