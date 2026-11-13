@@ -32,6 +32,7 @@ Es gibt keine Queue, keinen Durable Object, keinen Cronjob und kein serverseitig
 | --- | --- |
 | `index.js` | Routing, CRUD-Handler, Uploads/Promotion, Gallery-Ordner, Formulare und SEO |
 | `access.js` | Lokaler Token, RS256-JWT, JWKS-Cache und E-Mail-Allowlist |
+| `email.js` | Begrenzte E-Mail-Prüfung ohne RegEx-Backtracking |
 | `admin-methods.js` | Methodenvertrag und Route-Präzedenz für Content-Admin-APIs |
 | `hosts.js` | Vier Site-Domains und ihre vier `www`-Aliase |
 | `security-headers.js` | Gemeinsame Report-Only-CSP |
@@ -46,7 +47,7 @@ Es gibt keine Queue, keinen Durable Object, keinen Cronjob und kein serverseitig
 | `status.js` | Live-Probes, Aufrufaggregate, Details und Bot-/DNT-/GPC-Gruppen |
 | `contact-receipt.js` | Reine Mailvorlagen und isolierter Bestätigungsversand |
 
-Alle 15 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests prüfen querliegende Verträge. Der SQLite-Helfer liegt außerhalb von `src/` unter `worker/test/helpers/database.js`.
+Alle 16 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests prüfen querliegende Verträge. Der SQLite-Helfer liegt außerhalb von `src/` unter `worker/test/helpers/database.js`.
 
 ## Frontend-Module
 
@@ -56,7 +57,7 @@ Alle 15 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests p
 | `site/source/style/style.css` | Gemeinsame Gestaltung, Themes und responsive Regeln |
 | `site/source/style/subpage.css` | Wiederverwendeter Unterseiten-Header und gemeinsame Dokumentregeln |
 | `site/source/scripts/language.js` | Wörterbuch `T`, `currentLang`, `setLang`, Text-/Attributübersetzung |
-| `site/source/scripts/news-data.js` | Gebündelte News für Landingpage, News-Seite und Seed |
+| `site/source/scripts/news-data.js` | Gemeinsames ES-Modul mit gebündelten News; statische Imports in Landingpage, News-Seite und Seed |
 | `site/source/scripts/main.js` | Navigation, Theme, Hero, News-Dialoge, Projects, Partners und Lazy Loading |
 | `site/source/scripts/contact-mail.js` | Formularvalidierung im Browser, Turnstile und Kontakt-Requests |
 | `site/source/scripts/mirokit-world-map.js` | Lazy geladenes Canvas-Kartenmodul, API-/Fallback-Punkte und Länderfeed |

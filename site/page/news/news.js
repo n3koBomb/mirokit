@@ -1,3 +1,4 @@
+import { MIRoKIT_NEWS } from "../../source/scripts/news-data.js";
 /* News archive page: one public feed for both bundled fallback and D1 content. */
 const grid = document.getElementById("newsGrid");
 const empty = document.getElementById("newsEmpty");
@@ -23,7 +24,7 @@ const categoryKeys = {
   announce: "news_category_announce",
 };
 const accents = { blue: "nw-blue", red: "nw-red", green: "nw-green", amber: "nw-amber", violet: "nw-violet" };
-const state = { items: [...(typeof MIRoKIT_NEWS !== "undefined" ? MIRoKIT_NEWS : [])], filter: "all", query: "", sort: "newest", visible: [], activeIndex: 0 };
+const state = { items: [...MIRoKIT_NEWS], filter: "all", query: "", sort: "newest", visible: [], activeIndex: 0 };
 
 function text(item, field) {
   const value = item?.[field];

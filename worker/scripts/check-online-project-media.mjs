@@ -6,10 +6,11 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import worker from "../src/index.js";
+import { MIRoKIT_NEWS } from "../../site/source/scripts/news-data.js";
 process.chdir(fileURLToPath(new URL("../../", import.meta.url)));
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.MIROKIT_PLAYWRIGHT_MODULE || "playwright-core");
-const axePath = process.env.MIROKIT_AXE_SCRIPT || require.resolve("axe-core/axe.min.js");
+const axeSource = await readFile(require.resolve("axe-core/axe.min.js"), "utf8");
 const root = path.resolve("site");
 const objects = new Map();
 let version = 0;
@@ -39,7 +40,11 @@ const server = createServer(async (req, res) => {
     }
     res.writeHead(response.status, Object.fromEntries(response.headers));
     res.end(Buffer.from(await response.arrayBuffer()));
-  } catch (error) { res.writeHead(404); res.end(String(error)); }
+  } catch (error) {
+    console.error("Browser test request failed", error);
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end("Not found");
+  }
 });
 await new Promise((resolve) => server.listen(4173, "127.0.0.1", resolve));
 
@@ -59,7 +64,7 @@ const errors = [];
 const checks = [];
 const axeResults = [];
 async function audit(page, label) {
-  await page.addScriptTag({ content: await readFile(axePath, "utf8") });
+  await page.addScriptTag({ content: axeSource });
   const result = await page.evaluate(() => axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] } }));
   const violations = result.violations.map((issue) => ({ id: issue.id, impact: issue.impact, nodes: issue.nodes.map((node) => ({ target: node.target, summary: node.failureSummary })) }));
   axeResults.push({ label, violations });
@@ -77,6 +82,11 @@ try {
   const page = await context.newPage();
   page.on("pageerror", (error) => { errors.push(error.message); console.log("Page error:", error.message); });
   await page.goto("http://localhost:4173/admin/");
+  const missingAsset = await context.request.get("http://localhost:4173/public/security-check-missing.txt");
+  assert.equal(missingAsset.status(), 404);
+  assert.equal(await missingAsset.text(), "Not found");
+  assert.match(missingAsset.headers()["content-type"], /^text\/plain/);
+  checks.push("Test server returns generic error text without internal paths");
   await page.locator("#onlineProjectsTab").click();
   assert.equal(await page.locator("#quickGuide").getAttribute("open"), null);
   assert.equal(await page.locator(".rail-link").count(), 0);
@@ -103,10 +113,10 @@ try {
   const publicItems = (await (await context.request.get("http://localhost:4173/api/v1/online-projects/media")).json()).media;
   assert.equal(publicItems.length, 1);
   assert.equal((await context.request.get(`http://localhost:4173${publicItems[0].url}`)).headers()["content-type"], "application/pdf");
-  await mkdir("docs/screenshots", { recursive: true });
+  await mkdir("worker/.wrangler/media-browser-check", { recursive: true });
   await page.locator(".admin-toast-close").click();
   await page.evaluate(() => scrollTo(0, 0));
-  await page.screenshot({ path: "docs/screenshots/online-project-admin-desktop.png", fullPage: true, animations: "disabled", timeout: 45000 });
+  await page.screenshot({ path: "worker/.wrangler/media-browser-check/online-project-admin-desktop.png", fullPage: true, animations: "disabled", timeout: 45000 });
   await audit(page, "Admin light desktop");
   const publicPage = await context.newPage();
   await publicPage.emulateMedia({ reducedMotion: "reduce" });
@@ -115,14 +125,14 @@ try {
   await publicPage.locator(".online-project-document img").waitFor();
   assert.equal(await publicPage.locator(".online-project-document a").getAttribute("target"), "_blank");
   assert.equal(await publicPage.locator(".online-project-document h3").textContent(), "Testdokument");
-  await publicPage.locator("#onlineProjectTopicSelect").selectOption("poetry");
+  await publicPage.locator('[data-topic="poetry"]').click();
   assert.equal(await publicPage.locator(".online-project-document").count(), 0);
   await publicPage.goBack();
   await publicPage.locator(".online-project-document").waitFor();
   await publicPage.locator("[data-lang-select]").selectOption("en");
   assert.equal(await publicPage.locator(".online-project-document h3").textContent(), "Test document");
   await publicPage.locator("[data-lang-select]").selectOption("de");
-  await publicPage.screenshot({ path: "docs/screenshots/online-project-documents-desktop.png", fullPage: true, animations: "disabled", timeout: 45000 });
+  await publicPage.screenshot({ path: "worker/.wrangler/media-browser-check/online-project-documents-desktop.png", fullPage: true, animations: "disabled", timeout: 45000 });
   await audit(publicPage, "Documents light desktop");
   checks.push("Public PDF thumbnail, _blank link, topic filter, history and language switching");
   const popupPromise = publicPage.waitForEvent("popup");
@@ -197,7 +207,7 @@ try {
   await page.locator(".admin-toast-close").click();
   await page.bringToFront();
   await page.evaluate(() => scrollTo(0, 0));
-  await page.screenshot({ path: "docs/screenshots/online-project-admin-mobile-dark.png", fullPage: false, animations: "disabled", timeout: 45000 });
+  await page.screenshot({ path: "worker/.wrangler/media-browser-check/online-project-admin-mobile-dark.png", fullPage: false, animations: "disabled", timeout: 45000 });
   await audit(page, "Admin dark mobile");
   await publicPage.locator('[data-media="documents"]').click();
   await publicPage.reload();
@@ -206,7 +216,7 @@ try {
     assert.equal(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `public overflow at ${width}`);
   }
   await publicPage.bringToFront();
-  await publicPage.screenshot({ path: "docs/screenshots/online-project-documents-mobile.png", fullPage: true, animations: "disabled", timeout: 45000 });
+  await publicPage.screenshot({ path: "worker/.wrangler/media-browser-check/online-project-documents-mobile.png", fullPage: true, animations: "disabled", timeout: 45000 });
   await publicPage.locator("[data-theme-toggle]").click();
   await audit(publicPage, "Documents dark mobile");
   await publicPage.locator("[data-theme-toggle]").click();
@@ -225,6 +235,14 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator("#galleryTab").click();
   assert.equal(await page.locator("#galleryForm").isVisible(), true);
+  const unsafeName = '<img src=x onerror="window.filenameXss=true">.png';
+  await page.locator("#galleryFile").setInputFiles({ name: unsafeName, mimeType: "image/png", buffer: Buffer.from(photoBytes) });
+  assert.equal(await page.locator("#gallerySelectedFiles strong").textContent(), unsafeName);
+  assert.equal(await page.locator("#gallerySelectedFiles strong img").count(), 0);
+  assert.equal(await page.evaluate(() => window.filenameXss), undefined);
+  await page.locator("[data-gallery-selected-remove]").click();
+  assert.equal(await page.locator("#gallerySelectedFiles .gallery-selected-file").count(), 0);
+  checks.push("HTML-like file names remain literal text in gallery previews");
   assert.equal(await page.locator("#galleryList").isVisible(), true);
   assert.equal(await page.locator("#onlineAdminMediaNav").isVisible(), false);
   assert.equal(await page.locator("#galleryTopic").isDisabled(), true);
@@ -266,6 +284,16 @@ try {
   const gallery = (await (await context.request.get("http://localhost:4173/api/v1/gallery?collection=online-projects")).json()).gallery;
   assert.ok(gallery.some((item) => item.title.de === "Neue Arbeit" && item.alt.de === "MIRoKIT bei einer Veranstaltung"));
   checks.push("Photo upload preserves RU/EN/DE captions through the existing gallery API");
+  await context.route("**/api/v1/news", (route) => route.fulfill({ status: 503, contentType: "application/json", body: '{"success":false}' }));
+  for (const [route, selector] of [["/", "[data-news-grid]"], ["/page/news/", "#newsGrid"]]) {
+    const fallbackPage = await context.newPage();
+    fallbackPage.on("pageerror", (error) => errors.push(error.message));
+    await fallbackPage.goto(`http://localhost:4173${route}`);
+    await fallbackPage.locator("[data-lang-select]").selectOption("en");
+    await fallbackPage.waitForFunction(({ selector, title }) => document.querySelector(selector)?.textContent.includes(title), { selector, title: MIRoKIT_NEWS[0].title.en });
+    await fallbackPage.close();
+  }
+  checks.push("Home and news archive keep bundled module data when the news API fails");
   assert.deepEqual(errors, []);
   assert.ok(axeResults.every((result) => result.violations.length === 0));
   console.log(JSON.stringify({ checks, errors, axeResults }, null, 2));

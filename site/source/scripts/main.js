@@ -1,3 +1,4 @@
+import { MIRoKIT_NEWS } from "./news-data.js";
 /* eslint-disable no-undef */
 /* The translation object and language switch live in language.js. */
 const scroller = document.querySelector(".site-main.scroller"), progress = document.getElementById("progress"), burger = document.querySelector(".burger"), mobileMenu = document.getElementById("mobileMenu"), backdrop = document.getElementById("mobileBackdrop"), closeBtn = document.querySelector(".close-menu"), modal = document.getElementById("signupModal"), toast = document.getElementById("toast");
