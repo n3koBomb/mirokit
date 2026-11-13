@@ -240,9 +240,51 @@ try {
   assert.equal(await page.locator("#gallerySelectedFiles strong").textContent(), unsafeName);
   assert.equal(await page.locator("#gallerySelectedFiles strong img").count(), 0);
   assert.equal(await page.evaluate(() => window.filenameXss), undefined);
+  const selectedPreview = page.locator("#gallerySelectedFiles canvas");
+  assert.equal(await selectedPreview.getAttribute("aria-label"), unsafeName);
+  await page.waitForFunction(() => [...document.querySelector("#gallerySelectedFiles canvas").getContext("2d").getImageData(0, 0, 130, 116).data].some((value) => value > 0));
+  assert.equal(await page.locator("#gallerySelectedFiles [src]").count(), 0);
   await page.locator("[data-gallery-selected-remove]").click();
   assert.equal(await page.locator("#gallerySelectedFiles .gallery-selected-file").count(), 0);
   checks.push("HTML-like file names remain literal text in gallery previews");
+  const unsafeSvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.previewXss=true"></svg>';
+  await page.locator("#galleryFile").setInputFiles([
+    { name: "active.svg", mimeType: "image/svg+xml", buffer: Buffer.from(unsafeSvg) },
+    { name: "active.html", mimeType: "text/html", buffer: Buffer.from('<script>window.previewXss=true</script>') },
+  ]);
+  assert.equal(await page.locator("#gallerySelectedFiles .gallery-selected-file").count(), 0);
+  await page.locator("#galleryFile").setInputFiles({ name: "disguised.png", mimeType: "image/png", buffer: Buffer.from('<script>window.previewXss=true</script>') });
+  await page.waitForFunction(() => document.querySelector("#gallerySelectedFiles canvas")?.hidden);
+  assert.equal(await page.locator("#gallerySelectedFiles [src], #gallerySelectedFiles script").count(), 0);
+  assert.equal(await page.evaluate(() => window.previewXss), undefined);
+  await page.locator("[data-gallery-selected-remove]").click();
+  await page.locator("#galleryFile").setInputFiles([
+    { name: "first.png", mimeType: "image/png", buffer: Buffer.from(photoBytes) },
+    { name: "second.png", mimeType: "image/png", buffer: Buffer.from(photoBytes) },
+  ]);
+  await page.locator('[data-gallery-selected-move="up"]').nth(1).click();
+  assert.deepEqual(await page.locator("#gallerySelectedFiles strong").allTextContents(), ["second.png", "first.png"]);
+  await page.waitForFunction(() => [...document.querySelectorAll("#gallerySelectedFiles canvas")].every((canvas) => canvas.getContext("2d").getImageData(0, 0, 130, 116).data.some((value) => value > 0)));
+  await page.locator("[data-gallery-selected-remove]").first().click();
+  await page.locator("[data-gallery-selected-remove]").click();
+  // Finish a delayed decode after removal: no stale drawing, and close the bitmap.
+  await page.evaluate(() => {
+    const decode = window.createImageBitmap;
+    window.createImageBitmap = async (...args) => {
+      const bitmap = await decode(...args);
+      window.createImageBitmap = decode;
+      window.pendingPreviewBitmap = bitmap;
+      return new Promise((resolve) => { window.finishPreviewDecode = () => resolve(bitmap); });
+    };
+  });
+  await page.locator("#galleryFile").setInputFiles({ name: "removed.png", mimeType: "image/png", buffer: Buffer.from(photoBytes) });
+  await page.waitForFunction(() => typeof window.finishPreviewDecode === "function");
+  await page.evaluate(() => { window.removedPreviewCanvas = document.querySelector("#gallerySelectedFiles canvas"); });
+  await page.locator("[data-gallery-selected-remove]").click();
+  await page.evaluate(() => window.finishPreviewDecode());
+  await page.waitForFunction(() => window.pendingPreviewBitmap.width === 0);
+  assert.equal(await page.evaluate(() => window.removedPreviewCanvas.getContext("2d").getImageData(0, 0, 130, 116).data.every((value) => value === 0)), true);
+  checks.push("Selected previews render pixels without URLs; reject active formats, fail closed on invalid images, and handle reorder/removal during decoding");
   assert.equal(await page.locator("#galleryList").isVisible(), true);
   assert.equal(await page.locator("#onlineAdminMediaNav").isVisible(), false);
   assert.equal(await page.locator("#galleryTopic").isDisabled(), true);

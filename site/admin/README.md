@@ -39,6 +39,8 @@ Die öffentliche API liefert nur veröffentlichte News mit erreichtem UTC-Datum.
 
 Neue Slugs dürfen nicht kollidieren. `POST /api/v1/admin/gallery/reorder` speichert eine Liste eindeutiger Schlüssel aus genau einem normalen Gallery-Ordner, maximal 100. ETag-bedingte Writes können Konflikte melden; bereits erfolgreiche Teilschritte werden nicht zurückgerollt.
 
+Die lokale Bildauswahl akzeptiert JPEG, PNG, WebP und AVIF. Vorschaubilder werden als dekodierte Pixel auf Canvas gezeichnet; es werden dafür keine Datei-URLs erzeugt. Bei nicht dekodierbaren Dateien bleibt die Bildvorschau ausgeblendet. Die Originaldateien werden unverändert an die bestehende Upload-API übergeben.
+
 `PATCH /api/v1/admin/gallery/:encoded-key` ändert Metadaten; `DELETE` archiviert. Gallery-Zitate werden separat in D1 verwaltet und können einen Ordnerbezug haben. Öffentlich erscheinen gruppierte `folders` und `gallery`; ein Ordnerlink verwendet `?folder=<slug>`.
 
 **Bekannter Fehler:** Die API erzeugt für Pending-Gallery-Vorschauen derzeit kodierte Slash-Pfade, die der Medienhandler mit `404` ablehnt. Lokale Dateivorschauen vor dem Upload sind davon zu unterscheiden. Details im [Audit](../../docs/repository-audit.md#konkrete-offene-befunde).
