@@ -68,9 +68,9 @@ Fehler-/Leer-/Ladezustände bleiben je Medienart getrennt. Erfolgreiche leere An
 
 ## Optionale Browserprüfung
 
-`worker/scripts/check-online-project-media.mjs` startet einen lokalen HTTP-Server auf `127.0.0.1:4173`, verwendet den echten Worker für die betroffenen Medienrouten und einen R2-Fake im Arbeitsspeicher. Andere API-Listen sind Testdaten. Er schreibt Screenshots nach `docs/screenshots/`.
+`worker/scripts/check-online-project-media.mjs` startet einen lokalen HTTP-Server auf `127.0.0.1:4173`, verwendet den echten Worker für die betroffenen Medienrouten und einen R2-Fake im Arbeitsspeicher. Andere API-Listen sind Testdaten. Neue Screenshots liegen unter `worker/.wrangler/media-browser-check/`; vorhandene Dokumentationsbilder bleiben erhalten. Der Harness prüft außerdem HTML-artige Dateinamen in der Gallery-Vorschau und allgemeine Fehlerantworten ohne interne Dateipfade.
 
-Voraussetzungen sind separat verfügbare `playwright-core`, `axe-core` und ein Chromium-/Chrome-/Edge-Binary. Diese Pakete sind keine regulären Projektabhängigkeiten. Der Harness importiert ausdrücklich Chromium; er unterstützt Firefox derzeit nicht. Optional lassen sich `MIROKIT_PLAYWRIGHT_MODULE`, `MIROKIT_AXE_SCRIPT` und `MIROKIT_BROWSER_PATH` setzen, um vorhandene Installationen zu verwenden.
+Voraussetzungen sind separat verfügbare `playwright-core`, `axe-core` und ein Chromium-/Chrome-/Edge-Binary. Diese Pakete sind keine regulären Projektabhängigkeiten. Der Harness importiert ausdrücklich Chromium; er unterstützt Firefox derzeit nicht. Optional lassen sich `MIROKIT_PLAYWRIGHT_MODULE` und `MIROKIT_BROWSER_PATH` setzen, um vorhandene Installationen zu verwenden. `axe-core/axe.min.js` wird ausschließlich über die Paketauflösung geladen; ein freier `MIROKIT_AXE_SCRIPT`-Dateipfad wird nicht mehr unterstützt. Für separat installierte Node-Pakete kann deren `node_modules`-Verzeichnis über `NODE_PATH` verfügbar gemacht werden.
 
 Aus `worker/`:
 

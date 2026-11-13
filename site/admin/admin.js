@@ -748,8 +748,11 @@ class GalleryAdmin {
       image.src = previewUrl;
       image.alt = file.name;
       const copy = document.createElement("div");
-      copy.innerHTML = `<strong>${this.s.escapeHtml(file.name)}</strong><span>${(file.size / 1024 / 1024).toFixed(2)
-        } MB · Bild ${index + 1}</span>`;
+      const name = document.createElement("strong");
+      name.textContent = file.name;
+      const details = document.createElement("span");
+      details.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB · Bild ${index + 1}`;
+      copy.append(name, details);
       const actions = document.createElement("div");
       actions.className = "gallery-selected-file-actions";
       actions.innerHTML =

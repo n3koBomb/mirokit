@@ -33,7 +33,7 @@ site/
   admin/                       Geschützter Content Desk und Aufrufdetails
   public/                      Assets, Favicons, Manifest und PDF.js
 worker/
-  src/                         15 Laufzeitmodule und zugehörige Tests
+  src/                         16 Laufzeitmodule und zugehörige Tests
   migrations/                  0001 bis 0010
   scripts/                     News-Seed und optionale Medien-Browserprüfung
   test/helpers/                SQLite-Testdatenbank
@@ -133,7 +133,9 @@ Nach Annahme der Moderationsmail läuft die Eingangsbestätigung über `ctx.wait
 
 ## Prüfungen und Betrieb
 
-Vom Repository-Stamm:
+Zuerst die Entwicklungsabhängigkeiten mit `npm ci` aus `worker/` installieren. Die Syntaxprüfung verwendet den dort versionierten HTML-Parser `parse5`.
+
+Danach vom Repository-Stamm:
 
 ```bash
 node scripts/check-js.mjs
@@ -147,7 +149,7 @@ npm test -- --run
 XDG_CONFIG_HOME=/tmp/mirokit-wrangler-config npx --no-install wrangler deploy --dry-run
 ```
 
-Die lokale Testsuite enthält 578 Tests in 19 Dateien. Die [Testdokumentation](docs/testing.md) erklärt Abdeckung und Grenzen. Ein Test-Pass ist kein Beleg vollständiger Zweigabdeckung oder einer Cloudflare-Laufzeitprüfung.
+Die lokale Testsuite enthält 606 Tests in 22 Dateien. Die [Testdokumentation](docs/testing.md) erklärt Abdeckung und Grenzen. Die Korrekturen zu den sechs CodeQL-Meldungen stehen in [docs/codeql-security-fixes.md](docs/codeql-security-fixes.md). Ein Test-Pass ist kein Beleg vollständiger Zweigabdeckung oder einer Cloudflare-Laufzeitprüfung.
 
 CI führt Syntax, Whitespace, `npm ci`, Tests und Bundle-Dry-Run aus. Dieser Workflow veröffentlicht nicht. Externe Workers-Builds-Automation kann separat existieren und muss vor einem Push geprüft werden.
 

@@ -25,7 +25,9 @@ Rechtstexte und Impressumsangaben nur aus freigegebenen Quellen pflegen. Technis
 
 Voraussetzung ist Node.js 24 oder neuer. Es gibt nur im Verzeichnis `worker/` ein npm-Paket.
 
-Vom Repository-Stamm:
+Vor der Syntaxprüfung die gesperrten Entwicklungsabhängigkeiten einmal mit `npm ci` aus `worker/` installieren. `check-js.mjs` nutzt den dort installierten HTML-Parser `parse5`.
+
+Danach vom Repository-Stamm:
 
 ```bash
 node scripts/check-js.mjs

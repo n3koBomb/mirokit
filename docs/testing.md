@@ -4,7 +4,7 @@ Stand: **18. Oktober 2026**. Die Tests liegen neben dem Worker-Code unter `worke
 
 ## Befehle
 
-Node.js 24 oder neuer verwenden. Im Repository-Stamm existiert kein npm-Paket.
+Node.js 24 oder neuer verwenden. Im Repository-Stamm existiert kein npm-Paket. Zuerst `npm ci` aus `worker/` ausführen: Auch der Syntaxprüfer benötigt die dort installierte Entwicklungsabhängigkeit `parse5`. CI installiert die Pakete deshalb vor dem Syntaxcheck.
 
 ```bash
 # Repository-Stamm
@@ -32,8 +32,10 @@ npm test -- --run --reporters=dot
 | `admin-methods.test.js` | Alle deklarierten Content-Adminpfade, Methoden, Trailing Slash und `Allow` |
 | `contact-receipt.test.js` | Kontakt-/Liga-Versand, Sprachen, Schalter, Inhaltsgrenzen und Versandfehler |
 | `content.test.js` | World-/Partner-Validierung, SQL-Upserts, Übersetzungen und öffentliche Sortierung |
+| `email.test.js` | E-Mail-Format, 254-Zeichen-Grenze und problematische RegEx-Eingaben |
 | `hosts.test.js` | Alle acht Hostzuordnungen und unerlaubte Hostformen |
 | `index.test.js` | Formularfelder, Rate-Limit, Inhalte und API-/Admin-Verträge |
+| `inline-scripts.test.js` | Browser-kompatible Script-Tags, ungewöhnliche Endtags, Attribute und inerte Inhalte |
 | `interviews.test.js` | Materialien, Metadaten, Dateipfade, SQL und öffentliche Projektion |
 | `media.test.js` | Veröffentlichungsstatus, D1-Referenzen, Cache, ETag, Range und Vorschau |
 | `news.test.js` | Datums-/Link-/Übersetzungsvalidierung, SQL, Terminfreigabe und Datenformen |
@@ -41,6 +43,7 @@ npm test -- --run --reporters=dot
 | `projects.test.js` | Datumsgrenzen, Phasen, Übersetzungen und SQL |
 | `remote-media.test.js` | Drive-Hosts, Weiterleitungen, Formate, Streamlimits, Reader-Cleanup und Fehler |
 | `security-headers.test.js` | CSP-Direktiven und Gleichheit statischer/Worker-Header |
+| `seed-news.test.js` | Gemeinsame News-Daten und Seed-Dry-Run ohne dynamische Code-Auswertung |
 | `status.test.js` | Zähler, Datenschutzfilter, Bot-/DNT-/GPC-Gruppen, Paginierung, Routing und Probes |
 | `videos.test.js` | Quellen, Collections, YouTube, WebVTT, Join-Deduplizierung und SQL |
 | `admin-preview.test.js` | Frontend-Helfer für Token-, URL-, Blob- und konkurrierende Vorschauen |
@@ -48,7 +51,7 @@ npm test -- --run --reporters=dot
 | `online-projects.test.js` | Topics und normale Gallery-Ordner einschließlich Upload, Append und Reorder |
 | `security.test.js` | Übergreifende Hosts, CSP, Methoden und Drive-Grenzen |
 
-Der aktuelle Lauf umfasst **578 Tests in 19 Dateien**. Eine eigene Testdatei für jedes Laufzeitmodul ist keine Zusage von 100 Prozent Zeilen-/Zweigabdeckung. Die offenen Fälle im [Audit](repository-audit.md#konkrete-offene-befunde) sind trotz erfolgreicher Suite nicht abgesichert.
+Der aktuelle Lauf umfasst **606 Tests in 22 Dateien**. Eine eigene Testdatei für jedes Laufzeitmodul ist keine Zusage von 100 Prozent Zeilen-/Zweigabdeckung. Die offenen Fälle im [Audit](repository-audit.md#konkrete-offene-befunde) sind trotz erfolgreicher Suite nicht abgesichert.
 
 ## Umgebung und Isolation
 
@@ -71,7 +74,7 @@ Ein Bundle-Dry-Run prüft Zusammenstellung und Konfiguration, führt aber keine 
 
 ## Browser- und Produktionsgrenzen
 
-`check-js.mjs` prüft Syntax und Inline-JavaScript, aber weder DOM-Verträge noch CSS-Rendering, Barrierefreiheit, Bildrechte oder externe Medien. Es überspringt `public/`, Abhängigkeiten und generierte Worker-Berichte; der SQLite-Helfer wird durch die importierenden Tests geladen.
+`check-js.mjs` prüft Syntax und Inline-JavaScript, aber weder DOM-Verträge noch CSS-Rendering, Barrierefreiheit, Bildrechte oder externe Medien. `worker/scripts/inline-scripts.mjs` extrahiert ausführbare Inline-Skripte mit `parse5`, einschließlich der von Browsern akzeptierten ungewöhnlichen Script-Endtags. Der Check überspringt `public/`, Abhängigkeiten und generierte Worker-Berichte; der SQLite-Helfer wird durch die importierenden Tests geladen.
 
 Frontend-Änderungen separat mit Firefox prüfen. Der vorhandene Chromium-/Edge-Harness für Online-Medien ist optional und arbeitet mit lokalen Testdaten; Anleitung und Grenzen stehen in [online-project-media.md](online-project-media.md#optionale-browserprüfung). Ein alter Screenshot oder HTML-Testbericht bestätigt den aktuellen Stand nicht.
 
@@ -80,7 +83,7 @@ Produktionsnachweise benötigen die tatsächliche Umgebung: Hostrouting, Access-
 ## Getrennter lokaler Prototyp
 
 Das ignorierte `claude-philosophy/` besitzt eigene TypeScript-, ESLint-,
-i18n- und Webtests. Es gehört nicht zu den 578 Worker-Tests. Vor den
+i18n- und Webtests. Es gehört nicht zur Worker-Testsuite. Vor den
 workspaceübergreifenden Checks muss `npm run build --workspace @mirokit/shared`
 seine importierten JS-/Typausgaben erzeugen. Im aktuellen Audit bestanden
 dieser Build, ESLint und der i18n-Check mit Warnungen; der Web-Typecheck

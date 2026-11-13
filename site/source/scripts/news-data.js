@@ -271,3 +271,5 @@ const MIRoKIT_NEWS = [
       },
    },
 ];
+
+export { MIRoKIT_NEWS };

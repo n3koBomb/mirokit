@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { inlineScripts } from "../worker/scripts/inline-scripts.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 let checked = 0;
@@ -22,11 +23,8 @@ function walk(directory) {
     if (/\.(?:mjs|cjs|js)$/.test(entry.name)) check(readFileSync(path, "utf8"), relative(root, path), !entry.name.endsWith(".cjs"));
     if (entry.name.endsWith(".html")) {
       const html = readFileSync(path, "utf8");
-      for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
-        if (/\bsrc\s*=/.test(match[1]) || !match[2].trim()) continue;
-        const type = /\btype\s*=\s*["']([^"']+)["']/i.exec(match[1])?.[1];
-        if (type && !["module", "text/javascript", "application/javascript"].includes(type)) continue;
-        check(match[2], `${relative(root, path)} inline script`, type === "module");
+      for (const script of inlineScripts(html)) {
+        check(script.source, `${relative(root, path)}:${script.line} inline script`, script.module);
       }
     }
   }

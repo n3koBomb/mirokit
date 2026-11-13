@@ -1,4 +1,5 @@
 import { authorizeAdmin, isLocalHostname } from "./access.js";
+import { isEmail } from "./email.js";
 import { handleStatusRequest, queueVisit } from "./status.js";
 import { sendContactReceipt } from "./contact-receipt.js";
 import { getCanonicalSiteHostname } from "./hosts.js";
@@ -635,12 +636,6 @@ function stripHeaderCharacters(value) {
 		.replace(/[\r\n]+/g, " ")
 		.trim()
 		.slice(0, 120);
-}
-
-function isEmail(value) {
-	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-		String(value)
-	);
 }
 
 function toArray(value) {

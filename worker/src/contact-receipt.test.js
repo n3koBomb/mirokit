@@ -71,6 +71,16 @@ describe("contact receipt delivery", () => {
 		vi.restoreAllMocks();
 	});
 
+	it.each(["visitor@@example.org", "visitor@example", `!@!.${"!.".repeat(4_000)}@`, `${"a".repeat(245)}@example.org`])("rejects invalid or oversized email before Turnstile and delivery", async (email) => {
+		const env = mailEnvironment();
+		const response = await worker.fetch(contactRequest({ fields: { email } }), env);
+		expect(response.status).toBe(400);
+		expect((await response.json()).message).toBe("Invalid email");
+		expect(fetch).not.toHaveBeenCalled();
+		expect(env.CONTACT_EMAIL.send).not.toHaveBeenCalled();
+		expect(env.CONTACT_RECEIPT_EMAIL.send).not.toHaveBeenCalled();
+	});
+
 	it.each(["false", false, " FALSE ", "", "invalid"])("suppresses receipts for switch value %s while retaining moderator delivery", async (value) => {
 		const env = mailEnvironment();
 		env.USE_SEND_EMAIL_RESPONSE = value;
