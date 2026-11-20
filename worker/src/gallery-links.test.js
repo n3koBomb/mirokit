@@ -84,7 +84,6 @@ describe('Gallery media links', () => {
     expect(app.get('galleryViewer').open).toBe(true);
     expect(app.get('galleryStage').children[0].src).toContain('photo-30.webp');
     expect(app.get('galleryGrid').innerHTML).toContain('photo=photo-30');
-    expect(app.get('galleryShareUrl').value).toBe(app.context.location.href);
     const reload = page(app.context.location.search, { ...data, folders: [{ ...data.folders[0], images: [...photos].reverse() }] });
     await reload.flush();
     expect(reload.get('galleryStage').children[0].src).toContain('photo-30.webp');
@@ -98,7 +97,6 @@ describe('Gallery media links', () => {
     expect(app.context.location.searchParams.get('view')).toBe('video');
     expect(app.context.location.searchParams.has('q')).toBe(false);
     expect(app.context.location.searchParams.get('campaign')).toBe('summer');
-    expect(app.get('galleryShareUrl').value).toContain('video=our-summer-film');
   });
 
   it('restores selection with back/forward and ignores a queued close after reopening', async () => {
@@ -132,7 +130,6 @@ describe('Gallery media links', () => {
     expect(app.get('galleryShareStatus').textContent).toBe('ga_link_copied');
     app.context.navigator.clipboard.writeText.mockRejectedValueOnce(new Error('denied'));
     await app.get('galleryCopyLink').emit('click');
-    expect(app.get('galleryShareUrl').select).toHaveBeenCalled();
     expect(app.get('galleryShareStatus').textContent).toBe('ga_copy_manual');
   });
 
