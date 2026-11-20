@@ -34,6 +34,7 @@
 .subpage-brand img {
   display: block;
   width: 132px;
+  max-width: 100%;
   height: 44px;
   object-fit: contain;
 }
@@ -48,8 +49,8 @@
   padding: 0 15px;
   border: 1px solid rgba(21, 101, 255, 0.2);
   border-radius: 999px;
-  color: var(--bl, #1565ff);
-  font-size: 11px;
+  color: var(--theme-link, #145fe8);
+  font-size: .8125rem;
   font-weight: 800;
   white-space: nowrap;
   transition: background-color 0.2s ease, transform 0.2s ease;
@@ -82,7 +83,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
   color: #01337b;
-  font: 800 10px/1 "Montserrat", sans-serif;
+  font: 800 .75rem/1.25 "Montserrat", sans-serif;
   letter-spacing: 0.04em;
 }
 
@@ -150,7 +151,7 @@ body.theme-dark .subpage-lang {
     justify-self: start;
     min-height: 34px;
     padding-inline: 12px;
-    font-size: 10px;
+    font-size: .8125rem;
   }
 
   .subpage-actions {
@@ -202,4 +203,14 @@ body.theme-dark .subpage-lang {
   .privacy-page .privacy-main {
     padding: 0;
   }
+}
+
+.subpage-header :focus-visible { outline: 3px solid var(--theme-focus); outline-offset: 2px; }
+@media (max-width: 44em), (max-height: 30em) {
+  .subpage-header { position: static; display: flex; flex-wrap: wrap; }
+  .subpage-actions { flex-wrap: wrap; }
+  .subpage-home { white-space: normal; }
+}
+@media (min-width: 44em) and (min-height: 30em) {
+  html:has(.subpage-header) { scroll-padding-block-start: 6rem; }
 }

@@ -61,7 +61,7 @@ function isPublicDocumentResponse(request, response) {
   // A conditional browser reload can reuse cached HTML via 304 and is still a page view.
   return request.method === "GET" && (response.status === 200 || response.status === 304) &&
     Boolean(response.headers.get("Content-Type")?.includes("text/html")) &&
-    (path === "/" || path === "/index.html" || path.startsWith("/page/") || path.startsWith("/status/")) &&
+    (path === "/" || path === "/index.html" || path.startsWith("/page/") || path.startsWith("/news/") || path.startsWith("/status/")) &&
     !request.headers.get("Purpose")?.includes("prefetch") && !request.headers.get("Sec-Purpose")?.includes("prefetch");
 }
 

@@ -263,6 +263,42 @@
                      </div>
 
                      <p class="translation-tip">Eine Sprache aufklappen und ihre Texte bearbeiten. Zum Vergleichen können mehrere Sprachen gleichzeitig geöffnet werden. Pflichtfelder sind markiert.</p>
+                     <details class="markdown-help" id="newsMarkdownHelp">
+                        <summary>Markdown-Spickzettel · Texte, Links und Bilder formatieren</summary>
+                        <div class="markdown-help-body">
+                           <p>Diese Beispiele kannst du in das Feld <strong>„Inhalt“</strong> der jeweiligen Sprache kopieren und anpassen. Schreibe jeden Absatz, jede Überschrift, jedes Bild und jeden Listenpunkt auf eine eigene Zeile. Der Haupttitel gehört in das Feld „Titel“.</p>
+                           <dl class="markdown-examples">
+                              <div><dt>Zwischenüberschriften</dt><dd><pre><code>## Eine Zwischenüberschrift
+### Eine kleinere Zwischenüberschrift</code></pre><p><code>##</code> beginnt einen Abschnitt, <code>###</code> einen untergeordneten Abschnitt. Nach den Rauten steht ein Leerzeichen.</p></dd></div>
+                              <div><dt>Fett und kursiv</dt><dd><pre><code>Ein **wichtiger** Hinweis mit _Betonung_.</code></pre><p>Zwei Sternchen auf jeder Seite machen <code>**Text**</code> fett. Ein Unterstrich auf jeder Seite macht <code>_Text_</code> kursiv.</p></dd></div>
+                              <div><dt>Links im Text</dt><dd><pre><code>Mehr dazu auf [unserer Website](https://example.org/).</code></pre><p>In eckigen Klammern steht der sichtbare Linktext, in runden Klammern direkt danach die Adresse. Ersetze die Beispieladresse durch deinen HTTPS-Link. Eine Adresse ohne diese Schreibweise bleibt normaler Text.</p></dd></div>
+                              <div><dt>Aufzählungen und nummerierte Listen</dt><dd><pre><code>- Erster Punkt
+- Zweiter Punkt
+
+1. Erster Schritt
+2. Zweiter Schritt</code></pre><p>Nach dem Bindestrich beziehungsweise der Nummer mit Punkt steht ein Leerzeichen.</p></dd></div>
+                              <div><dt>Bilder im Artikel</dt><dd><pre><code>![Kinder beim Zeichnen](https://example.org/mein-foto.jpg)</code></pre><p>Das Ausrufezeichen macht daraus ein Bild. Der Text in <code>[…]</code> beschreibt das Motiv für Screenreader und bei fehlendem Bild; er erscheint nicht als Bildunterschrift. Verwende die direkte Adresse einer vorhandenen Bilddatei, keinen Link zu einer Webseite. Auch vorhandene Pfade unter <code>/public/</code> oder <code>/media/v1/</code> sind möglich.</p></dd></div>
+                              <div><dt>Bildunterschrift und Bildnachweis</dt><dd><pre><code>![Kinder beim Zeichnen](https://example.org/mein-foto.jpg "Foto: Name")</code></pre><p>Die Bildunterschrift steht nach einem Leerzeichen in geraden doppelten Anführungszeichen <strong>innerhalb</strong> der runden Klammern. Sie erscheint unter dem Bild. „Foto: Name“ ist ein Beispiel: Trage hier deine Beschriftung oder den passenden Bildnachweis ein. Die Angabe ist optional.</p></dd></div>
+                           </dl>
+                           <h4>Optionale Angaben für Datum und Ort</h4>
+                           <p>Diese Zeilen im Feld „Inhalt“ erscheinen unter „Auf einen Blick“. Verwende die Bezeichnungen der jeweiligen Sprache. Eine vollständige Adresse mit Stadt und Land hilft bei der Kartenvorschau.</p>
+                           <dl class="markdown-examples">
+                              <div><dt>Deutsch</dt><dd><pre><code>Veranstaltungsdatum: 20. Dezember 2026, 14 Uhr
+Ort: Straße, Hausnummer, PLZ, Stadt, Land</code></pre></dd></div>
+                              <div><dt>English</dt><dd><pre lang="en"><code>Event date: 20 December 2026, 2 pm
+Location: street, number, postcode, city, country</code></pre></dd></div>
+                              <div><dt lang="ru">Русский</dt><dd><pre lang="ru"><code>Дата мероприятия: 20 декабря 2026, 14:00
+Место: улица, номер дома, индекс, город, страна</code></pre></dd></div>
+                           </dl>
+                           <h4>Zusätzliche Informationen: im Feld „Zusammenfassung“</h4>
+                           <p>Ergänzenden Text schreibst du <strong>am Ende der Zusammenfassung</strong> in geschweifte Klammern, nicht in das Feld „Inhalt“:</p>
+                           <pre><code>Ein kurzer Vorschautext zum Beitrag.
+
+{Hier stehen zusätzliche Informationen.
+Mehr dazu: [Weitere Details](https://example.org/details)}</code></pre>
+                           <p>Der Text vor den Klammern bleibt die Vorschau. Der Klammerinhalt erscheint als aufklappbarer Zusatz: am Bild auf der Startseite und als „Zusätzliche Informationen“ auf der Artikelseite. Auf der Artikelseite sind darin auch Überschriften, Hervorhebungen, Listen und Links möglich. Ohne Zusatztext brauchst du keine Klammern.</p>
+                        </div>
+                     </details>
                      <div class="translations">
                         <details class="language-details" open="">
                            <summary>
@@ -286,8 +322,9 @@
                                     <textarea data-language="ru" data-field="summary" required maxlength="2000" id="editor-summary-ru-193" lang="ru" aria-labelledby="editor-summary-ru-193-label"></textarea>
                                  </label>
                                  <label for="editor-content-ru-194" class="language-field-wide">
-                                    <span id="editor-content-ru-194-label">Inhalt <small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
-                                    <textarea class="content-textarea" data-language="ru" data-field="content" required id="editor-content-ru-194" lang="ru" aria-labelledby="editor-content-ru-194-label"></textarea>
+                                    <span id="editor-content-ru-194-label">Inhalt <small class="required-mark">Pflichtfeld</small></span>
+                                    <small class="field-hint" id="editor-content-ru-194-help">Ein Absatz pro Zeile. Beispiele für Formatierungen und Bilder stehen oben im Markdown-Spickzettel.</small>
+                                    <textarea class="content-textarea" data-language="ru" data-field="content" required id="editor-content-ru-194" lang="ru" aria-labelledby="editor-content-ru-194-label" aria-describedby="editor-content-ru-194-help"></textarea>
                                  </label>
                               </div>
                            </fieldset>
@@ -315,8 +352,9 @@
                                     <textarea data-language="en" data-field="summary" required maxlength="2000" id="editor-summary-en-197" lang="en" aria-labelledby="editor-summary-en-197-label"></textarea>
                                  </label>
                                  <label for="editor-content-en-198" class="language-field-wide">
-                                    <span id="editor-content-en-198-label">Inhalt<small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
-                                    <textarea class="content-textarea" data-language="en" data-field="content" required id="editor-content-en-198" lang="en" aria-labelledby="editor-content-en-198-label"></textarea>
+                                    <span id="editor-content-en-198-label">Inhalt <small class="required-mark">Pflichtfeld</small></span>
+                                    <small class="field-hint" id="editor-content-en-198-help">Ein Absatz pro Zeile. Beispiele für Formatierungen und Bilder stehen oben im Markdown-Spickzettel.</small>
+                                    <textarea class="content-textarea" data-language="en" data-field="content" required id="editor-content-en-198" lang="en" aria-labelledby="editor-content-en-198-label" aria-describedby="editor-content-en-198-help"></textarea>
                                  </label>
                               </div>
                            </fieldset>
@@ -344,8 +382,9 @@
                                     <textarea data-language="de" data-field="summary" required maxlength="2000" id="editor-summary-de-201" lang="de" aria-labelledby="editor-summary-de-201-label"></textarea>
                                  </label>
                                  <label for="editor-content-de-202" class="language-field-wide">
-                                    <span id="editor-content-de-202-label">Inhalt <small class="field-hint">Ein Absatz pro Zeile</small><small class="required-mark">Pflichtfeld</small></span>
-                                    <textarea class="content-textarea" data-language="de" data-field="content" required id="editor-content-de-202" lang="de" aria-labelledby="editor-content-de-202-label"></textarea>
+                                    <span id="editor-content-de-202-label">Inhalt <small class="required-mark">Pflichtfeld</small></span>
+                                    <small class="field-hint" id="editor-content-de-202-help">Ein Absatz pro Zeile. Beispiele für Formatierungen und Bilder stehen oben im Markdown-Spickzettel.</small>
+                                    <textarea class="content-textarea" data-language="de" data-field="content" required id="editor-content-de-202" lang="de" aria-labelledby="editor-content-de-202-label" aria-describedby="editor-content-de-202-help"></textarea>
                                  </label>
                               </div>
                            </fieldset>

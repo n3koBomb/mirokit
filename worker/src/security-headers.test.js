@@ -19,7 +19,8 @@ describe("shared content security policy", () => {
 
   it("allows required integrations without permitting inline or evaluated scripts", () => {
     expect(directives.get("script-src")).toEqual(["'self'", "https://challenges.cloudflare.com", "https://cdn.jsdelivr.net"]);
-    expect(directives.get("frame-src")).toEqual(["https://challenges.cloudflare.com", "https://www.youtube.com", "https://www.youtube-nocookie.com"]);
+    expect(directives.get("frame-src")).toEqual(["https://challenges.cloudflare.com", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://www.openstreetmap.org"]);
+    expect(directives.get("connect-src")).toContain("https://photon.komoot.io");
     expect(directives.get("img-src")).toContain("blob:");
     expect(directives.get("media-src")).toContain("blob:");
   });

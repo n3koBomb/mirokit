@@ -327,7 +327,7 @@ try {
   assert.ok(gallery.some((item) => item.title.de === "Neue Arbeit" && item.alt.de === "MIRoKIT bei einer Veranstaltung"));
   checks.push("Photo upload preserves RU/EN/DE captions through the existing gallery API");
   await context.route("**/api/v1/news", (route) => route.fulfill({ status: 503, contentType: "application/json", body: '{"success":false}' }));
-  for (const [route, selector] of [["/", "[data-news-grid]"], ["/page/news/", "#newsGrid"]]) {
+  for (const [route, selector] of [["/", "[data-news-rotator]"], ["/page/news/", "#newsFeatured"]]) {
     const fallbackPage = await context.newPage();
     fallbackPage.on("pageerror", (error) => errors.push(error.message));
     await fallbackPage.goto(`http://localhost:4173${route}`);

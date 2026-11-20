@@ -1,5 +1,5 @@
 /* Gallery has its own layout; MIRoKIT's shared palette and type remain authoritative. */
-body.gallery-page { --ga-bg: #f5f8ff; --ga-paper: #fff; --ga-ink: var(--dk); --ga-muted: #586985; --ga-line: #dbe4f3; --ga-soft: #eaf0ff; --ga-accent: #155be6; margin: 0; padding: 0; display: block; overflow-x: hidden; background: var(--ga-bg); color: var(--ga-ink); font-family: Rubik, sans-serif; }
+body.gallery-page { --ga-bg: #f5f8ff; --ga-paper: #fff; --ga-ink: var(--dk); --ga-muted: #586985; --ga-line: #dbe4f3; --ga-soft: #eaf0ff; --ga-accent: #155be6; margin: 0; padding: 0; display: block; background: var(--ga-bg); color: var(--ga-ink); font-family: Rubik, sans-serif; }
 body.gallery-page.theme-dark { --ga-bg: #0b1427; --ga-paper: #14223b; --ga-ink: #eef4ff; --ga-muted: #a8bad5; --ga-line: #2d4160; --ga-soft: #1c3052; --ga-accent: #8cb7ff; }
 .gallery-page::before, .gallery-page::after { display: none; }
 .gallery-page [hidden] { display: none !important; }
@@ -228,8 +228,8 @@ body.gallery-page.theme-dark { --ga-bg: #0b1427; --ga-paper: #14223b; --ga-ink: 
   transform: translateY(6px) translateZ(16px) rotateX(-24deg) scaleY(.98);
 }
 .ga-card-button:is(:hover, :focus-visible) .ga-folder-gloss { transform: translateX(125%) rotate(24deg); }
-.ga-back { display: inline-flex; margin-top: 12px; padding: 8px 13px; border: 1px solid var(--ga-line); border-radius: 999px; background: var(--ga-soft); color: var(--ga-accent); font: 800 11px Montserrat, sans-serif; cursor: pointer; }
-.ga-back:hover, .ga-back:focus-visible { border-color: var(--ga-accent); outline: none; }
+.ga-back { display: inline-flex; align-items: center; margin-top: 12px; padding: 8px 13px; border: 1px solid var(--ga-line); border-radius: 999px; background: var(--ga-soft); color: var(--ga-ink); font: 800 .8125rem Montserrat, sans-serif; cursor: pointer; gap: 0.5rem}
+.ga-back:hover, .ga-back:focus-visible { border-color: var(--ga-accent); }
 .ga-card-icon { position: absolute; bottom: 14px; right: 14px; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #01337b; font-size: 20px; }
 .ga-featured { position: absolute; top: 14px; left: 14px; padding: 6px 10px; border-radius: 20px; background: var(--yl); color: #0d1b4b; font-size: 10px; font-weight: 500; }
 .ga-duration { position: absolute; bottom: 16px; left: 14px; border-radius: 5px; padding: 5px 8px; background: #0d1b4bcc; color: white; font-size: 11px; }
@@ -312,7 +312,7 @@ body.gallery-page {
   --ga-bg: #edf3fc;
   --ga-paper: rgba(255, 255, 255, .94);
   --ga-ink: #07194a;
-  --ga-muted: #52709e;
+  --ga-muted: #455f87;
   --ga-line: rgba(21, 101, 255, .15);
   --ga-soft: #e7effc;
   --ga-accent: #1565ff;
@@ -569,7 +569,7 @@ body.gallery-page.theme-dark {
 .ga-search-suggestion { display: grid; gap: 3px; width: 100%; padding: 9px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--ga-ink); text-align: left; cursor: pointer; }
 .ga-search-suggestion:hover, .ga-search-suggestion:focus-visible { background: rgba(21, 101, 255, .09); outline: none; }
 .ga-search-suggestion span { color: var(--ga-accent); font: 800 9px Montserrat, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
-.ga-search-suggestion strong { overflow: hidden; font: 700 11px/1.3 Montserrat, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.ga-search-suggestion strong { min-width: 0; overflow-wrap: anywhere; font: 700 .875rem/1.4 Montserrat, sans-serif; }
 
 @media (max-width: 900px) { .ga-search-wrap { flex: 1 1 200px; margin-left: 0; } }
 @media (max-width: 600px) { .ga-search-wrap { width: 50%; min-width: 0; } }
@@ -586,21 +586,37 @@ body.gallery-page.theme-dark {
 .ga-folder-card .ga-folder-count { color: var(--ga-muted); font-size: 11px; line-height: 1.35; }
 .ga-library.is-folder-view .ga-heading h2 { max-width: 26ch; }
 
-.ga-dialog--photo { overflow: hidden; background: #050b17; border-color: #ffffff2b; }
+.ga-dialog--photo { overflow: auto; background: #050b17; border-color: #ffffff2b; }
 .ga-dialog--photo .ga-viewer-top { position: absolute; top: 0; right: 0; left: 0; z-index: 4; color: #fff; pointer-events: none; }
 .ga-dialog--photo .ga-viewer-top button { pointer-events: auto; border-color: #ffffff55; background: #07132fcc; color: #fff; }
 .ga-dialog--photo .ga-stage { min-height: min(80dvh, 780px); height: min(80dvh, 780px); }
 .ga-dialog--photo .ga-stage > img { max-height: min(80dvh, 780px); }
-.ga-dialog--photo .ga-viewer-footer { position: absolute; inset: 0; display: block; padding: 0; pointer-events: none; }
-.ga-dialog--photo .ga-viewer-copy, .ga-dialog--photo #galleryOriginal { display: none; }
-.ga-dialog--photo .ga-viewer-controls { position: absolute; top: 50%; right: 0; left: 0; justify-content: space-between; padding: 0 14px; transform: translateY(-50%); pointer-events: none; }
+.ga-dialog--photo .ga-viewer-footer { position: static; display: flex; flex-wrap: wrap; flex-direction: row-reverse; padding: 1rem; color: #fff; pointer-events: auto; }
+.ga-dialog--photo .ga-viewer-copy, .ga-dialog--photo #galleryOriginal { display: block; }
+.ga-dialog--photo .ga-viewer-copy :is(h2, p, blockquote) { color: inherit; }
+.ga-dialog--photo .ga-viewer-controls { order: -1; justify-content: flex-start; gap: .5rem; pointer-events: auto; }
 .ga-dialog--photo .ga-viewer-controls button { width: 54px; height: 54px; padding: 0; border-color: #ffffff66; background: #07132fcc; color: #fff; font-size: 24px; pointer-events: auto; }
 .ga-dialog--photo .ga-viewer-controls button:hover, .ga-dialog--photo .ga-viewer-controls button:focus-visible { border-color: #ffd34e; background: #1565ff; }
+.ga-dialog--photo .ga-viewer-controls button#galleryCopyLink {border: 1px solid var(--ga-line); border-radius: 10px; background: var(--ga-soft); color: var(--ga-ink);}
 
 @media (max-width: 600px) {
-  .ga-heading-subtitle { font-size: 12px; }
+  .ga-heading-subtitle { font-size: .9375rem; }
   .ga-dialog--photo { width: calc(100% - 8px); max-height: calc(100dvh - 8px); }
   .ga-dialog--photo .ga-stage, .ga-dialog--photo .ga-stage > img { min-height: calc(100dvh - 8px); height: calc(100dvh - 8px); max-height: calc(100dvh - 8px); }
   .ga-dialog--photo .ga-viewer-controls { padding-inline: 8px; }
   .ga-dialog--photo .ga-viewer-controls button { width: 46px; height: 46px; }
+}
+
+.ga-library, .ga-footer, .ga-viewer-footer { overflow-wrap: anywhere; }
+.ga-tabs, .ga-viewer-controls { flex-wrap: wrap; }
+.ga-search input, .ga-sort, .ga-sort select { min-width: 0; max-width: 100%; }
+.ga-tabs a[aria-current] { text-decoration: underline; text-underline-offset: .2em; }
+
+.ga-share { padding: 0 1rem 1rem; color: var(--ga-ink); }
+.ga-share p { min-height: 1.4em; margin: .5rem 0 0; font-size: .875rem; }
+.ga-dialog--photo .ga-share { color: #fff; }
+
+@media (max-width: 36em) {
+  .ga-video-controls { display: flex; flex-wrap: wrap; }
+  .ga-video-seek { flex-basis: 100%; }
 }

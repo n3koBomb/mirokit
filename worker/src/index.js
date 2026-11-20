@@ -9,6 +9,7 @@ import { fetchDriveImage } from "./remote-media.js";
 import { adminMethodResponse } from "./admin-methods.js";
 import { isOnlineProjectTopic } from "../../site/source/scripts/online-project-topics.js";
 import { handleOnlineProjectMedia } from "./online-project-media.js";
+import { handleNewsPage } from "./news-pages.js";
 import {
 	NEWS_ADMIN_QUERY,
 	NEWS_PUBLIC_QUERY,
@@ -189,6 +190,7 @@ const COMMON_RESPONSE_HEADERS = Object.freeze({
 });
 
 const SITEMAP_PATHS = Object.freeze([
+	{ path: "/news/", changefreq: "weekly", priority: "0.8" },
 	{ path: "/status/", changefreq: "daily", priority: "0.4" },
 	{
 		path: "/page/gallery/",
@@ -2721,6 +2723,13 @@ export default {
 
 		const documentRedirect = canonicalDocumentRedirect(request, url);
 		if (documentRedirect) return documentRedirect;
+
+		const newsPage = await handleNewsPage(request, env);
+		if (newsPage) {
+			const response = withSiteHeaders(newsPage, url.pathname);
+			queueVisit(request, response, env, ctx);
+			return response;
+		}
 
 		if (url.pathname !== CONTACT_API_PATH) {
 			if (url.pathname.startsWith("/api/")) {

@@ -22,6 +22,13 @@ let selectedQuoteId = '';
 let returnFocus = null;
 let previousOverflow = '';
 let activePlayer = null;
+let readingLocation = false;
+
+// Videos use the admin slug; photos keep their stable identity when reordered.
+function mediaSlug(item, kind = view) {
+  if (kind === 'video') return item.slug || item.id;
+  return item.slug || String(item.id || item.key).split('/').pop().replace(/\.[^.]+$/, '');
+}
 
 // Bundled archive photos remain available when no remote images have been published.
 const archive = [
@@ -118,13 +125,14 @@ function duration(value) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-function urlFor(nextView = view) {
+function urlFor(nextView = view, item = null, folder = activeFolder) {
   const url = new URL(location.href);
 
   url.searchParams.set('view', nextView);
   url.searchParams.set('lang', currentLang);
 
-  const query = !activeFolder && search.value.trim();
+  const inFolder = nextView === 'photos' && folder;
+  const query = !inFolder && search.value.trim();
 
   if (query) {
     url.searchParams.set('q', query);
@@ -132,17 +140,21 @@ function urlFor(nextView = view) {
     url.searchParams.delete('q');
   }
 
-  if (!activeFolder && sort.value !== 'featured') {
+  if (!inFolder && sort.value !== 'featured') {
     url.searchParams.set('sort', sort.value);
   } else {
     url.searchParams.delete('sort');
   }
 
-  if (view === 'photos' && activeFolder) {
-    url.searchParams.set('folder', activeFolder);
+  if (inFolder) {
+    url.searchParams.set('folder', folder);
   } else {
     url.searchParams.delete('folder');
   }
+
+  url.searchParams.delete('photo');
+  url.searchParams.delete('video');
+  if (item) url.searchParams.set(nextView === 'video' ? 'video' : 'photo', mediaSlug(item, nextView));
 
   return url.pathname + url.search + url.hash;
 }
@@ -169,9 +181,10 @@ function syncLinks() {
 }
 
 function readLocation() {
+  readingLocation = true;
   const params = new URLSearchParams(location.search);
 
-  view = params.get('view') === 'video'
+  view = params.has('video') || params.get('view') === 'video'
     ? 'video'
     : 'photos';
 
@@ -195,6 +208,53 @@ function readLocation() {
   }
 
   limit = 24;
+  readingLocation = false;
+}
+
+function restoreMediaFromLocation() {
+  const resource = resources[view];
+  if (!['ready', 'error'].includes(resource.state)) return;
+  const params = new URLSearchParams(location.search);
+  const slug = params.get(view === 'video' ? 'video' : 'photo');
+  if (!slug) return;
+
+  let item;
+  if (view === 'photos') {
+    const folders = resource.folders.length
+      ? resource.folders
+      : [{ slug: 'archive', images: archive }];
+    const folder = folders.find((candidate) =>
+      (!params.get('folder') || candidate.slug === params.get('folder')) &&
+      candidate.images.some((photo) => mediaSlug(photo) === slug)
+    );
+    item = folder?.images.find((photo) => mediaSlug(photo) === slug);
+    if (folder) activeFolder = folder.slug;
+  } else {
+    item = resource.items.find((video) => mediaSlug(video) === slug);
+  }
+
+  if (!item) {
+    if (resource.state === 'error') return;
+    $('galleryStatus').hidden = false;
+    $('galleryStatusText').textContent = t('ga_link_missing');
+    $('galleryRetry').hidden = true;
+    return;
+  }
+
+  // A direct link takes priority over an outdated search filter.
+  if (!visible.includes(item)) search.value = '';
+  render();
+  const index = visible.indexOf(item);
+  if (index < 0) return;
+  limit = Math.max(limit, index + 1);
+  render();
+  openMedia(index, null, false);
+  history.replaceState(history.state, '', urlFor(view, selected));
+  syncShareLink();
+}
+
+function syncShareLink() {
+  $('galleryShareStatus').textContent = '';
 }
 
 function renderQuote() {
@@ -301,7 +361,7 @@ function render() {
     (candidate) => candidate.slug === activeFolder
   );
 
-  if (view === 'photos' && activeFolder && !folder) {
+  if (view === 'photos' && activeFolder && !folder && !loading) {
     activeFolder = '';
   }
 
@@ -455,9 +515,9 @@ function render() {
 
         return `
           <article class="ga-card ga-folder-card">
-            <button
+            <a
               class="ga-card-button"
-              type="button"
+              href="${escape(urlFor('photos', null, folderItem.slug))}"
               data-folder-slug="${escape(folderItem.slug)}"
               aria-label="${escape(
           `${t('gallery_open')}: ${folderTitle(folderItem)}`
@@ -519,7 +579,7 @@ function render() {
                 <strong>${escape(folderTitle(folderItem))}</strong>
                 <small class="ga-folder-count">${escape(folderSubtitle(folderItem) || `${folderItem.count} ${t('ga_photos')}`)}</small>
               </span>
-            </button>
+            </a>
           </article>
         `;
       })
@@ -557,9 +617,9 @@ function render() {
       const inFolder = view === 'photos' && activeFolder;
       return `
         <article class="ga-card">
-          <button
+          <a
             class="ga-card-button"
-            type="button"
+            href="${escape(urlFor(view, item))}"
             data-index="${index}"
             aria-haspopup="dialog"
             aria-label="${escape(
@@ -597,7 +657,7 @@ function render() {
                 class="ga-card-icon"
                 aria-hidden="true"
               >
-                ${view === 'video' ? '▷' : '↗'}
+                ${view === 'video' ? '<i class="fas fa-play"></i>' : '<i class="fas fa-location-arrow"></i>'}
               </span>
             </span>
 
@@ -616,7 +676,7 @@ function render() {
 
               <strong>${escape(title(item))}</strong>
             </span>`}
-          </button>
+          </a>
         </article>
       `;
     })
@@ -809,6 +869,7 @@ async function load(kind, retry = false) {
 
     if (view === kind) {
       render();
+      restoreMediaFromLocation();
     }
   }
 }
@@ -866,9 +927,6 @@ function viewerCopy() {
   $('galleryPrevious').disabled =
     $('galleryNext').disabled =
     visible.length < 2;
-
-  $('galleryOriginal').href =
-    selected.image || selected.sourceUrl;
 
   const img = stage.querySelector('img');
 
@@ -1436,8 +1494,10 @@ function createHtml5Player(item) {
   };
 }
 
-function openMedia(index, trigger) {
+function openMedia(index, trigger, updateHistory = true) {
   if (!visible.length) return;
+
+  const wasOpen = dialog.open;
 
   selected =
     visible[
@@ -1486,6 +1546,11 @@ function openMedia(index, trigger) {
 
   viewerCopy();
 
+  if (updateHistory) {
+    history[wasOpen ? 'replaceState' : 'pushState']({}, '', urlFor(view, selected));
+  }
+  syncShareLink();
+
   if (!dialog.open) {
     returnFocus =
       trigger || document.activeElement;
@@ -1498,6 +1563,32 @@ function openMedia(index, trigger) {
     $('galleryClose').focus();
   }
 }
+
+function closeMedia(updateHistory = true) {
+  dialog.classList.remove('ga-dialog--photo');
+  clearStage();
+  selected = null;
+  document.body.style.overflow = previousOverflow;
+  if (updateHistory) history.replaceState(history.state, '', urlFor());
+  if (dialog.open) dialog.close();
+
+  const index = returnFocus?.dataset.index;
+  render();
+  const target = index !== undefined
+    ? grid.querySelector(`[data-index="${index}"]`)
+    : returnFocus;
+  if (target?.isConnected) target.focus({ preventScroll: true });
+}
+
+$('galleryCopyLink').addEventListener('click', async () => {
+  const value = new URL(urlFor(view, selected), location.origin).href;
+  try {
+    await navigator.clipboard.writeText(value);
+    if (new URL(urlFor(view, selected), location.origin).href === value) $('galleryShareStatus').textContent = t('ga_link_copied');
+  } catch {
+    $('galleryShareStatus').textContent = t('ga_copy_manual');
+  }
+});
 
 $('galleryClose').addEventListener(
   'click',
@@ -1521,29 +1612,8 @@ $('galleryNext').addEventListener(
 dialog.addEventListener(
   'close',
   () => {
-    dialog.classList.remove('ga-dialog--photo');
-    clearStage();
-    selected = null;
-    document.body.style.overflow =
-      previousOverflow;
-
-    const index =
-      returnFocus?.dataset.index;
-
-    render();
-
-    const target =
-      index !== undefined
-        ? grid.querySelector(
-          `[data-index="${index}"]`
-        )
-        : returnFocus;
-
-    if (target?.isConnected) {
-      target.focus({
-        preventScroll: true
-      });
-    }
+    // A queued close event must not clear a viewer reopened by popstate.
+    if (!dialog.open && selected) closeMedia();
   }
 );
 
@@ -1575,6 +1645,7 @@ dialog.addEventListener(
     // Keep native video seeking/volume keyboard shortcuts available.
     if (
       view === 'photos' &&
+      !event.target.matches('input, textarea, select, [contenteditable="true"]') &&
       ['ArrowLeft', 'ArrowRight'].includes(
         event.key
       )
@@ -1659,12 +1730,14 @@ function openFolder(slug, trigger) {
 grid.addEventListener(
   'click',
   (event) => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const folderButton =
       event.target.closest(
         '[data-folder-slug]'
       );
 
     if (folderButton) {
+      event.preventDefault();
       openFolder(
         folderButton.dataset.folderSlug,
         folderButton
@@ -1677,6 +1750,7 @@ grid.addEventListener(
       event.target.closest('[data-index]');
 
     if (button) {
+      event.preventDefault();
       openMedia(
         Number(button.dataset.index),
         button
@@ -1895,12 +1969,13 @@ window.addEventListener(
   'popstate',
   () => {
     if (dialog.open) {
-      dialog.close();
+      closeMedia(false);
     }
 
     readLocation();
     render();
     load(view);
+    restoreMediaFromLocation();
   }
 );
 
@@ -1984,11 +2059,11 @@ document.addEventListener(
     document.title =
       `${t('menu_gallery')} — MIRoKIT`;
 
-    history.replaceState(
-      {},
-      '',
-      urlFor()
-    );
+    if (readingLocation) return;
+    // Keep a requested medium intact even while its API response is pending.
+    const url = new URL(location.href);
+    url.searchParams.set('lang', currentLang);
+    history.replaceState(history.state, '', url.pathname + url.search + url.hash);
 
     syncTheme(
       document.documentElement.dataset.theme
@@ -1999,6 +2074,7 @@ document.addEventListener(
 
     if (dialog.open) {
       viewerCopy();
+      syncShareLink();
     } else {
       render();
     }

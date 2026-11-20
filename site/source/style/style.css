@@ -155,6 +155,9 @@
 html {
 	scroll-behavior: smooth;
 }
+html:has(:focus-visible) {
+	scroll-behavior: auto;
+}
 
 body {
 	font-family: var(--font-body);
@@ -704,6 +707,8 @@ body.intro-loading .topbar .logo-placeholder {
 	letter-spacing: 0.28em;
 }
 
+#hero .hero-title-wrap { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+
 #hero .hero-title {
 	max-width: 830px;
 	margin: 0;
@@ -1209,7 +1214,7 @@ p {
 	--desktop-nav-button-hover: #559bc2;
 	--desktop-sub-button: #72afd0;
 	--desktop-nested-button: #83b9d6;
-	--desktop-nav-text: rgba(255, 255, 255, 0.94);
+	--desktop-nav-text: var(--paper);
 
 	display: none;
 	align-items: center;
@@ -1256,7 +1261,7 @@ p {
 	border-radius: 16px;
 
 	background: var(--desktop-nav-button);
-	color: var(--desktop-nav-text);
+	color: var(--paper);
 
 	font-family: "Montserrat", sans-serif;
 	font-size: 13px;
@@ -1381,7 +1386,7 @@ p {
 	border-radius: 13px;
 
 	background: var(--desktop-sub-button);
-	color: var(--desktop-nav-text);
+	color: var(--paper);
 
 	font-family: "Montserrat", sans-serif;
 	font-size: 12.5px;
@@ -1562,8 +1567,8 @@ p {
 
 	.submenu>li>a:hover,
 	.submenu>li>.submenu-toggle--nested:hover {
-		background: #65a5c8;
-		color: #fff;
+		background: var(--desktop-nav-button);
+		color: var(--paper);
 
 		transform: translateX(2px);
 
@@ -1572,7 +1577,7 @@ p {
 
 	.submenu--nested>li>a:hover,
 	.submenu--nested>li>.submenu-toggle--nested:hover {
-		background: #74aece;
+		background: var(--desktop-nav-button-hover);
 	}
 }
 
@@ -1773,6 +1778,8 @@ p {
 	gap: 14px;
 }
 
+.mobile-menu[aria-hidden="true"] { visibility: hidden; }
+
 .mobile-menu.show {
 	transform: translateX(0);
 }
@@ -1796,6 +1803,14 @@ p {
 
 /* --- Mobile navigation: MIRoKIT Buttons und verschachtelte Accordions --- */
 
+.mobile-nav {
+	--mobile-nav-button: #60a5cb;
+	--mobile-nav-button-hover: #559bc2;
+	--mobile-sub-button: #72afd0;
+	--mobile-nested-button: #83b9d6;
+	--mobile-nav-text: var(--paper);
+}
+
 .mobile-links>li {
 	min-width: 0;
 }
@@ -1816,8 +1831,8 @@ p {
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 16px;
 
-	background: #60a5cb;
-	color: rgba(255, 255, 255, 0.94);
+	background: var(--mobile-nav-button);
+	color: var(--paper);
 
 	font-family: "Montserrat", sans-serif;
 	font-size: 13px;
@@ -1920,8 +1935,8 @@ p {
 	border: 1px solid rgba(255, 255, 255, 0.18);
 	border-radius: 14px;
 
-	background: #72afd0;
-	color: rgba(255, 255, 255, 0.94);
+	background: var(--mobile-nav-button);
+	color: var(--paper);
 
 	font-family: "Montserrat", sans-serif;
 	font-size: 12.5px;
@@ -1957,8 +1972,8 @@ p {
 	border: 1px solid rgba(255, 255, 255, 0.18);
 	border-radius: 14px;
 
-	background: #72afd0;
-	color: rgba(255, 255, 255, 0.94);
+	background: var(--mobile-nested-button);
+	color: var(--paper);
 
 	font-family: "Montserrat", sans-serif;
 	font-size: 12.5px;
@@ -1988,7 +2003,7 @@ p {
 .mobile-sub--nested a {
 	min-height: 40px;
 
-	background: #83b9d6;
+	background: var(--mobile-nested-button);
 
 	font-size: 0.92rem;
 
@@ -2001,7 +2016,7 @@ p {
 
 	.mobile-links>li>.mobile-sub-toggle:hover,
 	.mobile-links>li>a:not(.mobile-cta):hover {
-		background: #559bc2;
+		background: var(--mobile-nav-button-hover);
 
 		transform: translateY(-1px);
 		filter: saturate(1.06);
@@ -2011,8 +2026,8 @@ p {
 
 	.mobile-sub a:hover,
 	.mobile-sub-toggle--nested:hover {
-		background: #65a5c8;
-		color: #fff;
+		background: var(--mobile-nested-button);
+		color: var(--paper);
 
 		transform: translateY(-1px);
 
@@ -2020,7 +2035,7 @@ p {
 	}
 
 	.mobile-sub--nested a:hover {
-		background: #74aece;
+		background: var(--mobile-nav-button-hover);
 	}
 }
 
@@ -2039,7 +2054,7 @@ p {
 
 .mobile-links .mobile-sub-toggle:focus-visible,
 .mobile-links a:focus-visible {
-	outline: 3px solid rgba(21, 101, 255, 0.38);
+	outline: 3px solid var(--theme-focus);
 	outline-offset: 3px;
 }
 
@@ -2103,7 +2118,7 @@ p {
 	border-radius: 50px;
 	border: 2px solid rgba(21, 101, 255, 0.18);
 	background: transparent;
-	color: #7b8298;
+	color: var(--theme-text-secondary);
 	cursor: pointer;
 	transition: 0.2s;
 }
@@ -2729,6 +2744,11 @@ body:has(.modal.show) .scroll-top-control {
 	.scroll-top-control.is-launching .scroll-top-globe {
 		animation: none !important;
 	}
+}
+
+/* At high zoom, leave the short viewport available for focused content. */
+@media (max-height: 30em) {
+	body:has(.landing-deck) :is(.topbar, .fixed-footer, .scroll-top-control) { position: relative; inset: auto; }
 }
 
 /* Footer refresh: same fixed height, clearer compact hierarchy. */
@@ -4874,8 +4894,13 @@ body #join {
 }
 
 @media (max-width: 980px) {
+	#team .team-showcase > :is(.main-text, .team-visual-container, .team-story) {
+		grid-area: auto;
+	}
+
 	#team .team-showcase {
-		grid-template-columns: 1fr;
+		overflow-wrap: anywhere;
+		grid-template-columns: minmax(0, 1fr);
 		align-items: start;
 	}
 
@@ -8447,7 +8472,7 @@ body.theme-dark #projects .projects-context {
 .three-bears-topic-copy p,
 .three-bears-topic-copy li {
 	color: var(--miro-mid-blue, var(--muted));
-	font-size: clamp(14px, 1.25vw, 16px);
+	font-size: clamp(1rem, 1.25vw, 1.25rem);
 	line-height: 1.7;
 }
 
@@ -8458,13 +8483,6 @@ body.theme-dark #projects .projects-context {
 
 .three-bears-intro-copy p:last-child {
 	margin-bottom: 0;
-}
-
-.three-bears-intro-copy .three-bears-lead {
-	color: var(--dk);
-	font-size: clamp(17px, 1.7vw, 22px);
-	font-weight: 500;
-	line-height: 1.55;
 }
 
 .three-bears-intro-visual {
@@ -8581,7 +8599,7 @@ body.theme-dark #projects .projects-context {
 .three-bears-topic-copy li {
 	position: relative;
 	padding-left: 17px;
-	font-size: 14px;
+	font-size: clamp(1rem, 1.25vw, 1.25rem);
 	line-height: 1.58;
 }
 
@@ -8616,7 +8634,6 @@ body.theme-dark #threeBears .three-bears-topic {
 	background: rgba(15, 31, 59, 0.9);
 }
 
-body.theme-dark #threeBears .three-bears-intro-copy .three-bears-lead,
 body.theme-dark #threeBears .three-bears-topic h3,
 body.theme-dark #threeBears .three-bears-topic-copy strong {
 	color: #f4f7ff;
@@ -11949,8 +11966,12 @@ body.theme-dark #projects .projects-flow>div {
 #contact .btn-reset,
 #contact .btn-send {
 	min-height: 46px;
-	padding: 0 20px;
-	font-size: 13px;
+	max-width: 100%;
+	min-width: 0;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	padding: .6em 1em;
+	font-size: .875rem;
 	gap: 8px;
 }
 
@@ -16181,4 +16202,37 @@ body.theme-dark #projects .projects-context {
 	#projects .projects-context-visual svg {
 		height: 72px;
 	}
+}
+
+/* Keep text inside intermediate grid items at large user font sizes. */
+#hero .hero-copy, #partners .partner-panel, #partners .partner-logo-stage,
+#aboutUs .path-step, #historyOfCreation .history-block-heading {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+#partners .partner-logo-tile figcaption, #hero .hero-tag { white-space: normal; }
+#contact :is(.contact-form, .field, legend, label) { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+#contact .contact-form :is(input, select, textarea) { max-width: 100%; min-width: 0; }
+#contact .contact-form :focus-visible { scroll-margin-block: calc(var(--nav-h) + 1rem) calc(var(--footer-h) + 1rem); }
+
+.site-main { overflow-wrap: anywhere; }
+.topbar > nav, .desktop-nav > .nav-item { min-width: 0; }
+.desktop-nav > .nav-item > :is(a, button) { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 44em) {
+	#projects .projects-switch { max-width: 100%; flex-wrap: wrap; }
+	#projects .projects-switch-btn { min-width: 0; white-space: normal; }
+	#world .world-map-head, #world .world-map-head > div, #threeBears .three-bears-topic-copy { min-width: 0; }
+	#aboutUs .contest-chip, #aboutUs .about-kicker, #world .world-manifesto-label { max-width: 100%; white-space: normal; }
+}
+
+@media (max-width: 48em), (max-height: 30em) {
+	body:has(.landing-deck) .fixed-footer {
+		position: relative;
+		height: auto;
+		grid-template-columns: minmax(0, 1fr);
+		padding-block: 1rem;
+	}
+	#fixedFooter .fixed-footer-copy { flex-wrap: wrap; overflow: visible; white-space: normal; line-height: 1.5; }
+	#fixedFooter .fixed-footer-actions { flex-wrap: wrap; justify-content: flex-start; }
+	#fixedFooter .fixed-footer-actions > a:nth-child(2) { display: inline-flex; }
 }

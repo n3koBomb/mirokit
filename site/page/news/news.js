@@ -1,212 +1,130 @@
 import { MIRoKIT_NEWS } from "../../source/scripts/news-data.js";
-/* News archive page: one public feed for both bundled fallback and D1 content. */
+import { NEWS_COPY, publicNews, newsCard, newsText, newsCategory, installNewsImageFallback } from "../../source/scripts/news-presentation.js";
+
 const grid = document.getElementById("newsGrid");
-const empty = document.getElementById("newsEmpty");
-const count = document.getElementById("newsCount");
-const clear = document.getElementById("newsClear");
+const featured = document.getElementById("newsFeatured");
+const filters = document.getElementById("newsFilters");
 const search = document.getElementById("newsSearch");
-const suggestions = document.getElementById("newsSuggestions");
 const sort = document.getElementById("newsSort");
-const filters = [...document.querySelectorAll("[data-filter]")];
-const dialog = document.getElementById("newsViewer");
-const dialogImage = document.getElementById("newsViewerImage");
-const dialogCategory = document.getElementById("newsViewerCategory");
-const dialogDate = document.getElementById("newsViewerDate");
-const dialogTitle = document.getElementById("newsViewerTitle");
-const dialogBody = document.getElementById("newsViewerBody");
-const dialogCounter = document.getElementById("newsViewerCounter");
-const themeToggles = [...document.querySelectorAll("[data-theme-toggle]")];
+const clear = document.getElementById("newsClear");
+const loadState = document.getElementById("newsLoadState");
+const retry = document.getElementById("newsRetry");
+const params = new URLSearchParams(location.search);
+const state = { items: [], filter: params.get("category") || "all", query: (params.get("q") || "").slice(0, 200), sort: ["newest", "featured", "title"].includes(params.get("sort")) ? params.get("sort") : "newest", loading: true, fallback: false };
+search.value = state.query;
+sort.value = state.sort;
+let restoring = true;
+history.scrollRestoration = "manual";
+const scrollKey = () => `mirokitNewsScroll:${location.pathname}${location.search}`;
+let savedScroll = Number(history.state?.newsScroll) || 0;
+try { savedScroll = Number(sessionStorage.getItem(scrollKey())) || savedScroll; } catch { /* history state still works */ }
 
-const categoryKeys = {
-  event: "news_category_events",
-  interview: "news_category_interview",
-  photo: "news_category_photo",
-  announce: "news_category_announce",
-};
-const accents = { blue: "nw-blue", red: "nw-red", green: "nw-green", amber: "nw-amber", violet: "nw-violet" };
-const state = { items: [...MIRoKIT_NEWS], filter: "all", query: "", sort: "newest", visible: [], activeIndex: 0 };
-
-function text(item, field) {
-  const value = item?.[field];
-  if (field === "categoryLabel" && !value) {
-    const key = categoryKeys[item?.category];
-    return (key && (T[currentLang]?.[key] || T.en?.[key])) || item?.category || "News";
+function rememberScroll() {
+  savedScroll = window.scrollY;
+  history.replaceState({ ...history.state, newsScroll: window.scrollY }, "");
+  try { sessionStorage.setItem(scrollKey(), String(window.scrollY)); } catch { /* history state still works */ }
+}
+async function restoreScroll() {
+  if (!savedScroll) { restoring = false; return; }
+  await Promise.race([
+    Promise.allSettled([...document.querySelectorAll("#newsFeatured img")].map((img) => img.decode())),
+    new Promise((resolve) => setTimeout(resolve, 3000)),
+  ]);
+  requestAnimationFrame(() => requestAnimationFrame(() => { window.scrollTo({ top: savedScroll, behavior: "instant" }); restoring = false; }));
+}
+function writeUrl() {
+  const url = new URL(location.href);
+  url.searchParams.set("lang", currentLang);
+  for (const [name, value] of [["category", state.filter === "all" ? "" : state.filter], ["q", state.query], ["sort", state.sort === "newest" ? "" : state.sort]]) {
+    if (value) url.searchParams.set(name, value); else url.searchParams.delete(name);
   }
-  if (value && typeof value === "object") return value[currentLang] || value.en || value.ru || "";
-  return String(value || "");
+  history.replaceState(history.state, "", url);
 }
-
-function escapeHtml(value) {
-  const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-  return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
-}
-
-function mediaUrl(value) {
-  const source = String(value || "");
-  if (source.startsWith("./public/")) return `/${source.slice(2)}`;
-  if (source.startsWith("public/")) return `/${source}`;
-  return source;
-}
-
-function dateValue(value) {
-  return new Date(`${value}T12:00:00`).getTime();
-}
-
-function dateLabel(value) {
-  const locale = { ru: "ru-RU", en: "en-GB", de: "de-DE" }[currentLang] || "en-GB";
-  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${value}T12:00:00`));
-}
-
-function published(item) {
-  return item?.publishedAt && dateValue(item.publishedAt) <= Date.now();
-}
-
-function matches(item) {
-  if (!published(item)) return false;
-  if (state.filter !== "all" && item.category !== state.filter) return false;
-  if (!state.query) return true;
-  const haystack = [text(item, "title"), text(item, "summary"), text(item, "categoryLabel")].join(" ").toLocaleLowerCase();
-  return haystack.includes(state.query.toLocaleLowerCase());
-}
-
-function sorted(items) {
-  return [...items].sort((a, b) => {
-    if (state.sort === "title") return text(a, "title").localeCompare(text(b, "title"), currentLang);
-    if (state.sort === "featured") {
-      const aRank = Number(a.featured) || Number.POSITIVE_INFINITY;
-      const bRank = Number(b.featured) || Number.POSITIVE_INFINITY;
-      if (aRank !== bRank) return aRank - bRank;
-    }
-    return dateValue(b.publishedAt) - dateValue(a.publishedAt) || String(a.id).localeCompare(String(b.id));
-  });
-}
-
-function card(item, index) {
-  const accent = accents[item.accent] || accents.blue;
-  const featured = Number(item.featured) > 0;
-  const title = text(item, "title");
-  const category = text(item, "categoryLabel");
-  const image = mediaUrl(item.image);
-  return `<article class="nw-card${featured ? " is-featured" : ""} ${accent}">
-    <button type="button" class="nw-card-button" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${T[currentLang]?.news_full || "Read in full"}: ${title}`)}">
-      <span class="nw-card-media"><img src="${escapeHtml(image)}" alt="${escapeHtml(text(item, "alt"))}" loading="lazy" /><span class="nw-card-number">${String(index + 1).padStart(2, "0")}</span><span class="nw-card-category">${escapeHtml(category)}</span></span>
-      <span class="nw-card-body"><span class="nw-card-date">${escapeHtml(dateLabel(item.publishedAt))}</span><strong>${escapeHtml(title)}</strong><span class="nw-card-summary">${escapeHtml(text(item, "summary"))}</span><span class="nw-read">${escapeHtml(T[currentLang]?.news_full || "Read in full")} <i aria-hidden="true">↗</i></span></span>
-    </button>
-  </article>`;
-}
-
-function renderSuggestions() {
-  const active = document.activeElement === search;
-  const items = active ? state.visible.slice(0, 3) : [];
-  suggestions.innerHTML = items.map((item, index) => `<button type="button" role="option" class="nw-search-suggestion" data-suggestion-index="${index}"><span>${escapeHtml(text(item, "categoryLabel"))}</span><strong>${escapeHtml(text(item, "title"))}</strong></button>`).join("");
-  suggestions.hidden = !items.length;
-  search.setAttribute("aria-expanded", String(Boolean(items.length)));
-}
-
-function render() {
-  state.visible = sorted(state.items.filter(matches));
-  grid.innerHTML = state.visible.map(card).join("");
-  renderSuggestions();
-  grid.setAttribute("aria-busy", "false");
-  empty.hidden = state.visible.length > 0;
-  clear.hidden = !state.query;
-  count.textContent = `${state.visible.length} · ${T[currentLang]?.news_title || "News"}`;
-}
-
-function openItem(id) {
-  const index = state.visible.findIndex((item) => item.id === id);
-  if (index < 0) return;
-  state.activeIndex = index;
-  renderDialog();
-  if (typeof dialog.showModal === "function") dialog.showModal();
-  else dialog.setAttribute("open", "");
-}
-
-function renderDialog() {
-  const item = state.visible[state.activeIndex];
-  if (!item) return;
-  dialogImage.src = mediaUrl(item.image);
-  dialogImage.alt = text(item, "alt");
-  dialogCategory.textContent = text(item, "categoryLabel");
-  dialogCategory.className = `nw-dialog-category ${accents[item.accent] || accents.blue}`;
-  dialogDate.textContent = dateLabel(item.publishedAt);
-  dialogTitle.textContent = text(item, "title");
-  dialogBody.replaceChildren(...(text(item, "content") || []).map((paragraph) => {
-    const node = document.createElement("p");
-    node.textContent = paragraph;
-    return node;
+function renderFilters(items) {
+  const categories = [...new Set(items.map((item) => item.category))];
+  if (!state.loading && state.filter !== "all" && !categories.includes(state.filter)) state.filter = "all";
+  const copy = NEWS_COPY[currentLang];
+  filters.replaceChildren(...["all", ...categories].map((category) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.filter = category;
+    button.textContent = category === "all" ? copy.all : copy.categories[category] || newsCategory(items.find((item) => item.category === category), currentLang);
+    button.classList.toggle("is-active", state.filter === category);
+    button.setAttribute("aria-pressed", String(state.filter === category));
+    return button;
   }));
-  dialogCounter.textContent = `${state.activeIndex + 1} / ${state.visible.length}`;
 }
-
-function syncTheme() {
-  let theme = "light";
-  try { theme = localStorage.getItem("mirokitTheme") === "dark" ? "dark" : "light"; } catch { /* current-page theme still works */ }
-  document.body.classList.toggle("theme-dark", theme === "dark");
-  document.documentElement.dataset.theme = theme;
-  const label = T[currentLang]?.[theme === "dark" ? "theme_light" : "theme_dark"] || (theme === "dark" ? "Light theme" : "Dark theme");
-  themeToggles.forEach((toggle) => {
-    toggle.setAttribute("aria-pressed", String(theme === "dark"));
-    toggle.setAttribute("aria-label", label);
-    toggle.title = label;
-    const labelNode = toggle.querySelector(".theme-toggle-label");
-    if (labelNode) labelNode.textContent = label;
+function render() {
+  const lang = currentLang, copy = NEWS_COPY[lang];
+  const items = publicNews(state.items);
+  renderFilters(items);
+  const query = state.query.toLocaleLowerCase(lang);
+  const visible = items.filter((item) => (state.filter === "all" || item.category === state.filter) && (!query || [newsText(item, "title", lang), newsText(item, "summary", lang), newsCategory(item, lang)].join(" ").toLocaleLowerCase(lang).includes(query)));
+  visible.sort((a, b) => {
+    if (state.sort === "title") return newsText(a, "title", lang).localeCompare(newsText(b, "title", lang), lang);
+    if (state.sort === "featured") { const difference = (Number(a.featured) || Infinity) - (Number(b.featured) || Infinity); if (difference && Number.isFinite(difference)) return difference; if (a.featured && !b.featured) return -1; if (!a.featured && b.featured) return 1; }
+    return b.publishedAt.localeCompare(a.publishedAt) || a.id.localeCompare(b.id);
   });
+  const [lead, ...rest] = visible;
+  featured.innerHTML = lead ? newsCard(lead, lang, true) : "";
+  grid.innerHTML = rest.map((item) => newsCard(item, lang)).join("");
+  grid.setAttribute("aria-busy", String(state.loading));
+  document.getElementById("newsArchiveTitle").textContent = copy.title;
+  document.getElementById("newsIntroduction").textContent = copy.intro;
+  document.getElementById("newsCount").textContent = state.loading ? "" : `${visible.length} · ${copy.news}`;
+  const empty = document.getElementById("newsEmpty");
+  empty.hidden = state.loading || visible.length > 0;
+  empty.textContent = copy.empty;
+  document.getElementById("newsLoadMessage").textContent = state.loading ? copy.loading : state.fallback ? copy.fallback : "";
+  loadState.hidden = !state.loading && !state.fallback;
+  retry.hidden = !state.fallback || state.loading;
+  retry.textContent = copy.retry;
+  clear.hidden = !state.query && state.filter === "all";
+  document.title = `${copy.title} — MIRoKIT`;
+  document.querySelector('meta[name="description"]').content = copy.intro;
+  document.querySelector('meta[property="og:title"]').content = copy.title;
+  document.querySelector('meta[property="og:description"]').content = copy.intro;
+  writeUrl();
+  const canonical = new URL("/news/", location.origin);
+  canonical.search = `?lang=${lang}`;
+  document.querySelector('link[rel="canonical"]').href = canonical;
+  document.querySelector('meta[property="og:url"]').content = canonical.href;
+  installNewsImageFallback(document.getElementById("newsArchive"));
 }
-
-themeToggles.forEach((toggle) => toggle.addEventListener("click", () => {
-  const next = document.body.classList.contains("theme-dark") ? "light" : "dark";
-  try { localStorage.setItem("mirokitTheme", next); } catch { /* ignored */ }
-  document.body.classList.toggle("theme-dark", next === "dark");
-  document.documentElement.dataset.theme = next;
-  syncTheme();
-}));
-
-filters.forEach((button) => button.addEventListener("click", () => {
-  state.filter = button.dataset.filter || "all";
-  filters.forEach((candidate) => {
-    const active = candidate === button;
-    candidate.classList.toggle("is-active", active);
-    candidate.setAttribute("aria-pressed", String(active));
-  });
+async function load() {
+  state.loading = true;
   render();
-}));
-search.addEventListener("input", () => { state.query = search.value.trim(); render(); });
-search.addEventListener("focus", renderSuggestions);
-search.addEventListener("blur", () => window.setTimeout(renderSuggestions, 120));
-suggestions.addEventListener("mousedown", (event) => event.preventDefault());
-suggestions.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-suggestion-index]");
-  if (!button) return;
-  suggestions.hidden = true;
-  search.setAttribute("aria-expanded", "false");
-  openItem(state.visible[Number(button.dataset.suggestionIndex)]?.id);
-});
-sort.addEventListener("change", () => { state.sort = sort.value; render(); });
-clear.addEventListener("click", () => { search.value = ""; state.query = ""; search.focus(); render(); });
-grid.addEventListener("click", (event) => {
-  const trigger = event.target.closest("[data-news-open]");
-  if (trigger) openItem(trigger.dataset.newsOpen);
-});
-document.getElementById("newsClose").addEventListener("click", () => dialog.close());
-dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
-document.getElementById("newsPrevious").addEventListener("click", () => { state.activeIndex = (state.activeIndex - 1 + state.visible.length) % state.visible.length; renderDialog(); });
-document.getElementById("newsNext").addEventListener("click", () => { state.activeIndex = (state.activeIndex + 1) % state.visible.length; renderDialog(); });
-document.addEventListener("keydown", (event) => {
-  if (!dialog.open) return;
-  if (event.key === "ArrowLeft") document.getElementById("newsPrevious").click();
-  if (event.key === "ArrowRight") document.getElementById("newsNext").click();
-});
-document.addEventListener("mirokit:languagechange", () => { syncTheme(); render(); if (dialog.open) renderDialog(); });
-
-syncTheme();
-render();
-
-fetch("/api/v1/news", { headers: { Accept: "application/json" }, cache: "no-store" })
-  .then((response) => { if (!response.ok) throw new Error(`News API returned ${response.status}`); return response.json(); })
-  .then((payload) => {
-    if (!Array.isArray(payload.news)) throw new Error("News API returned invalid data");
-    state.items = payload.news.filter((item) => item?.id && item?.publishedAt && item?.image && item?.title && item?.summary && item?.content);
+  const controller = new AbortController(), timeout = window.setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch("/api/v1/news", { headers: { Accept: "application/json" }, cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error("News unavailable");
+    const payload = await response.json();
+    if (!Array.isArray(payload.news)) throw new Error("Invalid news response");
+    state.items = payload.news;
+    state.fallback = false;
+  } catch {
+    state.items = MIRoKIT_NEWS;
+    state.fallback = true;
+  } finally {
+    clearTimeout(timeout);
+    state.loading = false;
     render();
-  })
-  .catch((error) => console.info("[MIRoKIT] Using bundled news fallback:", error.message));
+    if (restoring) restoreScroll();
+  }
+}
+filters.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-filter]");
+  if (!button) return;
+  state.filter = button.dataset.filter;
+  render();
+  [...filters.querySelectorAll("[data-filter]")].find((candidate) => candidate.dataset.filter === state.filter)?.focus();
+});
+search.addEventListener("input", () => { state.query = search.value.trim(); render(); });
+sort.addEventListener("change", () => { state.sort = sort.value; render(); });
+clear.addEventListener("click", () => { state.query = ""; state.filter = "all"; search.value = ""; render(); search.focus(); });
+retry.addEventListener("click", load);
+document.addEventListener("mirokit:languagechange", render);
+window.addEventListener("pagehide", rememberScroll);
+window.addEventListener("pageshow", (event) => { if (event.persisted) restoreScroll(); });
+document.addEventListener("click", (event) => { if (event.target.closest("a[href]")) rememberScroll(); }, { capture: true });
+load();

@@ -58,13 +58,14 @@ Alle 16 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests p
 | `site/source/style/subpage.css` | Wiederverwendeter Unterseiten-Header und gemeinsame Dokumentregeln |
 | `site/source/scripts/language.js` | Wörterbuch `T`, `currentLang`, `setLang`, Text-/Attributübersetzung |
 | `site/source/scripts/news-data.js` | Gemeinsames ES-Modul mit gebündelten News; statische Imports in Landingpage, News-Seite und Seed |
-| `site/source/scripts/main.js` | Navigation, Theme, Hero, News-Dialoge, Projects, Partners und Lazy Loading |
+| `site/source/scripts/main.js` | Navigation, Theme, Hero-Newsrotation mit Artikellinks, Projects, Partners und Lazy Loading |
+| `site/source/scripts/news-presentation.js` | Gemeinsame News-Links, Übersetzungen und sichere Artikel-/Kartendarstellung für Browser und Worker |
 | `site/source/scripts/contact-mail.js` | Formularvalidierung im Browser, Turnstile und Kontakt-Requests |
 | `site/source/scripts/mirokit-world-map.js` | Lazy geladenes Canvas-Kartenmodul, API-/Fallback-Punkte und Länderfeed |
 | `site/source/scripts/online-project-topics.js` | Zehn Topic-IDs, gemeinsam für Worker/Admin/Online Projects |
 | `site/source/scripts/subpage.js` | Eigenständige Theme-Steuerung für Kontakt-/Datenschutzseiten |
 | `site/page/gallery/` | Ordner-, Foto- und Videoansicht, Suche, Dialog und eigener HTML5-Player |
-| `site/page/news/` | Eigenständige News-Liste, Filter, Suche, Sortierung und Dialog |
+| `site/page/news/` | Magazinübersicht unter `/news/`, Filter, Suche, Sortierung und Artikel-Hydrierung |
 | `site/page/interviews/` | Gesprächsvideos und Material-Tabs |
 | `site/page/onlineProjects/` | Themenfilter, Masonry-Fotos, eigener Videoplayer und PDF-Karten |
 | `site/page/contactPersons/` | Profil-/Impressumsfenster und Hash-/Tastatur-Tabs |
@@ -76,6 +77,8 @@ Alle 16 Laufzeitmodule haben eine gleichnamige `.test.js`-Datei. Weitere Tests p
 | `site/admin/status/` | Geschützte Aufrufdetails und Diagnosegruppen |
 
 Landingpage-Skripte laden Sprache, News-Ausgangsdaten und Hauptinteraktionen; Formulare und Karteninitialisierung werden separat koordiniert. Unterseiten laden eigene Skripte und sollen nicht unbeabsichtigt den Landingpage-Bootstrap starten.
+
+`worker/src/news-pages.js` rendert `/news/<id>/` mit dem bestehenden News-Slug, veröffentlichten D1-Inhalten und lokalisierten Metadaten. Alte News-Übersichtsadressen leiten auf `/news/` um. Datenvertrag, optionale Editorformatierung und Browserchecks sind in [news-pages.md](docs/news-pages.md) beschrieben.
 
 ## Öffentliche APIs
 

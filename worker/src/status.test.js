@@ -31,6 +31,12 @@ beforeEach(() => {
 afterEach(() => { database.close(); vi.restoreAllMocks(); vi.useRealTimers(); });
 
 describe("visit counting and privacy boundaries", () => {
+  it("counts clean news URLs while excluding article language and search queries", async () => {
+    expect(shouldRecordVisit(request("/news/example-story/?lang=de"), html())).toBe(true);
+    await recordVisit(request("/news/example-story/?lang=de&q=private"), env);
+    const [detail] = database.prepare("SELECT path FROM site_visit_details").all();
+    expect(detail.path).toBe("/news/example-story/");
+  });
   it("increments permanent counters, strips query strings and exposes only aggregates publicly", async () => {
     await recordVisit(request("/page/gallery/?email=private@example.com", { "CF-Connecting-IP": "192.0.2.1" }), env);
     await recordVisit(request("/page/gallery/?token=secret"), env);

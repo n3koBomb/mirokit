@@ -5,10 +5,10 @@ body.status-page.theme-dark { --st-bg: #0b1427; --st-paper: #14223b; --st-ink: #
 .status-page * { box-sizing: border-box; }
 .status-page a { color: var(--st-accent); }
 .status-page :is(a, button, select, input, summary):focus-visible { outline: 3px solid var(--st-accent); outline-offset: 4px; }
-.st-main { width: min(1100px, 100%); margin: auto; padding: clamp(30px, 6vw, 72px) clamp(18px, 4vw, 40px) 24px; }
+.st-main { overflow-wrap: anywhere; width: min(1100px, 100%); margin: auto; padding: clamp(30px, 6vw, 72px) clamp(18px, 4vw, 40px) 24px; }
 .st-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
 .st-kicker { font: 800 11px Montserrat, sans-serif; letter-spacing: .18em; color: var(--st-accent); }
-.st-heading h1 { font: 800 clamp(30px, 4.4vw, 52px)/1.15 Montserrat, sans-serif; letter-spacing: -.04em; max-width: 760px; margin: 14px 0; }
+.st-heading h1 { font: 800 clamp(1.875rem, 1.5rem + 2vw, 3.25rem)/1.15 Montserrat, sans-serif; letter-spacing: -.04em; max-width: 760px; margin: 14px 0; }
 .st-heading p:not(.st-kicker), .st-explanation { color: var(--st-muted); line-height: 1.75; }
 .st-host { background: var(--st-soft); border-radius: 20px; padding: 9px 14px; font-size: 12px; white-space: nowrap; }
 .st-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--st-line); padding-bottom: 20px; }
@@ -59,8 +59,8 @@ body.status-page.theme-dark { --st-bg: #0b1427; --st-paper: #14223b; --st-ink: #
 .st-table th, .st-table td { text-align: left; padding: 14px 10px; border-bottom: 1px solid var(--st-line); white-space: nowrap; }
 .st-table td:nth-child(2) { white-space: normal; min-width: 160px; overflow-wrap: anywhere; }
 .st-login { display: flex; align-items: end; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
-.st-login label { display: grid; gap: 8px; }
-.st-login input { min-height: 44px; border: 1px solid var(--st-line); border-radius: 10px; padding: 10px; font: inherit; color: var(--st-ink); background: var(--st-paper); }
+.st-login label { min-width: 0; max-width: 100%; display: grid; gap: 8px; }
+.st-login input { min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--st-line); border-radius: 10px; padding: 10px; font: inherit; color: var(--st-ink); background: var(--st-paper); }
 .st-diagnostics { margin-top: 32px; }
 .st-diagnostics h2 { font-size: 24px; }
 .st-diagnostics h3 { margin-top: 28px; }

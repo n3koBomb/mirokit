@@ -97,6 +97,9 @@
       <meta name="theme-color" content="#1e73ff" />
 
       <link rel="stylesheet" href="./source/style/style.css" />
+      <link rel="stylesheet" href="./source/style/landing-deck.css" />
+      <link rel="stylesheet" href="./source/style/news-extra.css" />
+      <link rel="stylesheet" href="./source/style/news-shared.css" />
 
       <style>
          /* ==================================================================== */
@@ -194,7 +197,7 @@
                      <span aria-hidden="true">▾</span>
                   </button>
                   <ul class="submenu" id="submenu-media">
-                     <li class="submenu-item"><a href="#news" data-nav-link data-key="menu_news">News</a></li>
+                     <li class="submenu-item"><a href="/news" data-nav-link data-key="menu_news">News</a></li>
                      <li class="submenu-item has-children">
                         <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Galerie öffnen" data-i18n-attrs="aria-label:gallery_submenu_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-gallery">
                            <span data-key="menu_gallery"></span>
@@ -215,7 +218,7 @@
                      <span aria-hidden="true">▾</span>
                   </button>
                   <ul class="submenu" id="submenu-contact">
-                     <li class="submenu-item has-children">
+                     <li class="submenu-item has-children submenu-item--open-left">
                         <button class="submenu-toggle submenu-toggle--nested" type="button" aria-label="Untermenü Kontakt öffnen" data-i18n-attrs="aria-label:contact_submenu_aria" aria-haspopup="true" aria-expanded="false" aria-controls="submenu-contact-forms">
                            <span data-key="menu_contact"></span>
                            <span aria-hidden="true">></span>
@@ -266,7 +269,7 @@
             <button class="lang-btn" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
          </div>
-         <ul class="mobile-links">
+         <ul class="mobile-links mobile-nav">
             <li class="mobile-nav-item">
                <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-about"><span data-key="nav1"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
                <div class="mobile-sub" id="mobile-sub-about" aria-hidden="true">
@@ -304,7 +307,7 @@
                <button class="mobile-sub-toggle" type="button" aria-expanded="false" aria-controls="mobile-sub-media"><span data-key="nav4"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
                <div class="mobile-sub" id="mobile-sub-media" aria-hidden="true">
                   <ul>
-                     <li class="mobile-nav-item"><a href="#news" data-nav-link data-key="menu_news"></a></li>
+                     <li class="mobile-nav-item"><a href="/news" data-nav-link data-key="menu_news"></a></li>
                      <li class="mobile-nav-item mobile-nav-item--nested">
                         <button class="mobile-sub-toggle mobile-sub-toggle--nested" type="button" aria-expanded="false" aria-controls="mobile-sub-gallery"><span data-key="menu_gallery"></span><span class="mobile-sub-arrow" aria-hidden="true">▾</span></button>
                         <div class="mobile-sub mobile-sub--nested" id="mobile-sub-gallery" aria-hidden="true">
@@ -364,8 +367,8 @@
                      <p class="hero-sub" data-key="hero_sub">МИРоКИТ — культурно-игровой триатлон для детей и молодёжи. Пространство детской дипломатии, творчества и взаимопонимания.</p>
 
                      <div class="hero-actions">
-                        <a class="btn-primary hero-action-primary" href="#contact" data-nav-link data-link-key="main-contact" data-key="cta1">Присоединяйся! <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="btn-secondary hero-action-secondary" href="#aboutUs" data-nav-link data-key="cta2">Узнать больше <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a>
+                        <a class="btn-primary hero-action-primary" href="#contact" data-nav-link data-link-key="main-contact"><span data-key="cta1">Присоединяйся!</span><i class="fa-solid fa-arrow-up-right-from-square hero-arrow" aria-hidden="true"></i></a>
+                        <a class="btn-secondary hero-action-secondary" href="#aboutUs" data-nav-link><span data-key="cta2">Узнать больше</span><i class="fa-solid fa-arrow-down hero-arrow" aria-hidden="true"></i></a>
                      </div>
 
                      <div class="hero-tags" aria-label="Ключевые направления">
@@ -377,7 +380,7 @@
                   </div>
 
                   <div class="hero-visual" aria-label="Визуальная карта МИРоКИТ">
-                     <div class="hero-visual-label"><span data-key="hero_live">LIVE / WORLDWIDE</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></div>
+                     <div class="hero-visual-label"><span data-key="hero_live">LIVE / WORLDWIDE</span><i class="fa-solid fa-arrow-up-right-from-square hero-arrow" aria-hidden="true"></i></div>
                      <div class="hero-image-frame">
                         <!-- Above the fold: do not lazy-load the main hero artwork. -->
                         <img src="./public/assets/backgrounds/content-bg-home-right-4.png" alt="Участники международного проекта МИРоКИТ" loading="eager" fetchpriority="high" decoding="async" />
@@ -392,47 +395,46 @@
 
                <div class="hero-bottomline">
                   <span data-key="intro_open" data-i18n-mode="text"><i class="fa-solid fa-circle" aria-hidden="true"></i> OPEN TO EVERY CULTURE</span>
-                  <span data-key="intro_scroll" data-i18n-mode="text">SCROLL TO EXPLORE <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></span>
+                  <span data-key="intro_scroll" data-i18n-mode="text">SCROLL TO EXPLORE <i class="fa-solid fa-arrow-down hero-arrow" aria-hidden="true"></i></span>
                </div>
             </aside>
 
-            <aside class="content-row landing-deck" aria-label="Новости и партнёры МИРоКИТ">
+            <div class="content-row landing-deck">
                <article class="card news news-module" aria-labelledby="home-news-title">
                   <header class="module-head">
                      <div>
-                        <span class="module-kicker" data-key="live_feed" data-i18n-mode="text"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> LIVE FEED / 03</span>
-                        <h2 class="section-title" id="home-news-title"><span class="icon-box" aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span><span data-key="news_title">Новости проекта</span></h2>
+                        <span class="module-kicker" data-key="home_news_kicker">Актуальное</span>
+                        <h2 class="section-title" id="home-news-title" data-key="home_news_title">Новости МИРоКИТ</h2>
                      </div>
-                     <a class="module-link" href="/page/news/" data-key="all_news" data-i18n-mode="text">Все новости <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                     <a class="module-link" href="/news/" data-news-index><span data-key="home_all_news">Все новости</span><i class="fa-solid fa-arrow-right hero-arrow" aria-hidden="true"></i></a>
                   </header>
 
-                  <div class="news-rotator" data-news-rotator aria-live="polite"></div>
+                  <div class="news-rotator" data-news-rotator></div>
                </article>
 
                <article class="card partner partner-module" aria-labelledby="home-partners-title">
                   <header class="module-head">
                      <div>
-                        <span class="module-kicker module-kicker--gold" data-key="network" data-i18n-mode="text"><i class="fa-solid fa-circle-nodes" aria-hidden="true"></i> NETWORK / 08</span>
-                        <h2 class="section-title" id="home-partners-title"><span class="icon-box" aria-hidden="true"><i class="fa-solid fa-people-group"></i></span><span data-key="partners_title">Наши партнёры</span></h2>
+                        <h2 class="section-title" id="home-partners-title" data-key="home_partners_title">Вместе для МИРоКИТ</h2>
+                        <p class="module-subtitle" data-key="home_partners_subtitle">Наши партнёры и друзья</p>
                      </div>
-                     <a class="module-link" data-nav-link href="#partners" data-key="all_partners" data-i18n-mode="text">Все партнёры <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                     <a class="module-link" data-nav-link href="#partners"><span data-key="all_partners">Все партнёры</span><i class="fa-solid fa-arrow-right hero-arrow" aria-hidden="true"></i></a>
                   </header>
 
                   <div class="partner-showcase">
-                     <div class="partner-showcase-meta"><span data-key="partner_meta_count">08 организаций в одной истории</span><span data-key="partner_meta_title">Партнёры МИРоКИТ</span></div>
                      <div class="partner-group" aria-label="Краткая подборка партнёров" data-i18n-attrs="aria-label:partner_group">
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative Erleben"><span class="partner-index">01</span><img data-src="./public/assets/images/partners/initiative-erleben.png" alt="Initiative Erleben" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Vdochnovenije"><span class="partner-index">02</span><img data-src="./public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Iskra PNDJ"><span class="partner-index">03</span><img data-src="./public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="NKO без границ"><span class="partner-index">04</span><img data-src="./public/assets/images/partners/nko-no-border.png" alt="НКО без границ" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Bricks Charity"><span class="partner-index">05</span><img data-src="./public/assets/images/partners/bricks.png" alt="Bricks Charity" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Integral e.V."><span class="partner-index">06</span><img data-src="./public/assets/images/partners/integral-eV.png" alt="Integral e.V." loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="Социальная площадка Клумба"><span class="partner-index">07</span><img data-src="./public/assets/images/partners/klumba.png" alt="Социальная площадка Клумба" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
-                        <a class="partner-block" href="#partners" data-nav-link aria-label="BV NeMO"><span class="partner-index">08</span><img data-src="./public/assets/images/partners/wushu_sportclub-senden.png" alt="Wushu" loading="lazy" decoding="async" /><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Initiative erLeben"><img src="./public/assets/images/partners/initiative-erleben.png" alt="Initiative erLeben" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Vdochnovenije"><img src="./public/assets/images/partners/vdochnovenije.png" alt="Vdochnovenije" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Iskra PNDJ"><img src="./public/assets/images/partners/iskra-pndj.png" alt="Iskra PNDJ" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="НКО без границ"><img src="./public/assets/images/partners/nko-no-border.png" alt="НКО без границ" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Bricks Charity"><img src="./public/assets/images/partners/bricks.png" alt="Bricks Charity" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Integral e.V."><img src="./public/assets/images/partners/integral-eV.png" alt="Integral e.V." loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Социальная площадка Клумба"><img src="./public/assets/images/partners/klumba.png" alt="Социальная площадка Клумба" loading="lazy" decoding="async" /></a>
+                        <a class="partner-block" href="#partners" data-nav-link aria-label="Wushu Sportclub Senden e.V."><img src="./public/assets/images/partners/wushu_sportclub-senden.png" alt="Wushu Sportclub Senden e.V." loading="lazy" decoding="async" /></a>
                      </div>
                   </div>
                </article>
-            </aside>
+            </div>
          </section>
          <section id="aboutUs" class="panel compact-panel">
             <div class="panel-inner aboutUs-layout">
@@ -701,7 +703,7 @@
                      <div class="world-visual-glow world-visual-glow--blue"></div>
                      <div class="world-visual-glow world-visual-glow--red"></div>
                      <div class="world-orbit-stage" aria-hidden="true">
-                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" role="img" aria-labelledby="orbit-title orbit-desc">
+                     <svg class="world-orbit-emblem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" role="img" aria-labelledby="orbit-title orbit-desc">
                         <title id="orbit-title">MIRoKIT orbital emblem</title>
                         <desc id="orbit-desc">MIRoKIT at the centre of three elliptical orbits with three slowly moving satellites.</desc>
                         <defs>
@@ -726,7 +728,7 @@
                            <path id="orbit-gold-motion" d="M260 76 A218 134 0 1 1 259.9 344 A218 134 0 1 1 260 76 Z" transform="rotate(-7 260 210)"/>
                         </defs>
                         <style>
-                           svg { overflow: visible; shape-rendering: geometricPrecision; }
+                           .world-orbit-emblem { overflow: visible; shape-rendering: geometricPrecision; }
                            .guide { fill: none; stroke: #eef7ff; stroke-width: 1.2; stroke-opacity: .22; }
                            .guide--soft { stroke-opacity: .10; stroke-dasharray: 2 8; }
                            .orbit { fill: none; stroke-linecap: round; }
@@ -1493,7 +1495,7 @@
                   <div class="three-bears-intro">
                      <div class="three-bears-intro-copy">
                         <span class="three-bears-kicker" data-key="threeBears_kicker"></span>
-                        <p class="three-bears-lead" data-key="threeBears_intro_1"></p>
+                        <p data-key="threeBears_intro_1"></p>
                         <p data-key="threeBears_intro_2"></p>
                         <p data-key="threeBears_intro_3"></p>
                         <p data-key="threeBears_intro_4"></p>
@@ -1567,7 +1569,7 @@
                </div>
             </div>
          </section>
-         <section id="news" class="panel compact-panel">
+         <!-- <section id="news" class="panel compact-panel">
             <div class="panel-inner news-layout">
                <div class="section-header">
                   <div class="section-logo" data-section-logo="news_page" data-logo-key="news_page"></div>
@@ -1580,11 +1582,11 @@
                <div class="news-grid-full news-preview-grid fu d1" id="newsGridFull" data-news-grid data-news-preview></div>
                <div class="news-preview-footer fu d2">
                   <p data-key="news_preview_note">Die neuesten Geschichten zuerst — im News-Archiv findest du alle veröffentlichten Meldungen.</p>
-                  <a class="btn-primary" href="/page/news/" data-key="all_news" data-i18n-mode="text">Alle News <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+                  <a class="btn-primary" href="/news/" data-news-index data-key="all_news" data-i18n-mode="text">Alle News <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
                </div>
                <p class="news-empty" id="newsEmpty" hidden data-key="news_empty">В этой категории пока нет новостей — загляните позже.</p>
             </div>
-         </section>
+         </section> -->
          <section id="gallery" class="panel compact-panel">
             <div class="panel-inner gallery-layout">
                <div class="gallery-view">
@@ -2002,25 +2004,6 @@
                <div class="field"><label for="message" data-key="form_message">Nachricht</label><textarea id="message" name="message" required minlength="8"></textarea></div>
                <button class="btn-primary" type="submit" data-key="form_submit">Anfrage senden</button>
             </form>
-         </div>
-      </div>
-      <div class="modal news-modal" id="newsModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="newsModalTitle">
-         <div class="modal-card news-modal-card">
-            <button class="modal-close news-modal-close" type="button" aria-label="Закрыть" data-i18n-attrs="aria-label:close">×</button>
-            <div class="news-modal-image">
-               <img loading="lazy" src="" alt="" />
-               <span class="category news-modal-category"></span>
-            </div>
-            <div class="news-modal-content">
-               <span class="news-modal-date"></span>
-               <h2 class="news-modal-title" id="newsModalTitle"></h2>
-               <div class="news-modal-body-text"></div>
-            </div>
-            <div class="news-modal-nav">
-               <button type="button" class="news-modal-prev" aria-label="Предыдущая новость" data-i18n-attrs="aria-label:news_prev" data-key="previous" data-i18n-mode="text"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Назад</button>
-               <span class="news-modal-counter" aria-live="polite"></span>
-               <button type="button" class="news-modal-next" aria-label="Следующая новость" data-i18n-attrs="aria-label:news_next" data-key="next" data-i18n-mode="text">Далее <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-            </div>
          </div>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>

@@ -1,4 +1,5 @@
 import { MIRoKIT_NEWS } from "./news-data.js";
+import { newsImage, installNewsImageFallback, newsHref, newsIndexHref, publicNews, parseNewsSummary as parseSharedNewsSummary, newsExtraMarkup, installNewsExtras, newsCategoryMarkup } from "./news-presentation.js";
 /* eslint-disable no-undef */
 /* The translation object and language switch live in language.js. */
 const scroller = document.querySelector(".site-main.scroller"), progress = document.getElementById("progress"), burger = document.querySelector(".burger"), mobileMenu = document.getElementById("mobileMenu"), backdrop = document.getElementById("mobileBackdrop"), closeBtn = document.querySelector(".close-menu"), modal = document.getElementById("signupModal"), toast = document.getElementById("toast");
@@ -21,6 +22,11 @@ let newsItems = MIRoKIT_NEWS;
 let newsHeroItems = [];
 let newsSlideIndex = 0;
 let newsRotationTimer = 0;
+const NEWS_SLIDE_DURATION = 6500;
+const newsReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+let rotationEnabled = !newsReducedMotion?.matches;
+let newsRotationElapsed = 0;
+let newsRotationStartedAt = 0;
 let revealFrame = 0;
 let revealObserver = null;
 let deferredImageObserver = null;
@@ -238,13 +244,6 @@ function setTheme(theme) {
    syncThemeControls();
 }
 
-const newsCategoryClasses = {
-   blue: "cat-blue",
-   green: "cat-green",
-   red: "cat-red",
-   violet: "cat-violet",
-};
-
 function newsText(item, field) {
    const values = item[field] || {};
    if (field === "categoryLabel" && !item[field]) {
@@ -260,13 +259,7 @@ function escapeHtml(value) {
 }
 
 function parseNewsSummary(value) {
-   const source = String(value ?? "").trim();
-   const match = source.match(/^(.*?)\s*\{([\s\S]*)\}\s*$/);
-   if (!match) return { summary: source, sectionExtra: "" };
-
-   const summary = match[1].trim();
-   const sectionExtra = match[2].replace(/\\n/g, "\n").trim();
-   return { summary: summary || source, sectionExtra };
+   return parseSharedNewsSummary(value);
 }
 
 function newsSectionSummaryMarkup(item) {
@@ -317,7 +310,7 @@ function formatNewsDate(date) {
 }
 
 function isPublishedNews(item) {
-   return new Date(`${item.publishedAt}T23:59:59`).getTime() <= Date.now();
+   return publicNews([item]).length > 0;
 }
 
 function newsFeaturedRank(item) {
@@ -350,23 +343,55 @@ function getHeroNews() {
 }
 
 function stopNewsRotation() {
-   window.clearTimeout(newsRotationTimer);
+   if (newsRotationTimer) {
+      newsRotationElapsed = Math.min(NEWS_SLIDE_DURATION, newsRotationElapsed + performance.now() - newsRotationStartedAt);
+      window.cancelAnimationFrame(newsRotationTimer);
+   }
    newsRotationTimer = 0;
+   updateNewsProgress(newsRotationElapsed);
+}
+
+function updateNewsProgress(elapsed) {
+   if (!newsRotator) return;
+   newsRotator.querySelectorAll("[data-news-rotate-target]").forEach((button, index) => {
+      const progress = index < newsSlideIndex ? 1 : index === newsSlideIndex ? elapsed / NEWS_SLIDE_DURATION : 0;
+      button.style.setProperty("--news-progress", String(progress));
+   });
+}
+
+function setRotationEnabled(enabled) {
+   rotationEnabled = enabled;
+
+   scheduleNewsRotation();
 }
 
 function scheduleNewsRotation() {
    stopNewsRotation();
-   if (!newsRotator || newsHeroItems.length < 2 || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-   newsRotationTimer = window.setTimeout(() => showNewsSlide(newsSlideIndex + 1), 6500);
+   if (!newsRotator || newsHeroItems.length < 2 || !rotationEnabled || document.hidden
+      || newsRotator.matches(":hover") || newsRotator.querySelector(".news-extra[open]")) return;
+   newsRotationStartedAt = performance.now();
+   const tick = (timestamp) => {
+      const elapsed = Math.min(NEWS_SLIDE_DURATION, newsRotationElapsed + timestamp - newsRotationStartedAt);
+      if (elapsed >= NEWS_SLIDE_DURATION) {
+         showNewsSlide(newsSlideIndex + 1);
+         return;
+      }
+      updateNewsProgress(elapsed);
+      newsRotationTimer = window.requestAnimationFrame(tick);
+   };
+   newsRotationTimer = window.requestAnimationFrame(tick);
 }
 
-function showNewsSlide(index) {
+function showNewsSlide(index, elapsed = 0) {
+   stopNewsRotation();
+   newsRotationElapsed = elapsed;
    if (!newsRotator || !newsHeroItems.length) return;
    newsSlideIndex = (index + newsHeroItems.length) % newsHeroItems.length;
    newsRotator.querySelectorAll("[data-news-slide]").forEach((slide, slideIndex) => {
       const isActive = slideIndex === newsSlideIndex;
       slide.hidden = !isActive;
       slide.classList.toggle("is-active", isActive);
+      if (!isActive) slide.querySelectorAll(".news-extra[open]").forEach((details) => { details.open = false; });
    });
    newsRotator.querySelectorAll("[data-news-rotate-target]").forEach((dot) => {
       const isActive = Number(dot.dataset.newsRotateTarget) === newsSlideIndex;
@@ -375,47 +400,55 @@ function showNewsSlide(index) {
    });
    const current = newsRotator.querySelector("[data-news-current]");
    if (current) current.textContent = String(newsSlideIndex + 1).padStart(2, "0");
+   updateNewsProgress(newsRotationElapsed);
    scheduleNewsRotation();
 }
 
 function newsHeroSlideMarkup(item, index) {
    const title = newsText(item, "title");
-   const { summary } = parseNewsSummary(newsText(item, "summary"));
+   const { summary, sectionExtra } = parseNewsSummary(newsText(item, "summary"));
    const category = newsText(item, "categoryLabel");
-   const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
-   const position = String(index + 1).padStart(2, "0");
    const readableLabel = T[currentLang]?.news_full || "Read in full";
-   const storyLabel = T[currentLang]?.news_read || "Read the story";
+   const storyLabel = T[currentLang]?.home_news_read || "Read the story";
 
-   return `<article class="news-slide" data-news-slide="${index}" hidden>
-            <a class="news-slide-media" href="#news" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
-               <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span>
-            </a>
-            <div class="news-slide-content"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-slide-actions"><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>${newsMoreInfoMarkup(item)}</div></div>
+   return `<article class="news-slide" data-news-slide="${index}" aria-labelledby="home-news-slide-${index}" hidden>
+            <div class="news-slide-visual">
+               <a class="news-slide-media" href="${escapeHtml(newsHref(item, currentLang))}" aria-label="${escapeHtml(`${category} · ${readableLabel}: ${title}`)}">
+                  ${newsImage(item, currentLang)}
+               </a>
+            </div>
+            <div class="news-slide-content"><div class="news-card-meta"><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time>${newsCategoryMarkup(item, currentLang, "news-image-eyebrow")}</div><h3 class="news-title" id="home-news-slide-${index}">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-slide-actions"><a class="news-read-link" href="${escapeHtml(newsHref(item, currentLang))}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right hero-arrow" aria-hidden="true"></i></a>${newsMoreInfoMarkup(item)}</div></div>
+            ${newsExtraMarkup(sectionExtra, currentLang)}
          </article>`;
 }
 
 function renderHeroNews() {
    if (!newsRotator) return;
+   stopNewsRotation();
    const previousId = newsHeroItems[newsSlideIndex]?.id;
+   const previousElapsed = newsRotationElapsed;
+   const extraWasOpen = Boolean(newsRotator.querySelector("[data-news-slide]:not([hidden]) .news-extra[open]"));
    newsHeroItems = getHeroNews();
    const chooseNewsLabel = T[currentLang]?.choose_news || "Choose a news item";
-   const dots = newsHeroItems.map((_, index) => {
+   const dots = newsHeroItems.map((item, index) => {
       const isActive = index === 0;
       const label = T[currentLang]?.[`show_news_${index + 1}`] || `Show news item ${index + 1}`;
-      return `<button class="news-rotator-dot${isActive ? " is-active" : ""}" type="button" data-news-rotate-target="${index}" aria-label="${escapeHtml(label)}" aria-current="${String(isActive)}"></button>`;
+      return `<button class="news-rotator-dot${isActive ? " is-active" : ""}" type="button" data-news-rotate-target="${index}" aria-label="${escapeHtml(`${label}: ${newsText(item, "title")}`)}" aria-current="${String(isActive)}"><span class="news-progress-track" aria-hidden="true"><span class="news-progress-fill"></span></span></button>`;
    }).join("");
-   const controls = newsHeroItems.length > 1 ? `<div class="news-rotator-controls" aria-label="${escapeHtml(chooseNewsLabel)}"><div class="news-rotator-dots">${dots}</div><span class="news-rotator-status"><span data-news-current>01</span> / ${String(newsHeroItems.length).padStart(2, "0")}</span></div>` : "";
-   newsRotator.innerHTML = newsHeroItems.map(newsHeroSlideMarkup).join("") + controls;
+   const controls = newsHeroItems.length > 1 ? `<div class="news-rotator-controls" role="group" aria-label="${escapeHtml(chooseNewsLabel)}"><div class="news-rotator-arrows"><button type="button" class="news-rotator-arrow" data-news-step="-1" aria-label="${escapeHtml(T[currentLang]?.news_prev || "Previous news item")}"><span aria-hidden="true"><i class="fas fa-arrow-left"></i></span></button><button type="button" class="news-rotator-arrow" data-news-step="1" aria-label="${escapeHtml(T[currentLang]?.news_next || "Next news item")}"><span aria-hidden="true"><i class="fas fa-arrow-right"></i></span></button></div><div class="news-rotator-dots">${dots}</div><span class="news-rotator-status" aria-live="polite" aria-atomic="true"><span data-news-current>01</span> / ${String(newsHeroItems.length).padStart(2, "0")}</span></div>` : "";
+   newsRotator.innerHTML = (newsHeroItems.length ? newsHeroItems.map(newsHeroSlideMarkup).join("") : `<p class="news-slide-summary">${escapeHtml(T[currentLang]?.news_empty || "No news yet.")}</p>`) + controls;
+   installNewsImageFallback(newsRotator);
    const restoredIndex = newsHeroItems.findIndex((item) => item.id === previousId);
-   showNewsSlide(restoredIndex >= 0 ? restoredIndex : 0);
+   if (extraWasOpen && restoredIndex >= 0) {
+      const details = newsRotator.querySelector(`[data-news-slide="${restoredIndex}"] .news-extra`);
+      if (details) details.open = true;
+   }
+   showNewsSlide(restoredIndex >= 0 ? restoredIndex : 0, restoredIndex >= 0 ? previousElapsed : 0);
 }
 
 function newsCardMarkup(item, index, isHero = false) {
    const title = newsText(item, "title");
    const { summary } = parseNewsSummary(newsText(item, "summary"));
-   const category = newsText(item, "categoryLabel");
-   const accentClass = newsCategoryClasses[item.accent] || newsCategoryClasses.blue;
    const cardClass = isHero ? (item.featured === 1 ? "news-card--featured" : "news-card--compact") : "";
    const position = String(index + 1).padStart(2, "0");
    const readableLabel = T[currentLang]?.news_full || "Read in full";
@@ -423,23 +456,24 @@ function newsCardMarkup(item, index, isHero = false) {
    if (!isHero) {
       const infoLink = newsMoreInfoMarkup(item);
       return `<div class="news-card-full-wrap${item.featured === 1 ? " featured" : ""}${infoLink ? " has-news-link" : ""}" data-category="${escapeHtml(item.category)}" data-news-id="${escapeHtml(item.id)}">
-               <button type="button" class="news-card-full" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
-                  <span class="news-full-img-wrap"><img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="category ${accentClass}">${escapeHtml(category)}</span></span>
+               <a class="news-card-full" href="${escapeHtml(newsHref(item, currentLang))}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
+                  <span class="news-full-img-wrap"><img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" />${newsCategoryMarkup(item, currentLang, "category")}</span>
                   <span class="news-full-body"><span class="news-full-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}</span><span class="news-full-title">${escapeHtml(title)}</span><span class="news-full-excerpt">${newsSectionSummaryMarkup(item)}</span><span class="news-full-readmore">${escapeHtml(readableLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></span>
-               </button>${infoLink}
+               </a>${infoLink}
             </div>`;
    }
 
    const storyLabel = T[currentLang]?.news_read || "Read the story";
    return `<article class="news-card ${cardClass}" data-news-id="${escapeHtml(item.id)}">
-            <a class="news-card-media" href="#news" data-news-open="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
-               <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="news-card-index">${position}</span><span class="category ${accentClass}">${escapeHtml(category)}</span><span class="news-card-scan" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            <a class="news-card-media" href="${escapeHtml(newsHref(item, currentLang))}" aria-label="${escapeHtml(`${readableLabel}: ${title}`)}">
+               <img loading="lazy" data-src="${escapeHtml(item.image)}" alt="${escapeHtml(newsText(item, "alt"))}" /><span class="news-card-index">${position}</span>${newsCategoryMarkup(item, currentLang, "category")}<span class="news-card-scan" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
             </a>
-            <div class="news-body"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-footer"><span>${escapeHtml(category)}</span><a class="news-read-link" href="#news" data-news-open="${escapeHtml(item.id)}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
+            <div class="news-body"><div class="news-card-meta"><span>${position} / NEWS</span><time datetime="${escapeHtml(item.publishedAt)}">${escapeHtml(formatNewsDate(item.publishedAt))}</time></div><h3 class="news-title">${escapeHtml(title)}</h3><p class="news-slide-summary">${escapeHtml(summary)}</p><div class="news-footer"><span>${escapeHtml(category)}</span><a class="news-read-link" href="${escapeHtml(newsHref(item, currentLang))}">${escapeHtml(storyLabel)} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>
          </article>`;
 }
 
 function renderNewsViews() {
+   document.querySelectorAll("[data-news-index]").forEach((link) => { link.href = newsIndexHref(currentLang); });
    renderHeroNews();
 
    const visibleNews = getVisibleNews();
@@ -452,16 +486,24 @@ function renderNewsViews() {
 }
 
 newsRotator?.addEventListener("click", (event) => {
+   const arrow = event.target instanceof Element ? event.target.closest("[data-news-step]") : null;
+   if (arrow && newsRotator.contains(arrow)) {
+      showNewsSlide(newsSlideIndex + Number(arrow.dataset.newsStep));
+      return;
+   }
    const dot = event.target instanceof Element ? event.target.closest("[data-news-rotate-target]") : null;
    if (!dot || !newsRotator.contains(dot)) return;
    showNewsSlide(Number(dot.dataset.newsRotateTarget));
 });
 newsRotator?.addEventListener("mouseenter", stopNewsRotation);
+installNewsExtras(newsRotator);
+newsRotator?.addEventListener("toggle", scheduleNewsRotation, true);
 newsRotator?.addEventListener("mouseleave", scheduleNewsRotation);
-newsRotator?.addEventListener("focusin", stopNewsRotation);
-newsRotator?.addEventListener("focusout", (event) => {
-   if (!newsRotator.contains(event.relatedTarget)) scheduleNewsRotation();
+newsRotator?.addEventListener("focusin", (event) => {
+   if (event.target.matches(":focus-visible")) setRotationEnabled(false);
 });
+document.addEventListener("visibilitychange", scheduleNewsRotation);
+newsReducedMotion?.addEventListener("change", () => { if (newsReducedMotion.matches) setRotationEnabled(false); });
 
 newsFilterBtns.forEach((button) => button.addEventListener("click", () => {
    activeNewsFilter = button.dataset.filter || "all";
@@ -905,9 +947,11 @@ function openMenu() {
    backdrop.classList.add("show");
    burger.setAttribute("aria-expanded", "true");
    mobileMenu.setAttribute("aria-hidden", "false");
+   closeBtn.focus();
    document.body.classList.add("menu-open");
 }
 function closeMenu() {
+   if (mobileMenu.contains(document.activeElement)) burger.focus({ preventScroll: true });
    mobileMenu.classList.remove("show");
    backdrop.classList.remove("show");
    burger.setAttribute("aria-expanded", "false");
@@ -917,8 +961,23 @@ function closeMenu() {
       button.setAttribute("aria-expanded", "false");
       button.classList.remove("is-open");
    });
-   document.querySelectorAll(".mobile-sub").forEach((submenu) => submenu.classList.remove("open"));
+   document.querySelectorAll(".mobile-sub").forEach((submenu) => {
+      submenu.classList.remove("open");
+      submenu.setAttribute("aria-hidden", "true");
+   });
 }
+mobileMenu.addEventListener("keydown", (event) => {
+   if (event.key !== "Tab") return;
+   const controls = [...mobileMenu.querySelectorAll("a[href], button:not(:disabled)")].filter((el) => el.checkVisibility({ visibilityProperty: true }));
+   const first = controls[0], last = controls.at(-1);
+   if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+   } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+   }
+});
 burger.addEventListener("click", () => (burger.getAttribute("aria-expanded") === "true" ? closeMenu() : openMenu()));
 backdrop.addEventListener("click", closeMenu);
 closeBtn.addEventListener("click", closeMenu);
@@ -1001,114 +1060,6 @@ document.getElementById("signupForm").addEventListener("submit", (e) => {
    showToast(T[currentLang].toast_sent);
    closeModal();
    location.href = `mailto:info@mirokit.org?subject=${subject}&body=${body}`;
-});
-
-// --- #news: Modal mit Vor/Zurück-Navigation zwischen den Karten ---
-const newsModal = document.getElementById("newsModal");
-const newsModalCard = newsModal.querySelector(".news-modal-card");
-const newsModalImg = newsModal.querySelector(".news-modal-image img");
-const newsModalCategory = newsModal.querySelector(".news-modal-category");
-const newsModalDate = newsModal.querySelector(".news-modal-date");
-const newsModalTitle = document.getElementById("newsModalTitle");
-const newsModalBody = newsModal.querySelector(".news-modal-body-text");
-const newsModalCounter = newsModal.querySelector(".news-modal-counter");
-let newsIndex = 0;
-let newsOpenedFrom = null;
-
-function renderNewsModal(index) {
-   const visible = getVisibleNews();
-   if (!visible.length) return;
-   newsIndex = (index + visible.length) % visible.length;
-   const item = visible[newsIndex];
-   newsModalImg.src = item.image;
-   newsModalImg.alt = newsText(item, "alt");
-   newsModalCategory.textContent = newsText(item, "categoryLabel");
-   newsModalCategory.className = `category news-modal-category ${newsCategoryClasses[item.accent] || newsCategoryClasses.blue}`;
-   newsModalDate.innerHTML = `<i class="fa-regular fa-calendar" aria-hidden="true"></i> ${escapeHtml(formatNewsDate(item.publishedAt))}`;
-   newsModalTitle.textContent = newsText(item, "title");
-   newsModalBody.replaceChildren(...(newsText(item, "content") || []).map((paragraph) => {
-      const node = document.createElement("p");
-      node.textContent = paragraph;
-      return node;
-   }));
-   newsModalCounter.textContent = `${newsIndex + 1} / ${visible.length}`;
-}
-
-function openNewsModal(startIndex) {
-   newsOpenedFrom = document.activeElement;
-   renderNewsModal(startIndex);
-   newsModal.classList.add("show");
-   newsModal.setAttribute("aria-hidden", "false");
-   document.body.classList.add("menu-open");
-   newsModal.querySelector(".news-modal-close").focus();
-}
-
-function closeNewsModal() {
-   newsModal.classList.remove("show");
-   newsModal.setAttribute("aria-hidden", "true");
-   document.body.classList.remove("menu-open");
-   newsOpenedFrom?.focus();
-}
-
-function openNewsById(newsId) {
-   let visible = getVisibleNews();
-   let itemIndex = visible.findIndex((item) => item.id === newsId);
-   if (itemIndex < 0) {
-      activeNewsFilter = "all";
-      newsFilterBtns.forEach((button) => {
-         const isActive = button.dataset.filter === "all";
-         button.classList.toggle("is-active", isActive);
-         button.setAttribute("aria-pressed", String(isActive));
-      });
-      renderNewsViews();
-      visible = getVisibleNews();
-      itemIndex = visible.findIndex((item) => item.id === newsId);
-   }
-   if (itemIndex >= 0) openNewsModal(itemIndex);
-}
-
-document.addEventListener("click", (event) => {
-   const trigger = event.target instanceof Element ? event.target.closest("[data-news-open]") : null;
-   if (!trigger) return;
-   event.preventDefault();
-   openNewsById(trigger.dataset.newsOpen);
-});
-document.addEventListener("mirokit:languagechange", () => {
-   if (newsModal.classList.contains("show")) renderNewsModal(newsIndex);
-});
-newsModal.querySelector(".news-modal-close").addEventListener("click", closeNewsModal);
-newsModal.querySelector(".news-modal-prev").addEventListener("click", () => renderNewsModal(newsIndex - 1));
-newsModal.querySelector(".news-modal-next").addEventListener("click", () => renderNewsModal(newsIndex + 1));
-newsModal.addEventListener("click", (e) => {
-   if (e.target === newsModal) closeNewsModal();
-});
-document.addEventListener("keydown", (e) => {
-   if (!newsModal.classList.contains("show")) return;
-   if (e.key === "Escape") {
-      closeNewsModal();
-      return;
-   }
-   if (e.key === "ArrowRight") {
-      renderNewsModal(newsIndex + 1);
-      return;
-   }
-   if (e.key === "ArrowLeft") {
-      renderNewsModal(newsIndex - 1);
-      return;
-   }
-   if (e.key === "Tab") {
-      const focusables = newsModalCard.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      if (!focusables.length) return;
-      const first = focusables[0],
-         last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-         e.preventDefault();
-         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-         e.preventDefault();
-         first.focus();
-      }
-   }
 });
 
 scroller.addEventListener("scroll", () => {

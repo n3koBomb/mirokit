@@ -2427,7 +2427,6 @@ Object.assign(T.ru, {
    "op_library_close": "Закрыть изображение",
    "op_library_previous": "Предыдущее изображение",
    "op_library_next": "Следующее изображение",
-   "op_library_original": "Открыть оригинал",
    "op_library_image_error": "Не удалось загрузить изображение."
 });
 Object.assign(T.en, {
@@ -2455,7 +2454,6 @@ Object.assign(T.en, {
    "op_library_close": "Close image",
    "op_library_previous": "Previous image",
    "op_library_next": "Next image",
-   "op_library_original": "Open original",
    "op_library_image_error": "This image could not be loaded."
 });
 Object.assign(T.de, {
@@ -2483,7 +2481,6 @@ Object.assign(T.de, {
    "op_library_close": "Bild schließen",
    "op_library_previous": "Vorheriges Bild",
    "op_library_next": "Nächstes Bild",
-   "op_library_original": "Original öffnen",
    "op_library_image_error": "Dieses Bild konnte nicht geladen werden."
 });
 
@@ -2497,7 +2494,7 @@ Object.assign(T.en, {
    "ga_discover": "Choose a folder, then enter the story",
    "ga_library_intro": "Open a folder to browse its images without extra labels.",
    "ga_folder_label": "PHOTO FOLDER",
-   "ga_back": "← Back to folders",
+   "ga_back": '<i class="fas fa-arrow-left"></i> Back to folders',
    "ga_folder": "Folder",
    "ga_projects": "Explore creative works ↗",
    "ga_photos": "Photos",
@@ -2511,6 +2508,10 @@ Object.assign(T.en, {
    "ga_more": "Show more",
    "ga_contribute": "Every perspective adds to our story.",
    "ga_media_error": "This media could not be loaded. Please try opening the original.",
+   "ga_share_link": "Link to this media",
+   "ga_link_copied": "Link copied.",
+   "ga_copy_manual": "Select and copy the link manually.",
+   "ga_link_missing": "The linked media is no longer available. Browse the collection below.",
    "ga_archive": "From our archive",
    "ga_archive_sub": "Тестовая папка",
    "ga_load_error": "The collection could not be loaded. Please try again.",
@@ -2527,7 +2528,7 @@ Object.assign(T.de, {
    "ga_discover": "Wähle einen Ordner und öffne seine Geschichte",
    "ga_library_intro": "Öffne einen Ordner, um seine Bilder ohne zusätzliche Beschriftungen zu sehen.",
    "ga_folder_label": "FOTOORDNER",
-   "ga_back": "← Zurück zu den Ordnern",
+   "ga_back": '<i class="fas fa-arrow-left"></i> Zurück zu den Ordnern',
    "ga_folder": "Ordner",
    "ga_projects": "Kreative Arbeiten entdecken ↗",
    "ga_photos": "Fotos",
@@ -2541,6 +2542,10 @@ Object.assign(T.de, {
    "ga_more": "Mehr anzeigen",
    "ga_contribute": "Jede Perspektive bereichert unsere Geschichte.",
    "ga_media_error": "Dieses Medium konnte nicht geladen werden. Bitte öffne das Original.",
+   "ga_share_link": "Link zu diesem Medium",
+   "ga_link_copied": "Link kopiert.",
+   "ga_copy_manual": "Bitte den markierten Link manuell kopieren.",
+   "ga_link_missing": "Das verlinkte Medium ist nicht mehr verfügbar. Entdecke unten die Sammlung.",
    "ga_archive": "Aus unserem Archiv",
    "ga_archive_sub": "Тестовая папка",
    "ga_load_error": "Die Sammlung konnte nicht geladen werden. Bitte versuche es erneut.",
@@ -2557,7 +2562,7 @@ Object.assign(T.ru, {
    "ga_discover": "Выберите папку и откройте её историю",
    "ga_library_intro": "Откройте папку, чтобы увидеть фотографии без лишних подписей.",
    "ga_folder_label": "ФОТОПАПКА",
-   "ga_back": "← Назад к папкам",
+   "ga_back": '<i class="fas fa-arrow-left"></i> Назад к папкам',
    "ga_folder": "",
    "ga_projects": "Творческие работы ↗",
    "ga_photos": "Фото",
@@ -2571,6 +2576,10 @@ Object.assign(T.ru, {
    "ga_more": "Показать ещё",
    "ga_contribute": "Каждый взгляд дополняет нашу историю.",
    "ga_media_error": "Не удалось загрузить медиа. Попробуйте открыть оригинал.",
+   "ga_share_link": "Ссылка на этот материал",
+   "ga_link_copied": "Ссылка скопирована.",
+   "ga_copy_manual": "Скопируйте выделенную ссылку вручную.",
+   "ga_link_missing": "Материал по ссылке больше недоступен. Посмотрите коллекцию ниже.",
    "ga_archive": "Из нашего архива",
    "ga_archive_sub": "Тестовая папка",
    "ga_load_error": "Не удалось загрузить коллекцию. Попробуйте ещё раз.",
@@ -2587,6 +2596,8 @@ Object.assign(T.ru, {
  * recognised; every other locale falls back to English.
  */
 function detectInitialLanguage(hostname = window.location.hostname, browserLanguage = window.navigator.language) {
+   const newsLanguage = /^\/(?:news(?:\/|$)|(?:site\/)?page\/news(?:\/|$))/.test(window.location.pathname) ? new URLSearchParams(window.location.search).get("lang") : null;
+   if (["de", "en", "ru"].includes(newsLanguage)) return newsLanguage;
    const host = String(hostname || "")
       .toLowerCase()
       .replace(/\.$/, "");
@@ -3010,6 +3021,35 @@ Object.assign(T.de, {
    pp_tabs_aria: "Datenschutzerklärungen",
    pp_russia: "Russland · RU",
    pp_eu: "EU · EN",
+});
+
+// Homepage deck copy stays separate from the full news and partner sections.
+Object.assign(T.de, {
+   home_news_kicker: "Aktuelles",
+   home_news_title: "Neues aus MIRoKIT",
+   home_all_news: "Alle Nachrichten",
+   home_news_read: "Zum Beitrag",
+   home_news_remaining: "Noch {seconds} s",
+   home_partners_title: "Gemeinsam für MIRoKIT",
+   home_partners_subtitle: "Unsere Partner und Unterstützer",
+});
+Object.assign(T.en, {
+   home_news_kicker: "Latest",
+   home_news_title: "News from MIRoKIT",
+   home_all_news: "All news",
+   home_news_read: "Read the story",
+   home_news_remaining: "{seconds} s left",
+   home_partners_title: "Together for MIRoKIT",
+   home_partners_subtitle: "Our partners and supporters",
+});
+Object.assign(T.ru, {
+   home_news_kicker: "Актуальное",
+   home_news_title: "Новости МИРоКИТ",
+   home_all_news: "Все новости",
+   home_news_read: "Читать новость",
+   home_news_remaining: "Ещё {seconds} с",
+   home_partners_title: "Вместе для МИРоКИТ",
+   home_partners_subtitle: "Наши партнёры и друзья",
 });
 
 function setLang(lang) {
